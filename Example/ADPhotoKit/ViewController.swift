@@ -7,12 +7,16 @@
 //
 
 import UIKit
+import ADPhotoKit
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        ADPhotoKitConfiguration.default.locale = Locale(identifier: "zh-Hans")
+        ADPhotoManager.allPhotoAlbumList(ascending: true, allowSelectImage: true, allowSelectVideo: true) { (list) in
+            print(list)
+        }
     }
 
     override func didReceiveMemoryWarning() {

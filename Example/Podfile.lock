@@ -1,0 +1,31 @@
+PODS:
+  - ADPhotoKit (0.1.0):
+    - ADPhotoKit/UI (= 0.1.0)
+  - ADPhotoKit/Core (0.1.0)
+  - ADPhotoKit/UI (0.1.0):
+    - ADPhotoKit/Core
+    - Kingfisher
+    - SnapKit
+  - Kingfisher (6.2.1)
+  - SnapKit (5.0.1)
+
+DEPENDENCIES:
+  - ADPhotoKit (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - Kingfisher
+    - SnapKit
+
+EXTERNAL SOURCES:
+  ADPhotoKit:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  ADPhotoKit: f2f63dc8ea21b7dfc2d6943787c7cd9839adf0b2
+  Kingfisher: e71c6fac2aebb1262888cabc2cb13d313362a48f
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+
+PODFILE CHECKSUM: afaa29da6e0a7b53cb05d70cca48075aaf6c9532
+
+COCOAPODS: 1.9.1

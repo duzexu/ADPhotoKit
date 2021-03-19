@@ -22,21 +22,34 @@ TODO: Add long description of the pod here.
                        DESC
 
   s.homepage         = 'https://github.com/zexu007@qq.com/ADPhotoKit'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zexu007@qq.com' => 'zexu007@qq.com' }
   s.source           = { :git => 'https://github.com/zexu007@qq.com/ADPhotoKit.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.0'
-
-  s.source_files = 'ADPhotoKit/Classes/**/*'
+  s.ios.deployment_target = '10.0'
+  s.requires_arc          = true
+  s.frameworks            = 'UIKit','Photos','PhotosUI','AVFoundation'
+  s.default_subspec = 'UI'
   
-  # s.resource_bundles = {
-  #   'ADPhotoKit' => ['ADPhotoKit/Assets/*.png']
-  # }
+  s.subspec "Core" do |c|
+    c.source_files  = ["ADPhotoKit/Classes/Core/**/*.swift"]
+    c.resource_bundles = {
+      'ADPhotoKitCore' => ['ADPhotoKit/Assets/Core/**/*']
+    }
+  end
+  
+  s.subspec "UI" do |ui|
+    ui.dependency 'ADPhotoKit/Core'
+    ui.dependency 'SnapKit'
+    ui.dependency 'Kingfisher'
+    ui.source_files  = ["ADPhotoKit/Classes/UI/**/*.swift"]
+    ui.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_UI'}
+    ui.resource_bundles = {
+      'ADPhotoKitUI' => ['ADPhotoKit/Assets/UI/**/*']
+    }
+  end
 
+  # s.source_files = 'ADPhotoKit/Classes/**/*'
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
