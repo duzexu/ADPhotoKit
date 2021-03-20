@@ -55,7 +55,7 @@ public enum ADAlbumType: CaseIterable {
     }
 }
 
-public class ADAlbumListModel {
+public class ADAlbumModel {
     
     public let title: String
     
@@ -74,14 +74,12 @@ public class ADAlbumListModel {
     /// 是否是最近项目
     public let isCameraRoll: Bool
     
-    public var headImageAsset: PHAsset? {
+    public var lastestAsset: PHAsset? {
         return result.lastObject
     }
-    
-    public var models: [ADPhotoModel] = []
-    
+        
     public init(result: PHFetchResult<PHAsset>, collection: PHAssetCollection, option: PHFetchOptions) {
-        let info = ADAlbumListModel.collectionInfo(collection)
+        let info = ADAlbumModel.collectionInfo(collection)
         self.title = info.0
         self.type = info.1
         self.isCameraRoll = info.1 == .cameraRoll
@@ -151,13 +149,13 @@ public class ADAlbumListModel {
     }
 }
 
-extension ADAlbumListModel: CustomStringConvertible {
+extension ADAlbumModel: CustomStringConvertible {
     public var description: String {
         return "title-\(title) count-\(count)"
     }
 }
 
-public class ADPhotoModel: Equatable {
+public class ADAssetModel: Equatable {
     
     public enum MediaType: Equatable {
         case unknown
@@ -256,7 +254,7 @@ public class ADPhotoModel: Equatable {
         }
     }
     
-    public static func == (lhs: ADPhotoModel, rhs: ADPhotoModel) -> Bool {
+    public static func == (lhs: ADAssetModel, rhs: ADAssetModel) -> Bool {
         return lhs.identifier == rhs.identifier
     }
     

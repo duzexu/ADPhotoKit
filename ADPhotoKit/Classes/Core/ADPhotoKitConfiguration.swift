@@ -23,6 +23,15 @@ public class ADPhotoKitConfiguration {
     
     /// 自定义相簿顺序 默认 ADAlbumType.allCases 顺序
     public var customAlbumOrders: [ADAlbumType]?
-
+    
+    #if Module_UI
+    
+    /// When slide select is active, will auto scroll to top or bottom when your finger at the top or bottom. Defaults to true.
+    public var autoScrollWhenSlideSelectIsActive = true
+    
+    /// The max speed (pt/s) of auto scroll. Defaults to 600.
+    public var autoScrollMaxSpeed: CGFloat = 600
+    
+    #endif
 
 }

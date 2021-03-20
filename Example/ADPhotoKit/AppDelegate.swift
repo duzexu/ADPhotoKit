@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  ADPhotoKit
 //
-//  Created by zexu007@qq.com on 03/14/2021.
+//  Created by zexu0cellForItemAtIndexPath07@qq.com on 03/14/2021.
 //  Copyright (c) 2021 zexu007@qq.com. All rights reserved.
 //
 

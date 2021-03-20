@@ -8,24 +8,55 @@
 import UIKit
 import Photos
 
-public struct ADPhotoSelectConfig {
-    let ascending: Bool = false
-    let allowImage: Bool = true
-    let allowVideo: Bool = true
+public struct ADAlbumSelectOptions: OptionSet {
+    public let rawValue: Int
     
-    public init() {
+    public static let ascending = ADAlbumSelectOptions(rawValue: 1 << 0)
+    public static let allowImage = ADAlbumSelectOptions(rawValue: 1 << 1)
+    public static let allowVideo = ADAlbumSelectOptions(rawValue: 1 << 2)
+    
+    public static let `default`: ADAlbumSelectOptions = [.ascending, .allowImage, .allowVideo]
+    
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
     }
+}
+
+public struct ADPhotoSelectOptions: OptionSet {
+    public let rawValue: Int
+    
+    /// Whether photos and videos can be selected together.
+    static let mixSelect = ADPhotoSelectOptions(rawValue: 1 << 0)
+    /// Allow select Gif, it only controls whether it is displayed in Gif form.
+    static let selectAsGif = ADPhotoSelectOptions(rawValue: 1 << 1)
+    /// Allow select LivePhoto, it only controls whether it is displayed in LivePhoto form.
+    static let selectAsLivePhoto = ADPhotoSelectOptions(rawValue: 1 << 2)
+    /// If true, you can slide select photos in album.
+    static let slideSelect = ADPhotoSelectOptions(rawValue: 1 << 3)
+    /// Allow select full image.
+    static let selectOriginal = ADPhotoSelectOptions(rawValue: 1 << 4)
+    /// Allow access to the preview large image interface.
+    static let previewPhotos = ADPhotoSelectOptions(rawValue: 1 << 5)
+        
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+    
+    static let `default`: ADPhotoSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos]
 }
 
 public class ADPhotoManager {
 
     /// 获取所有的相册列表
-    public class func allPhotoAlbumList(ascending: Bool, allowSelectImage: Bool, allowSelectVideo: Bool, completion: (([ADAlbumListModel]) -> Void)) {
+    public class func allPhotoAlbumList(options: ADAlbumSelectOptions = .default, completion: (([ADAlbumModel]) -> Void)) {
+        let allowImage = options.contains(.allowImage)
+        let allowVideo = options.contains(.allowVideo)
+        
         let option = PHFetchOptions()
-        if !allowSelectImage {
+        if !allowImage {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.video.rawValue)
         }
-        if !allowSelectVideo {
+        if !allowVideo {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.image.rawValue)
         }
         
@@ -36,7 +67,7 @@ public class ADPhotoManager {
         let sharedAlbums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumCloudShared, options: nil) as! PHFetchResult<PHCollection>
         let arr = [smartAlbums, albums, streamAlbums, syncedAlbums, sharedAlbums]
         
-        var albumList: [ADAlbumListModel] = []
+        var albumList: [ADAlbumModel] = []
         arr.forEach { (album) in
             album.enumerateObjects { (collection, _, _) in
                 guard let collection = collection as? PHAssetCollection else { return }
@@ -54,7 +85,7 @@ public class ADPhotoManager {
                     return
                 }
                 
-                let albumModel = ADAlbumListModel(result: result, collection: collection, option: option)
+                let albumModel = ADAlbumModel(result: result, collection: collection, option: option)
                 albumList.append(albumModel)
             }
         }
@@ -63,12 +94,15 @@ public class ADPhotoManager {
     }
     
     /// 获取最近项目相册
-    public class func cameraRollAlbum(allowSelectImage: Bool, allowSelectVideo: Bool, completion: @escaping ( (ADAlbumListModel) -> Void )) {
+    public class func cameraRollAlbum(options: ADAlbumSelectOptions = .default, completion: @escaping ( (ADAlbumModel) -> Void )) {
+        let allowImage = options.contains(.allowImage)
+        let allowVideo = options.contains(.allowVideo)
+        
         let option = PHFetchOptions()
-        if !allowSelectImage {
+        if !allowImage {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.video.rawValue)
         }
-        if !allowSelectVideo {
+        if !allowVideo {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.image.rawValue)
         }
         
@@ -76,7 +110,7 @@ public class ADPhotoManager {
         smartAlbums.enumerateObjects { (collection, _, stop) in
             if collection.assetCollectionSubtype == .smartAlbumUserLibrary {
                 let result = PHAsset.fetchAssets(in: collection, options: option)
-                let albumModel = ADAlbumListModel(result: result, collection: collection, option: option)
+                let albumModel = ADAlbumModel(result: result, collection: collection, option: option)
                 completion(albumModel)
                 stop.pointee = true
             }
@@ -84,18 +118,22 @@ public class ADPhotoManager {
     }
     
     /// 获取相册中的资源信息
-    public class func fetchPhoto(in result: PHFetchResult<PHAsset>, ascending: Bool, allowSelectImage: Bool, allowSelectVideo: Bool, limitCount: Int = .max) -> [ADPhotoModel] {
-        var models: [ADPhotoModel] = []
+    public class func fetchAssets(in result: PHFetchResult<PHAsset>, options: ADAlbumSelectOptions = .default, limitCount: Int = .max) -> [ADAssetModel] {
+        let ascending = options.contains(.ascending)
+        let allowImage = options.contains(.allowImage)
+        let allowVideo = options.contains(.allowVideo)
+        
+        var models: [ADAssetModel] = []
         let option: NSEnumerationOptions = ascending ? .init(rawValue: 0) : .reverse
         var count = 1
         
         result.enumerateObjects(options: option) { (asset, index, stop) in
-            let m = ADPhotoModel(asset: asset)
+            let m = ADAssetModel(asset: asset)
             
-            if m.type == .image, !allowSelectImage {
+            if m.type == .image, !allowImage {
                 return
             }
-            if m.type == .video(), !allowSelectVideo {
+            if m.type == .video(), !allowVideo {
                 return
             }
             if count == limitCount {
@@ -297,10 +335,10 @@ public class ADPhotoManager {
 /// Private
 extension ADPhotoManager {
     
-    class func albumListByOrder(_ input: [ADAlbumListModel]) -> [ADAlbumListModel] {
+    class func albumListByOrder(_ input: [ADAlbumModel]) -> [ADAlbumModel] {
         let custom = input.filter { $0.type == .custom }
-        let old = input.filter { $0.type != .custom }.reduce(into: [ADAlbumType: ADAlbumListModel]()) { $0[$1.type] = $1 }
-        var new: [ADAlbumListModel] = []
+        let old = input.filter { $0.type != .custom }.reduce(into: [ADAlbumType: ADAlbumModel]()) { $0[$1.type] = $1 }
+        var new: [ADAlbumModel] = []
         let orders = ADPhotoKitConfiguration.default.customAlbumOrders ?? ADAlbumType.allCases
         for item in orders {
             if item == .custom {

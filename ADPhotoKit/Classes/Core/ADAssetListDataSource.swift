@@ -1,21 +1,25 @@
 //
-//  ADAlbumListDataSource.swift
+//  ADAssetListDataSource.swift
 //  ADPhotoKit
 //
-//  Created by xu on 2021/3/19.
+//  Created by MAC on 2021/3/20.
 //
 
 import Foundation
 import Photos
 
-public class ADAlbumListDataSource: NSObject {
+public class ADAssetListDataSource: NSObject {
     
     public weak var reloadable: ADDataSourceReloadable?
     public let options: ADAlbumSelectOptions
-    public var list: [ADAlbumModel] = []
+    public let album: ADAlbumModel
+    public var list: [ADAssetModel] = []
     
-    public init(reloadable: ADDataSourceReloadable, options: ADAlbumSelectOptions = .default) {
+    public init(reloadable: ADDataSourceReloadable,
+                album: ADAlbumModel,
+                options: ADAlbumSelectOptions = .default) {
         self.reloadable = reloadable
+        self.album = album
         self.options = options
         super.init()
         if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
@@ -30,19 +34,18 @@ public class ADAlbumListDataSource: NSObject {
     public func reloadData() {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }
-            ADPhotoManager.allPhotoAlbumList(options: strong.options) { [weak self] (list) in
-                self?.list.removeAll()
-                self?.list.append(contentsOf: list)
-                DispatchQueue.main.async {
-                    self?.reloadable?.reloadData()
-                }
+            let models = ADPhotoManager.fetchAssets(in: strong.album.result, options: strong.options)
+            strong.list.removeAll()
+            strong.list.append(contentsOf: models)
+            DispatchQueue.main.async {
+                self?.reloadable?.reloadData()
             }
         }
     }
     
 }
 
-extension ADAlbumListDataSource: PHPhotoLibraryChangeObserver {
+extension ADAssetListDataSource: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
         reloadData()

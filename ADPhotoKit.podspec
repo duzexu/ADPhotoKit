@@ -27,6 +27,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/zexu007@qq.com/ADPhotoKit.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '10.0'
+  s.swift_version = '5.1'
   s.requires_arc          = true
   s.frameworks            = 'UIKit','Photos','PhotosUI','AVFoundation'
   s.default_subspec = 'UI'
