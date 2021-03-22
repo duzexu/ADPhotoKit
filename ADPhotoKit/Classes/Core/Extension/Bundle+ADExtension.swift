@@ -32,7 +32,7 @@ extension Bundle {
     private static var locale_bundle: Bundle? = nil
     
     private static var module: Bundle? = {
-        let bundleName = "ADPhotoKit"
+        let bundleName = "ADPhotoKitCore"
 
         var candidates = [
             // Bundle should be present here when the package is linked into an App.
