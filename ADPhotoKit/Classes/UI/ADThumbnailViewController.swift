@@ -7,16 +7,27 @@
 
 import UIKit
 
+struct ADThumbnailParams {
+    var minImageCount: Int?
+    var maxImageCount: Int?
+    
+    var minVideoCount: Int?
+    var maxVideoCount: Int?
+    
+    var minVideoTime: Int?
+    var maxVideoTime: Int?
+}
+
 class ADThumbnailViewController: UIViewController {
     
-    let options: ADAlbumSelectOptions
+    let model: ADPhotoKitInternal
     let albumList: ADAlbumModel
     
     var collectionView: UICollectionView!
     var dataSource: ADAssetListDataSource!
     
-    init(options: ADAlbumSelectOptions, albumList: ADAlbumModel) {
-        self.options = options
+    init(model: ADPhotoKitInternal, albumList: ADAlbumModel) {
+        self.model = model
         self.albumList = albumList
         super.init(nibName: nil, bundle: nil)
     }
@@ -25,9 +36,18 @@ class ADThumbnailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private var panGesture: UIPanGestureRecognizer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        if model.assetOpts.contains(.slideSelect) {
+            if (model.params.maxImageCount ?? Int.max) > 1 {
+                panGesture = UIPanGestureRecognizer(target: self, action: #selector(slideSelectAction(_:)))
+                view.addGestureRecognizer(panGesture!)
+            }
+        }
         
         dataSource.reloadData()
     }
@@ -39,8 +59,10 @@ extension ADThumbnailViewController {
     func setupUI() {
         automaticallyAdjustsScrollViewInsets = true
         edgesForExtendedLayout = .all
+        view.backgroundColor = UIColor(hex: 0x323232)
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         if #available(iOS 11.0, *) {
@@ -53,7 +75,7 @@ extension ADThumbnailViewController {
         
         collectionView.regisiter(cell: ADThumbnailListCell.self)
         
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, options: options)
+        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, options: model.albumOpts)
     }
     
 }
@@ -61,16 +83,20 @@ extension ADThumbnailViewController {
 extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
+        return 2
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let columnCount: CGFloat = 4
-        let totalW = collectionView.bounds.width - (columnCount - 1) * 8
+        let totalW = collectionView.bounds.width - (columnCount - 1) * 2
         let singleW = totalW / columnCount
         return CGSize(width: singleW, height: singleW)
     }
@@ -91,4 +117,14 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
     }
+}
+
+/// 滑动手势
+extension ADThumbnailViewController {
+    
+    @objc
+    func slideSelectAction(_ pan: UIPanGestureRecognizer) {
+        
+    }
+    
 }

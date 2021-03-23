@@ -31,6 +31,7 @@ class ADAlbumListCell: UITableViewCell {
     }
     
     func setupUI() {
+        backgroundColor = .clear
         selectionStyle = .none
         
         albumImageView = UIImageView()

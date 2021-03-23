@@ -94,7 +94,6 @@ class ADThumbnailListCell: UICollectionViewCell {
         descLabel.textColor = .white
         bottomMaskView.addSubview(descLabel)
         descLabel.snp.makeConstraints { (make) in
-            make.left.equalToSuperview().offset(30)
             make.top.equalToSuperview().offset(1)
             make.right.equalToSuperview().offset(-5)
         }

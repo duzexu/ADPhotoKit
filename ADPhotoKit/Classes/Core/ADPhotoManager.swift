@@ -22,27 +22,27 @@ public struct ADAlbumSelectOptions: OptionSet {
     }
 }
 
-public struct ADPhotoSelectOptions: OptionSet {
+public struct ADAssetSelectOptions: OptionSet {
     public let rawValue: Int
     
     /// Whether photos and videos can be selected together.
-    static let mixSelect = ADPhotoSelectOptions(rawValue: 1 << 0)
+    static let mixSelect = ADAssetSelectOptions(rawValue: 1 << 0)
     /// Allow select Gif, it only controls whether it is displayed in Gif form.
-    static let selectAsGif = ADPhotoSelectOptions(rawValue: 1 << 1)
+    static let selectAsGif = ADAssetSelectOptions(rawValue: 1 << 1)
     /// Allow select LivePhoto, it only controls whether it is displayed in LivePhoto form.
-    static let selectAsLivePhoto = ADPhotoSelectOptions(rawValue: 1 << 2)
+    static let selectAsLivePhoto = ADAssetSelectOptions(rawValue: 1 << 2)
     /// If true, you can slide select photos in album.
-    static let slideSelect = ADPhotoSelectOptions(rawValue: 1 << 3)
+    static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
     /// Allow select full image.
-    static let selectOriginal = ADPhotoSelectOptions(rawValue: 1 << 4)
+    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 4)
     /// Allow access to the preview large image interface.
-    static let previewPhotos = ADPhotoSelectOptions(rawValue: 1 << 5)
+    static let previewPhotos = ADAssetSelectOptions(rawValue: 1 << 5)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    static let `default`: ADPhotoSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos]
 }
 
 public class ADPhotoManager {

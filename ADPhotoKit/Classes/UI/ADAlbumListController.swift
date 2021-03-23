@@ -10,13 +10,13 @@ import SnapKit
 
 class ADAlbumListController: UIViewController {
     
-    let options: ADAlbumSelectOptions
+    let model: ADPhotoKitInternal
     
     var tableView: UITableView!
     var dataSource: ADAlbumListDataSource!
     
-    init(options: ADAlbumSelectOptions) {
-        self.options = options
+    init(model: ADPhotoKitInternal) {
+        self.model = model
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -41,8 +41,12 @@ class ADAlbumListController: UIViewController {
 extension ADAlbumListController {
     
     func setupUI() {
+        view.backgroundColor = UIColor(hex: 0x2D2D2D)
+        
         tableView = UITableView(frame: .zero)
+        tableView.backgroundColor = .clear
         tableView.tableFooterView = UIView()
+        tableView.separatorColor = UIColor(hex: 0x3C3C3C)
         tableView.rowHeight = 65
         tableView.delegate = self
         tableView.dataSource = self
@@ -56,7 +60,7 @@ extension ADAlbumListController {
         
         tableView.regisiter(cell: ADAlbumListCell.self)
         
-        dataSource = ADAlbumListDataSource(reloadable: tableView, options: options)
+        dataSource = ADAlbumListDataSource(reloadable: tableView, options: model.albumOpts)
     }
     
 }
@@ -76,7 +80,7 @@ extension ADAlbumListController: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let thumbnail = ADThumbnailViewController(options: options, albumList: dataSource.list[indexPath.row])
+        let thumbnail = ADThumbnailViewController(model: model, albumList: dataSource.list[indexPath.row])
         navigationController?.pushViewController(thumbnail, animated: true)
     }
     
