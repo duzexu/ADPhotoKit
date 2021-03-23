@@ -18,7 +18,8 @@ class ADAlbumListCell: UITableViewCell {
     
     /// ui
     var albumImageView: UIImageView!
-    var albumLabel: UILabel!
+    var albumTitleLabel: UILabel!
+    var albumCountLabel: UILabel!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -43,16 +44,27 @@ class ADAlbumListCell: UITableViewCell {
             make.width.equalTo(albumImageView.snp.height)
         }
         
-        albumLabel = UILabel()
-        albumLabel.font = UIFont.systemFont(ofSize: 17)
-        albumLabel.textColor = .white
-        albumLabel.lineBreakMode = .byTruncatingTail
-        contentView.addSubview(albumLabel)
-        albumLabel.snp.makeConstraints { (make) in
+        albumTitleLabel = UILabel()
+        albumTitleLabel.font = UIFont.systemFont(ofSize: 17)
+        albumTitleLabel.textColor = .white
+        albumTitleLabel.lineBreakMode = .byTruncatingTail
+        contentView.addSubview(albumTitleLabel)
+        albumTitleLabel.snp.makeConstraints { (make) in
             make.left.equalTo(albumImageView.snp.right).offset(10)
             make.centerY.equalToSuperview()
-            make.right.equalToSuperview().offset(-40)
         }
+        
+        albumCountLabel = UILabel()
+        albumCountLabel.font = UIFont.systemFont(ofSize: 16)
+        albumCountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        albumCountLabel.textColor = UIColor(hex: 0xB4B4B4)
+        contentView.addSubview(albumCountLabel)
+        albumCountLabel.snp.makeConstraints { (make) in
+            make.left.equalTo(albumTitleLabel.snp.right).offset(10)
+            make.centerY.equalToSuperview()
+            make.right.lessThanOrEqualToSuperview().offset(-40)
+        }
+        
     }
     
 }
@@ -62,7 +74,9 @@ extension ADAlbumListCell: ADAlbumListConfigurable {
     func configure(with model: ADAlbumModel) {
         albumModel = model
         identifier = model.lastestAsset?.localIdentifier
-        albumLabel.text = model.title + "  (\(model.count))"
+        albumTitleLabel.text = model.title
+        albumCountLabel.text = "(\(model.count))"
+        albumImageView.image = Bundle.uiBundle?.image(name: "defaultphoto")
         if let asset = model.lastestAsset {
             if let id = requestID {
                 PHImageManager.default().cancelImageRequest(id)
@@ -95,10 +109,21 @@ extension ADAlbumListCell {
     @objc
     public dynamic var titleColor: UIColor {
         set {
-            albumLabel.textColor = newValue
+            albumTitleLabel.textColor = newValue
         }
         get {
-            return albumLabel.textColor ?? .white
+            return albumTitleLabel.textColor
+        }
+    }
+    
+    /// 标题颜色
+    @objc
+    public dynamic var countColor: UIColor {
+        set {
+            albumCountLabel.textColor = newValue
+        }
+        get {
+            return albumCountLabel.textColor
         }
     }
 }

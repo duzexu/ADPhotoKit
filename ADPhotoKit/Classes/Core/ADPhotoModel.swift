@@ -189,8 +189,8 @@ public class ADAssetModel: Equatable {
     public let asset: PHAsset
     
     public var type: MediaType = .unknown
-        
-    public var isSelected: Bool = false
+            
+    public var selectStatus: ADThumbnailSelectStatus = .select(index: nil)
     
     public var whRatio: CGFloat {
         return CGFloat(self.asset.pixelWidth) / CGFloat(self.asset.pixelHeight)

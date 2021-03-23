@@ -51,7 +51,7 @@ extension ADThumbnailViewController {
             make.edges.equalToSuperview()
         }
         
-        collectionView.regisiter(cell: UICollectionViewCell.self)
+        collectionView.regisiter(cell: ADThumbnailListCell.self)
         
         dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, options: options)
     }
@@ -69,7 +69,10 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return .zero
+        let columnCount: CGFloat = 4
+        let totalW = collectionView.bounds.width - (columnCount - 1) * 8
+        let singleW = totalW / columnCount
+        return CGSize(width: singleW, height: singleW)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -77,7 +80,11 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UICollectionViewCell.reuseIdentifier, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
+        
+        let model = dataSource.list[indexPath.row]
+        cell.configure(with: model)
+        
         return cell
     }
     

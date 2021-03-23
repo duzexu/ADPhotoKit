@@ -9,7 +9,7 @@ import Foundation
 
 extension Bundle {
     
-    static var photoKitUIBundle: Bundle? {
+    static var uiBundle: Bundle? {
         return moduleUI
     }
     

@@ -27,9 +27,6 @@ class ADAlbumListController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
-        ADAlbumListCell.appearance().cornerRadius = 4
-        ADAlbumListCell.appearance().titleColor = .red
     }
     
     override func viewWillAppear(_ animated: Bool) {

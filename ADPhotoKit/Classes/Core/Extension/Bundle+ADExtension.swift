@@ -95,3 +95,13 @@ extension Bundle {
     }
     
 }
+
+extension Bundle {
+    
+    func image(name: String) -> UIImage? {
+        var path = self.bundlePath
+        path.append("/\(name)")
+        return UIImage(named: path)
+    }
+    
+}
