@@ -27,7 +27,7 @@ public class ADAlbumListDataSource: NSObject {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
-    public func reloadData() {
+    public func reloadData(completion: (() -> Void)? = nil) {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }
             ADPhotoManager.allPhotoAlbumList(options: strong.options) { [weak self] (list) in
@@ -35,6 +35,7 @@ public class ADAlbumListDataSource: NSObject {
                 self?.list.append(contentsOf: list)
                 DispatchQueue.main.async {
                     self?.reloadable?.reloadData()
+                    completion?()
                 }
             }
         }

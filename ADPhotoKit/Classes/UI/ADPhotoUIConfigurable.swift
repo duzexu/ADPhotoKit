@@ -64,3 +64,12 @@ public protocol ADProgressConfigurable {
     var progress: CGFloat { set get }
     
 }
+
+public typealias ADProgressHUDable = (UIView & ADProgressHUDConfigurable)
+public protocol ADProgressHUDConfigurable {
+        
+    func show(timeout: TimeInterval)
+    
+    func hide()
+    
+}

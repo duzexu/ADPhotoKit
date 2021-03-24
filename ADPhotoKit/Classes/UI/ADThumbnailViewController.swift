@@ -49,7 +49,19 @@ class ADThumbnailViewController: UIViewController {
             }
         }
         
-        dataSource.reloadData()
+        reloadAssets()
+    }
+    
+    func reloadAssets() {
+        if dataSource.list.isEmpty {
+            let hud = ADProgressHUD()
+            hud.show()
+            dataSource.reloadData() {
+                hud.hide()
+            }
+        }else{
+            dataSource.reloadData()
+        }
     }
 
 }
@@ -124,6 +136,23 @@ extension ADThumbnailViewController {
     
     @objc
     func slideSelectAction(_ pan: UIPanGestureRecognizer) {
+        let point = pan.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: point) else {
+            return
+        }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailListCell else {
+            return
+        }
+        if pan.state == .began {
+            
+        }else if pan.state == .changed {
+            
+        }else{
+            
+        }
+    }
+    
+    func slideRangeDidChange() {
         
     }
     

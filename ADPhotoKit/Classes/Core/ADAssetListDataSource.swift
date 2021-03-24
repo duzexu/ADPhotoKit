@@ -31,7 +31,7 @@ public class ADAssetListDataSource: NSObject {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
-    public func reloadData() {
+    public func reloadData(completion: (() -> Void)? = nil) {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }
             let models = ADPhotoManager.fetchAssets(in: strong.album.result, options: strong.options)
@@ -39,6 +39,7 @@ public class ADAssetListDataSource: NSObject {
             strong.list.append(contentsOf: models)
             DispatchQueue.main.async {
                 self?.reloadable?.reloadData()
+                completion?()
             }
         }
     }
