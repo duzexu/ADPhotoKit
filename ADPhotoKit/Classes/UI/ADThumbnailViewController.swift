@@ -86,6 +86,8 @@ extension ADThumbnailViewController {
         }
         
         collectionView.regisiter(cell: ADThumbnailListCell.self)
+        collectionView.regisiter(cell: ADCameraCell.self)
+        collectionView.regisiter(cell: ADAddPhotoCell.self)
         
         dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, options: model.albumOpts)
     }

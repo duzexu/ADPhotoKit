@@ -37,6 +37,11 @@ public struct ADAssetSelectOptions: OptionSet {
     static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 4)
     /// Allow access to the preview large image interface.
     static let previewPhotos = ADAssetSelectOptions(rawValue: 1 << 5)
+    /// Allow take photos in the album.
+    static let allowTakeAsset = ADAssetSelectOptions(rawValue: 1 << 6)
+    /// If user choose limited Photo mode, a button with '+' will be added. It will call PHPhotoLibrary.shared().presentLimitedLibraryPicker(from:) to add photo.
+    @available(iOS 14, *)
+    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 7)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
