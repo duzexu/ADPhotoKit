@@ -89,7 +89,7 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, options: model.albumOpts)
+        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, options: model.albumOpts)
     }
     
 }
@@ -136,26 +136,56 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
 /// 滑动手势
 extension ADThumbnailViewController {
     
+    static var beginIndexPath: IndexPath?
+    static var lastIndexPath: IndexPath?
+    static var slideShouldSelect: Bool?
+    static var selectIndexs: [Int]?
+    
     @objc
     func slideSelectAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: collectionView)
         guard let indexPath = collectionView.indexPathForItem(at: point) else {
             return
         }
-        guard let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailListCell else {
-            return
-        }
+        let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailListCell
         if pan.state == .began {
-            
+            if cell != nil {
+                slideRangeDidChange(indexPath: indexPath, cell: cell!)
+            }
         }else if pan.state == .changed {
-            
+            if cell != nil {
+                slideRangeDidChange(indexPath: indexPath, cell: cell!)
+            }
         }else{
             
         }
     }
     
-    func slideRangeDidChange() {
-        
+    func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailListCell) {
+        let index = indexPath.row
+        let model = dataSource.list[index]
+        //已经有第一个
+        if let select = ADThumbnailViewController.slideShouldSelect {
+            if !select { //取消选择
+                
+            }else{
+                
+            }
+        }else{
+            ADThumbnailViewController.selectIndexs = dataSource.selects.compactMap { $0.index }
+            ADThumbnailViewController.slideShouldSelect = !model.selectStatus.isSelect
+            ADThumbnailViewController.beginIndexPath = indexPath
+            ADThumbnailViewController.lastIndexPath = indexPath
+            if model.selectStatus.isSelect { //取消选择
+                if ADThumbnailViewController.selectIndexs!.contains(index) {
+                    dataSource.deselectAssetAt(index: index)
+                }
+            }else{
+                if !ADThumbnailViewController.selectIndexs!.contains(index) {
+                    dataSource.selectAssetAt(index: index)
+                }
+            }
+        }
     }
     
 }

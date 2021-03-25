@@ -31,6 +31,7 @@ public enum ADPhotoSelectParams: Hashable {
 }
 
 class ADPhotoKitInternal {
+    var assets: [PHAsset]
     let albumOpts: ADAlbumSelectOptions
     let assetOpts: ADAssetSelectOptions
     let params: ADThumbnailParams
@@ -38,12 +39,14 @@ class ADPhotoKitInternal {
     let canceled: ADPhotoKitUI.AssetCancelHandler?
     let error: ADPhotoKitUI.AssetRequestError?
         
-    init(albumOpts: ADAlbumSelectOptions,
+    init(assets: [PHAsset],
+         albumOpts: ADAlbumSelectOptions,
          assetOpts: ADAssetSelectOptions,
          params: Set<ADPhotoSelectParams>,
          selected: @escaping ADPhotoKitUI.AssetSelectHandler,
          canceled: ADPhotoKitUI.AssetCancelHandler? = nil,
          error: ADPhotoKitUI.AssetRequestError? = nil) {
+        self.assets = assets
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts
         self.selected = selected
@@ -83,7 +86,7 @@ public class ADPhotoKitUI {
                                     selected: @escaping AssetSelectHandler,
                                     canceled: AssetCancelHandler? = nil,
                                     error: AssetRequestError? = nil) {
-        let `internal` = ADPhotoKitInternal(albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
+        let `internal` = ADPhotoKitInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
         ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
             let album = ADAlbumListController(model: `internal`)
             let nav = ADPhotoNavController(rootViewController: album, model: `internal`)

@@ -259,3 +259,22 @@ public class ADAssetModel: Equatable {
     }
     
 }
+
+public class ADSelectAssetModel: Equatable {
+    
+    public let identifier: String
+    
+    public let asset: PHAsset
+    
+    public var index: Int?
+    
+    public init(asset: PHAsset) {
+        self.identifier = asset.localIdentifier
+        self.asset = asset
+    }
+    
+    public static func == (lhs: ADSelectAssetModel, rhs: ADSelectAssetModel) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
+}
