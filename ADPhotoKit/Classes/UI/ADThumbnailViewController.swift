@@ -157,7 +157,9 @@ extension ADThumbnailViewController {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
             }
         }else{
-            
+            ADThumbnailViewController.beginIndexPath = nil
+            ADThumbnailViewController.lastIndexPath = nil
+            ADThumbnailViewController.slideShouldSelect = nil
         }
     }
     
@@ -166,10 +168,49 @@ extension ADThumbnailViewController {
         let model = dataSource.list[index]
         //已经有第一个
         if let select = ADThumbnailViewController.slideShouldSelect {
-            if !select { //取消选择
-                
-            }else{
-                
+            let last = ADThumbnailViewController.lastIndexPath!.row
+            let begin = ADThumbnailViewController.beginIndexPath!.row
+            if last != index {
+                if begin < indexPath.row  { //向下选择
+                    if last < index {
+                        for i in last...index {
+                            if select { //判断是否能添加
+                                if !model.selectStatus.isSelect {
+                                    dataSource.selectAssetAt(index: i)
+                                }
+                            }else{
+                                if model.selectStatus.isSelect {
+                                    dataSource.deselectAssetAt(index: i)
+                                }
+                            }
+                        }
+                    }else{
+                        for i in index...last {
+                            if select { //判断是否能添加
+                                if model.selectStatus.isSelect {
+                                    dataSource.deselectAssetAt(index: i)
+                                }
+                            }else{ //之前选择的有
+                                if ADThumbnailViewController.selectIndexs!.contains(i) {
+                                    dataSource.selectAssetAt(index: i)
+                                }
+                            }
+                        }
+                    }
+                }else if begin > indexPath.row { //向上选择
+                    for i in (last...indexPath.row).reversed() {
+                        if select { //判断是否能添加
+                            if !model.selectStatus.isSelect {
+                                dataSource.selectAssetAt(index: i)
+                            }
+                        }else{
+                            if model.selectStatus.isSelect {
+                                dataSource.deselectAssetAt(index: i)
+                            }
+                        }
+                    }
+                }
+                ADThumbnailViewController.lastIndexPath = indexPath
             }
         }else{
             ADThumbnailViewController.selectIndexs = dataSource.selects.compactMap { $0.index }
@@ -177,13 +218,9 @@ extension ADThumbnailViewController {
             ADThumbnailViewController.beginIndexPath = indexPath
             ADThumbnailViewController.lastIndexPath = indexPath
             if model.selectStatus.isSelect { //取消选择
-                if ADThumbnailViewController.selectIndexs!.contains(index) {
-                    dataSource.deselectAssetAt(index: index)
-                }
+                dataSource.deselectAssetAt(index: index)
             }else{
-                if !ADThumbnailViewController.selectIndexs!.contains(index) {
-                    dataSource.selectAssetAt(index: index)
-                }
+                dataSource.selectAssetAt(index: index)
             }
         }
     }
