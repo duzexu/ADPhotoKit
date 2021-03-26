@@ -164,6 +164,10 @@ public class ADAssetModel: Equatable {
         case livePhoto
         case video(duration: Int = 0, format: String = "")
         
+        var isImage: Bool {
+            return value < 4
+        }
+        
         private var value: Int {
             switch self {
             case .unknown:

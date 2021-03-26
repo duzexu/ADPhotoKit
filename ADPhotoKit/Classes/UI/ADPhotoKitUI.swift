@@ -10,7 +10,7 @@ import Photos
 
 public enum ADPhotoSelectParams: Hashable {
     /// 图片选择数量 最小 最大
-    case imageCount(min: Int?, max: Int?)
+    case maxCount(max: Int?)
     /// 视频数量 最小 最大
     case videoCount(min: Int?, max:Int?)
     /// 视频时长 最小 最大
@@ -19,7 +19,7 @@ public enum ADPhotoSelectParams: Hashable {
     public func hash(into hasher: inout Hasher) {
         var value: Int = 0
         switch self {
-        case .imageCount:
+        case .maxCount:
             value = 0
         case .videoCount:
             value = 1
@@ -28,6 +28,35 @@ public enum ADPhotoSelectParams: Hashable {
         }
         hasher.combine(value)
     }
+}
+
+public class ADPhotoKitUI {
+    
+    public typealias Asset = (asset: PHAsset, image: UIImage)
+    public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
+    public typealias AssetRequestError = ((PHAsset,Error) -> Void)
+    public typealias AssetCancelHandler = (() -> Void)
+    
+    public class func imagePicker(present on: UIViewController,
+                                    assets:  [PHAsset] = [],
+                                    albumOpts: ADAlbumSelectOptions = .default,
+                                    assetOpts: ADAssetSelectOptions = .default,
+                                    params: Set<ADPhotoSelectParams> = [],
+                                    selected: @escaping AssetSelectHandler,
+                                    canceled: AssetCancelHandler? = nil,
+                                    error: AssetRequestError? = nil) {
+        let `internal` = ADPhotoKitInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
+        internalModel = `internal`
+        ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
+            let album = ADAlbumListController(model: `internal`)
+            let nav = ADPhotoNavController(rootViewController: album, model: `internal`)
+            let thumbnail = ADThumbnailViewController(model: `internal`, albumList: model)
+            nav.pushViewController(thumbnail, animated: false)
+            on.present(nav, animated: true, completion: nil)
+        }
+    }
+    
+    static var internalModel: ADPhotoKitInternal?
 }
 
 class ADPhotoKitInternal {
@@ -56,9 +85,8 @@ class ADPhotoKitInternal {
         var value = ADThumbnailParams()
         for item in params {
             switch item {
-            case let .imageCount(min, max):
-                value.minImageCount = min
-                value.maxImageCount = max
+            case let .maxCount(max):
+                value.maxCount = max
             case let .videoCount(min, max):
                 value.minVideoCount = min
                 value.maxVideoCount = max
@@ -71,29 +99,16 @@ class ADPhotoKitInternal {
     }
 }
 
-public class ADPhotoKitUI {
+extension ADPhotoKitInternal {
     
-    public typealias Asset = (asset: PHAsset, image: UIImage)
-    public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
-    public typealias AssetRequestError = ((PHAsset,Error) -> Void)
-    public typealias AssetCancelHandler = (() -> Void)
-    
-    public class func imagePicker(present on: UIViewController,
-                                    assets:  [PHAsset] = [],
-                                    albumOpts: ADAlbumSelectOptions = .default,
-                                    assetOpts: ADAssetSelectOptions = .default,
-                                    params: Set<ADPhotoSelectParams> = [],
-                                    selected: @escaping AssetSelectHandler,
-                                    canceled: AssetCancelHandler? = nil,
-                                    error: AssetRequestError? = nil) {
-        let `internal` = ADPhotoKitInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
-        ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-            let album = ADAlbumListController(model: `internal`)
-            let nav = ADPhotoNavController(rootViewController: album, model: `internal`)
-            let thumbnail = ADThumbnailViewController(model: `internal`, albumList: model)
-            nav.pushViewController(thumbnail, animated: false)
-            on.present(nav, animated: true, completion: nil)
+    var selectMediaImage: Bool {
+        if let asset = assets.randomElement() {
+            return ADAssetModel(asset: asset).type.isImage
         }
+        if albumOpts.contains(.allowImage) {
+            return true
+        }
+        return false
     }
     
 }

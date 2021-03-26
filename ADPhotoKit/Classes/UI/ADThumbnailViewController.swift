@@ -8,8 +8,7 @@
 import UIKit
 
 struct ADThumbnailParams {
-    var minImageCount: Int?
-    var maxImageCount: Int?
+    var maxCount: Int?
     
     var minVideoCount: Int?
     var maxVideoCount: Int?
@@ -36,14 +35,17 @@ class ADThumbnailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 滑动选择
     private var panGesture: UIPanGestureRecognizer?
+    private var selectionInfo: SlideSelectionInfo?
+    private var selectionRange: SlideSelectionRange?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         
         if model.assetOpts.contains(.slideSelect) {
-            if (model.params.maxImageCount ?? Int.max) > 1 {
+            if (model.params.maxCount ?? Int.max) > 1 {
                 panGesture = UIPanGestureRecognizer(target: self, action: #selector(slideSelectAction(_:)))
                 view.addGestureRecognizer(panGesture!)
             }
@@ -136,10 +138,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
 /// 滑动手势
 extension ADThumbnailViewController {
     
-    static var beginIndexPath: IndexPath?
-    static var lastIndexPath: IndexPath?
-    static var slideShouldSelect: Bool?
-    static var selectIndexs: [Int]?
+    typealias SlideSelectionInfo = (begin: Int, select: Bool, indexs: [Int])
+    typealias SlideSelectionRange = (s: Int, e: Int, len: Int, index: Int)
     
     @objc
     func slideSelectAction(_ pan: UIPanGestureRecognizer) {
@@ -157,9 +157,8 @@ extension ADThumbnailViewController {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
             }
         }else{
-            ADThumbnailViewController.beginIndexPath = nil
-            ADThumbnailViewController.lastIndexPath = nil
-            ADThumbnailViewController.slideShouldSelect = nil
+            selectionInfo = nil
+            selectionRange = nil
         }
     }
     
@@ -167,61 +166,63 @@ extension ADThumbnailViewController {
         let index = indexPath.row
         let model = dataSource.list[index]
         //已经有第一个
-        if let select = ADThumbnailViewController.slideShouldSelect {
-            let last = ADThumbnailViewController.lastIndexPath!.row
-            let begin = ADThumbnailViewController.beginIndexPath!.row
-            if last != index {
-                if begin < indexPath.row  { //向下选择
-                    if last < index {
-                        for i in last...index {
-                            if select { //判断是否能添加
-                                if !model.selectStatus.isSelect {
-                                    dataSource.selectAssetAt(index: i)
-                                }
-                            }else{
-                                if model.selectStatus.isSelect {
-                                    dataSource.deselectAssetAt(index: i)
-                                }
+        if let info = selectionInfo, let range = selectionRange {
+            if range.index != index {
+                let current: SlideSelectionRange = (min(index, info.begin),max(index, info.begin),max(index, info.begin)-min(index, info.begin),index)
+                var shrankRange: (Int,Int)?
+                var expandRange: (Int,Int)?
+                if range.s == current.s || range.e == current.e { //同方向
+                    let minIndex = range.s == current.s ? min(range.e, current.e) : min(range.s, current.s)
+                    let maxIndex = range.s == current.s ? max(range.e, current.e) : max(range.s, current.s)
+                    let shink = range.len > current.len
+                    if shink { //缩短
+                        shrankRange = (minIndex,maxIndex)
+                    }else{ //扩大
+                        expandRange = (minIndex,maxIndex)
+                    }
+                }else{
+                    shrankRange = (range.s,range.e)
+                    expandRange = (current.s,current.e)
+                }
+                if let range = shrankRange {
+                    for i in range.0...range.1 {
+                        let item = dataSource.list[i]
+                        if i != info.begin {
+                            if info.select && item.selectStatus.isSelect {
+                                dataSource.deselectAssetAt(index: i)
                             }
-                        }
-                    }else{
-                        for i in index...last {
-                            if select { //判断是否能添加
-                                if model.selectStatus.isSelect {
-                                    dataSource.deselectAssetAt(index: i)
-                                }
-                            }else{ //之前选择的有
-                                if ADThumbnailViewController.selectIndexs!.contains(i) {
-                                    dataSource.selectAssetAt(index: i)
-                                }
+                            if !info.select && info.indexs.contains(i) {
+                                dataSource.selectAssetAt(index: i)
                             }
                         }
                     }
-                }else if begin > indexPath.row { //向上选择
-                    for i in (last...indexPath.row).reversed() {
-                        if select { //判断是否能添加
-                            if !model.selectStatus.isSelect {
+                }
+                if let range = expandRange {
+                    for i in range.0...range.1 {
+                        let item = dataSource.list[i]
+                        if i != info.begin {
+                            if info.select && !item.selectStatus.isSelect {
                                 dataSource.selectAssetAt(index: i)
                             }
-                        }else{
-                            if model.selectStatus.isSelect {
+                            if !info.select && item.selectStatus.isSelect {
                                 dataSource.deselectAssetAt(index: i)
                             }
                         }
                     }
                 }
-                ADThumbnailViewController.lastIndexPath = indexPath
+                selectionRange = current
+                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
             }
         }else{
-            ADThumbnailViewController.selectIndexs = dataSource.selects.compactMap { $0.index }
-            ADThumbnailViewController.slideShouldSelect = !model.selectStatus.isSelect
-            ADThumbnailViewController.beginIndexPath = indexPath
-            ADThumbnailViewController.lastIndexPath = indexPath
+            let indexs = dataSource.selects.compactMap { $0.index }
+            selectionInfo = (index,!model.selectStatus.isSelect,indexs)
+            selectionRange = (index,index,0,index)
             if model.selectStatus.isSelect { //取消选择
                 dataSource.deselectAssetAt(index: index)
             }else{
                 dataSource.selectAssetAt(index: index)
             }
+            cell.configure(with: model)
         }
     }
     

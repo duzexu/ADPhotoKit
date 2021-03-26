@@ -63,7 +63,9 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
         
         indexLabel = UILabel()
+        indexLabel.backgroundColor = UIColor(hex: 0x50A938)
         indexLabel.layer.cornerRadius = 12
+        indexLabel.layer.masksToBounds = true
         indexLabel.textColor = .white
         indexLabel.font = UIFont.systemFont(ofSize: 14)
         indexLabel.adjustsFontSizeToFitWidth = true
@@ -75,6 +77,7 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
         
         bottomMaskView = UIImageView(frame: .zero)
+        bottomMaskView.image = Bundle.uiBundle?.image(name: "shadow")
         contentView.addSubview(bottomMaskView)
         bottomMaskView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
@@ -82,6 +85,7 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
         
         tagImageView = UIImageView(frame: .zero)
+        tagImageView.contentMode = .center
         bottomMaskView.addSubview(tagImageView)
         tagImageView.snp.makeConstraints { (make) in
             make.left.equalToSuperview().offset(5)
@@ -114,6 +118,9 @@ class ADThumbnailListCell: UICollectionViewCell {
         switch selectStatus {
         case let .select(index):
             if let idx = index {
+                selectBtn.isSelected = true
+                indexLabel.isHidden = false
+                indexLabel.text = "\(idx)"
                 bigRequestID = ADPhotoManager.fetch(for: assetModel.asset, type: .originImageData, progress: { [weak self] (progress, err, _, _) in
                     if self?.selectStatus.isSelect == true {
                         self?.progressView.isHidden = false
@@ -133,10 +140,11 @@ class ADThumbnailListCell: UICollectionViewCell {
                     self?.imageView.alpha = 1
                 })
             }else{
-                
+                indexLabel.isHidden = true
+                selectBtn.isSelected = false
             }
         case .deselect:
-            break
+            indexLabel.isHidden = true
         }
     }
 }
@@ -147,6 +155,27 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
         assetModel = model
         identifier = model.identifier
         selectStatus = model.selectStatus
+        selectBtn.isHidden = !(ADPhotoKitUI.internalModel?.displaySelectBtn(model: model) ?? true)
+        
+        switch model.type {
+        case .unknown:
+            bottomMaskView.isHidden = true
+        case .image:
+            bottomMaskView.isHidden = true
+        case .gif:
+            bottomMaskView.isHidden = !(ADPhotoKitUI.internalModel?.assetOpts.contains(.selectAsGif) ?? true)
+            tagImageView.image = nil
+            descLabel.text = "GIF"
+        case .livePhoto:
+            bottomMaskView.isHidden = !(ADPhotoKitUI.internalModel?.assetOpts.contains(.selectAsLivePhoto) ?? true)
+            tagImageView.image = Bundle.uiBundle?.image(name: "livePhoto")
+            descLabel.text = "Live"
+        case let .video(_, format):
+            tagImageView.image = Bundle.uiBundle?.image(name: "video")
+            bottomMaskView.isHidden = false
+            descLabel.text = format
+        }
+        
         if let id = smallRequestID {
             PHImageManager.default().cancelImageRequest(id)
         }
@@ -156,6 +185,26 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
                 self?.imageView?.image =  image as? UIImage
             }
         }
+    }
+    
+}
+
+extension ADPhotoKitInternal {
+    
+    fileprivate func displaySelectBtn(model: ADAssetModel) -> Bool {
+        if let max = params.maxCount {
+            if max > 1 {
+                if !assetOpts.contains(.mixSelect) {
+                    let type = selectMediaImage
+                    return model.type.isImage == type
+                }else{
+                    return true
+                }
+            }else{
+                return false
+            }
+        }
+        return true
     }
     
 }

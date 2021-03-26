@@ -47,7 +47,7 @@ public struct ADAssetSelectOptions: OptionSet {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.selectAsLivePhoto]
 }
 
 public class ADPhotoManager {

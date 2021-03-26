@@ -46,7 +46,7 @@ public class ADAssetListDataSource: NSObject {
                     return model.identifier == item.identifier
                 }) {
                     item.index = index
-                    strong.list[index].selectStatus = .select(index: idx)
+                    strong.list[index].selectStatus = .select(index: idx+1)
                 }
             }
             DispatchQueue.main.async {
@@ -78,6 +78,12 @@ public class ADAssetListDataSource: NSObject {
             }) != nil {
                 item.selectStatus = .select(index: nil)
                 selects.removeAll() { $0.identifier == item.identifier }
+                for (idx,model) in selects.enumerated() {
+                    if let index = model.index {
+                        let m = list[index]
+                        m.selectStatus = .select(index: idx+1)
+                    }
+                }
             }
         }
     }
