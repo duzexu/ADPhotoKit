@@ -25,6 +25,8 @@ class ADThumbnailViewController: UIViewController {
     var collectionView: UICollectionView!
     var dataSource: ADAssetListDataSource!
     
+    var toolBarView: ADThumbnailToolBarable!
+    
     init(model: ADPhotoKitInternal, albumList: ADAlbumModel) {
         self.model = model
         self.albumList = albumList
@@ -35,10 +37,23 @@ class ADThumbnailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        cleanTimer()
+    }
+    
     /// 滑动选择
     private var panGesture: UIPanGestureRecognizer?
     private var selectionInfo: SlideSelectionInfo?
     private var selectionRange: SlideSelectionRange?
+    
+    private enum AutoScrollDirection {
+        case none
+        case top
+        case bottom
+    }
+    private var autoScrollTimer: CADisplayLink?
+    private var lastPanUpdateTime = CACurrentMediaTime()
+    private var autoScrollInfo: (direction: AutoScrollDirection, speed: CGFloat) = (.none, 0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,6 +107,13 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
         dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, options: model.albumOpts)
+        
+        toolBarView = ADThumbnailToolBarView()
+        view.addSubview(toolBarView)
+        toolBarView.snp.makeConstraints { (make) in
+            make.left.right.bottom.equalToSuperview()
+            make.height.equalTo(ADThumbnailToolBarView.height)
+        }
     }
     
 }
@@ -99,11 +121,11 @@ extension ADThumbnailViewController {
 extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 2
+        return ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 2
+        return ADPhotoKitConfiguration.default.thumbnailLayout.lineSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -111,8 +133,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let columnCount: CGFloat = 4
-        let totalW = collectionView.bounds.width - (columnCount - 1) * 2
+        let columnCount: CGFloat = CGFloat(ADPhotoKitConfiguration.default.thumbnailLayout.columnCount)
+        let totalW = collectionView.bounds.width - (columnCount - 1) * ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing
         let singleW = totalW / columnCount
         return CGSize(width: singleW, height: singleW)
     }
@@ -125,7 +147,24 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
         
         let model = dataSource.list[indexPath.row]
-        cell.configure(with: model)
+        cell.configure(with: model, indexPath: indexPath)
+        cell.selectAction = { [weak self] cell, sel in
+            guard let strong = self else {
+                return
+            }
+            if sel { //取消选择
+                self?.dataSource.selectAssetAt(index: cell.indexPath.row)
+            }else{
+                self?.dataSource.deselectAssetAt(index: cell.indexPath.row)
+            }
+            
+            /// 单独刷新这个cell 防止选择动画停止
+            cell.configure(with: strong.dataSource.list[cell.indexPath.row], indexPath: nil)
+            
+            var indexs = strong.collectionView.indexPathsForVisibleItems
+            indexs.removeAll {$0 == cell.indexPath}
+            self?.collectionView.reloadItems(at: indexs)
+        }
         
         return cell
     }
@@ -136,7 +175,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
 }
 
 /// 滑动手势
-extension ADThumbnailViewController {
+private extension ADThumbnailViewController {
     
     typealias SlideSelectionInfo = (begin: Int, select: Bool, indexs: [Int])
     typealias SlideSelectionRange = (s: Int, e: Int, len: Int, index: Int)
@@ -153,10 +192,12 @@ extension ADThumbnailViewController {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
             }
         }else if pan.state == .changed {
+            autoScrollWhenSlideSelect(pan)
             if cell != nil {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
             }
         }else{
+            cleanTimer()
             selectionInfo = nil
             selectionRange = nil
         }
@@ -184,14 +225,17 @@ extension ADThumbnailViewController {
                     shrankRange = (range.s,range.e)
                     expandRange = (current.s,current.e)
                 }
+                var indexPaths: [IndexPath] = []
                 if let range = shrankRange {
                     for i in range.0...range.1 {
                         let item = dataSource.list[i]
                         if i != info.begin {
                             if info.select && item.selectStatus.isSelect {
+                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.deselectAssetAt(index: i)
                             }
                             if !info.select && info.indexs.contains(i) {
+                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.selectAssetAt(index: i)
                             }
                         }
@@ -202,16 +246,20 @@ extension ADThumbnailViewController {
                         let item = dataSource.list[i]
                         if i != info.begin {
                             if info.select && !item.selectStatus.isSelect {
+                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.selectAssetAt(index: i)
                             }
                             if !info.select && item.selectStatus.isSelect {
+                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.deselectAssetAt(index: i)
                             }
                         }
                     }
                 }
                 selectionRange = current
-                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                DispatchQueue.main.async {
+                    self.collectionView.reloadItems(at: indexPaths)
+                }
             }
         }else{
             let indexs = dataSource.selects.compactMap { $0.index }
@@ -223,6 +271,70 @@ extension ADThumbnailViewController {
                 dataSource.selectAssetAt(index: index)
             }
             cell.configure(with: model)
+        }
+    }
+    
+    func autoScrollWhenSlideSelect(_ pan: UIPanGestureRecognizer) {
+        guard model.assetOpts.contains(.autoScroll) else {
+            return
+        }
+        
+        if let max = model.params.maxCount {
+            guard model.assets.count < max else {
+                cleanTimer()
+                return
+            }
+        }
+        
+        let top = navigationController!.navigationBar.frame.height + 30
+        let bottom = view.frame.height - ADThumbnailToolBarView.height - 30
+        
+        let point = pan.location(in: self.view)
+        
+        var diff: CGFloat = 0
+        var direction: AutoScrollDirection = .none
+        if point.y < top {
+            diff = top - point.y
+            direction = .top
+        } else if point.y > bottom {
+            diff = point.y - bottom
+            direction = .bottom
+        } else {
+            cleanTimer()
+            return
+        }
+                
+        let speed = min(diff, 60) / 60 * ADPhotoKitConfiguration.default.autoScrollMaxSpeed
+        
+        autoScrollInfo = (direction, speed)
+        
+        if autoScrollTimer == nil {
+            autoScrollTimer = CADisplayLink(target: ADWeakProxy(target: self), selector: #selector(autoScrollAction))
+            autoScrollTimer?.add(to: RunLoop.current, forMode: .common)
+        }
+    }
+    
+    func cleanTimer() {
+        autoScrollTimer?.remove(from: RunLoop.current, forMode: .common)
+        autoScrollTimer?.invalidate()
+        autoScrollTimer = nil
+    }
+    
+    @objc
+    func autoScrollAction() {
+        guard autoScrollInfo.direction != .none else { return }
+        if CACurrentMediaTime() - lastPanUpdateTime > 0.2 {
+            // Finger may be not moved in slide selection mode
+            slideSelectAction(panGesture!)
+        }
+        let duration = CGFloat(autoScrollTimer?.duration ?? 1 / 60)
+        let distance = autoScrollInfo.speed * duration
+        let offset = collectionView.contentOffset
+        let inset = collectionView.contentInset
+        if autoScrollInfo.direction == .top, offset.y + inset.top > distance {
+            collectionView.contentOffset = CGPoint(x: 0, y: offset.y - distance)
+        } else if autoScrollInfo.direction == .bottom, offset.y + collectionView.bounds.height + distance - inset.bottom < collectionView.contentSize.height {
+            collectionView.contentOffset = CGPoint(x: 0, y: offset.y + distance)
         }
     }
     

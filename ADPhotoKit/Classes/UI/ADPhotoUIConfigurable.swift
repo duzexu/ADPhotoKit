@@ -40,6 +40,7 @@ public enum ADThumbnailSelectStatus {
     }
 }
 
+public typealias ADThumbnailListable = (UICollectionViewCell & ADThumbnailListConfigurable)
 public protocol ADThumbnailListConfigurable {
     
     var identifier: String? { set get }
@@ -50,15 +51,26 @@ public protocol ADThumbnailListConfigurable {
     
     var selectStatus: ADThumbnailSelectStatus { set get }
     
-    var progressView: ADProgressableView! { set get }
+    var progressView: ADProgressableable! { set get }
     
     var assetModel: ADAssetModel! { set get }
     
-    func configure(with model: ADAssetModel)
+    var indexPath: IndexPath! { set get }
+
+    var selectAction: ((ADThumbnailListable,Bool)->Void)? { set get }
+    
+    func configure(with model: ADAssetModel, indexPath: IndexPath?)
     
 }
 
-public typealias ADProgressableView = (UIView & ADProgressConfigurable)
+public typealias ADThumbnailToolBarable = (UIView & ADThumbnailToolBarConfigurable)
+public protocol ADThumbnailToolBarConfigurable {
+    
+    static var height: CGFloat { get }
+    
+}
+
+public typealias ADProgressableable = (UIView & ADProgressConfigurable)
 public protocol ADProgressConfigurable {
     
     var progress: CGFloat { set get }

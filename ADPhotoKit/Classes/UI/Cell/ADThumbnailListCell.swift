@@ -22,9 +22,13 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
     }
     
-    var progressView: ADProgressableView!
+    var progressView: ADProgressableable!
+    
+    var selectAction: ((ADThumbnailListable,Bool)->Void)?
     
     var assetModel: ADAssetModel!
+    
+    var indexPath: IndexPath!
     
     // ui
     var imageView: UIImageView!
@@ -53,9 +57,18 @@ class ADThumbnailListCell: UICollectionViewCell {
             make.edges.equalToSuperview()
         }
         
+        coverView = UIView()
+        coverView.isUserInteractionEnabled = false
+        coverView.isHidden = true
+        contentView.addSubview(coverView)
+        coverView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        
         selectBtn = UIButton(type: .custom)
         selectBtn.setBackgroundImage(Bundle.uiBundle?.image(name: "btn_unselected"), for: .normal)
         selectBtn.setBackgroundImage(Bundle.uiBundle?.image(name: "btn_selected"), for: .selected)
+        selectBtn.addTarget(self, action: #selector(selectBtnAction(sender:)), for: .touchUpInside)
         contentView.addSubview(selectBtn)
         selectBtn.snp.makeConstraints { (make) in
             make.top.equalToSuperview().offset(8)
@@ -118,6 +131,8 @@ class ADThumbnailListCell: UICollectionViewCell {
         switch selectStatus {
         case let .select(index):
             if let idx = index {
+                coverView.isHidden = false
+                coverView.backgroundColor = UIColor(white: 0, alpha: 0.2)
                 selectBtn.isSelected = true
                 indexLabel.isHidden = false
                 indexLabel.text = "\(idx)"
@@ -140,18 +155,33 @@ class ADThumbnailListCell: UICollectionViewCell {
                     self?.imageView.alpha = 1
                 })
             }else{
+                coverView.isHidden = true
                 indexLabel.isHidden = true
                 selectBtn.isSelected = false
             }
         case .deselect:
+            coverView.isHidden = false
+            coverView.backgroundColor = UIColor(white: 1, alpha: 0.5)
             indexLabel.isHidden = true
         }
+    }
+    
+    @objc
+    func selectBtnAction(sender: UIButton) {
+        selectBtn.layer.removeAllAnimations()
+        if !selectBtn.isSelected {
+            selectBtn.layer.add(ADPhotoKitUI.springAnimation(), forKey: nil)
+        }
+        selectAction?(self,!sender.isSelected)
     }
 }
 
 extension ADThumbnailListCell: ADThumbnailListConfigurable {
     
-    func configure(with model: ADAssetModel) {
+    func configure(with model: ADAssetModel, indexPath: IndexPath? = nil) {
+        if let index = indexPath {
+            self.indexPath = index
+        }
         assetModel = model
         identifier = model.identifier
         selectStatus = model.selectStatus

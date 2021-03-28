@@ -25,12 +25,17 @@ public class ADPhotoKitConfiguration {
     public var customAlbumOrders: [ADAlbumType]?
     
     #if Module_UI
-    
-    /// When slide select is active, will auto scroll to top or bottom when your finger at the top or bottom. Defaults to true.
-    public var autoScrollWhenSlideSelectIsActive = true
-    
+        
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600
+    
+    public struct ThumbnailControllerLayout {
+        public var itemSpacing: CGFloat = 2
+        public var lineSpacing: CGFloat = 2
+        public var columnCount: Int = 4
+    }
+    
+    public var thumbnailLayout = ThumbnailControllerLayout()
     
     #endif
 

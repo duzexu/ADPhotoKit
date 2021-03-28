@@ -59,6 +59,23 @@ public class ADPhotoKitUI {
     static var internalModel: ADPhotoKitInternal?
 }
 
+extension ADPhotoKitUI {
+    
+    static func springAnimation() -> CAKeyframeAnimation {
+        let animate = CAKeyframeAnimation(keyPath: "transform")
+        animate.duration = 0.4
+        animate.isRemovedOnCompletion = true
+        animate.fillMode = .forwards
+        
+        animate.values = [CATransform3DMakeScale(0.7, 0.7, 1),
+                          CATransform3DMakeScale(1.2, 1.2, 1),
+                          CATransform3DMakeScale(0.8, 0.8, 1),
+                          CATransform3DMakeScale(1, 1, 1)]
+        return animate
+    }
+    
+}
+
 class ADPhotoKitInternal {
     var assets: [PHAsset]
     let albumOpts: ADAlbumSelectOptions

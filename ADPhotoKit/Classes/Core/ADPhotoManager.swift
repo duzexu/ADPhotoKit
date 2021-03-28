@@ -31,23 +31,25 @@ public struct ADAssetSelectOptions: OptionSet {
     static let selectAsGif = ADAssetSelectOptions(rawValue: 1 << 1)
     /// Allow select LivePhoto, it only controls whether it is displayed in LivePhoto form.
     static let selectAsLivePhoto = ADAssetSelectOptions(rawValue: 1 << 2)
-    /// If true, you can slide select photos in album.
+    /// You can slide select photos in album.
     static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
+    /// Will auto scroll to top or bottom when your finger at the top or bottom.
+    static let autoScroll = ADAssetSelectOptions(rawValue: 1 << 4)
     /// Allow select full image.
-    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 4)
+    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 5)
     /// Allow access to the preview large image interface.
-    static let previewPhotos = ADAssetSelectOptions(rawValue: 1 << 5)
+    static let previewPhotos = ADAssetSelectOptions(rawValue: 1 << 6)
     /// Allow take photos in the album.
-    static let allowTakeAsset = ADAssetSelectOptions(rawValue: 1 << 6)
+    static let allowTakeAsset = ADAssetSelectOptions(rawValue: 1 << 7)
     /// If user choose limited Photo mode, a button with '+' will be added. It will call PHPhotoLibrary.shared().presentLimitedLibraryPicker(from:) to add photo.
     @available(iOS 14, *)
-    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 7)
+    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 8)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.selectAsLivePhoto]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.autoScroll,.selectAsLivePhoto]
 }
 
 public class ADPhotoManager {
