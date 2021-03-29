@@ -130,6 +130,7 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
         switch selectStatus {
         case let .select(index):
+            selectBtn.isEnabled = true
             if let idx = index {
                 coverView.isHidden = false
                 coverView.backgroundColor = UIColor(white: 0, alpha: 0.2)
@@ -163,6 +164,8 @@ class ADThumbnailListCell: UICollectionViewCell {
             coverView.isHidden = false
             coverView.backgroundColor = UIColor(white: 1, alpha: 0.5)
             indexLabel.isHidden = true
+            selectBtn.isSelected = false
+            selectBtn.isEnabled = false
         }
     }
     

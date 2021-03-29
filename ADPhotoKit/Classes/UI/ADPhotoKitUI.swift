@@ -9,8 +9,10 @@ import Foundation
 import Photos
 
 public enum ADPhotoSelectParams: Hashable {
-    /// 图片选择数量 最小 最大
+    /// 最多选择数量
     case maxCount(max: Int?)
+    /// 图片选择数量 最小 最大
+    case imageCount(min: Int?, max:Int?)
     /// 视频数量 最小 最大
     case videoCount(min: Int?, max:Int?)
     /// 视频时长 最小 最大
@@ -21,10 +23,12 @@ public enum ADPhotoSelectParams: Hashable {
         switch self {
         case .maxCount:
             value = 0
-        case .videoCount:
+        case .imageCount:
             value = 1
-        case .videoTime:
+        case .videoCount:
             value = 2
+        case .videoTime:
+            value = 3
         }
         hasher.combine(value)
     }
@@ -104,6 +108,9 @@ class ADPhotoKitInternal {
             switch item {
             case let .maxCount(max):
                 value.maxCount = max
+            case let .imageCount(min, max):
+                value.minImageCount = min
+                value.maxImageCount = max
             case let .videoCount(min, max):
                 value.minVideoCount = min
                 value.maxVideoCount = max

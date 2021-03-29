@@ -10,6 +10,9 @@ import UIKit
 struct ADThumbnailParams {
     var maxCount: Int?
     
+    var minImageCount: Int?
+    var maxImageCount: Int?
+    
     var minVideoCount: Int?
     var maxVideoCount: Int?
     
@@ -169,6 +172,53 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let c = cell as? ADThumbnailListCell else {
+            return
+        }
+        let item = dataSource.list[indexPath.row]
+        if !c.selectStatus.isSelect {
+            c.selectStatus = .select(index: nil)
+            item.selectStatus = .select(index: nil)
+            let selected = dataSource.selects.count
+            let max = model.params.maxCount ?? Int.max
+            if selected < max {
+                let itemIsImage = item.type.isImage
+                if model.assetOpts.contains(.mixSelect) {
+                    let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
+                    let maxVideoCount = model.params.maxVideoCount ?? Int.max
+                    let maxImageCount = model.params.maxImageCount ?? Int.max
+                    if videoCount >= maxVideoCount, !itemIsImage {
+                        c.selectStatus = .deselect
+                        item.selectStatus = .deselect
+                    }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                        c.selectStatus = .deselect
+                        item.selectStatus = .deselect
+                    }
+                }else{
+                    if item.type.isImage != model.selectMediaImage {
+                        c.selectStatus = .deselect
+                        item.selectStatus = .deselect
+                    }else{
+                        let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
+                        let maxVideoCount = model.params.maxVideoCount ?? Int.max
+                        let maxImageCount = model.params.maxImageCount ?? Int.max
+                        if videoCount >= maxVideoCount, !itemIsImage {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }
+                    }
+                }
+            }else{
+                c.selectStatus = .deselect
+                item.selectStatus = .deselect
+            }
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
     }
@@ -225,17 +275,14 @@ private extension ADThumbnailViewController {
                     shrankRange = (range.s,range.e)
                     expandRange = (current.s,current.e)
                 }
-                var indexPaths: [IndexPath] = []
                 if let range = shrankRange {
                     for i in range.0...range.1 {
                         let item = dataSource.list[i]
                         if i != info.begin {
                             if info.select && item.selectStatus.isSelect {
-                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.deselectAssetAt(index: i)
                             }
                             if !info.select && info.indexs.contains(i) {
-                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.selectAssetAt(index: i)
                             }
                         }
@@ -245,12 +292,10 @@ private extension ADThumbnailViewController {
                     for i in range.0...range.1 {
                         let item = dataSource.list[i]
                         if i != info.begin {
-                            if info.select && !item.selectStatus.isSelect {
-                                indexPaths.append(IndexPath(row: i, section: 0))
+                            if info.select && !item.selectStatus.isSelect && item.selectStatus.isEnable {
                                 dataSource.selectAssetAt(index: i)
                             }
                             if !info.select && item.selectStatus.isSelect {
-                                indexPaths.append(IndexPath(row: i, section: 0))
                                 dataSource.deselectAssetAt(index: i)
                             }
                         }
@@ -258,19 +303,21 @@ private extension ADThumbnailViewController {
                 }
                 selectionRange = current
                 DispatchQueue.main.async {
-                    self.collectionView.reloadItems(at: indexPaths)
+                    self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
                 }
             }
         }else{
-            let indexs = dataSource.selects.compactMap { $0.index }
-            selectionInfo = (index,!model.selectStatus.isSelect,indexs)
-            selectionRange = (index,index,0,index)
-            if model.selectStatus.isSelect { //取消选择
-                dataSource.deselectAssetAt(index: index)
-            }else{
-                dataSource.selectAssetAt(index: index)
+            if model.selectStatus.isEnable {
+                let indexs = dataSource.selects.compactMap { $0.index }
+                selectionInfo = (index,!model.selectStatus.isSelect,indexs)
+                selectionRange = (index,index,0,index)
+                if model.selectStatus.isSelect { //取消选择
+                    dataSource.deselectAssetAt(index: index)
+                }else{
+                    dataSource.selectAssetAt(index: index)
+                }
+                cell.configure(with: model)
             }
-            cell.configure(with: model)
         }
     }
     

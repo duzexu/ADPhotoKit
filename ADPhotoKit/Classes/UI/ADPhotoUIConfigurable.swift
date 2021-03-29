@@ -38,6 +38,15 @@ public enum ADThumbnailSelectStatus {
             return false
         }
     }
+    
+    var isEnable: Bool {
+        switch self {
+        case .select:
+            return true
+        case .deselect:
+            return false
+        }
+    }
 }
 
 public typealias ADThumbnailListable = (UICollectionViewCell & ADThumbnailListConfigurable)

@@ -26,7 +26,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func showImagePicker(_ sender: UIButton) {
-        ADPhotoKitUI.imagePicker(present: self) { (assets, value) in
+        ADPhotoKitUI.imagePicker(present: self, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
             print(assets)
         }
     }
