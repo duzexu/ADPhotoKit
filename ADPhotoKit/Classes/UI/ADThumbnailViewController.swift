@@ -109,7 +109,7 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, options: model.albumOpts)
+        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
         
         toolBarView = ADThumbnailToolBarView()
         view.addSubview(toolBarView)
@@ -147,6 +147,22 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if dataSource.enableCameraCell {
+            if indexPath.row == dataSource.cameraCellIndex {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADCameraCell.reuseIdentifier, for: indexPath) as! ADCameraCell
+                return cell
+            }
+        }
+        
+        if #available(iOS 14, *) {
+            if dataSource.enableAddAssetCell {
+                if indexPath.row == dataSource.addAssetCellIndex {
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADAddPhotoCell.reuseIdentifier, for: indexPath) as! ADAddPhotoCell
+                    return cell
+                }
+            }
+        }
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
         
         let model = dataSource.list[indexPath.row]

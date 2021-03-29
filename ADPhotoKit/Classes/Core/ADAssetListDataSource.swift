@@ -11,19 +11,62 @@ import Photos
 public class ADAssetListDataSource: NSObject {
     
     public weak var reloadable: ADDataSourceReloadable?
-    public let options: ADAlbumSelectOptions
+    public let albumOpts: ADAlbumSelectOptions
+    public let assetOpts: ADAssetSelectOptions
     public let album: ADAlbumModel
     
     public var list: [ADAssetModel] = []
     public var selects: [ADSelectAssetModel] = []
     
+    public var appendCellCount: Int {
+        var count: Int = 0
+        if enableCameraCell {
+            count += 1
+        }
+        if #available(iOS 14, *) {
+            if enableAddAssetCell {
+                count += 1
+            }
+        }
+        return count
+    }
+    
+    /// 显示拍照按钮
+    public var enableCameraCell: Bool {
+        return album.isCameraRoll && (assetOpts.contains(.allowTakePhotoAsset) || assetOpts.contains(.allowTakeVideoAsset))
+    }
+    
+    public var cameraCellIndex: Int {
+        if albumOpts.contains(.ascending) {
+            return list.count + appendCellCount - 2
+        }else{
+            return appendCellCount - 2
+        }
+    }
+    
+    /// 显示添加按钮
+    @available(iOS 14, *)
+    public var enableAddAssetCell: Bool {
+        return album.isCameraRoll && PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited && assetOpts.contains(.allowAddAsset)
+    }
+    
+    public var addAssetCellIndex: Int {
+        if albumOpts.contains(.ascending) {
+            return list.count + appendCellCount - 1
+        }else{
+            return appendCellCount - 1
+        }
+    }
+    
     public init(reloadable: ADDataSourceReloadable,
                 album: ADAlbumModel,
                 select: [PHAsset],
-                options: ADAlbumSelectOptions = .default) {
+                albumOpts: ADAlbumSelectOptions,
+                assetOpts: ADAssetSelectOptions) {
         self.reloadable = reloadable
         self.album = album
-        self.options = options
+        self.albumOpts = albumOpts
+        self.assetOpts = assetOpts
         self.selects = select.map { ADSelectAssetModel(asset: $0) }
         super.init()
         if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
@@ -38,7 +81,7 @@ public class ADAssetListDataSource: NSObject {
     public func reloadData(completion: (() -> Void)? = nil) {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }
-            let models = ADPhotoManager.fetchAssets(in: strong.album.result, options: strong.options)
+            let models = ADPhotoManager.fetchAssets(in: strong.album.result, options: strong.albumOpts)
             strong.list.removeAll()
             strong.list.append(contentsOf: models)
             for (idx,item) in strong.selects.enumerated() {
@@ -51,6 +94,7 @@ public class ADAssetListDataSource: NSObject {
             }
             DispatchQueue.main.async {
                 self?.reloadable?.reloadData()
+                self?.scrollToBottom()
                 completion?()
             }
         }
@@ -88,12 +132,33 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    private func scrollToBottom() {
+        guard albumOpts.contains(.ascending), list.count > 0 else {
+            return
+        }
+        if let view = reloadable as? UICollectionView {
+            view.scrollToItem(at: IndexPath(row: list.count-1, section: 0), at: .centeredVertically, animated: false)
+        }
+    }
+    
 }
 
 extension ADAssetListDataSource: PHPhotoLibraryChangeObserver {
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        reloadData()
+        guard let changes = changeInstance.changeDetails(for: album.result) else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.album.result = changes.fetchResultAfterChanges
+            for sm in self.selects {
+                let isDelete = changeInstance.changeDetails(for: sm.asset)?.objectWasDeleted ?? false
+                if isDelete {
+                    self.selects.removeAll { $0 == sm }
+                }
+            }
+            self.reloadData()
+        }
     }
     
 }
