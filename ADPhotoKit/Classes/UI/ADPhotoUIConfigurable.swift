@@ -70,12 +70,14 @@ public protocol ADThumbnailListConfigurable {
     
     func configure(with model: ADAssetModel, indexPath: IndexPath?)
     
+    func cellSelectAction()
+    
 }
 
 public typealias ADThumbnailToolBarable = (UIView & ADThumbnailToolBarConfigurable)
 public protocol ADThumbnailToolBarConfigurable {
     
-    static var height: CGFloat { get }
+    var height: CGFloat { get }
     
 }
 

@@ -21,8 +21,8 @@ class ADCameraCell: UICollectionViewCell {
         super.init(frame: frame)
         backgroundColor = UIColor(white: 0.3, alpha: 1)
         
-        imageView = UIImageView(image: Bundle.uiBundle?.image(name: "addPhoto"))
-        imageView.contentMode = .scaleAspectFit
+        imageView = UIImageView(image: Bundle.uiBundle?.image(name: "takePhoto"))
+        imageView.contentMode = .center
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
             make.center.equalToSuperview()

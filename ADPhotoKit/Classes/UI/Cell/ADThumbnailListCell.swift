@@ -212,12 +212,16 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
         if let id = smallRequestID {
             PHImageManager.default().cancelImageRequest(id)
         }
-        imageView.image = Bundle.uiBundle?.image(name: "defaultphoto")
-        smallRequestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: CGSize(width: 80, height: 80)), progress: nil) { [weak self] (image, _, _) in
+        //imageView.image = Bundle.uiBundle?.image(name: "defaultphoto")
+        smallRequestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: bounds.size), progress: nil) { [weak self] (image, _, _) in
             if self?.identifier == self?.assetModel.identifier {
                 self?.imageView?.image =  image as? UIImage
             }
         }
+    }
+    
+    func cellSelectAction() {
+        selectBtnAction(sender: selectBtn)
     }
     
 }

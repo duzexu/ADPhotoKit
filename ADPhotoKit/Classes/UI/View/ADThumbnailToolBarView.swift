@@ -9,7 +9,7 @@ import UIKit
 
 class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     
-    static var height: CGFloat {
+    var height: CGFloat {
         return 40
     }
     

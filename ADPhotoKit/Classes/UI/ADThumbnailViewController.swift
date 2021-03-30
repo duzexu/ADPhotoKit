@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PhotosUI
 
 struct ADThumbnailParams {
     var maxCount: Int?
@@ -115,7 +116,7 @@ extension ADThumbnailViewController {
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(ADThumbnailToolBarView.height)
+            make.height.equalTo(toolBarView.height)
         }
     }
     
@@ -132,7 +133,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
+        return UIEdgeInsets(top: 3, left: 0, bottom: 3+toolBarView.height, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -143,13 +144,16 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.list.count
+        return dataSource.list.count+dataSource.appendCellCount
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if dataSource.enableCameraCell {
             if indexPath.row == dataSource.cameraCellIndex {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADCameraCell.reuseIdentifier, for: indexPath) as! ADCameraCell
+                if model.assetOpts.contains(.captureOnTakeAsset) {
+                    cell.startCapture()
+                }
                 return cell
             }
         }
@@ -165,8 +169,9 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
         
-        let model = dataSource.list[indexPath.row]
-        cell.configure(with: model, indexPath: indexPath)
+        let new = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+        let model = dataSource.list[new.row]
+        cell.configure(with: model, indexPath: new)
         cell.selectAction = { [weak self] cell, sel in
             guard let strong = self else {
                 return
@@ -192,7 +197,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         guard let c = cell as? ADThumbnailListCell else {
             return
         }
-        let item = dataSource.list[indexPath.row]
+        let index = model.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
+        let item = dataSource.list[index]
         if !c.selectStatus.isSelect {
             c.selectStatus = .select(index: nil)
             item.selectStatus = .select(index: nil)
@@ -236,7 +242,20 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        let cell = collectionView.cellForItem(at: indexPath)
+        if cell is ADCameraCell {
+            presentCameraController()
+        }else if cell is ADAddPhotoCell {
+            if #available(iOS 14, *) {
+                PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+            }
+        }else if let c = cell as? ADThumbnailListCell {
+            if !model.assetOpts.contains(.allowPreview) {
+                c.cellSelectAction()
+            }else if c.selectStatus.isEnable {
+                
+            }
+        }
     }
 }
 
@@ -270,7 +289,7 @@ private extension ADThumbnailViewController {
     }
     
     func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailListCell) {
-        let index = indexPath.row
+        let index = model.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
         let model = dataSource.list[index]
         //已经有第一个
         if let info = selectionInfo, let range = selectionRange {
@@ -350,7 +369,7 @@ private extension ADThumbnailViewController {
         }
         
         let top = navigationController!.navigationBar.frame.height + 30
-        let bottom = view.frame.height - ADThumbnailToolBarView.height - 30
+        let bottom = view.frame.height - toolBarView.height - 30
         
         let point = pan.location(in: self.view)
         
@@ -398,6 +417,63 @@ private extension ADThumbnailViewController {
             collectionView.contentOffset = CGPoint(x: 0, y: offset.y - distance)
         } else if autoScrollInfo.direction == .bottom, offset.y + collectionView.bounds.height + distance - inset.bottom < collectionView.contentSize.height {
             collectionView.contentOffset = CGPoint(x: 0, y: offset.y + distance)
+        }
+    }
+    
+}
+
+/// 相机
+extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func presentCameraController() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            let picker = UIImagePickerController()
+            picker.delegate = self
+            picker.allowsEditing = false
+            picker.videoQuality = .typeHigh
+            picker.sourceType = .camera
+            picker.cameraFlashMode = .off
+            var mediaTypes = [String]()
+            if model.assetOpts.contains(.allowTakePhotoAsset) {
+                mediaTypes.append("public.image")
+            }
+            if model.assetOpts.contains(.allowTakeVideoAsset) {
+                mediaTypes.append("public.movie")
+            }
+            picker.mediaTypes = mediaTypes
+            if let max = model.params.maxVideoTime {
+                picker.videoMaximumDuration = TimeInterval(max)
+            }
+            showDetailViewController(picker, sender: nil)
+        }
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true) {
+            if let image = info[.originalImage] as? UIImage {
+                let hud = ADProgressHUD()
+                hud.show()
+                ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
+                    if suc {
+                        self.dataSource.reloadData()
+                    } else {
+                        
+                    }
+                    hud.hide()
+                }
+            }
+            if let url = info[.mediaURL] as? URL {
+                let hud = ADProgressHUD()
+                hud.show()
+                ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
+                    if suc {
+                        self.dataSource.reloadData()
+                    } else {
+                        
+                    }
+                    hud.hide()
+                }
+            }
         }
     }
     

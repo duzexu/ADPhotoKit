@@ -15,7 +15,7 @@ public struct ADAlbumSelectOptions: OptionSet {
     public static let allowImage = ADAlbumSelectOptions(rawValue: 1 << 1)
     public static let allowVideo = ADAlbumSelectOptions(rawValue: 1 << 2)
     
-    public static let `default`: ADAlbumSelectOptions = [.ascending, .allowImage, .allowVideo]
+    public static let `default`: ADAlbumSelectOptions = [.allowImage, .allowVideo]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue
@@ -43,15 +43,22 @@ public struct ADAssetSelectOptions: OptionSet {
     static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 7)
     /// Allow take video asset in the album.
     static let allowTakeVideoAsset = ADAssetSelectOptions(rawValue: 1 << 8)
+    /// Show the image captured by the camera is displayed on the camera button inside the album.
+    static let captureOnTakeAsset = ADAssetSelectOptions(rawValue: 1 << 9)
     /// If user choose limited Photo mode, a button with '+' will be added. It will call PHPhotoLibrary.shared().presentLimitedLibraryPicker(from:) to add photo.
     @available(iOS 14, *)
-    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 9)
+    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 10)
+    /// Allow access to the preview large image interface (That is, whether to allow access to the large image interface after clicking the thumbnail image).
+    static let allowPreview = ADAssetSelectOptions(rawValue: 1 << 11)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
     public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset]
+    
+    @available(iOS 14, *)
+    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset]
 }
 
 public class ADPhotoManager {
