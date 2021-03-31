@@ -40,7 +40,7 @@ public class ADAssetListDataSource: NSObject {
         if albumOpts.contains(.ascending) {
             return list.count + appendCellCount - 2
         }else{
-            return appendCellCount - 2
+            return appendCellCount - 1
         }
     }
     
@@ -54,7 +54,7 @@ public class ADAssetListDataSource: NSObject {
         if albumOpts.contains(.ascending) {
             return list.count + appendCellCount - 1
         }else{
-            return appendCellCount - 1
+            return appendCellCount
         }
     }
     

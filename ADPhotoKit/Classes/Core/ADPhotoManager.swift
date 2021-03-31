@@ -35,30 +35,34 @@ public struct ADAssetSelectOptions: OptionSet {
     static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
     /// Will auto scroll to top or bottom when your finger at the top or bottom.
     static let autoScroll = ADAssetSelectOptions(rawValue: 1 << 4)
-    /// Allow select full image.
-    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 5)
-    /// Allow access to the preview large image interface.
-    static let previewPhotos = ADAssetSelectOptions(rawValue: 1 << 6)
     /// Allow take photo asset in the album.
-    static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 7)
+    static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 5)
     /// Allow take video asset in the album.
-    static let allowTakeVideoAsset = ADAssetSelectOptions(rawValue: 1 << 8)
+    static let allowTakeVideoAsset = ADAssetSelectOptions(rawValue: 1 << 6)
     /// Show the image captured by the camera is displayed on the camera button inside the album.
-    static let captureOnTakeAsset = ADAssetSelectOptions(rawValue: 1 << 9)
+    static let captureOnTakeAsset = ADAssetSelectOptions(rawValue: 1 << 7)
     /// If user choose limited Photo mode, a button with '+' will be added. It will call PHPhotoLibrary.shared().presentLimitedLibraryPicker(from:) to add photo.
     @available(iOS 14, *)
-    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 10)
+    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 8)
+    /// iOS14 limited Photo mode, will show collection footer view in ZLThumbnailViewController.
+    /// Will go to system setting if clicked.
+    @available(iOS 14, *)
+    static let allowAuthTips = ADAssetSelectOptions(rawValue: 1 << 9)
     /// Allow access to the preview large image interface (That is, whether to allow access to the large image interface after clicking the thumbnail image).
-    static let allowPreview = ADAssetSelectOptions(rawValue: 1 << 11)
+    static let allowPreview = ADAssetSelectOptions(rawValue: 1 << 10)
+    /// Allow toolbar in thumbnail controller
+    static let thumbnailToolBar = ADAssetSelectOptions(rawValue: 1 << 11)
+    /// Allow select full image.
+    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 12)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.thumbnailToolBar]
     
     @available(iOS 14, *)
-    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.previewPhotos,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset]
+    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar]
 }
 
 public class ADPhotoManager {

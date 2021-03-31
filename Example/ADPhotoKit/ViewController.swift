@@ -30,6 +30,10 @@ class ViewController: UIViewController {
             ADPhotoKitUI.imagePicker(present: self, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
                 print(assets)
             }
+        }else{
+            ADPhotoKitUI.imagePicker(present: self, assetOpts: .default, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
+                print(assets)
+            }
         }
     }
     

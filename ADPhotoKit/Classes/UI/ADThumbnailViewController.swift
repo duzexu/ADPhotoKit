@@ -112,11 +112,15 @@ extension ADThumbnailViewController {
         
         dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
         
-        toolBarView = ADThumbnailToolBarView()
+        var insetsBottom: CGFloat = 0
+        if #available(iOS 11.0, *) {
+            insetsBottom = view.safeAreaInsets.bottom
+        }
+        toolBarView = ADThumbnailToolBarView(model: model)
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(toolBarView.height)
+            make.height.equalTo(toolBarView.height+insetsBottom)
         }
     }
     
