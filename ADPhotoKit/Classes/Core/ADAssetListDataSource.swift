@@ -40,7 +40,7 @@ public class ADAssetListDataSource: NSObject {
         if albumOpts.contains(.ascending) {
             return list.count + appendCellCount - 2
         }else{
-            return appendCellCount - 1
+            return 0
         }
     }
     
@@ -54,9 +54,11 @@ public class ADAssetListDataSource: NSObject {
         if albumOpts.contains(.ascending) {
             return list.count + appendCellCount - 1
         }else{
-            return appendCellCount
+            return 1
         }
     }
+    
+    public var selectAssetChanged: ((Int)->Void)?
     
     public init(reloadable: ADDataSourceReloadable,
                 album: ADAlbumModel,
@@ -111,6 +113,7 @@ public class ADAssetListDataSource: NSObject {
                 selects.append(selected)
                 item.selectStatus = .select(index: selects.count)
             }
+            selectAssetChanged?(selects.count)
         }
     }
     
@@ -129,6 +132,7 @@ public class ADAssetListDataSource: NSObject {
                     }
                 }
             }
+            selectAssetChanged?(selects.count)
         }
     }
     
@@ -157,6 +161,7 @@ extension ADAssetListDataSource: PHPhotoLibraryChangeObserver {
                     self.selects.removeAll { $0 == sm }
                 }
             }
+            self.selectAssetChanged?(self.selects.count)
             self.reloadData()
         }
     }

@@ -79,6 +79,8 @@ public protocol ADThumbnailToolBarConfigurable {
     
     var height: CGFloat { get }
     
+    var selectCount: Int { set get }
+    
 }
 
 public typealias ADProgressableable = (UIView & ADProgressConfigurable)

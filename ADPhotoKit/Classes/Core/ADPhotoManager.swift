@@ -62,7 +62,7 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.thumbnailToolBar]
     
     @available(iOS 14, *)
-    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar]
+    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar,.allowAuthTips]
 }
 
 public class ADPhotoManager {

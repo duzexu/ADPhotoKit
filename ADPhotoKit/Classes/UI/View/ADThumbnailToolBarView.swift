@@ -30,7 +30,7 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     public var selectCount: Int = 0 {
         didSet {
             if selectCount > 0 {
-                doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(selectCount)", for: .normal)
+                doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(selectCount))", for: .normal)
                 doneBtn.isEnabled = true
                 previewBtn.isEnabled = true
             }else{
@@ -106,6 +106,7 @@ private extension ADThumbnailToolBarView {
             label.snp.makeConstraints { (make) in
                 make.left.equalToSuperview().offset(55)
                 make.right.equalToSuperview().offset(-30)
+                make.centerY.equalToSuperview()
                 make.height.equalTo(40)
             }
             
@@ -123,7 +124,8 @@ private extension ADThumbnailToolBarView {
         let btnsView = UIView()
         addSubview(btnsView)
         btnsView.snp.makeConstraints { (make) in
-            make.left.bottom.right.equalToSuperview()
+            make.left.right.equalToSuperview()
+            make.top.equalToSuperview().offset(authTipsEnable ? 70 : 0)
             make.height.equalTo(55)
         }
         
@@ -140,7 +142,8 @@ private extension ADThumbnailToolBarView {
         originalBtn.isSelected = isSelectedOriginal
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
-        originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: -10)
+        originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
+        originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
         btnsView.addSubview(originalBtn)
         originalBtn.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
@@ -192,7 +195,7 @@ private extension ADThumbnailToolBarView {
     
     @objc
     func originalAction() {
-        
+        isSelectedOriginal = !isSelectedOriginal
     }
     
     @objc

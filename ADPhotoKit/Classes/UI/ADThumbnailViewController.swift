@@ -110,18 +110,19 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
-        
-        var insetsBottom: CGFloat = 0
-        if #available(iOS 11.0, *) {
-            insetsBottom = view.safeAreaInsets.bottom
-        }
         toolBarView = ADThumbnailToolBarView(model: model)
+        toolBarView.selectCount = model.assets.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(toolBarView.height+insetsBottom)
+            make.height.equalTo(toolBarView.height+tabBarOffset)
         }
+        
+        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+        dataSource.selectAssetChanged = { [weak self] count in
+            self?.toolBarView.selectCount = count
+        }
+        
     }
     
 }
