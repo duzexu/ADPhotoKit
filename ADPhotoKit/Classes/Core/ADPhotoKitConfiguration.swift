@@ -37,6 +37,8 @@ public class ADPhotoKitConfiguration {
     
     public var thumbnailLayout = ThumbnailControllerLayout()
     
+    public var browseItemSpacing: CGFloat = 40
+    
     #endif
 
 }

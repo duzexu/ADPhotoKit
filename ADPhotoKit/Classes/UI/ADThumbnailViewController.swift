@@ -142,10 +142,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let columnCount: CGFloat = CGFloat(ADPhotoKitConfiguration.default.thumbnailLayout.columnCount)
-        let totalW = collectionView.bounds.width - (columnCount - 1) * ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing
-        let singleW = totalW / columnCount
-        return CGSize(width: singleW, height: singleW)
+        return ADAssetModel.thumbnailSize
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -258,7 +255,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             if !model.assetOpts.contains(.allowPreview) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
-                
+                let browser = ADAssetModelBrowserController(dataSource: dataSource, index: indexPath.row)
+                navigationController?.pushViewController(browser, animated: true)
             }
         }
     }

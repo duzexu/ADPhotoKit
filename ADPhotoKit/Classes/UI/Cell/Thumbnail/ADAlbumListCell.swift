@@ -10,10 +10,6 @@ import Photos
 
 class ADAlbumListCell: UITableViewCell {
 
-    var identifier: String?
-    
-    var requestID: PHImageRequestID?
-    
     var albumModel: ADAlbumModel!
     
     /// ui
@@ -74,19 +70,10 @@ extension ADAlbumListCell: ADAlbumListConfigurable {
     
     func configure(with model: ADAlbumModel) {
         albumModel = model
-        identifier = model.lastestAsset?.localIdentifier
         albumTitleLabel.text = model.title
         albumCountLabel.text = "(\(model.count))"
-        albumImageView.image = Bundle.uiBundle?.image(name: "defaultphoto")
         if let asset = model.lastestAsset {
-            if let id = requestID {
-                PHImageManager.default().cancelImageRequest(id)
-            }
-            requestID = ADPhotoManager.fetch(for: asset, type: .image(size: CGSize(width: 80, height: 80)), progress: nil) { [weak self] (image, _, _) in
-                if self?.identifier == self?.albumModel.lastestAsset?.localIdentifier {
-                    self?.albumImageView?.image =  image as? UIImage
-                }
-            }
+            albumImageView.kf.setImage(with: PHAssetImageDataProvider(asset: asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale)), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
         }
     }
     

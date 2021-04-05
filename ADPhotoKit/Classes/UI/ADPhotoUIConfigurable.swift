@@ -10,10 +10,6 @@ import Photos
 
 public protocol ADAlbumListConfigurable {
     
-    var identifier: String? { set get }
-    
-    var requestID: PHImageRequestID? { set get }
-    
     var albumModel: ADAlbumModel! { set get }
     
     func configure(with model: ADAlbumModel)
@@ -52,16 +48,8 @@ public enum ADThumbnailSelectStatus {
 public typealias ADThumbnailListable = (UICollectionViewCell & ADThumbnailListConfigurable)
 public protocol ADThumbnailListConfigurable {
     
-    var identifier: String? { set get }
-    
-    var smallRequestID: PHImageRequestID? { set get }
-    
-    var bigRequestID: PHImageRequestID? { set get }
-    
     var selectStatus: ADThumbnailSelectStatus { set get }
-    
-    var progressView: ADProgressableable! { set get }
-    
+        
     var assetModel: ADAssetModel! { set get }
     
     var indexPath: IndexPath! { set get }

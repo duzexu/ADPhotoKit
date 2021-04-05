@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import Kingfisher
 import Photos
 
 protocol ADAssetBrowsable {
-    var browseAsset: ADAsset? { get }
+    var browseAsset: ADAsset { get }
 }
 
 enum ADImageSource {
@@ -30,7 +31,7 @@ enum ADAsset {
 }
 
 extension ADAssetModel: ADAssetBrowsable {
-    var browseAsset: ADAsset? {
+    var browseAsset: ADAsset {
         if type.isImage  {
             return .image(.album(asset))
         }else{
@@ -40,38 +41,20 @@ extension ADAssetModel: ADAssetBrowsable {
 }
 
 extension PHAsset: ADAssetBrowsable {
-    var browseAsset: ADAsset? {
+    var browseAsset: ADAsset {
         switch self.mediaType {
         case .video:
             return .video(.album(self))
         case .image:
             return .image(.album(self))
         default:
-            return nil
+            return .image(.album(self))
         }
     }
 }
 
 extension UIImage: ADAssetBrowsable {
-    var browseAsset: ADAsset? {
+    var browseAsset: ADAsset {
         return .image(.local(self))
     }
-}
-
-struct PHAssetImageDataProvider: ImageDataProvider {
-    
-    var cacheKey: String {
-        return asset.localIdentifier
-    }
-    
-    let asset: PHAsset
-    
-    init(asset: PHAsset) {
-        self.asset = asset
-    }
-    
-    func data(handler: @escaping (Result<Data, Error>) -> Void) {
-        
-    }
-    
 }

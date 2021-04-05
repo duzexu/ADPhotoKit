@@ -199,20 +199,7 @@ public class ADAssetModel: Equatable {
     public var whRatio: CGFloat {
         return CGFloat(self.asset.pixelWidth) / CGFloat(self.asset.pixelHeight)
     }
-    
-    public var previewSize: CGSize {
-        let scale: CGFloat = 2 //UIScreen.main.scale
-        if self.whRatio > 1 {
-            let h = min(UIScreen.main.bounds.height, 600) * scale
-            let w = h * self.whRatio
-            return CGSize(width: w, height: h)
-        } else {
-            let w = min(UIScreen.main.bounds.width, 600) * scale
-            let h = w / self.whRatio
-            return CGSize(width: w, height: h)
-        }
-    }
-        
+      
     public init(asset: PHAsset) {
         self.identifier = asset.localIdentifier
         self.asset = asset

@@ -59,10 +59,10 @@ public struct ADAssetSelectOptions: OptionSet {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.thumbnailToolBar]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.thumbnailToolBar,.allowPreview]
     
     @available(iOS 14, *)
-    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar,.allowAuthTips]
+    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar,.allowAuthTips,.allowPreview]
 }
 
 public class ADPhotoManager {
@@ -182,7 +182,7 @@ public class ADPhotoManager {
     }
     
     public typealias ADAssetProgressHandler = (Double, Error?, UnsafeMutablePointer<ObjCBool>, [AnyHashable : Any]?) -> Void
-    public typealias ADAssetCompletionHandler = (Any, [AnyHashable: Any]?, Bool) -> Void
+    public typealias ADAssetCompletionHandler = (Any?, [AnyHashable: Any]?, Bool) -> Void
     public typealias ADImageCompletionHandler = (UIImage?, [AnyHashable: Any]?, Bool) -> Void
     public typealias ADDataCompletionHandler = (Data?, [AnyHashable: Any]?, Bool) -> Void
     public typealias ADLivePhotoCompletionHandler = (PHLivePhoto?, [AnyHashable: Any]?, Bool) -> Void

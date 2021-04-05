@@ -8,22 +8,23 @@
 import UIKit
 import Photos
 
+extension ADAssetModel {
+    static var thumbnailSize: CGSize {
+        let columnCount: CGFloat = CGFloat(ADPhotoKitConfiguration.default.thumbnailLayout.columnCount)
+        let totalW = screenWidth - (columnCount - 1) * ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing
+        let singleW = totalW / columnCount
+        return CGSize(width: singleW, height: singleW)
+    }
+}
+
 class ADThumbnailListCell: UICollectionViewCell {
-    
-    var identifier: String?
-    
-    var smallRequestID: PHImageRequestID?
-    
-    var bigRequestID: PHImageRequestID?
-    
+        
     var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
         didSet {
             selectStatusDidChange()
         }
     }
-    
-    var progressView: ADProgressableable!
-    
+        
     var selectAction: ((ADThumbnailListable,Bool)->Void)?
     
     var assetModel: ADAssetModel!
@@ -114,20 +115,9 @@ class ADThumbnailListCell: UICollectionViewCell {
             make.top.equalToSuperview().offset(1)
             make.right.equalToSuperview().offset(-5)
         }
-        
-        progressView = ADProgressView(frame: .zero)
-        progressView.isHidden = true
-        addSubview(progressView)
-        progressView.snp.makeConstraints { (make) in
-            make.size.equalTo(CGSize(width: 20, height: 20))
-            make.center.equalToSuperview()
-        }
     }
     
     func selectStatusDidChange() {
-        if let id = bigRequestID {
-            PHImageManager.default().cancelImageRequest(id)
-        }
         switch selectStatus {
         case let .select(index):
             selectBtn.isEnabled = true
@@ -137,24 +127,6 @@ class ADThumbnailListCell: UICollectionViewCell {
                 selectBtn.isSelected = true
                 indexLabel.isHidden = false
                 indexLabel.text = "\(idx)"
-                bigRequestID = ADPhotoManager.fetch(for: assetModel.asset, type: .originImageData, progress: { [weak self] (progress, err, _, _) in
-                    if self?.selectStatus.isSelect == true {
-                        self?.progressView.isHidden = false
-                        self?.progressView.progress = max(0.1, CGFloat(progress))
-                        self?.imageView.alpha = 0.5
-                        if progress >= 1 {
-                            self?.progressView.isHidden = true
-                            self?.imageView.alpha = 1
-                        }
-                    } else {
-                        if let id = self?.bigRequestID {
-                            PHImageManager.default().cancelImageRequest(id)
-                        }
-                    }
-                }, completion: { [weak self] (_, _, _) in
-                    self?.progressView.isHidden = true
-                    self?.imageView.alpha = 1
-                })
             }else{
                 coverView.isHidden = true
                 indexLabel.isHidden = true
@@ -186,7 +158,6 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
             self.indexPath = index
         }
         assetModel = model
-        identifier = model.identifier
         selectStatus = model.selectStatus
         selectBtn.isHidden = !(ADPhotoKitUI.internalModel?.displaySelectBtn(model: model) ?? true)
         
@@ -209,15 +180,7 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
             descLabel.text = format
         }
         
-        if let id = smallRequestID {
-            PHImageManager.default().cancelImageRequest(id)
-        }
-        //imageView.image = Bundle.uiBundle?.image(name: "defaultphoto")
-        smallRequestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: bounds.size), progress: nil) { [weak self] (image, _, _) in
-            if self?.identifier == self?.assetModel.identifier {
-                self?.imageView?.image =  image as? UIImage
-            }
-        }
+        imageView.kf.setImage(with: PHAssetImageDataProvider(asset: model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale)), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
     }
     
     func cellSelectAction() {
