@@ -123,24 +123,98 @@ private extension ADImageBrowserView {
             } completionHandler: { [weak self] (result) in
                 self?.progressView.isHidden = true
                 if let img = try? result.get() {
-                    self?.imageView.image = img.image
-                }else{
-                    
+                    self?.resizeView(pixelWidth: img.image.size.width, pixelHeight: img.image.size.height)
                 }
             }
         case let .album(asset):
-            contentView.frame = CGRect(x: 0, y: 0, width: asset.pixelWidth, height: asset.pixelHeight)
-            scrollView.contentSize = CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
+            progressView.isHidden = false
+            progressView.progress = 0
+            resizeView(pixelWidth: CGFloat(asset.pixelWidth), pixelHeight: CGFloat(asset.pixelHeight))
             let model = ADAssetModel(asset: asset)
-            if model.type == .gif {
-                
-            }else{
-                
-            }
             imageView.kf.setImage(with: PHAssetImageDataProvider(asset: asset, size: model.browserSize))
         case let .local(img):
+            progressView.isHidden = true
             imageView.image = img
+            resizeView(pixelWidth: img.size.width, pixelHeight: img.size.height)
         }
+    }
+    
+    func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {
+        let imageSize = CGSize(width: pixelWidth, height: pixelHeight)
+        
+        var frame: CGRect = .zero
+        var contenSize: CGSize = .zero
+        
+        let viewW = screenWidth
+        let viewH = screenHeight
+        
+        var width = viewW
+        
+        if UIApplication.shared.statusBarOrientation.isLandscape {
+            let height = viewH
+            frame.size.height = height
+            
+            let imageWHRatio = imageSize.width / imageSize.height
+            let viewWHRatio = viewW / viewH
+            
+            if imageWHRatio > viewWHRatio {
+                frame.size.width = floor(height * imageWHRatio)
+                if frame.size.width > viewW {
+                    // 宽图
+                    frame.size.width = viewW
+                    frame.size.height = viewW / imageWHRatio
+                }
+            } else {
+                width = floor(height * imageWHRatio)
+                if width < 1 || width.isNaN {
+                    width = viewW
+                }
+                frame.size.width = width
+            }
+        } else {
+            frame.size.width = width
+            
+            let imageHWRatio = imageSize.height / imageSize.width
+            let viewHWRatio = viewH / viewW
+            
+            if imageHWRatio > viewHWRatio {
+                // 长图
+                frame.size.width = min(imageSize.width, viewW)
+                frame.size.height = floor(frame.size.width * imageHWRatio)
+            } else {
+                var height = floor(frame.size.width * imageHWRatio)
+                if height < 1 || height.isNaN {
+                    height = viewH
+                }
+                frame.size.height = height
+            }
+        }
+        
+        // 优化 scroll view zoom scale
+        if frame.width < frame.height {
+            scrollView.maximumZoomScale = max(3, viewW / frame.width)
+        } else {
+            scrollView.maximumZoomScale = max(3, viewH / frame.height)
+        }
+        
+        contentView.frame = frame
+        
+        if UIApplication.shared.statusBarOrientation.isLandscape {
+            contenSize = CGSize(width: width, height: max(viewH, frame.height))
+            if frame.height < viewH {
+                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
+            } else {
+                contentView.frame = CGRect(origin: CGPoint(x: (viewW-frame.width)/2, y: 0), size: frame.size)
+            }
+        } else {
+            contenSize = frame.size
+            if frame.width < viewW || frame.height < viewH {
+                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
+            }
+        }
+        
+        scrollView.contentSize = contenSize
+        scrollView.contentOffset = .zero
     }
     
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {

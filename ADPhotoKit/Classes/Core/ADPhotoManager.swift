@@ -169,7 +169,7 @@ public class ADPhotoManager {
     
     public enum AssetResultType {
         /// size为nil 获取原图
-        case image(size: CGSize?, resizeMode: PHImageRequestOptionsResizeMode = .fast)
+        case image(size: CGSize?, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false)
         case originImageData
         
         case livePhoto
@@ -194,8 +194,8 @@ public class ADPhotoManager {
     @discardableResult
     class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler?, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
         switch type {
-        case let .image(size, resizeMode):
-            return fetchImage(for: asset, size: size, resizeMode: resizeMode, progress: progress, completion: completion)
+        case let .image(size, resizeMode, synchronous):
+            return fetchImage(for: asset, size: size, resizeMode: resizeMode, synchronous: synchronous, progress: progress, completion: completion)
         case .originImageData:
             return fetchOriginImageData(for: asset, progress: progress, completion: completion)
         case .livePhoto:
@@ -212,10 +212,11 @@ public class ADPhotoManager {
         
     /// Fetch image for asset.
     @discardableResult
-    class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADImageCompletionHandler) -> PHImageRequestID {
+    class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADImageCompletionHandler) -> PHImageRequestID {
         let option = PHImageRequestOptions()
         option.resizeMode = resizeMode
         option.isNetworkAccessAllowed = true
+        option.isSynchronous = synchronous
         option.progressHandler = { (pro, error, stop, info) in
             DispatchQueue.main.async {
                 progress?(pro, error, stop, info)

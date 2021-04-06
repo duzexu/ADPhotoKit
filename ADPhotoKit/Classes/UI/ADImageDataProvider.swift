@@ -24,12 +24,14 @@ class PHAssetImageDataProvider: ImageDataProvider {
     
     let asset: PHAsset
     let size: CGSize?
+    let progress: ((String,Double)->Void)?
     
     private var requestID: PHImageRequestID?
     
-    init(asset: PHAsset, size: CGSize? = nil) {
+    init(asset: PHAsset, size: CGSize? = nil, progress: ((String,Double)->Void)? = nil) {
         self.asset = asset
         self.size = size
+        self.progress = progress
     }
     
     deinit {
@@ -43,16 +45,23 @@ class PHAssetImageDataProvider: ImageDataProvider {
             PHImageManager.default().cancelImageRequest(id)
         }
         if let s = size {
-            requestID = ADPhotoManager.fetch(for: asset, type: .image(size: s), progress: nil) { (image, info, _) in
+            requestID = ADPhotoManager.fetch(for: asset, type: .image(size: s, synchronous: true), progress: { [weak self] (pro, _, _, _) in
+                guard let strong = self else { return }
+                print(pro)
+                self?.progress?(strong.asset.localIdentifier,pro)
+            }, completion: { (image, info, _) in
                 if let img = image as? UIImage {
                     handler(.success(img.pngData()!))
                 }else{
                     let error: Error = ((info?[PHImageErrorKey]) as? Error) ?? ADImageDataProviderError.fetchError
                     handler(.failure(error))
                 }
-            }
+            })
         }else{
-            requestID = ADPhotoManager.fetch(for: asset, type: .originImageData, progress: nil, completion: { (data, info, _) in
+            requestID = ADPhotoManager.fetch(for: asset, type: .originImageData, progress: { [weak self] (pro, _, _, _) in
+                guard let strong = self else { return }
+                self?.progress?(strong.asset.localIdentifier,pro)
+            }, completion: { (data, info, _) in
                 if let d = data as? Data {
                     handler(.success(d))
                 }else{
