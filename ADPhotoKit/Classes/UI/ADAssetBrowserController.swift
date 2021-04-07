@@ -122,6 +122,11 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
                 
             }
         }
+        (cell as? ADBrowserBaseCell)?.cellWillDisplay()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        (cell as? ADBrowserBaseCell)?.cellDidEndDisplay()
     }
     
 }

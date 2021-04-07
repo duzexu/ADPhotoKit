@@ -115,6 +115,7 @@ private extension ADImageBrowserView {
     }
     
     func loadImageSource(_ source: ADImageSource) {
+        scrollView.zoomScale = 1
         switch source {
         case let .network(url):
             progressView.isHidden = false
@@ -132,17 +133,26 @@ private extension ADImageBrowserView {
             progressView.progress = 0
             resizeView(pixelWidth: CGFloat(asset.pixelWidth), pixelHeight: CGFloat(asset.pixelHeight))
             if asset.isGif { //gif 情况下优先加载一个小的缩略图
-                imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (p) in
-                    self?.progressView.progress = CGFloat(p)
-                }
+                imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
+                    self?.progressView.isHidden = true
+                    self?.loadOriginImageData(asset: asset)
+                })
             }else{
-                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (p) in
+                    self?.progressView.progress = CGFloat(p)
+                } completionHandler: { [weak self] (img) in
+                    self?.progressView.isHidden = true
+                }
             }
         case let .local(img):
             progressView.isHidden = true
             imageView.image = img
             resizeView(pixelWidth: img.size.width, pixelHeight: img.size.height)
         }
+    }
+    
+    func loadOriginImageData(asset: PHAsset) {
+        imageView.kf.setImage(with: PHAssetImageDataProvider(asset: asset))
     }
     
     func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {
@@ -243,7 +253,9 @@ extension ADImageBrowserView: UIScrollViewDelegate {
         return contentView
     }
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        
+        let offsetX = (scrollView.frame.width > scrollView.contentSize.width) ? (scrollView.frame.width - scrollView.contentSize.width) * 0.5 : 0
+        let offsetY = (scrollView.frame.height > scrollView.contentSize.height) ? (scrollView.frame.height - scrollView.contentSize.height) * 0.5 : 0
+        contentView.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY)
     }
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         
