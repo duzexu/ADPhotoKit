@@ -9,6 +9,17 @@ import UIKit
 import Photos
 import Kingfisher
 
+extension ADAsset {
+    var reuseIdentifier: String {
+        switch self {
+        case .image(_):
+            return ADImageBrowserCell.reuseIdentifier
+        case .video(_):
+            return ADVideoBrowserCell.reuseIdentifier
+        }
+    }
+}
+
 class ADAssetBrowserController: UIViewController {
     
     let dataSource: [ADAssetBrowsable]
@@ -31,8 +42,13 @@ class ADAssetBrowserController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
+        collectionView.layoutIfNeeded()
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        collectionView.reloadData()
     }
     
 }
@@ -90,17 +106,22 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let model = dataSource[indexPath.row]
-        var cell: ADBrowserBaseCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: model.browseAsset.reuseIdentifier, for: indexPath) as! ADBrowserBaseCell
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let model = dataSource[indexPath.row]
         switch model.browseAsset {
         case let .image(source):
-            let imageCell = collectionView.dequeueReusableCell(withReuseIdentifier: ADImageBrowserCell.reuseIdentifier, for: indexPath) as! ADImageBrowserCell
-            imageCell.configure(with: source)
-            cell = imageCell
+            if let imageCell = cell as? ADImageBrowserCell {
+                imageCell.configure(with: source)
+            }
         case let .video(source):
-            let videoCell = collectionView.dequeueReusableCell(withReuseIdentifier: ADVideoBrowserCell.reuseIdentifier, for: indexPath) as! ADVideoBrowserCell
-            cell = videoCell
+            if let imageCell = cell as? ADVideoBrowserCell {
+                
+            }
         }
-        return cell
     }
     
 }

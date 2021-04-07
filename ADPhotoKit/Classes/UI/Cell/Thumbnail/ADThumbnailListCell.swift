@@ -180,7 +180,7 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
             descLabel.text = format
         }
         
-        imageView.kf.setImage(with: PHAssetImageDataProvider(asset: model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale)), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+        imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
     }
     
     func cellSelectAction() {

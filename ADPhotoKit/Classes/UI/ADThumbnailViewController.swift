@@ -171,9 +171,9 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
         
-        let new = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
-        let model = dataSource.list[new.row]
-        cell.configure(with: model, indexPath: new)
+        let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+        let model = dataSource.list[modify.row]
+        cell.configure(with: model, indexPath: modify)
         cell.selectAction = { [weak self] cell, sel in
             guard let strong = self else {
                 return
@@ -255,7 +255,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             if !model.assetOpts.contains(.allowPreview) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
-                let browser = ADAssetModelBrowserController(dataSource: dataSource, index: indexPath.row)
+                let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+                let browser = ADAssetModelBrowserController(dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
         }

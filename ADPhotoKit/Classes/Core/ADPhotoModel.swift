@@ -196,10 +196,6 @@ public class ADAssetModel: Equatable {
             
     public var selectStatus: ADThumbnailSelectStatus = .select(index: nil)
     
-    public var whRatio: CGFloat {
-        return CGFloat(self.asset.pixelWidth) / CGFloat(self.asset.pixelHeight)
-    }
-      
     public init(asset: PHAsset) {
         self.identifier = asset.localIdentifier
         self.asset = asset

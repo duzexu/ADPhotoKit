@@ -6,17 +6,18 @@
 //
 
 import UIKit
+import Photos
 
-extension ADAssetModel {
+extension PHAsset {
     public var browserSize: CGSize {
-        let scale: CGFloat = UIScreen.main.scale
-        if self.whRatio > 1 {
+        let scale: CGFloat = 2
+        if whRatio > 1 {
             let h = min(UIScreen.main.bounds.height, 600) * scale
-            let w = h * self.whRatio
+            let w = h * whRatio
             return CGSize(width: w, height: h)
         } else {
             let w = min(UIScreen.main.bounds.width, 600) * scale
-            let h = w / self.whRatio
+            let h = w / whRatio
             return CGSize(width: w, height: h)
         }
     }
@@ -130,8 +131,13 @@ private extension ADImageBrowserView {
             progressView.isHidden = false
             progressView.progress = 0
             resizeView(pixelWidth: CGFloat(asset.pixelWidth), pixelHeight: CGFloat(asset.pixelHeight))
-            let model = ADAssetModel(asset: asset)
-            imageView.kf.setImage(with: PHAssetImageDataProvider(asset: asset, size: model.browserSize))
+            if asset.isGif { //gif 情况下优先加载一个小的缩略图
+                imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (p) in
+                    self?.progressView.progress = CGFloat(p)
+                }
+            }else{
+                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+            }
         case let .local(img):
             progressView.isHidden = true
             imageView.image = img

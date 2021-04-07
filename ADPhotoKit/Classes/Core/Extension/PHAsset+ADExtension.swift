@@ -16,4 +16,33 @@ extension PHAsset {
         return !(resource.value(forKey: "locallyAvailable") as? Bool ?? true)
     }
     
+    var whRatio: CGFloat {
+        return CGFloat(pixelWidth) / CGFloat(pixelHeight)
+    }
+    
+    var isGif: Bool {
+        switch mediaType {
+        case .image:
+            if (value(forKey: "filename") as? String)?.hasSuffix("GIF") == true {
+                return true
+            }
+        default:
+            break
+        }
+        return false
+    }
+    
+    @available(iOS 9.1, *)
+    var isLivePhoto: Bool {
+        switch mediaType {
+        case .image:
+            if mediaSubtypes == .photoLive || mediaSubtypes.rawValue == 10 {
+                return true
+            }
+        default:
+            break
+        }
+        return false
+    }
+    
 }

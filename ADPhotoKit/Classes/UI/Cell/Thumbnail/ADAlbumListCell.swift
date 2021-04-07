@@ -73,7 +73,7 @@ extension ADAlbumListCell: ADAlbumListConfigurable {
         albumTitleLabel.text = model.title
         albumCountLabel.text = "(\(model.count))"
         if let asset = model.lastestAsset {
-            albumImageView.kf.setImage(with: PHAssetImageDataProvider(asset: asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale)), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+            albumImageView.setAsset(asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
         }
     }
     

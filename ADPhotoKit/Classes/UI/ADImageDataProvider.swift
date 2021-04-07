@@ -45,18 +45,19 @@ class PHAssetImageDataProvider: ImageDataProvider {
             PHImageManager.default().cancelImageRequest(id)
         }
         if let s = size {
-            requestID = ADPhotoManager.fetch(for: asset, type: .image(size: s, synchronous: true), progress: { [weak self] (pro, _, _, _) in
-                guard let strong = self else { return }
-                print(pro)
-                self?.progress?(strong.asset.localIdentifier,pro)
-            }, completion: { (image, info, _) in
-                if let img = image as? UIImage {
-                    handler(.success(img.pngData()!))
-                }else{
-                    let error: Error = ((info?[PHImageErrorKey]) as? Error) ?? ADImageDataProviderError.fetchError
-                    handler(.failure(error))
-                }
-            })
+            DispatchQueue.global().async {
+                self.requestID = ADPhotoManager.fetch(for: self.asset, type: .image(size: s, synchronous: true), progress: { [weak self] (pro, _, _, _) in
+                    guard let strong = self else { return }
+                    self?.progress?(strong.asset.localIdentifier,pro)
+                }, completion: { (image, info, _) in
+                    if let img = image as? UIImage {
+                        handler(.success(img.pngData()!))
+                    }else{
+                        let error: Error = ((info?[PHImageErrorKey]) as? Error) ?? ADImageDataProviderError.fetchError
+                        handler(.failure(error))
+                    }
+                })
+            }
         }else{
             requestID = ADPhotoManager.fetch(for: asset, type: .originImageData, progress: { [weak self] (pro, _, _, _) in
                 guard let strong = self else { return }
