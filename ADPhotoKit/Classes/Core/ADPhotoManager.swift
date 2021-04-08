@@ -192,7 +192,7 @@ public class ADPhotoManager {
     
     /// 获取资源文件
     @discardableResult
-    class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler?, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
+    class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler? = nil, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
         switch type {
         case let .image(size, resizeMode, synchronous):
             return fetchImage(for: asset, size: size, resizeMode: resizeMode, synchronous: synchronous, progress: progress, completion: completion)

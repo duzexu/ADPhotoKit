@@ -9,6 +9,8 @@ import UIKit
 
 class ADBrowserBaseCell: UICollectionViewCell {
     
+    var singleTapBlock: (() -> Void)?
+    
     func cellWillDisplay() {
         
     }

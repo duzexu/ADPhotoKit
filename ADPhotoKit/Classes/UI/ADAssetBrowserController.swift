@@ -48,7 +48,6 @@ class ADAssetBrowserController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        collectionView.reloadData()
     }
     
 }
@@ -115,11 +114,11 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
         switch model.browseAsset {
         case let .image(source):
             if let imageCell = cell as? ADImageBrowserCell {
-                imageCell.configure(with: source)
+                imageCell.configure(with: source, indexPath: indexPath)
             }
         case let .video(source):
-            if let imageCell = cell as? ADVideoBrowserCell {
-                
+            if let videoCell = cell as? ADVideoBrowserCell {
+                videoCell.configure(with: source, indexPath: indexPath)
             }
         }
         (cell as? ADBrowserBaseCell)?.cellWillDisplay()

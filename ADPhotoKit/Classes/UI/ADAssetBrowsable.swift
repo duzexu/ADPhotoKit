@@ -17,6 +17,18 @@ enum ADImageSource {
     case network(URL)
     case album(PHAsset)
     case local(UIImage)
+    
+    var identifier: String {
+        switch self {
+        case let .network(url):
+            return url.absoluteString
+        case let .album(asset):
+            return asset.localIdentifier
+        case .local(_):
+            return UUID().uuidString
+        }
+    }
+    
 }
 
 enum ADVideoSource {

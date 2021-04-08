@@ -7,6 +7,7 @@
 
 import UIKit
 import Photos
+import PhotosUI
 
 extension PHAsset {
     public var browserSize: CGSize {
@@ -23,15 +24,49 @@ extension PHAsset {
     }
 }
 
+extension ADImageSource {
+    var isLivePhoto: Bool {
+        switch self {
+        case let .album(asset):
+            if #available(iOS 9.1, *) {
+                return asset.isLivePhoto
+            }
+            return false
+        default:
+            return false
+        }
+    }
+    var livePhotoAsset: PHAsset? {
+        switch self {
+        case let .album(asset):
+            if #available(iOS 9.1, *) {
+                return asset
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
+}
+
 class ADImageBrowserCell: ADBrowserBaseCell {
     
-    var browserView: ADImageBrowserView!
+    var imageBrowserView: ADImageBrowserView!
     
+    var livePhotoBrowserView: ADLivePhotoBrowserView!
+    
+    var indexPath: IndexPath?
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
-        browserView = ADImageBrowserView(frame: .zero)
-        addSubview(browserView)
-        browserView.snp.makeConstraints { (make) in
+        imageBrowserView = ADImageBrowserView(frame: .zero)
+        contentView.addSubview(imageBrowserView)
+        imageBrowserView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        livePhotoBrowserView = ADLivePhotoBrowserView(frame: .zero)
+        contentView.addSubview(livePhotoBrowserView)
+        livePhotoBrowserView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
     }
@@ -41,7 +76,14 @@ class ADImageBrowserCell: ADBrowserBaseCell {
     }
     
     func configure(with source: ADImageSource, indexPath: IndexPath? = nil) {
-        browserView.source = source
+        self.indexPath = indexPath
+        imageBrowserView.isHidden = source.isLivePhoto
+        livePhotoBrowserView.isHidden = !source.isLivePhoto
+        if source.isLivePhoto {
+            livePhotoBrowserView.asset = source.livePhotoAsset!
+        }else{
+            imageBrowserView.source = source
+        }
     }
 }
 
@@ -49,7 +91,9 @@ class ADImageBrowserView: UIView {
     
     var source: ADImageSource! {
         didSet {
-            loadImageSource(source)
+            if source.identifier != identifier {
+                loadImageSource(source)
+            }
         }
     }
     
@@ -58,6 +102,8 @@ class ADImageBrowserView: UIView {
     var imageView: UIImageView!
     
     var progressView: ADProgressView!
+    
+    private var identifier: String?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -115,6 +161,7 @@ private extension ADImageBrowserView {
     }
     
     func loadImageSource(_ source: ADImageSource) {
+        identifier = source.identifier
         scrollView.zoomScale = 1
         switch source {
         case let .network(url):
@@ -129,17 +176,21 @@ private extension ADImageBrowserView {
                 }
             }
         case let .album(asset):
-            progressView.isHidden = false
+            progressView.isHidden = true
             progressView.progress = 0
             resizeView(pixelWidth: CGFloat(asset.pixelWidth), pixelHeight: CGFloat(asset.pixelHeight))
             if asset.isGif { //gif 情况下优先加载一个小的缩略图
                 imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
-                    self?.progressView.isHidden = true
                     self?.loadOriginImageData(asset: asset)
                 })
             }else{
-                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (p) in
-                    self?.progressView.progress = CGFloat(p)
+                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (progress) in
+                    if progress >= 1 {
+                        self?.progressView.isHidden = true
+                    }else{
+                        self?.progressView.isHidden = false
+                    }
+                    self?.progressView.progress = CGFloat(progress)
                 } completionHandler: { [weak self] (img) in
                     self?.progressView.isHidden = true
                 }
@@ -259,5 +310,73 @@ extension ADImageBrowserView: UIScrollViewDelegate {
     }
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         
+    }
+}
+
+class ADLivePhotoBrowserView: UIView {
+    
+    var asset: PHAsset! {
+        didSet {
+            if identifier != asset.localIdentifier {
+                loadAsset(asset)
+            }
+        }
+    }
+    
+    var livePhotoView: PHLivePhotoView!
+    
+    var imageView: UIImageView!
+    
+    private var identifier: String?
+    
+    private var requestID: PHImageRequestID?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+}
+
+private extension ADLivePhotoBrowserView {
+    func setupUI() {
+        livePhotoView = PHLivePhotoView()
+        livePhotoView.contentMode = .scaleAspectFit
+        addSubview(livePhotoView)
+        livePhotoView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        
+        imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        addSubview(imageView)
+        imageView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func loadAsset(_ asset: PHAsset) {
+        identifier = asset.localIdentifier
+        livePhotoView.isHidden = true
+        imageView.isHidden = false
+        if let id = requestID {
+            PHImageManager.default().cancelImageRequest(id)
+        }
+        imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
+            self?.loadLivePhotoData(asset: asset)
+        })
+    }
+    
+    func loadLivePhotoData(asset: PHAsset) {
+        requestID = ADPhotoManager.fetch(for: asset, type: .livePhoto, completion: { [weak self] (livePhoto, _, _) in
+            self?.livePhotoView.livePhoto = livePhoto as? PHLivePhoto
+            self?.livePhotoView.isHidden = false
+            self?.imageView.isHidden = true
+            self?.livePhotoView.startPlayback(with: .full)
+        })
     }
 }
