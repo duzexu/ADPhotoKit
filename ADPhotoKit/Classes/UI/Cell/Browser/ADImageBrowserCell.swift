@@ -85,6 +85,23 @@ class ADImageBrowserCell: ADBrowserBaseCell {
             imageBrowserView.source = source
         }
     }
+        
+    override func transationBegin() -> (UIView, CGRect) {
+        if !imageBrowserView.isHidden {
+            let trans = imageBrowserView.imageView
+            let frame = trans!.superview!.convert(trans!.frame, to: self)
+            let imageView = UIImageView(image: trans!.image)
+            imageView.contentMode = .scaleAspectFit
+            return (imageView,frame)
+        }else{
+            let trans = livePhotoBrowserView.imageView
+            let frame = trans!.superview!.convert(trans!.frame, to: self)
+            let imageView = UIImageView(image: trans!.image)
+            imageView.contentMode = .scaleAspectFit
+            return (imageView,frame)
+        }
+    }
+    
 }
 
 class ADImageBrowserView: UIView {

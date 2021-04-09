@@ -19,6 +19,15 @@ class ADBrowserBaseCell: UICollectionViewCell {
         
     }
     
+    ///transation
+    func transationBegin() -> (UIView,CGRect) {
+        return (UIView(),.zero)
+    }
+    
+    func transationCancel(view: UIView) {
+        
+    }
+    
 }
 
 

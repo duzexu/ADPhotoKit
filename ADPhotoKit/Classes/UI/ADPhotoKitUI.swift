@@ -55,6 +55,7 @@ public class ADPhotoKitUI {
             let album = ADAlbumListController(model: `internal`)
             let nav = ADPhotoNavController(rootViewController: album, model: `internal`)
             let thumbnail = ADThumbnailViewController(model: `internal`, albumList: model)
+            nav.modalPresentationStyle = .fullScreen
             nav.pushViewController(thumbnail, animated: false)
             on.present(nav, animated: true, completion: nil)
         }

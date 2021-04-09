@@ -35,11 +35,31 @@ enum ADVideoSource {
     case network(URL)
     case album(PHAsset)
     case local(URL)
+    
+    var identifier: String {
+        switch self {
+        case let .network(url):
+            return url.absoluteString
+        case let .album(asset):
+            return asset.localIdentifier
+        case let .local(url):
+            return url.absoluteString
+        }
+    }
 }
 
 enum ADAsset {
     case image(ADImageSource)
     case video(ADVideoSource)
+    
+    var identifier: String {
+        switch self {
+        case let .image(source):
+            return source.identifier
+        case let .video(source):
+            return source.identifier
+        }
+    }
 }
 
 extension ADAssetModel: ADAssetBrowsable {

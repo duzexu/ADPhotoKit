@@ -28,6 +28,8 @@ class ADAssetBrowserController: UIViewController {
     
     var collectionView: UICollectionView!
     
+    var popTransition: ADAssetBrowserInteractiveTransition?
+    
     init(assets: [ADAssetBrowsable], index: Int = 0, selects: [Int] = []) {
         self.dataSource = assets
         self.index = index
@@ -42,6 +44,7 @@ class ADAssetBrowserController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupTransition()
         collectionView.layoutIfNeeded()
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
     }
@@ -79,6 +82,20 @@ private extension ADAssetBrowserController {
         collectionView.regisiter(cell: ADVideoBrowserCell.self)
     }
     
+    func setupTransition() {
+        guard let nav = navigationController else {
+            return
+        }
+        guard nav.viewControllers.count > 1 else {
+            return
+        }
+        let from = nav.viewControllers[nav.viewControllers.count-2]
+        guard from is ADAssetBrowserTransitionContextTo else {
+            return
+        }
+        navigationController?.delegate = self
+        popTransition = ADAssetBrowserInteractiveTransition(transable: self)
+    }
 }
 
 extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -126,6 +143,60 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? ADBrowserBaseCell)?.cellDidEndDisplay()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offset = scrollView.contentOffset
+        var idx = Int(offset.x / scrollView.bounds.width)
+        idx = max(0, min(idx, dataSource.count-1))
+        if idx != index  {
+            index = idx
+        }
+    }
+    
+}
+
+extension ADAssetBrowserController: UINavigationControllerDelegate {
+    
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        if operation == .pop {
+            return popTransition?.interactive == true ? ADAssetBrowserTransition() : nil
+        }
+        return nil
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        return popTransition?.interactive == true ? popTransition : nil
+    }
+    
+}
+
+extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate {
+    
+    func transitionDidStart() {
+        
+    }
+    
+    func transitionDidCancel(view: UIView?) {
+        let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as! ADBrowserBaseCell
+        cell.transationCancel(view: view!)
+    }
+    
+    func transitionDidFinish() {
+        
+    }
+}
+
+extension ADAssetBrowserController: ADAssetBrowserTransitionContextFrom {
+    
+    var contextIdentifier: String {
+        return dataSource[index].browseAsset.identifier
+    }
+    
+    func transitionInfo(convertTo: UIView) -> (UIView, CGRect) {
+        let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as! ADBrowserBaseCell
+        let info = cell.transationBegin()
+        return (info.0, cell.convert(info.1, to: convertTo))
     }
     
 }

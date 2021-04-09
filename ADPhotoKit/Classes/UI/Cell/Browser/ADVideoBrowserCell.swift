@@ -23,6 +23,8 @@ class ADVideoBrowserCell: ADBrowserBaseCell {
     var imageView: UIImageView!
     var errorLabel: UILabel!
     
+    private var identifier: String?
+    
     private var requestID: PHImageRequestID?
     
     override init(frame: CGRect) {
@@ -40,7 +42,10 @@ class ADVideoBrowserCell: ADBrowserBaseCell {
     
     func configure(with source: ADVideoSource, indexPath: IndexPath? = nil) {
         self.indexPath = indexPath
-        configureCell(source: source)
+        if identifier != source.identifier {
+            identifier = source.identifier
+            configureCell(source: source)
+        }
     }
     
     override func layoutSubviews() {
@@ -50,6 +55,37 @@ class ADVideoBrowserCell: ADBrowserBaseCell {
     
     override func cellDidEndDisplay() {
         pause()
+    }
+    
+    internal class VideoTransView: UIView {
+        
+        var playerLayer: CALayer
+        
+        init(playerLayer: CALayer) {
+            self.playerLayer = playerLayer
+            super.init(frame: playerLayer.frame)
+            layer.addSublayer(playerLayer)
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            playerLayer.frame = bounds
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+    
+    override func transationBegin() -> (UIView, CGRect) {
+        let frame = playerLayer.frame
+        let view = VideoTransView(playerLayer: playerLayer)
+        return (view,frame)
+    }
+    
+    override func transationCancel(view: UIView) {
+        let trans = view as! VideoTransView
+        layer.insertSublayer(trans.playerLayer, at: 0)
     }
 }
 

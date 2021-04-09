@@ -482,3 +482,17 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
     }
     
 }
+
+extension ADThumbnailViewController: ADAssetBrowserTransitionContextTo {
+    func transitionRect(identifier: String, convertTo: UIView) -> CGRect? {
+        let indexPaths = collectionView.indexPathsForVisibleItems
+        for indexPath in indexPaths {
+            if dataSource.list[indexPath.row].asset.localIdentifier == identifier {
+                if let cell = collectionView.cellForItem(at: indexPath) {
+                    return collectionView.convert(cell.frame, to: convertTo)
+                }
+            }
+        }
+        return nil
+    }
+}
