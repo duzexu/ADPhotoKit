@@ -28,6 +28,10 @@ class ADAssetBrowserController: UIViewController {
     
     var collectionView: UICollectionView!
     
+    var controlsView: ADBrowserControlsView!
+    var navView: ADBrowserNavBarable!
+    var toolView: ADBrowserToolBarable!
+    
     var popTransition: ADAssetBrowserInteractiveTransition?
     
     init(assets: [ADAssetBrowsable], index: Int = 0, selects: [Int] = []) {
@@ -47,6 +51,11 @@ class ADAssetBrowserController: UIViewController {
         setupTransition()
         collectionView.layoutIfNeeded()
         collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -80,6 +89,14 @@ private extension ADAssetBrowserController {
         
         collectionView.regisiter(cell: ADImageBrowserCell.self)
         collectionView.regisiter(cell: ADVideoBrowserCell.self)
+        
+        navView = ADBrowserNavBarView(options: .default)
+        toolView = ADBrowserToolBarView(options: .default)
+        controlsView = ADBrowserControlsView(topView: navView, bottomView: toolView)
+        view.addSubview(controlsView)
+        controlsView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
     }
     
     func setupTransition() {
@@ -95,6 +112,10 @@ private extension ADAssetBrowserController {
         }
         navigationController?.delegate = self
         popTransition = ADAssetBrowserInteractiveTransition(transable: self)
+    }
+    
+    func hideOrShowControlsView() {
+        controlsView.isHidden = !controlsView.isHidden
     }
 }
 
@@ -123,6 +144,9 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let model = dataSource[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: model.browseAsset.reuseIdentifier, for: indexPath) as! ADBrowserBaseCell
+        cell.singleTapBlock = { [weak self] in
+            self?.hideOrShowControlsView()
+        }
         return cell
     }
     

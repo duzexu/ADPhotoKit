@@ -65,6 +65,20 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar,.allowAuthTips,.allowPreview]
 }
 
+public struct ADAssetBrowserOptions: OptionSet {
+    public let rawValue: Int
+    
+    public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
+    public static let showSelected = ADAssetBrowserOptions(rawValue: 1 << 1)
+    public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
+    
+    static let `default`: ADAssetBrowserOptions = [.selectOriginal, .showSelected, .selectIndex]
+    
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+}
+
 public class ADPhotoManager {
 
     /// 获取所有的相册列表

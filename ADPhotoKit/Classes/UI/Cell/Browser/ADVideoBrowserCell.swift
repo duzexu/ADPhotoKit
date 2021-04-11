@@ -217,6 +217,7 @@ private extension ADVideoBrowserCell {
             imageView.isHidden = true
             play.play()
             playBtn.isSelected = true
+            singleTapBlock?()
         }else{
             pause()
         }

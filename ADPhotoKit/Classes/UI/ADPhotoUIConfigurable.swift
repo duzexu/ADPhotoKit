@@ -86,3 +86,17 @@ public protocol ADProgressHUDConfigurable {
     func hide()
     
 }
+
+public typealias ADBrowserToolBarable = (UIView & ADBrowserToolBarConfigurable)
+public protocol ADBrowserToolBarConfigurable {
+    
+    var height: CGFloat { get }
+        
+}
+
+public typealias ADBrowserNavBarable = (UIView & ADBrowserNavBarConfigurable)
+public protocol ADBrowserNavBarConfigurable {
+    
+    var height: CGFloat { get }
+        
+}

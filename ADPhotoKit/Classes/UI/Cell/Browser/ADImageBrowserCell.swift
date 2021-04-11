@@ -60,11 +60,17 @@ class ADImageBrowserCell: ADBrowserBaseCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         imageBrowserView = ADImageBrowserView(frame: .zero)
+        imageBrowserView.singleTapBlock = { [weak self] in
+            self?.singleTapBlock?()
+        }
         contentView.addSubview(imageBrowserView)
         imageBrowserView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         livePhotoBrowserView = ADLivePhotoBrowserView(frame: .zero)
+        livePhotoBrowserView.singleTapBlock = { [weak self] in
+            self?.singleTapBlock?()
+        }
         contentView.addSubview(livePhotoBrowserView)
         livePhotoBrowserView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -113,6 +119,8 @@ class ADImageBrowserView: UIView {
             }
         }
     }
+    
+    var singleTapBlock: (() -> Void)?
     
     var scrollView: UIScrollView!
     var contentView: UIView!
@@ -302,6 +310,7 @@ private extension ADImageBrowserView {
     }
     
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
+        singleTapBlock?()
     }
     
     @objc func doubleTapAction(_ tap: UITapGestureRecognizer) {
@@ -339,6 +348,8 @@ class ADLivePhotoBrowserView: UIView {
             }
         }
     }
+    
+    var singleTapBlock: (() -> Void)?
     
     var livePhotoView: PHLivePhotoView!
     

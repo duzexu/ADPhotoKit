@@ -487,7 +487,13 @@ extension ADThumbnailViewController: ADAssetBrowserTransitionContextTo {
     func transitionRect(identifier: String, convertTo: UIView) -> CGRect? {
         let indexPaths = collectionView.indexPathsForVisibleItems
         for indexPath in indexPaths {
-            if dataSource.list[indexPath.row].asset.localIdentifier == identifier {
+            if !model.albumOpts.contains(.ascending) {
+                guard indexPath.row >= dataSource.appendCellCount else {
+                    continue
+                }
+            }
+            let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+            if dataSource.list[modify.row].asset.localIdentifier == identifier {
                 if let cell = collectionView.cellForItem(at: indexPath) {
                     return collectionView.convert(cell.frame, to: convertTo)
                 }
