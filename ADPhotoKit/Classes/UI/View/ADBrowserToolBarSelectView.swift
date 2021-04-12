@@ -8,16 +8,13 @@
 import UIKit
 
 class ADBrowserToolBarSelectView: UIView {
-    
-    var currentAsset: ADAssetBrowsable?
-    
-    var dataSource: [ADAssetBrowsable]
+        
+    weak var dataSource: ADAssetBrowserDataSource?
     
     private var collectionView: UICollectionView!
 
-    init(selects: [ADAssetBrowsable], current: ADAssetBrowsable) {
-        dataSource = selects
-        currentAsset = current
+    init(dataSource: ADAssetBrowserDataSource) {
+        self.dataSource = dataSource
         super.init(frame: .zero)
         
         setupUI()
@@ -25,21 +22,6 @@ class ADBrowserToolBarSelectView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func updateCurrentAsset(_ asset: ADAssetBrowsable) {
-        currentAsset = asset
-        if let index = dataSource.firstIndex(where: { $0.browseAsset == asset.browseAsset }) {
-            collectionView.performBatchUpdates { [weak self] in
-                self?.collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
-            } completion: { [weak self] (_) in
-                guard let strong = self else { return }
-                self?.collectionView.reloadItems(at: strong.collectionView.indexPathsForVisibleItems)
-            }
-
-        }else{
-            collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
-        }
     }
     
 }
@@ -75,6 +57,8 @@ private extension ADBrowserToolBarSelectView {
             let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressAction))
             collectionView.addGestureRecognizer(longPressGesture)
         }
+        
+        dataSource?.selectView = collectionView
     }
     
     // MARK: iOS10 拖动
@@ -97,21 +81,27 @@ private extension ADBrowserToolBarSelectView {
 extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return dataSource?.selects.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADBrowserToolBarCell.reuseIdentifier, for: indexPath) as! ADBrowserToolBarCell
         
-        let asset = dataSource[indexPath.row]
-        cell.configure(with: asset)
-        if asset.browseAsset == currentAsset?.browseAsset {
-            cell.layer.borderWidth = 4
-        }else{
-            cell.layer.borderWidth = 0
+        if let selects = dataSource?.selects {
+            let asset = selects[indexPath.row]
+            cell.configure(with: asset)
+            if asset.browseAsset == dataSource?.current.browseAsset {
+                cell.layer.borderWidth = 4
+            }else{
+                cell.layer.borderWidth = 0
+            }
         }
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        dataSource?.didSelectIndexChange(indexPath.row)
     }
     
     @available(iOS 11.0, *)

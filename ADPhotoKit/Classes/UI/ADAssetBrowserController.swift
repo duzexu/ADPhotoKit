@@ -22,22 +22,21 @@ extension ADAsset {
 
 class ADAssetBrowserController: UIViewController {
     
-    let dataSource: [ADAssetBrowsable]
-    var index: Int
-    var selects: [Int]
+    /// dataSource
+    var dataSource: ADAssetBrowserDataSource!
     
+    /// ui
     var collectionView: UICollectionView!
     
     var controlsView: ADBrowserControlsView!
     var navView: ADBrowserNavBarable!
     var toolView: ADBrowserToolBarable!
     
+    /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
     
     init(assets: [ADAssetBrowsable], index: Int = 0, selects: [Int] = []) {
-        self.dataSource = assets
-        self.index = index
-        self.selects = selects
+        dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: index, selects: selects)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -50,7 +49,7 @@ class ADAssetBrowserController: UIViewController {
         setupUI()
         setupTransition()
         collectionView.layoutIfNeeded()
-        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
+        collectionView.scrollToItem(at: IndexPath(row: dataSource.index, section: 0), at: .centeredHorizontally, animated: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -61,16 +60,6 @@ class ADAssetBrowserController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
-    
-    func selectAssetAt(index: Int) {
-        selects.append(index)
-        
-    }
-    
-    func deselectAssetAt(index: Int) {
-        
-    }
-    
     
     
 }
@@ -101,8 +90,10 @@ private extension ADAssetBrowserController {
         collectionView.regisiter(cell: ADImageBrowserCell.self)
         collectionView.regisiter(cell: ADVideoBrowserCell.self)
         
-        navView = ADBrowserNavBarView(options: .default)
-        toolView = ADBrowserToolBarView(options: .default, selects: selects.map { dataSource[$0] }, current: dataSource[index])
+        dataSource?.listView = collectionView
+        
+        navView = ADBrowserNavBarView(dataSource: dataSource)
+        toolView = ADBrowserToolBarView(dataSource: dataSource)
         controlsView = ADBrowserControlsView(topView: navView, bottomView: toolView)
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { (make) in
@@ -149,11 +140,11 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return dataSource.list.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let model = dataSource[indexPath.row]
+        let model = dataSource.list[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: model.browseAsset.reuseIdentifier, for: indexPath) as! ADBrowserBaseCell
         cell.singleTapBlock = { [weak self] in
             self?.hideOrShowControlsView()
@@ -162,7 +153,7 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        let model = dataSource[indexPath.row]
+        let model = dataSource.list[indexPath.row]
         switch model.browseAsset {
         case let .image(source):
             if let imageCell = cell as? ADImageBrowserCell {
@@ -183,9 +174,9 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offset = scrollView.contentOffset
         var idx = Int(offset.x / scrollView.bounds.width)
-        idx = max(0, min(idx, dataSource.count-1))
-        if idx != index  {
-            index = idx
+        idx = max(0, min(idx, dataSource.list.count-1))
+        if idx != dataSource.index  {
+            dataSource.didIndexChange(idx)
         }
     }
     
@@ -220,7 +211,7 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
     }
     
     func transitionDidCancel(view: UIView?) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as! ADBrowserBaseCell
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserBaseCell
         cell.transationCancel(view: view!)
     }
     
@@ -232,11 +223,11 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
 extension ADAssetBrowserController: ADAssetBrowserTransitionContextFrom {
     
     var contextIdentifier: String {
-        return dataSource[index].browseAsset.identifier
+        return dataSource.current.browseAsset.identifier
     }
     
     func transitionInfo(convertTo: UIView) -> (UIView, CGRect) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as! ADBrowserBaseCell
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserBaseCell
         let info = cell.transationBegin()
         return (info.0, cell.convert(info.1, to: convertTo))
     }

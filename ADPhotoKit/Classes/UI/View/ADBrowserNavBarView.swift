@@ -13,10 +13,10 @@ class ADBrowserNavBarView: UIView, ADBrowserNavBarConfigurable {
         return UIApplication.shared.statusBarFrame.height + 44
     }
     
-    let options: ADAssetBrowserOptions
+    weak var dataSource: ADAssetBrowserDataSource?
 
-    init(options: ADAssetBrowserOptions) {
-        self.options = options
+    init(dataSource: ADAssetBrowserDataSource) {
+        self.dataSource = dataSource
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
         

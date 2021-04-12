@@ -11,7 +11,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
 
     var height: CGFloat {
         var hi: CGFloat = 55+tabBarOffset
-        if options.contains(.selectBrowser) {
+        if let ds = dataSource, ds.options.contains(.selectBrowser) {
             hi += 100
         }
         return hi
@@ -38,14 +38,14 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     }
     
     var selectBrowserEnable: Bool {
-        if options.contains(.selectBrowser) && selectCount > 0 {
+        if let ds = dataSource, ds.options.contains(.selectBrowser) && selectCount > 0 {
             return true
         } else {
             return false
         }
     }
 
-    let options: ADAssetBrowserOptions
+    weak var dataSource: ADAssetBrowserDataSource?
     
     /// ui
     var editBtn: UIButton!
@@ -55,13 +55,12 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     var btnsView: UIView!
     var selectView: ADBrowserToolBarSelectView!
 
-    init(options: ADAssetBrowserOptions, selects: [ADAssetBrowsable], current: ADAssetBrowsable) {
-        self.options = options
-        self.selectCount = selects.count
+    init(dataSource: ADAssetBrowserDataSource) {
+        self.dataSource = dataSource
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
         
-        selectView = ADBrowserToolBarSelectView(selects: selects, current: current)
+        selectView = ADBrowserToolBarSelectView(dataSource: dataSource)
 
         setupUI()
     }
@@ -97,7 +96,7 @@ private extension ADBrowserToolBarView {
         }
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
-        originalBtn.isHidden = !options.contains(.selectOriginal)
+        originalBtn.isHidden = !(dataSource?.options.contains(.selectOriginal) ?? false)
         originalBtn.isSelected = isSelectedOriginal
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
