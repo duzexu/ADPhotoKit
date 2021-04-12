@@ -77,4 +77,14 @@ extension UIImageView {
         }
     }
     
+    func setVideoUrlAsset(_ url: URL) {
+        let assert = AVURLAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: assert)
+        generator.appliesPreferredTrackTransform = true
+        generator.apertureMode = .encodedPixels
+        if let img = try? generator.copyCGImage(at: .zero, actualTime: nil) {
+            image = UIImage(cgImage: img)
+        }
+    }
+    
 }

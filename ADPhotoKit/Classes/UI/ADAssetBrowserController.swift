@@ -62,6 +62,17 @@ class ADAssetBrowserController: UIViewController {
         super.viewDidAppear(animated)
     }
     
+    func selectAssetAt(index: Int) {
+        selects.append(index)
+        
+    }
+    
+    func deselectAssetAt(index: Int) {
+        
+    }
+    
+    
+    
 }
 
 private extension ADAssetBrowserController {
@@ -91,7 +102,7 @@ private extension ADAssetBrowserController {
         collectionView.regisiter(cell: ADVideoBrowserCell.self)
         
         navView = ADBrowserNavBarView(options: .default)
-        toolView = ADBrowserToolBarView(options: .default)
+        toolView = ADBrowserToolBarView(options: .default, selects: selects.map { dataSource[$0] }, current: dataSource[index])
         controlsView = ADBrowserControlsView(topView: navView, bottomView: toolView)
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { (make) in
@@ -196,6 +207,13 @@ extension ADAssetBrowserController: UINavigationControllerDelegate {
 }
 
 extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate {
+    
+    func transitionShouldStart(_ point: CGPoint) -> Bool {
+        if !controlsView.isHidden {
+            return controlsView.insideTransitionArea(point: point)
+        }
+        return true
+    }
     
     func transitionDidStart() {
         

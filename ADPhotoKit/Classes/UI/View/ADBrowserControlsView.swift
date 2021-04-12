@@ -36,6 +36,15 @@ class ADBrowserControlsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func insideTransitionArea(point: CGPoint) -> Bool {
+        let top = topView?.height ?? 0
+        let bottom = bottomView?.height ?? 0
+        if point.y < top || point.y > frame.height - bottom {
+            return false
+        }
+        return true
+    }
+    
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let top = topView?.height ?? 0
         let bottom = bottomView?.height ?? 0

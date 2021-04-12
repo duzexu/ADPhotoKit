@@ -69,10 +69,10 @@ public struct ADAssetBrowserOptions: OptionSet {
     public let rawValue: Int
     
     public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
-    public static let showSelected = ADAssetBrowserOptions(rawValue: 1 << 1)
+    public static let selectBrowser = ADAssetBrowserOptions(rawValue: 1 << 1)
     public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
     
-    static let `default`: ADAssetBrowserOptions = [.selectOriginal, .showSelected, .selectIndex]
+    static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectBrowser, .selectIndex]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue

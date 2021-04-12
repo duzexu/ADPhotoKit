@@ -48,7 +48,8 @@ enum ADVideoSource {
     }
 }
 
-enum ADAsset {
+enum ADAsset: Equatable {
+    
     case image(ADImageSource)
     case video(ADVideoSource)
     
@@ -59,6 +60,10 @@ enum ADAsset {
         case let .video(source):
             return source.identifier
         }
+    }
+    
+    static func == (lhs: ADAsset, rhs: ADAsset) -> Bool {
+        return lhs.identifier == rhs.identifier
     }
 }
 
