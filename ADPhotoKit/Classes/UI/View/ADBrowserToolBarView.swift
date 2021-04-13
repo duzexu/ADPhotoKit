@@ -22,64 +22,63 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
             originalBtn.isSelected = isSelectedOriginal
         }
     }
-    
-    public var selectCount: Int = 0 {
-        didSet {
-            if selectCount > 0 {
-                doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(selectCount))", for: .normal)
-                doneBtn.isEnabled = true
-                editBtn.isEnabled = true
-            }else{
-                doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
-                doneBtn.isEnabled = false
-                editBtn.isEnabled = false
-            }
-        }
-    }
-    
-    var selectBrowserEnable: Bool {
-        if let ds = dataSource, ds.options.contains(.selectBrowser) && selectCount > 0 {
-            return true
-        } else {
-            return false
-        }
-    }
 
     weak var dataSource: ADAssetBrowserDataSource?
     
+    var editActionBlock: (()->Void)?
+    var doneActionBlock: (()->Void)?
+    
     /// ui
+    var bgView: UIView!
+    
     var editBtn: UIButton!
     var originalBtn: UIButton!
     var doneBtn: UIButton!
     
-    var btnsView: UIView!
     var selectView: ADBrowserToolBarSelectView!
+    
+    private var token: NSKeyValueObservation?
 
     init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
         super.init(frame: .zero)
-        backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
         
         selectView = ADBrowserToolBarSelectView(dataSource: dataSource)
 
         setupUI()
+        
+        dataSource.selectAssetChanged = { [weak self] count in
+            self?.reloadCount(count)
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        token?.invalidate()
     }
 }
 
 private extension ADBrowserToolBarView {
     
     func setupUI() {
+        bgView = UIView()
+        bgView.backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
+        addSubview(bgView)
+        bgView.snp.makeConstraints { (make) in
+            make.left.right.bottom.equalToSuperview()
+            make.height.equalTo(height).labeled("bgViewHeight")
+        }
+        
         let effect = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        addSubview(effect)
+        bgView.addSubview(effect)
         effect.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         
-        btnsView = UIView()
+        let btnsView = UIView()
         addSubview(btnsView)
         btnsView.snp.makeConstraints { (make) in
             make.left.right.equalToSuperview()
@@ -127,6 +126,15 @@ private extension ADBrowserToolBarView {
             make.bottom.equalToSuperview().offset(-tabBarOffset-55)
             make.height.equalTo(100)
         }
+        
+        if let ass = dataSource?.current {
+            reload(asset: ass)
+        }
+        token = dataSource?.observe(\.index, options: .new) { [weak self] (dataSource, change) in
+            if let ass = self?.dataSource?.current {
+                self?.reload(asset: ass)
+            }
+        }
     }
     
     func createBtn(_ title: String, _ action: Selector) -> UIButton {
@@ -139,13 +147,60 @@ private extension ADBrowserToolBarView {
         return btn
     }
     
+    func reload(asset: ADAssetBrowsable) {
+        switch asset.browseAsset {
+        case let .image(source):
+            switch source {
+            case .network(_):
+                editBtn.isHidden = true
+                originalBtn.isHidden = true
+            case let .album(ass):
+                if ass.isGif || ass.isLivePhoto {
+                    editBtn.isHidden = true
+                    originalBtn.isHidden = true
+                }else{
+                    editBtn.isHidden = false
+                    originalBtn.isHidden = false
+                }
+            case .local(_):
+                editBtn.isHidden = true
+                originalBtn.isHidden = true
+            }
+        case .video(_):
+            editBtn.isHidden = true
+            originalBtn.isHidden = true
+        }
+    }
+    
+    func reloadCount(_ count: Int) {
+        if count > 0 {
+            selectView.isHidden = false
+            doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(count))", for: .normal)
+            for item in bgView.constraints {
+                if item.identifier == "bgViewHeight" {
+                    item.constant = height
+                    break
+                }
+            }
+        }else{
+            selectView.isHidden = true
+            doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
+            for item in bgView.constraints {
+                if item.identifier == "bgViewHeight" {
+                    item.constant = 55+tabBarOffset
+                    break
+                }
+            }
+        }
+    }
+    
 }
 
 private extension ADBrowserToolBarView {
     
     @objc
     func editAction() {
-        
+        editActionBlock?()
     }
     
     @objc
@@ -155,7 +210,7 @@ private extension ADBrowserToolBarView {
     
     @objc
     func doneAction() {
-        
+        doneActionBlock?()
     }
     
 }

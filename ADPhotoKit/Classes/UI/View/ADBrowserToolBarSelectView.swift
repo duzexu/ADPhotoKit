@@ -132,17 +132,7 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
         }
         
         if coordinator.proposal.operation == .move {
-//            collectionView.performBatchUpdates({
-//                let moveModel = self.arrSelectedModels[sourceIndexPath.row]
-//
-//                self.arrSelectedModels.remove(at: sourceIndexPath.row)
-//
-//                self.arrSelectedModels.insert(moveModel, at: destinationIndexPath.row)
-//
-//                collectionView.deleteItems(at: [sourceIndexPath])
-//                collectionView.insertItems(at: [destinationIndexPath])
-//            }, completion: nil)
-            
+            dataSource?.moveSelect(from: sourceIndexPath.row, to: destinationIndexPath.row)
             coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
         }
     }

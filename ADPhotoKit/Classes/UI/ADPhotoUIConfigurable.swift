@@ -69,6 +69,10 @@ public protocol ADThumbnailToolBarConfigurable {
     
     var selectCount: Int { set get }
     
+    var previewActionBlock: (()->Void)? { set get }
+    
+    var doneActionBlock: (()->Void)? { set get }
+    
 }
 
 public typealias ADProgressableable = (UIView & ADProgressConfigurable)
@@ -91,6 +95,10 @@ public typealias ADBrowserToolBarable = (UIView & ADBrowserToolBarConfigurable)
 public protocol ADBrowserToolBarConfigurable {
     
     var height: CGFloat { get }
+    
+    var editActionBlock: (()->Void)? { set get }
+    
+    var doneActionBlock: (()->Void)? { set get }
         
 }
 
@@ -98,5 +106,7 @@ public typealias ADBrowserNavBarable = (UIView & ADBrowserNavBarConfigurable)
 public protocol ADBrowserNavBarConfigurable {
     
     var height: CGFloat { get }
+    
+    var backActionBlock: (()->Void)? { set get }
         
 }

@@ -159,7 +159,7 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
         }
         assetModel = model
         selectStatus = model.selectStatus
-        selectBtn.isHidden = !(ADPhotoKitUI.internalModel?.displaySelectBtn(model: model) ?? true)
+        selectBtn.isHidden = !(ADPhotoKitUI.internalPickerModel?.displaySelectBtn(model: model) ?? true)
         
         switch model.type {
         case .unknown:
@@ -167,11 +167,11 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
         case .image:
             bottomMaskView.isHidden = true
         case .gif:
-            bottomMaskView.isHidden = !(ADPhotoKitUI.internalModel?.assetOpts.contains(.selectAsGif) ?? true)
+            bottomMaskView.isHidden = !(ADPhotoKitUI.internalPickerModel?.assetOpts.contains(.selectAsGif) ?? true)
             tagImageView.image = nil
             descLabel.text = "GIF"
         case .livePhoto:
-            bottomMaskView.isHidden = !(ADPhotoKitUI.internalModel?.assetOpts.contains(.selectAsLivePhoto) ?? true)
+            bottomMaskView.isHidden = !(ADPhotoKitUI.internalPickerModel?.assetOpts.contains(.selectAsLivePhoto) ?? true)
             tagImageView.image = Bundle.uiBundle?.image(name: "livePhoto")
             descLabel.text = "Live"
         case let .video(_, format):
@@ -189,7 +189,7 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
     
 }
 
-extension ADPhotoKitInternal {
+extension ADPhotoKitPickerInternal {
     
     fileprivate func displaySelectBtn(model: ADAssetModel) -> Bool {
         if let max = params.maxCount {

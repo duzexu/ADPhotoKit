@@ -61,6 +61,9 @@ class ADAssetBrowserController: UIViewController {
         super.viewDidAppear(animated)
     }
     
+    func didSelectsUpdate() {
+        
+    }
     
 }
 
@@ -93,6 +96,13 @@ private extension ADAssetBrowserController {
         dataSource?.listView = collectionView
         
         navView = ADBrowserNavBarView(dataSource: dataSource)
+        navView.backActionBlock = { [weak self] in
+            self?.didSelectsUpdate()
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
         toolView = ADBrowserToolBarView(dataSource: dataSource)
         controlsView = ADBrowserControlsView(topView: navView, bottomView: toolView)
         view.addSubview(controlsView)
@@ -216,7 +226,7 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
     }
     
     func transitionDidFinish() {
-        
+        didSelectsUpdate()
     }
 }
 

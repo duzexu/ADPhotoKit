@@ -194,11 +194,13 @@ private extension ADVideoBrowserCell {
     
     func pause(seekToZero: Bool = false) {
         playBtn.isSelected = false
+        if let status = player?.timeControlStatus, status == .playing {
+            singleTapBlock?()
+        }
         player?.pause()
         if seekToZero {
             player?.seek(to: .zero)
         }
-        singleTapBlock?()
     }
 }
 

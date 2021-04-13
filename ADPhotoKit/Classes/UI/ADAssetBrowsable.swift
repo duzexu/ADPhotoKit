@@ -9,11 +9,11 @@ import Foundation
 import Kingfisher
 import Photos
 
-protocol ADAssetBrowsable {
+public protocol ADAssetBrowsable {
     var browseAsset: ADAsset { get }
 }
 
-enum ADImageSource {
+public enum ADImageSource {
     case network(URL)
     case album(PHAsset)
     case local(UIImage)
@@ -31,7 +31,7 @@ enum ADImageSource {
     
 }
 
-enum ADVideoSource {
+public enum ADVideoSource {
     case network(URL)
     case album(PHAsset)
     case local(URL)
@@ -48,7 +48,7 @@ enum ADVideoSource {
     }
 }
 
-enum ADAsset: Equatable {
+public enum ADAsset: Equatable {
     
     case image(ADImageSource)
     case video(ADVideoSource)
@@ -62,13 +62,13 @@ enum ADAsset: Equatable {
         }
     }
     
-    static func == (lhs: ADAsset, rhs: ADAsset) -> Bool {
+    public static func == (lhs: ADAsset, rhs: ADAsset) -> Bool {
         return lhs.identifier == rhs.identifier
     }
 }
 
 extension ADAssetModel: ADAssetBrowsable {
-    var browseAsset: ADAsset {
+    public var browseAsset: ADAsset {
         if type.isImage  {
             return .image(.album(asset))
         }else{
@@ -78,7 +78,7 @@ extension ADAssetModel: ADAssetBrowsable {
 }
 
 extension PHAsset: ADAssetBrowsable {
-    var browseAsset: ADAsset {
+    public var browseAsset: ADAsset {
         switch self.mediaType {
         case .video:
             return .video(.album(self))
@@ -91,7 +91,7 @@ extension PHAsset: ADAssetBrowsable {
 }
 
 extension UIImage: ADAssetBrowsable {
-    var browseAsset: ADAsset {
+    public var browseAsset: ADAsset {
         return .image(.local(self))
     }
 }

@@ -136,6 +136,25 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    public func reloadSelectAssetIndexs(_ indexs: [Int], current: Int) {
+        selects.removeAll()
+        for (idx,item) in list.enumerated() {
+            if let index = indexs.firstIndex(of: idx) {
+                let model = ADSelectAssetModel(asset: item.asset)
+                item.selectStatus = .select(index: index+1)
+                model.index = idx
+                selects.append(model)
+            }else{
+                item.selectStatus = .select(index: nil)
+            }
+        }
+        selectAssetChanged?(selects.count)
+        if let view = reloadable as? UICollectionView {
+            view.reloadItems(at: view.indexPathsForVisibleItems)
+            view.scrollToItem(at: IndexPath(row: current, section: 0), at: .centeredVertically, animated: false)
+        }
+    }
+    
     private func scrollToBottom() {
         guard albumOpts.contains(.ascending), list.count > 0 else {
             return

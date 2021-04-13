@@ -13,7 +13,11 @@ class ADBrowserNavBarView: UIView, ADBrowserNavBarConfigurable {
         return UIApplication.shared.statusBarFrame.height + 44
     }
     
+    var backActionBlock: (()->Void)?
+    
     weak var dataSource: ADAssetBrowserDataSource?
+    
+    private var token: NSKeyValueObservation?
 
     init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
@@ -25,6 +29,10 @@ class ADBrowserNavBarView: UIView, ADBrowserNavBarConfigurable {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        token?.invalidate()
     }
     
 }
@@ -52,21 +60,31 @@ private extension ADBrowserNavBarView {
         selectBtn.contentMode = .right
         selectBtn.setImage(Bundle.uiBundle?.image(name: "btn_circle"), for: .normal)
         selectBtn.setImage(Bundle.uiBundle?.image(name: "btn_selected"), for: .selected)
-        selectBtn.addTarget(self, action: #selector(selectBtnAction), for: .touchUpInside)
+        selectBtn.addTarget(self, action: #selector(selectBtnAction(sender:)), for: .touchUpInside)
         addSubview(selectBtn)
         selectBtn.snp.makeConstraints { (make) in
             make.right.bottom.equalToSuperview()
             make.size.equalTo(CGSize(width: 60, height: 44))
+        }
+        
+        selectBtn.isSelected = dataSource?.isSelected ?? false
+        token = dataSource?.observe(\.isSelected, options: .new) { (dataSource, change) in
+            guard let selected = change.newValue else { return }
+            selectBtn.isSelected = selected
         }
     }
 }
 
 extension ADBrowserNavBarView {
     @objc func backBtnAction() {
-        
+        backActionBlock?()
     }
     
-    @objc func selectBtnAction() {
-        
+    @objc func selectBtnAction(sender: UIButton) {
+        if sender.isSelected {
+            dataSource?.deleteSelect(dataSource!.index)
+        }else{
+            dataSource?.appendSelect(dataSource!.index)
+        }
     }
 }

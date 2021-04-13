@@ -21,4 +21,9 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func didSelectsUpdate() {
+        super.didSelectsUpdate()
+        listData.reloadSelectAssetIndexs(dataSource.selectIndexs, current: dataSource.index)
+    }
+    
 }

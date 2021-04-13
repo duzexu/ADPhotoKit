@@ -49,14 +49,17 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
         }
     }
     
-    let model: ADPhotoKitInternal
+    var previewActionBlock: (()->Void)?
+    var doneActionBlock: (()->Void)?
+    
+    let model: ADPhotoKitPickerInternal
     
     /// ui
     var previewBtn: UIButton!
     var originalBtn: UIButton!
     var doneBtn: UIButton!
     
-    init(model: ADPhotoKitInternal) {
+    init(model: ADPhotoKitPickerInternal) {
         self.model = model
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
@@ -190,7 +193,7 @@ private extension ADThumbnailToolBarView {
     
     @objc
     func previewAction() {
-        
+        previewActionBlock?()
     }
     
     @objc
@@ -200,7 +203,7 @@ private extension ADThumbnailToolBarView {
     
     @objc
     func doneAction() {
-        
+        doneActionBlock?()
     }
     
 }

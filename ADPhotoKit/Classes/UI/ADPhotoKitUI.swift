@@ -49,11 +49,11 @@ public class ADPhotoKitUI {
                                     selected: @escaping AssetSelectHandler,
                                     canceled: AssetCancelHandler? = nil,
                                     error: AssetRequestError? = nil) {
-        let `internal` = ADPhotoKitInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
-        internalModel = `internal`
+        let `internal` = ADPhotoKitPickerInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
+        internalPickerModel = `internal`
         ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
             let album = ADAlbumListController(model: `internal`)
-            let nav = ADPhotoNavController(rootViewController: album, model: `internal`)
+            let nav = ADPhotoNavController(rootViewController: album)
             let thumbnail = ADThumbnailViewController(model: `internal`, albumList: model)
             nav.modalPresentationStyle = .fullScreen
             nav.pushViewController(thumbnail, animated: false)
@@ -61,7 +61,22 @@ public class ADPhotoKitUI {
         }
     }
     
-    static var internalModel: ADPhotoKitInternal?
+    public class func assetBrowser(present on: UIViewController,
+                                    assets:  [ADAssetBrowsable],
+                                    index: Int = 0,
+                                    selects: [Int] = [],
+                                    options: ADAssetBrowserOptions = .default,
+                                    selected: @escaping AssetSelectHandler,
+                                    canceled: AssetCancelHandler? = nil) {
+        internalBrowserModel = ADPhotoKitBrowserInternal(assets: assets, options: options, selected: selected, canceled: canceled)
+        let browser = ADAssetBrowserController(assets: assets, index: index, selects: selects)
+        let nav = ADPhotoNavController(rootViewController: browser)
+        nav.modalPresentationStyle = .fullScreen
+        on.present(nav, animated: true, completion: nil)
+    }
+    
+    static var internalPickerModel: ADPhotoKitPickerInternal?
+    static var internalBrowserModel: ADPhotoKitBrowserInternal?
 }
 
 extension ADPhotoKitUI {
@@ -81,7 +96,7 @@ extension ADPhotoKitUI {
     
 }
 
-class ADPhotoKitInternal {
+class ADPhotoKitPickerInternal {
     var assets: [PHAsset]
     let albumOpts: ADAlbumSelectOptions
     let assetOpts: ADAssetSelectOptions
@@ -95,8 +110,8 @@ class ADPhotoKitInternal {
          assetOpts: ADAssetSelectOptions,
          params: Set<ADPhotoSelectParams>,
          selected: @escaping ADPhotoKitUI.AssetSelectHandler,
-         canceled: ADPhotoKitUI.AssetCancelHandler? = nil,
-         error: ADPhotoKitUI.AssetRequestError? = nil) {
+         canceled: ADPhotoKitUI.AssetCancelHandler?,
+         error: ADPhotoKitUI.AssetRequestError?) {
         self.assets = assets
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts
@@ -124,7 +139,7 @@ class ADPhotoKitInternal {
     }
 }
 
-extension ADPhotoKitInternal {
+extension ADPhotoKitPickerInternal {
     
     var selectMediaImage: Bool {
         if let asset = assets.randomElement() {
@@ -136,4 +151,22 @@ extension ADPhotoKitInternal {
         return false
     }
     
+}
+
+class ADPhotoKitBrowserInternal {
+    
+    var assets: [ADAssetBrowsable]
+    let options: ADAssetBrowserOptions
+    let selected: ADPhotoKitUI.AssetSelectHandler
+    let canceled: ADPhotoKitUI.AssetCancelHandler?
+
+    init(assets: [ADAssetBrowsable],
+         options: ADAssetBrowserOptions,
+         selected: @escaping ADPhotoKitUI.AssetSelectHandler,
+         canceled: ADPhotoKitUI.AssetCancelHandler?) {
+        self.assets = assets
+        self.options = options
+        self.selected = selected
+        self.canceled = canceled
+    }
 }

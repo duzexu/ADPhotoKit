@@ -10,12 +10,12 @@ import SnapKit
 
 class ADAlbumListController: UIViewController {
     
-    let model: ADPhotoKitInternal
+    let model: ADPhotoKitPickerInternal
     
     var tableView: UITableView!
     var dataSource: ADAlbumListDataSource!
     
-    init(model: ADPhotoKitInternal) {
+    init(model: ADPhotoKitPickerInternal) {
         self.model = model
         super.init(nibName: nil, bundle: nil)
     }

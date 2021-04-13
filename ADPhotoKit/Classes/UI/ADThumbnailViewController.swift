@@ -23,7 +23,7 @@ struct ADThumbnailParams {
 
 class ADThumbnailViewController: UIViewController {
     
-    let model: ADPhotoKitInternal
+    let model: ADPhotoKitPickerInternal
     let albumList: ADAlbumModel
     
     var collectionView: UICollectionView!
@@ -31,7 +31,7 @@ class ADThumbnailViewController: UIViewController {
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(model: ADPhotoKitInternal, albumList: ADAlbumModel) {
+    init(model: ADPhotoKitPickerInternal, albumList: ADAlbumModel) {
         self.model = model
         self.albumList = albumList
         super.init(nibName: nil, bundle: nil)
@@ -116,6 +116,11 @@ extension ADThumbnailViewController {
         toolBarView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
             make.height.equalTo(toolBarView.height+tabBarOffset)
+        }
+        toolBarView.previewActionBlock = { [weak self] in
+            guard let strong = self else { return }
+            let browser = ADAssetModelBrowserController(dataSource: strong.dataSource, index: 0)
+            strong.navigationController?.pushViewController(browser, animated: true)
         }
         
         dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
