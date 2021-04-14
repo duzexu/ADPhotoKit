@@ -11,7 +11,7 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
 
     var listData: ADAssetListDataSource
     
-    init(dataSource: ADAssetListDataSource, index: Int) {
+    init(dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
         let selects = dataSource.selects.compactMap { $0.index }
         super.init(assets: dataSource.list, index: index, selects: selects)

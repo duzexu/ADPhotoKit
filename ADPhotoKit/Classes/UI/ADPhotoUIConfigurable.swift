@@ -75,6 +75,13 @@ public protocol ADThumbnailToolBarConfigurable {
     
 }
 
+public typealias ADThumbnailNavBarable = (UIView & ADThumbnailNavBarConfigurable)
+public protocol ADThumbnailNavBarConfigurable {
+    
+    var height: CGFloat { get }
+    
+}
+
 public typealias ADProgressableable = (UIView & ADProgressConfigurable)
 public protocol ADProgressConfigurable {
     

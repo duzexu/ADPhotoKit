@@ -12,6 +12,8 @@ class ADBrowserToolBarSelectView: UIView {
     weak var dataSource: ADAssetBrowserDataSource?
     
     private var collectionView: UICollectionView!
+    
+    private var isDraging = false
 
     init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
@@ -67,12 +69,15 @@ private extension ADBrowserToolBarSelectView {
             guard let indexPath = collectionView.indexPathForItem(at: gesture.location(in: collectionView)) else {
                 return
             }
+            isDraging = true
             collectionView.beginInteractiveMovementForItem(at: indexPath)
         } else if gesture.state == .changed {
             collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: collectionView))
         } else if gesture.state == .ended {
+            isDraging = false
             collectionView.endInteractiveMovement()
         } else {
+            isDraging = false
             collectionView.cancelInteractiveMovement()
         }
     }
@@ -101,11 +106,19 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        dataSource?.didSelectIndexChange(indexPath.row)
+        collectionView.deselectItem(at: indexPath, animated: false)
+        if #available(iOS 11.0, *) {
+            dataSource?.didSelectIndexChange(indexPath.row)
+        }else{
+            if !isDraging {
+                dataSource?.didSelectIndexChange(indexPath.row)
+            }
+        }
     }
     
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        isDraging = true
         let itemProvider = NSItemProvider()
         let item = UIDragItem(itemProvider: itemProvider)
         return [item]
@@ -121,6 +134,8 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
     
     @available(iOS 11.0, *)
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        isDraging = false
+        
         guard let destinationIndexPath = coordinator.destinationIndexPath else {
             return
         }
@@ -132,7 +147,7 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
         }
         
         if coordinator.proposal.operation == .move {
-            dataSource?.moveSelect(from: sourceIndexPath.row, to: destinationIndexPath.row)
+            dataSource?.moveSelect(from: sourceIndexPath.row, to: destinationIndexPath.row, reload: true)
             coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
         }
     }
@@ -142,7 +157,7 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        
+        dataSource?.moveSelect(from: sourceIndexPath.row, to: destinationIndexPath.row)
     }
     
 }

@@ -17,7 +17,8 @@ class ADBrowserNavBarView: UIView, ADBrowserNavBarConfigurable {
     
     weak var dataSource: ADAssetBrowserDataSource?
     
-    private var token: NSKeyValueObservation?
+    private var selectToken: NSKeyValueObservation?
+    private var selectIndexToken: NSKeyValueObservation?
 
     init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
@@ -32,7 +33,8 @@ class ADBrowserNavBarView: UIView, ADBrowserNavBarConfigurable {
     }
     
     deinit {
-        token?.invalidate()
+        selectToken?.invalidate()
+        selectIndexToken?.invalidate()
     }
     
 }
@@ -67,11 +69,43 @@ private extension ADBrowserNavBarView {
             make.size.equalTo(CGSize(width: 60, height: 44))
         }
         
+        let indexLabel = UILabel()
+        indexLabel.backgroundColor = UIColor(hex: 0x50A938)
+        indexLabel.layer.cornerRadius = 13
+        indexLabel.layer.masksToBounds = true
+        indexLabel.textColor = .white
+        indexLabel.font = UIFont.systemFont(ofSize: 14)
+        indexLabel.textAlignment = .center
+        indexLabel.isHidden = true
+        selectBtn.addSubview(indexLabel)
+        indexLabel.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+            make.size.equalTo(CGSize(width: 26, height: 26))
+        }
+        
         selectBtn.isSelected = dataSource?.isSelected ?? false
-        token = dataSource?.observe(\.isSelected, options: .new) { (dataSource, change) in
+        selectToken = dataSource?.observe(\.isSelected, options: .new, changeHandler: { (dataSource, change) in
             guard let selected = change.newValue else { return }
             selectBtn.isSelected = selected
+        })
+        
+        if let index = dataSource?.selectIndex {
+            if index >= 0 {
+                indexLabel.isHidden = false
+                indexLabel.text = "\(index+1)"
+            }else{
+                indexLabel.isHidden = true
+            }
         }
+        selectIndexToken = dataSource?.observe(\.selectIndex, options: .new, changeHandler: { (dataSource, change) in
+            guard let index = change.newValue else { return }
+            if index >= 0 {
+                indexLabel.isHidden = false
+                indexLabel.text = "\(index+1)"
+            }else{
+                indexLabel.isHidden = true
+            }
+        })
     }
 }
 

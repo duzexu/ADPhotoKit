@@ -151,7 +151,6 @@ public class ADAssetListDataSource: NSObject {
         selectAssetChanged?(selects.count)
         if let view = reloadable as? UICollectionView {
             view.reloadItems(at: view.indexPathsForVisibleItems)
-            view.scrollToItem(at: IndexPath(row: current, section: 0), at: .centeredVertically, animated: false)
         }
     }
     

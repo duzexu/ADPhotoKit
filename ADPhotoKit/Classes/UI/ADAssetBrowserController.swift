@@ -35,8 +35,8 @@ class ADAssetBrowserController: UIViewController {
     /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
     
-    init(assets: [ADAssetBrowsable], index: Int = 0, selects: [Int] = []) {
-        dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: index, selects: selects)
+    init(assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
+        dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -59,6 +59,10 @@ class ADAssetBrowserController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
     func didSelectsUpdate() {

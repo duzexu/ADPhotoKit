@@ -28,6 +28,9 @@ class ADAssetBrowserDataSource: NSObject {
     @objc
     public dynamic var isSelected: Bool = false
     
+    @objc
+    public dynamic var selectIndex: Int = -1
+    
     public var selectAssetChanged: ((Int)->Void)?
         
     public init(options: ADAssetBrowserOptions,
@@ -40,6 +43,9 @@ class ADAssetBrowserDataSource: NSObject {
         self.selectIndexs = selects
         self.selects = selectIndexs.map { list[$0] }
         self.isSelected = selects.contains(index)
+        if isSelected {
+            self.selectIndex = selects.firstIndex(of: index)!
+        }
         selectAssetChanged?(selects.count)
         super.init()
     }
@@ -48,6 +54,7 @@ class ADAssetBrowserDataSource: NSObject {
         index = idx
         isSelected = selectIndexs.contains(index)
         if let index = selects.firstIndex(where: { $0.browseAsset == current.browseAsset }) {
+            selectIndex = index
             selectView?.performBatchUpdates { [weak self] in
                 self?.selectView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
             } completion: { [weak self] (_) in
@@ -55,6 +62,7 @@ class ADAssetBrowserDataSource: NSObject {
                 strong.reloadItems(at: strong.indexPathsForVisibleItems)
             }
         }else{
+            selectIndex = -1
             selectView?.reloadItems(at: selectView!.indexPathsForVisibleItems)
         }
     }
@@ -69,6 +77,7 @@ class ADAssetBrowserDataSource: NSObject {
         selects.append(list[idx])
         isSelected = selectIndexs.contains(index)
         let ip = IndexPath(row: selects.count-1, section: 0)
+        selectIndex = selects.count-1
         selectView?.insertItems(at: [ip])
         selectView?.scrollToItem(at: ip, at: .centeredHorizontally, animated: true)
         selectAssetChanged?(selects.count)
@@ -76,6 +85,7 @@ class ADAssetBrowserDataSource: NSObject {
     
     func deleteSelect(_ idx: Int) {
         if let i = selectIndexs.firstIndex(where: { $0 == idx }) {
+            selectIndex = -1
             selectIndexs.remove(at: i)
             selects.remove(at: i)
             isSelected = selectIndexs.contains(index)
@@ -84,21 +94,30 @@ class ADAssetBrowserDataSource: NSObject {
         }
     }
     
-    func moveSelect(from fIdx: Int, to tIdx: Int) {
-        selectView?.performBatchUpdates({
+    func moveSelect(from fIdx: Int, to tIdx: Int, reload: Bool = false) {
+        selectIndex = tIdx
+        if reload {
+            selectView?.performBatchUpdates({
+                let select = self.selectIndexs[fIdx]
+                self.selectIndexs.remove(at: fIdx)
+                self.selectIndexs.insert(select, at: tIdx)
+                let selectModel = self.selects[fIdx]
+                self.selects.remove(at: fIdx)
+                self.selects.insert(selectModel, at: tIdx)
+                
+                self.selectView?.moveItem(at: IndexPath(row: fIdx, section: 0), to: IndexPath(row: tIdx, section: 0))
+            }, completion: { (_) in
+                if let collectionView = self.selectView {
+                    collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                }
+            })
+        }else{
             let select = self.selectIndexs[fIdx]
             self.selectIndexs.remove(at: fIdx)
             self.selectIndexs.insert(select, at: tIdx)
             let selectModel = self.selects[fIdx]
             self.selects.remove(at: fIdx)
             self.selects.insert(selectModel, at: tIdx)
-            
-            self.selectView?.deleteItems(at: [IndexPath(row: fIdx, section: 0)])
-            self.selectView?.insertItems(at: [IndexPath(row: tIdx, section: 0)])
-        }, completion: nil)
+        }
     }
-}
-
-private extension ADAssetBrowserDataSource {
-    
 }

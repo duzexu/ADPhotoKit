@@ -36,9 +36,9 @@ public enum ADPhotoSelectParams: Hashable {
 
 public class ADPhotoKitUI {
     
-    public typealias Asset = (asset: PHAsset, image: UIImage)
+    public typealias Asset = (asset: PHAsset, image: UIImage?, error: Error?)
+    /// return asset and is original image
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
-    public typealias AssetRequestError = ((PHAsset,Error) -> Void)
     public typealias AssetCancelHandler = (() -> Void)
     
     public class func imagePicker(present on: UIViewController,
@@ -47,9 +47,8 @@ public class ADPhotoKitUI {
                                     assetOpts: ADAssetSelectOptions = .default,
                                     params: Set<ADPhotoSelectParams> = [],
                                     selected: @escaping AssetSelectHandler,
-                                    canceled: AssetCancelHandler? = nil,
-                                    error: AssetRequestError? = nil) {
-        let `internal` = ADPhotoKitPickerInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled, error: error)
+                                    canceled: AssetCancelHandler? = nil) {
+        let `internal` = ADPhotoKitPickerInternal(assets: assets, albumOpts: albumOpts, assetOpts: assetOpts, params: params, selected: selected, canceled: canceled)
         internalPickerModel = `internal`
         ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
             let album = ADAlbumListController(model: `internal`)
@@ -63,7 +62,7 @@ public class ADPhotoKitUI {
     
     public class func assetBrowser(present on: UIViewController,
                                     assets:  [ADAssetBrowsable],
-                                    index: Int = 0,
+                                    index: Int? = nil,
                                     selects: [Int] = [],
                                     options: ADAssetBrowserOptions = .default,
                                     selected: @escaping AssetSelectHandler,
@@ -103,21 +102,18 @@ class ADPhotoKitPickerInternal {
     let params: ADThumbnailParams
     let selected: ADPhotoKitUI.AssetSelectHandler
     let canceled: ADPhotoKitUI.AssetCancelHandler?
-    let error: ADPhotoKitUI.AssetRequestError?
         
     init(assets: [PHAsset],
          albumOpts: ADAlbumSelectOptions,
          assetOpts: ADAssetSelectOptions,
          params: Set<ADPhotoSelectParams>,
          selected: @escaping ADPhotoKitUI.AssetSelectHandler,
-         canceled: ADPhotoKitUI.AssetCancelHandler?,
-         error: ADPhotoKitUI.AssetRequestError?) {
+         canceled: ADPhotoKitUI.AssetCancelHandler?) {
         self.assets = assets
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts
         self.selected = selected
         self.canceled = canceled
-        self.error = error
         
         var value = ADThumbnailParams()
         for item in params {

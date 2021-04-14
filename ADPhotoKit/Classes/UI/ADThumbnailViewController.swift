@@ -73,6 +73,11 @@ class ADThumbnailViewController: UIViewController {
         reloadAssets()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
     func reloadAssets() {
         if dataSource.list.isEmpty {
             let hud = ADProgressHUD()
@@ -110,6 +115,14 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
+        let navBarView = ADThumbnailNavBarView()
+        navBarView.title = albumList.title
+        view.addSubview(navBarView)
+        navBarView.snp.makeConstraints { (make) in
+            make.left.right.top.equalToSuperview()
+            make.height.equalTo(navBarView.height)
+        }
+        
         toolBarView = ADThumbnailToolBarView(model: model)
         toolBarView.selectCount = model.assets.count
         view.addSubview(toolBarView)
@@ -119,7 +132,7 @@ extension ADThumbnailViewController {
         }
         toolBarView.previewActionBlock = { [weak self] in
             guard let strong = self else { return }
-            let browser = ADAssetModelBrowserController(dataSource: strong.dataSource, index: 0)
+            let browser = ADAssetModelBrowserController(dataSource: strong.dataSource)
             strong.navigationController?.pushViewController(browser, animated: true)
         }
         

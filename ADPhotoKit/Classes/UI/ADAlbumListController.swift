@@ -31,6 +31,7 @@ class ADAlbumListController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         if dataSource.list.count == 0 {
             dataSource.reloadData()
         }
