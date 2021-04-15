@@ -7,12 +7,12 @@
 
 import UIKit
 
-class ADBaseNavBarView: UIView {
+class ADBaseNavBarView: UIView, ADNavBarConfigurable {
     
     typealias ButtonItem = (normal: UIImage?, select: UIImage?)
 
     var height: CGFloat {
-        return UIApplication.shared.statusBarFrame.height + 44
+        return statusBarHeight + 44
     }
     
     var title: String? {

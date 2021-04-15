@@ -17,9 +17,9 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
         return hi
     }
     
-    public var isSelectedOriginal: Bool = false {
+    var isOriginal: Bool = false {
         didSet {
-            originalBtn.isSelected = isSelectedOriginal
+            originalBtn.isSelected = isOriginal
         }
     }
 
@@ -96,7 +96,7 @@ private extension ADBrowserToolBarView {
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
         originalBtn.isHidden = !(dataSource?.options.contains(.selectOriginal) ?? false)
-        originalBtn.isSelected = isSelectedOriginal
+        originalBtn.isSelected = isOriginal
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
         originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
@@ -205,7 +205,7 @@ private extension ADBrowserToolBarView {
     
     @objc
     func originalAction() {
-        isSelectedOriginal = !isSelectedOriginal
+        isOriginal = !isOriginal
     }
     
     @objc

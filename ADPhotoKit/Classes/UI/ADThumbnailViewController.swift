@@ -23,17 +23,19 @@ struct ADThumbnailParams {
 
 class ADThumbnailViewController: UIViewController {
     
-    let model: ADPhotoKitPickerInternal
+    let model: ADPhotoKitConfig
     let albumList: ADAlbumModel
+    let selects: [PHAsset]
     
     var collectionView: UICollectionView!
     var dataSource: ADAssetListDataSource!
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(model: ADPhotoKitPickerInternal, albumList: ADAlbumModel) {
+    init(model: ADPhotoKitConfig, albumList: ADAlbumModel, selects: [PHAsset] = []) {
         self.model = model
         self.albumList = albumList
+        self.selects = selects
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -75,7 +77,17 @@ class ADThumbnailViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
     
     func reloadAssets() {
@@ -95,8 +107,7 @@ class ADThumbnailViewController: UIViewController {
 extension ADThumbnailViewController {
     
     func setupUI() {
-        automaticallyAdjustsScrollViewInsets = true
-        edgesForExtendedLayout = .all
+        automaticallyAdjustsScrollViewInsets = false
         view.backgroundColor = UIColor(hex: 0x323232)
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -104,7 +115,7 @@ extension ADThumbnailViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .always
+            collectionView.contentInsetAdjustmentBehavior = .never
         }
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints { (make) in
@@ -117,6 +128,13 @@ extension ADThumbnailViewController {
         
         let navBarView = ADThumbnailNavBarView()
         navBarView.title = albumList.title
+        navBarView.leftActionBlock = { [weak self] btn in
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                ADPhotoKitUI.config.canceled?()
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
         view.addSubview(navBarView)
         navBarView.snp.makeConstraints { (make) in
             make.left.right.top.equalToSuperview()
@@ -124,19 +142,27 @@ extension ADThumbnailViewController {
         }
         
         toolBarView = ADThumbnailToolBarView(model: model)
-        toolBarView.selectCount = model.assets.count
+        toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(toolBarView.height+tabBarOffset)
+            make.height.equalTo(toolBarView.height)
         }
-        toolBarView.previewActionBlock = { [weak self] in
+        toolBarView.browserActionBlock = { [weak self] in
             guard let strong = self else { return }
-            let browser = ADAssetModelBrowserController(dataSource: strong.dataSource)
+            let browser = ADAssetModelBrowserController(model: strong.model, dataSource: strong.dataSource)
             strong.navigationController?.pushViewController(browser, animated: true)
         }
+        toolBarView.doneActionBlock = { [weak self] in
+            guard let strong = self else { return }
+            self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.model.assetOpts.contains(.selectAsGif)) { [weak self] in
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
         
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: model.assets, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+        collectionView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: toolBarView.height, right: 0)
+        
+        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: selects, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
         dataSource.selectAssetChanged = { [weak self] count in
             self?.toolBarView.selectCount = count
         }
@@ -156,7 +182,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 3, left: 0, bottom: 3+toolBarView.height, right: 0)
+        return UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -274,7 +300,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
                 let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
-                let browser = ADAssetModelBrowserController(dataSource: dataSource, index: modify.row)
+                let browser = ADAssetModelBrowserController(model: model, dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
         }
@@ -384,7 +410,7 @@ private extension ADThumbnailViewController {
         }
         
         if let max = model.params.maxCount {
-            guard model.assets.count < max else {
+            guard dataSource.selects.count < max else {
                 cleanTimer()
                 return
             }

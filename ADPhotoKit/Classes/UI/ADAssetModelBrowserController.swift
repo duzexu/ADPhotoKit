@@ -11,10 +11,10 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
 
     var listData: ADAssetListDataSource
     
-    init(dataSource: ADAssetListDataSource, index: Int? = nil) {
+    init(model: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
         let selects = dataSource.selects.compactMap { $0.index }
-        super.init(assets: dataSource.list, index: index, selects: selects)
+        super.init(model: model, assets: dataSource.list, index: index, selects: selects)
     }
     
     required init?(coder: NSCoder) {
@@ -26,4 +26,15 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
         listData.reloadSelectAssetIndexs(dataSource.selectIndexs, current: dataSource.index)
     }
     
+    override func finishSelection() {
+        if model.browserOpts.contains(.fetchImage) {
+            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: model.assetOpts.contains(.selectAsGif)) { [weak self] in
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }else{
+            let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,nil,nil) }
+            ADPhotoKitUI.config.pickerSelect?(selected, toolBarView.isOriginal)
+            navigationController?.dismiss(animated: true, completion: nil)
+        }
+    }
 }

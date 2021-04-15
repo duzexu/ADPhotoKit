@@ -13,17 +13,17 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     var height: CGFloat {
         var hi: CGFloat = 0
         if model.assetOpts.contains(.thumbnailToolBar) {
-            hi += 55
-        }
-        if authTipsEnable {
-            hi += 70
+            hi += 55+tabBarOffset
+            if authTipsEnable {
+                hi += 70
+            }
         }
         return hi
     }
     
-    public var isSelectedOriginal: Bool = false {
+    var isOriginal: Bool = false {
         didSet {
-            originalBtn.isSelected = isSelectedOriginal
+            originalBtn.isSelected = isOriginal
         }
     }
     
@@ -49,17 +49,17 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
         }
     }
     
-    var previewActionBlock: (()->Void)?
+    var browserActionBlock: (()->Void)?
     var doneActionBlock: (()->Void)?
     
-    let model: ADPhotoKitPickerInternal
+    let model: ADPhotoKitConfig
     
     /// ui
     var previewBtn: UIButton!
     var originalBtn: UIButton!
     var doneBtn: UIButton!
     
-    init(model: ADPhotoKitPickerInternal) {
+    init(model: ADPhotoKitConfig) {
         self.model = model
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
@@ -142,7 +142,7 @@ private extension ADThumbnailToolBarView {
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
         originalBtn.isHidden = !model.assetOpts.contains(.selectOriginal) && model.albumOpts.contains(.allowImage)
-        originalBtn.isSelected = isSelectedOriginal
+        originalBtn.isSelected = isOriginal
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
         originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
@@ -193,12 +193,12 @@ private extension ADThumbnailToolBarView {
     
     @objc
     func previewAction() {
-        previewActionBlock?()
+        browserActionBlock?()
     }
     
     @objc
     func originalAction() {
-        isSelectedOriginal = !isSelectedOriginal
+        isOriginal = !isOriginal
     }
     
     @objc

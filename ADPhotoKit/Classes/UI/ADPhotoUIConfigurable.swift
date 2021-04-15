@@ -45,6 +45,29 @@ public enum ADThumbnailSelectStatus {
     }
 }
 
+public typealias ADNavBarable = (UIView & ADNavBarConfigurable)
+public protocol ADNavBarConfigurable {
+    
+    var height: CGFloat { get }
+    
+    var title: String? { set get }
+    
+    var leftActionBlock: ((UIButton)->Void)? { set get }
+    
+    var rightActionBlock: ((UIButton)->Void)? { set get }
+            
+}
+
+public protocol ADToolBarConfigurable {
+    
+    var height: CGFloat { get }
+        
+    var leftActionBlock: ((UIButton)->Void)? { set get }
+    
+    var rightActionBlock: ((UIButton)->Void)? { set get }
+            
+}
+
 public typealias ADThumbnailListable = (UICollectionViewCell & ADThumbnailListConfigurable)
 public protocol ADThumbnailListConfigurable {
     
@@ -67,18 +90,13 @@ public protocol ADThumbnailToolBarConfigurable {
     
     var height: CGFloat { get }
     
+    var isOriginal: Bool { set get }
+    
     var selectCount: Int { set get }
     
-    var previewActionBlock: (()->Void)? { set get }
+    var browserActionBlock: (()->Void)? { set get }
     
     var doneActionBlock: (()->Void)? { set get }
-    
-}
-
-public typealias ADThumbnailNavBarable = (UIView & ADThumbnailNavBarConfigurable)
-public protocol ADThumbnailNavBarConfigurable {
-    
-    var height: CGFloat { get }
     
 }
 
@@ -103,17 +121,10 @@ public protocol ADBrowserToolBarConfigurable {
     
     var height: CGFloat { get }
     
+    var isOriginal: Bool { set get }
+    
     var editActionBlock: (()->Void)? { set get }
     
     var doneActionBlock: (()->Void)? { set get }
-        
-}
-
-public typealias ADBrowserNavBarable = (UIView & ADBrowserNavBarConfigurable)
-public protocol ADBrowserNavBarConfigurable {
-    
-    var height: CGFloat { get }
-    
-    var backActionBlock: (()->Void)? { set get }
         
 }

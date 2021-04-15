@@ -9,10 +9,10 @@ import UIKit
 
 class ADBrowserControlsView: UIView {
     
-    weak var topView: ADBrowserNavBarable?
+    weak var topView: ADNavBarable?
     weak var bottomView: ADBrowserToolBarable?
 
-    init(topView: ADBrowserNavBarable?, bottomView: ADBrowserToolBarable?) {
+    init(topView: ADNavBarable?, bottomView: ADBrowserToolBarable?) {
         self.topView = topView
         self.bottomView = bottomView
         super.init(frame: .zero)

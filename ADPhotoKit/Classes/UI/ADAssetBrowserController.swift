@@ -22,6 +22,8 @@ extension ADAsset {
 
 class ADAssetBrowserController: UIViewController {
     
+    let model: ADPhotoKitConfig
+    
     /// dataSource
     var dataSource: ADAssetBrowserDataSource!
     
@@ -29,14 +31,15 @@ class ADAssetBrowserController: UIViewController {
     var collectionView: UICollectionView!
     
     var controlsView: ADBrowserControlsView!
-    var navView: ADBrowserNavBarable!
-    var toolView: ADBrowserToolBarable!
+    var navBarView: ADNavBarable!
+    var toolBarView: ADBrowserToolBarable!
     
     /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
     
-    init(assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
-        dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
+    init(model: ADPhotoKitConfig, assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
+        self.model = model
+        self.dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -54,19 +57,29 @@ class ADAssetBrowserController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
     }
     
     override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    func didSelectsUpdate() {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    open func didSelectsUpdate() {
         
+    }
+    
+    open func finishSelection() {
+        ADPhotoKitUI.config.browserSelect?(dataSource.selects)
     }
     
 }
@@ -99,19 +112,31 @@ private extension ADAssetBrowserController {
         
         dataSource?.listView = collectionView
         
-        navView = ADBrowserNavBarView(dataSource: dataSource)
-        navView.backActionBlock = { [weak self] in
+        navBarView = ADBrowserNavBarView(dataSource: dataSource)
+        navBarView.leftActionBlock = { [weak self] btn in
             self?.didSelectsUpdate()
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
+                ADPhotoKitUI.config.canceled?()
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
-        toolView = ADBrowserToolBarView(dataSource: dataSource)
-        controlsView = ADBrowserControlsView(topView: navView, bottomView: toolView)
+        navBarView.rightActionBlock = { [weak self] btn in
+            guard let strong = self else { return }
+            if btn.isSelected {
+                self?.dataSource.deleteSelect(strong.dataSource.index)
+            }else{
+                self?.dataSource.appendSelect(strong.dataSource.index)
+            }
+        }
+        toolBarView = ADBrowserToolBarView(dataSource: dataSource)
+        controlsView = ADBrowserControlsView(topView: navBarView, bottomView: toolBarView)
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
+        }
+        toolBarView.doneActionBlock = { [weak self] in
+            self?.finishSelection()
         }
     }
     

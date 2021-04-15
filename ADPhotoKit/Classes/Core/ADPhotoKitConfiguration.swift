@@ -39,6 +39,8 @@ public class ADPhotoKitConfiguration {
     
     public var browseItemSpacing: CGFloat = 40
     
+    public var fetchTimeout: TimeInterval = 20
+    
     #endif
 
 }

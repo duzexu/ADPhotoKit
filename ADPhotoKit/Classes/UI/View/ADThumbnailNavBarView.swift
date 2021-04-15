@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADThumbnailNavBarView: ADBaseNavBarView, ADThumbnailNavBarConfigurable {
+class ADThumbnailNavBarView: ADBaseNavBarView {
     
     
 

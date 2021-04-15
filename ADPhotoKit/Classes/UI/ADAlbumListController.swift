@@ -10,12 +10,12 @@ import SnapKit
 
 class ADAlbumListController: UIViewController {
     
-    let model: ADPhotoKitPickerInternal
+    let model: ADPhotoKitConfig
     
     var tableView: UITableView!
     var dataSource: ADAlbumListDataSource!
     
-    init(model: ADPhotoKitPickerInternal) {
+    init(model: ADPhotoKitConfig) {
         self.model = model
         super.init(nibName: nil, bundle: nil)
     }
@@ -37,22 +37,28 @@ class ADAlbumListController: UIViewController {
         }
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
 }
 
 extension ADAlbumListController {
     
     func setupUI() {
+        automaticallyAdjustsScrollViewInsets = false
         view.backgroundColor = UIColor(hex: 0x2D2D2D)
         
         tableView = UITableView(frame: .zero)
         tableView.backgroundColor = .clear
         tableView.tableFooterView = UIView()
         tableView.separatorColor = UIColor(hex: 0x3C3C3C)
+        tableView.contentInset = UIEdgeInsets(top: topBarHeight, left: 0, bottom: tabBarOffset, right: 0)
         tableView.rowHeight = 65
         tableView.delegate = self
         tableView.dataSource = self
         if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = .always
+            tableView.contentInsetAdjustmentBehavior = .never
         }
         view.addSubview(tableView)
         tableView.snp.makeConstraints { (make) in
@@ -60,6 +66,20 @@ extension ADAlbumListController {
         }
         
         tableView.regisiter(cell: ADAlbumListCell.self)
+        
+        let navBarView = ADThumbnailNavBarView()
+        navBarView.title = "照片"
+        navBarView.leftActionBlock = { [weak self] btn in
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
+        view.addSubview(navBarView)
+        navBarView.snp.makeConstraints { (make) in
+            make.left.right.top.equalToSuperview()
+            make.height.equalTo(navBarView.height)
+        }
         
         dataSource = ADAlbumListDataSource(reloadable: tableView, options: model.albumOpts)
     }
