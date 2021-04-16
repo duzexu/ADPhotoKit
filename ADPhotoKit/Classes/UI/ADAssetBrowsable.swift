@@ -62,6 +62,15 @@ public enum ADAsset: Equatable {
         }
     }
     
+    var isImage: Bool {
+        switch self {
+        case .image(_):
+            return true
+        case .video(_):
+            return false
+        }
+    }
+    
     public static func == (lhs: ADAsset, rhs: ADAsset) -> Bool {
         return lhs.identifier == rhs.identifier
     }

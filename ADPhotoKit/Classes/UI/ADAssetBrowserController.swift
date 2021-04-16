@@ -82,6 +82,53 @@ class ADAssetBrowserController: UIViewController {
         ADPhotoKitUI.config.browserSelect?(dataSource.selects)
     }
     
+    open func canSelectWithCurrentIndex() -> Bool {
+        let selected = dataSource.selects.count
+        let max = model.params.maxCount ?? Int.max
+        let item = dataSource.current
+        if selected < max {
+            let itemIsImage = item.browseAsset.isImage
+            if model.assetOpts.contains(.mixSelect) {
+                let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
+                let maxVideoCount = model.params.maxVideoCount ?? Int.max
+                let maxImageCount = model.params.maxImageCount ?? Int.max
+                if videoCount >= maxVideoCount, !itemIsImage {
+                    let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
+                    ADAlert.alert(on: self, message: message)
+                    return false
+                }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                    ADAlert.alert(on: self, message: "最多选择\(maxImageCount)个图片")
+                    return false
+                }
+            }else{
+                if item.browseAsset.isImage != model.selectMediaImage {
+                    if model.selectMediaImage {
+                        ADAlert.alert(on: self, message: "不能选择视频")
+                    }else{
+                        ADAlert.alert(on: self, message: "不能选择图片")
+                    }
+                    return false
+                }else{
+                    let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
+                    let maxVideoCount = model.params.maxVideoCount ?? Int.max
+                    let maxImageCount = model.params.maxImageCount ?? Int.max
+                    if videoCount >= maxVideoCount, !itemIsImage {
+                        let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
+                        ADAlert.alert(on: self, message: message)
+                        return false
+                    }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                        ADAlert.alert(on: self, message: "最多选择\(maxImageCount)个图片")
+                        return false
+                    }
+                }
+            }
+        }else{
+            let message = String(format: ADLocale.LocaleKey.exceededMaxSelectCount.localeTextValue, max)
+            ADAlert.alert(on: self, message: message)
+            return false
+        }
+        return true
+    }
 }
 
 private extension ADAssetBrowserController {
@@ -126,7 +173,9 @@ private extension ADAssetBrowserController {
             if btn.isSelected {
                 self?.dataSource.deleteSelect(strong.dataSource.index)
             }else{
-                self?.dataSource.appendSelect(strong.dataSource.index)
+                if strong.canSelectWithCurrentIndex() {
+                    self?.dataSource.appendSelect(strong.dataSource.index)
+                }
             }
         }
         toolBarView = ADBrowserToolBarView(dataSource: dataSource)

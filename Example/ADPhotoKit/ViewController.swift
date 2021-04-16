@@ -27,7 +27,7 @@ class ViewController: UIViewController {
     
     @IBAction func showImagePicker(_ sender: UIButton) {
         if #available(iOS 14, *) {
-            ADPhotoKitUI.imagePicker(present: self, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
+            ADPhotoKitUI.imagePicker(present: self, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1),.videoTime(min: 10, max: nil)]) { (assets, value) in
                 print(assets)
             }
         }else{

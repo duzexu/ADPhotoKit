@@ -280,6 +280,20 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                         }
                     }
                 }
+                if !itemIsImage {
+                    if let max = model.params.maxVideoTime {
+                        if item.type.duration > max {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }
+                    }
+                    if let min = model.params.minVideoTime {
+                        if item.type.duration < min {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }
+                    }
+                }
             }else{
                 c.selectStatus = .deselect
                 item.selectStatus = .deselect

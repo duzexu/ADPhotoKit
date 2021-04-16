@@ -68,7 +68,7 @@ extension ADAlbumListController {
         tableView.regisiter(cell: ADAlbumListCell.self)
         
         let navBarView = ADThumbnailNavBarView()
-        navBarView.title = "照片"
+        navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
         navBarView.leftActionBlock = { [weak self] btn in
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{

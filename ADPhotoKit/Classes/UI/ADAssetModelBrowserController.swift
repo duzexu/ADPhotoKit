@@ -37,4 +37,32 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
             navigationController?.dismiss(animated: true, completion: nil)
         }
     }
+    
+    override func canSelectWithCurrentIndex() -> Bool {
+        let item = listData.list[dataSource.index]
+        switch item.type {
+        case let .video(duration, _):
+            if super.canSelectWithCurrentIndex() {
+                if let max = model.params.maxVideoTime {
+                    if duration > max {
+                        let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
+                        ADAlert.alert(on: self, message: message)
+                        return false
+                    }
+                }
+                if let min = model.params.minVideoTime {
+                    if duration < min {
+                        let message = String(format: ADLocale.LocaleKey.shorterThanMaxVideoDuration.localeTextValue, min)
+                        ADAlert.alert(on: self, message: message)
+                        return false
+                    }
+                }
+                return true
+            }else{
+                return false
+            }
+        default:
+            return super.canSelectWithCurrentIndex()
+        }
+    }
 }

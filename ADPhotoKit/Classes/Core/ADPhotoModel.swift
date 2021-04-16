@@ -168,6 +168,15 @@ public class ADAssetModel: Equatable {
             return value < 4
         }
         
+        var duration: Int {
+            switch self {
+            case let .video(duration,_):
+                return duration
+            default:
+                return 0
+            }
+        }
+        
         private var value: Int {
             switch self {
             case .unknown:

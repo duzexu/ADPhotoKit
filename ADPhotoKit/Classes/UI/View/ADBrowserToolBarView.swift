@@ -47,6 +47,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
 
         setupUI()
         
+        reloadCount(dataSource.selects.count)
         dataSource.selectAssetChanged = { [weak self] count in
             self?.reloadCount(count)
         }

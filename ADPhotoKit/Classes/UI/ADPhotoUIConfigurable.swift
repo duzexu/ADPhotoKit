@@ -128,3 +128,9 @@ public protocol ADBrowserToolBarConfigurable {
     var doneActionBlock: (()->Void)? { set get }
         
 }
+
+public protocol ADAlertConfigurable {
+    
+    static func alert(on: UIViewController, title: String?, message: String?, completion: ((Int)->Void)?)
+        
+}
