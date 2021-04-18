@@ -163,7 +163,7 @@ private extension ADBrowserToolBarView {
                     editBtn.isHidden = false
                     originalBtn.isHidden = false
                 }
-            case .local(_):
+            case .local:
                 editBtn.isHidden = true
                 originalBtn.isHidden = true
             }

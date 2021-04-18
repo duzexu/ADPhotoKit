@@ -66,7 +66,7 @@ class ADBrowserToolBarCell: UICollectionViewCell {
                     tagImageView.image = Bundle.uiBundle?.image(name: "livePhoto")
                 }
                 imageView.setAsset(asset, size: CGSize(width: 60*UIScreen.main.scale, height: 60*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
-            case let .local(img):
+            case let .local(img,_):
                 imageView.image = img
             }
         case let .video(source):

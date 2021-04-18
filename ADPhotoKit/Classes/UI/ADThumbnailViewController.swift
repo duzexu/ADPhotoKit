@@ -217,19 +217,22 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
         let model = dataSource.list[modify.row]
-        cell.configure(with: model, indexPath: modify)
+        cell.configure(with: model, indexPath: indexPath)
         cell.selectAction = { [weak self] cell, sel in
             guard let strong = self else {
                 return
             }
+            
+            let index = strong.model.albumOpts.contains(.ascending) ? cell.indexPath.row : indexPath.row-strong.dataSource.appendCellCount
+            
             if sel { //取消选择
-                self?.dataSource.selectAssetAt(index: cell.indexPath.row)
+                self?.dataSource.selectAssetAt(index: index)
             }else{
-                self?.dataSource.deselectAssetAt(index: cell.indexPath.row)
+                self?.dataSource.deselectAssetAt(index: index)
             }
             
             /// 单独刷新这个cell 防止选择动画停止
-            cell.configure(with: strong.dataSource.list[cell.indexPath.row], indexPath: nil)
+            cell.configure(with: strong.dataSource.list[index], indexPath: nil)
             
             var indexs = strong.collectionView.indexPathsForVisibleItems
             indexs.removeAll {$0 == cell.indexPath}

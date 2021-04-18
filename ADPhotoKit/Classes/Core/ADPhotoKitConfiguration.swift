@@ -25,6 +25,9 @@ public class ADPhotoKitConfiguration {
     public var customAlbumOrders: [ADAlbumType]?
     
     #if Module_UI
+    
+    /// 自定义ui
+    public var customUIBundle: Bundle?
         
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600

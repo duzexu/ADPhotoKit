@@ -16,16 +16,16 @@ public protocol ADAssetBrowsable {
 public enum ADImageSource {
     case network(URL)
     case album(PHAsset)
-    case local(UIImage)
+    case local(UIImage, String)
     
-    var identifier: String {
+    public var identifier: String {
         switch self {
         case let .network(url):
             return url.absoluteString
         case let .album(asset):
             return asset.localIdentifier
-        case .local(_):
-            return UUID().uuidString
+        case let .local(_, identify):
+            return identify
         }
     }
     
@@ -36,7 +36,7 @@ public enum ADVideoSource {
     case album(PHAsset)
     case local(URL)
     
-    var identifier: String {
+    public var identifier: String {
         switch self {
         case let .network(url):
             return url.absoluteString
@@ -53,7 +53,7 @@ public enum ADAsset: Equatable {
     case image(ADImageSource)
     case video(ADVideoSource)
     
-    var identifier: String {
+    public var identifier: String {
         switch self {
         case let .image(source):
             return source.identifier
@@ -62,7 +62,7 @@ public enum ADAsset: Equatable {
         }
     }
     
-    var isImage: Bool {
+    public var isImage: Bool {
         switch self {
         case .image(_):
             return true
@@ -101,6 +101,6 @@ extension PHAsset: ADAssetBrowsable {
 
 extension UIImage: ADAssetBrowsable {
     public var browseAsset: ADAsset {
-        return .image(.local(self))
+        return .image(.local(self, UUID().uuidString))
     }
 }

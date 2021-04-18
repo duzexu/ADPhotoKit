@@ -10,15 +10,12 @@ import Foundation
 extension Bundle {
     
     static var uiBundle: Bundle? {
+        if let bundle = ADPhotoKitConfiguration.default.customUIBundle {
+            return bundle
+        }
         return moduleUI
     }
-    
-    class func resetLocaleUIBundle() {
-        locale_UIbundle = nil
-    }
-    
-    private static var locale_UIbundle: Bundle? = nil
-    
+      
     private static var moduleUI: Bundle? = {
         let bundleName = "ADPhotoKitUI"
 

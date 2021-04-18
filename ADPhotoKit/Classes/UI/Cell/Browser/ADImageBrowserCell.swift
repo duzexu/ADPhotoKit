@@ -220,7 +220,7 @@ private extension ADImageBrowserView {
                     self?.progressView.isHidden = true
                 }
             }
-        case let .local(img):
+        case let .local(img,_):
             progressView.isHidden = true
             imageView.image = img
             resizeView(pixelWidth: img.size.width, pixelHeight: img.size.height)
