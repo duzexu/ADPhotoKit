@@ -8,6 +8,11 @@
 import Foundation
 import Photos
 
+public enum ADPickerStyle {
+    case normal
+    case embed
+}
+
 public struct ADAssetSelectOptions: OptionSet {
     public let rawValue: Int
     
@@ -101,6 +106,7 @@ public class ADPhotoKitUI {
     public typealias AssetCancelHandler = (() -> Void)
     
     public class func imagePicker(present on: UIViewController,
+                                    style: ADPickerStyle = .normal,
                                     assets: [PHAsset] = [],
                                     albumOpts: ADAlbumSelectOptions = .default,
                                     assetOpts: ADAssetSelectOptions = .default,
@@ -116,13 +122,22 @@ public class ADPhotoKitUI {
             configuration.selectMediaImage = true
         }
         config = configuration
-        ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-            let album = ADAlbumListController(model: configuration)
-            let nav = ADPhotoNavController(rootViewController: album)
-            let thumbnail = ADThumbnailViewController(model: configuration, albumList: model, selects: assets)
-            nav.modalPresentationStyle = .fullScreen
-            nav.pushViewController(thumbnail, animated: false)
-            on.present(nav, animated: true, completion: nil)
+        if style == .normal {
+            ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
+                let album = ADAlbumListController(model: configuration)
+                let nav = ADPhotoNavController(rootViewController: album)
+                let thumbnail = ADThumbnailViewController(model: configuration, albumList: model, style: style, selects: assets)
+                nav.modalPresentationStyle = .fullScreen
+                nav.pushViewController(thumbnail, animated: false)
+                on.present(nav, animated: true, completion: nil)
+            }
+        }else{
+            ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
+                let thumbnail = ADThumbnailViewController(model: configuration, albumList: model, style: style, selects: assets)
+                let nav = ADPhotoNavController(rootViewController: thumbnail)
+                nav.modalPresentationStyle = .fullScreen
+                on.present(nav, animated: true, completion: nil)
+            }
         }
     }
     

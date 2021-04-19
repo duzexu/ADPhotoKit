@@ -17,7 +17,7 @@ class ViewController: UIViewController {
         ADPhotoManager.allPhotoAlbumList() { (list) in
             print(list)
         }
-        
+        ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor.rawValue:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius.rawValue:6])
     }
 
     override func didReceiveMemoryWarning() {
@@ -27,7 +27,7 @@ class ViewController: UIViewController {
     
     @IBAction func showImagePicker(_ sender: UIButton) {
         if #available(iOS 14, *) {
-            ADPhotoKitUI.imagePicker(present: self, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1),.videoTime(min: 10, max: nil)]) { (assets, value) in
+            ADPhotoKitUI.imagePicker(present: self, style: .normal, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1),.videoTime(min: 10, max: nil)]) { (assets, value) in
                 print(assets)
             }
         }else{

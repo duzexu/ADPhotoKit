@@ -9,7 +9,7 @@ import UIKit
 
 class ADBaseNavBarView: UIView, ADNavBarConfigurable {
     
-    typealias ButtonItem = (normal: UIImage?, select: UIImage?)
+    typealias ButtonItem = (normal: UIImage?, select: UIImage?, title: String?)
 
     var height: CGFloat {
         return statusBarHeight + 44
@@ -28,7 +28,7 @@ class ADBaseNavBarView: UIView, ADNavBarConfigurable {
     var rightBtnItem: UIButton!
     var titleLabel: UILabel!
 
-    init(leftItem: ButtonItem? = (Bundle.uiBundle?.image(name: "navBack"),nil), rightItem: ButtonItem? = nil) {
+    init(leftItem: ButtonItem? = (Bundle.uiBundle?.image(name: "navBack"),nil,nil), rightItem: ButtonItem? = nil) {
         super.init(frame: .zero)
         setupUI(leftItem: leftItem, rightItem: rightItem)
     }
@@ -61,6 +61,8 @@ private extension ADBaseNavBarView {
         
         leftBtnItem = UIButton(type: .custom)
         leftBtnItem.contentMode = .left
+        leftBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        leftBtnItem.setTitleColor(.white, for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
@@ -71,10 +73,15 @@ private extension ADBaseNavBarView {
         if let left = leftItem {
             leftBtnItem.setImage(left.normal, for: .normal)
             leftBtnItem.setImage(left.select, for: .selected)
+            leftBtnItem.setTitle(left.title, for: .normal)
+        }else{
+            leftBtnItem.isHidden = true
         }
         
         rightBtnItem = UIButton(type: .custom)
         rightBtnItem.contentMode = .right
+        rightBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        rightBtnItem.setTitleColor(.white, for: .normal)
         rightBtnItem.addTarget(self, action: #selector(rightBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(rightBtnItem)
         rightBtnItem.snp.makeConstraints { (make) in
@@ -85,6 +92,9 @@ private extension ADBaseNavBarView {
         if let right = rightItem {
             rightBtnItem.setImage(right.normal, for: .normal)
             rightBtnItem.setImage(right.select, for: .selected)
+            rightBtnItem.setTitle(right.title, for: .normal)
+        }else{
+            rightBtnItem.isHidden = true
         }
     }
 }

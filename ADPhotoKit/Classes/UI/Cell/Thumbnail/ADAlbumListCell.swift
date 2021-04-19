@@ -8,14 +8,37 @@
 import UIKit
 import Photos
 
-class ADAlbumListCell: UITableViewCell {
+public class ADAlbumListCell: UITableViewCell {
 
-    var albumModel: ADAlbumModel!
+    public var albumModel: ADAlbumModel!
+    
+    public var style: ADPickerStyle! = .normal {
+        didSet {
+            if style == .normal {
+                accessoryView = nil
+                albumImageView.snp.makeConstraints { (make) in
+                    make.left.equalToSuperview().offset(12)
+                    make.top.equalToSuperview().offset(2)
+                    make.bottom.equalToSuperview().offset(-2)
+                    make.width.equalTo(albumImageView.snp.height)
+                }
+            }else{
+                accessoryView = accessory
+                albumImageView.snp.remakeConstraints { (make) in
+                    make.left.equalToSuperview()
+                    make.top.equalToSuperview().offset(2)
+                    make.bottom.equalToSuperview().offset(-2)
+                    make.width.equalTo(albumImageView.snp.height)
+                }
+            }
+        }
+    }
     
     /// ui
     var albumImageView: UIImageView!
     var albumTitleLabel: UILabel!
     var albumCountLabel: UILabel!
+    var accessory: UIImageView!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -29,13 +52,14 @@ class ADAlbumListCell: UITableViewCell {
     func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
+        accessoryType = .disclosureIndicator
         
         albumImageView = UIImageView()
         albumImageView.contentMode = .scaleAspectFill
         albumImageView.clipsToBounds = true
         contentView.addSubview(albumImageView)
         albumImageView.snp.makeConstraints { (make) in
-            make.left.equalToSuperview()
+            make.left.equalToSuperview().offset(12)
             make.top.equalToSuperview().offset(2)
             make.bottom.equalToSuperview().offset(-2)
             make.width.equalTo(albumImageView.snp.height)
@@ -62,13 +86,21 @@ class ADAlbumListCell: UITableViewCell {
             make.right.lessThanOrEqualToSuperview().offset(-40)
         }
         
+        accessory = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        accessory.image = Bundle.uiBundle?.image(name: "albumSelect")
+        accessory.isHidden = true
+    }
+    
+    public override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        accessoryView?.isHidden = !selected
     }
     
 }
 
 extension ADAlbumListCell: ADAlbumListConfigurable {
     
-    func configure(with model: ADAlbumModel) {
+    public func configure(with model: ADAlbumModel) {
         albumModel = model
         albumTitleLabel.text = model.title
         albumCountLabel.text = "(\(model.count))"
@@ -82,36 +114,34 @@ extension ADAlbumListCell: ADAlbumListConfigurable {
 /// UIAppearance
 extension ADAlbumListCell {
     
-    /// 封面圆角
+    public enum Key: String {
+        case cornerRadius /// 封面圆角
+        case titleColor /// 标题颜色
+        case titleFont /// 标题
+        case countColor /// 数量颜色
+        case countFont //数量
+    }
+    
     @objc
-    public dynamic var cornerRadius: CGFloat {
-        set {
-            albumImageView.layer.cornerRadius = newValue
-        }
-        get {
-            return albumImageView.layer.cornerRadius
+    public func setAttributes(_ attrs: [String : Any]?) {
+        if let kvs = attrs {
+            for (k,v) in kvs {
+                if let key = Key(rawValue: k) {
+                    switch key {
+                    case .cornerRadius:
+                        albumImageView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                    case .titleColor:
+                        albumTitleLabel.textColor = (v as? UIColor) ?? .white
+                    case .countColor:
+                        albumCountLabel.textColor = (v as? UIColor) ?? UIColor(hex: 0xB4B4B4)
+                    case .titleFont:
+                        albumTitleLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 17)
+                    case .countFont:
+                        albumCountLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 16)
+                    }
+                }
+            }
         }
     }
     
-    /// 标题颜色
-    @objc
-    public dynamic var titleColor: UIColor {
-        set {
-            albumTitleLabel.textColor = newValue
-        }
-        get {
-            return albumTitleLabel.textColor
-        }
-    }
-    
-    /// 标题颜色
-    @objc
-    public dynamic var countColor: UIColor {
-        set {
-            albumCountLabel.textColor = newValue
-        }
-        get {
-            return albumCountLabel.textColor
-        }
-    }
 }

@@ -16,7 +16,7 @@ class ADBrowserNavBarView: ADBaseNavBarView {
 
     init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
-        super.init(rightItem: (Bundle.uiBundle?.image(name: "btn_circle"), Bundle.uiBundle?.image(name: "btn_selected")))
+        super.init(rightItem: (Bundle.uiBundle?.image(name: "btn_circle"), Bundle.uiBundle?.image(name: "btn_selected"),nil))
         
         setupChildUI()
     }

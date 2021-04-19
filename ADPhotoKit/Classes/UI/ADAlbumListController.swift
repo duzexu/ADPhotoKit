@@ -33,7 +33,9 @@ class ADAlbumListController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         if dataSource.list.count == 0 {
-            dataSource.reloadData()
+            dataSource.reloadData { [weak self] in
+                self?.tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
+            }
         }
     }
     
@@ -66,8 +68,8 @@ extension ADAlbumListController {
         }
         
         tableView.regisiter(cell: ADAlbumListCell.self)
-        
-        let navBarView = ADThumbnailNavBarView()
+                
+        let navBarView = ADAlbumNavBarView()
         navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
         navBarView.leftActionBlock = { [weak self] btn in
             if let _ = self?.navigationController?.popViewController(animated: true) {

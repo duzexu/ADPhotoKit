@@ -25,6 +25,7 @@ class ADThumbnailViewController: UIViewController {
     
     let model: ADPhotoKitConfig
     let albumList: ADAlbumModel
+    let style: ADPickerStyle
     let selects: [PHAsset]
     
     var collectionView: UICollectionView!
@@ -32,9 +33,10 @@ class ADThumbnailViewController: UIViewController {
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(model: ADPhotoKitConfig, albumList: ADAlbumModel, selects: [PHAsset] = []) {
+    init(model: ADPhotoKitConfig, albumList: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
         self.model = model
         self.albumList = albumList
+        self.style = style
         self.selects = selects
         super.init(nibName: nil, bundle: nil)
     }
@@ -126,7 +128,7 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        let navBarView = ADThumbnailNavBarView()
+        let navBarView = ADThumbnailNavBarView(style: style)
         navBarView.title = albumList.title
         navBarView.leftActionBlock = { [weak self] btn in
             if let _ = self?.navigationController?.popViewController(animated: true) {

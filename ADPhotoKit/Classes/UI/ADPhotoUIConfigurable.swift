@@ -12,6 +12,8 @@ public protocol ADAlbumListConfigurable {
     
     var albumModel: ADAlbumModel! { set get }
     
+    var style: ADPickerStyle! { set get }
+    
     func configure(with model: ADAlbumModel)
     
 }
