@@ -89,6 +89,7 @@ private extension ADThumbnailNavBarView {
                 albumListView!.selectAlbumBlock = { [weak self] album in
                     self?.reset()
                     if let al = album {
+                        self?.title = al.title
                         self?.reloadAlbumBlock?(al)
                     }
                 }

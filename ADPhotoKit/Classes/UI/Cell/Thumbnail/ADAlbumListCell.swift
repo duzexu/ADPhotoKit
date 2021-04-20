@@ -16,7 +16,7 @@ public class ADAlbumListCell: UITableViewCell {
         didSet {
             if style == .normal {
                 accessoryView = nil
-                albumImageView.snp.makeConstraints { (make) in
+                albumImageView.snp.remakeConstraints { (make) in
                     make.left.equalToSuperview().offset(12)
                     make.top.equalToSuperview().offset(2)
                     make.bottom.equalToSuperview().offset(-2)

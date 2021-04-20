@@ -99,6 +99,7 @@ class ADThumbnailListCell: UICollectionViewCell {
         }
         
         tagImageView = UIImageView(frame: .zero)
+        tagImageView.image = nil
         tagImageView.contentMode = .center
         bottomMaskView.addSubview(tagImageView)
         tagImageView.snp.makeConstraints { (make) in
