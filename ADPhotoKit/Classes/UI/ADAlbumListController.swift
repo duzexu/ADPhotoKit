@@ -103,7 +103,7 @@ extension ADAlbumListController: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let thumbnail = ADThumbnailViewController(model: model, albumList: dataSource.list[indexPath.row])
+        let thumbnail = ADThumbnailViewController(model: model, album: dataSource.list[indexPath.row])
         navigationController?.pushViewController(thumbnail, animated: true)
     }
     

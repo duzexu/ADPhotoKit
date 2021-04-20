@@ -9,7 +9,12 @@ import UIKit
 
 class ADThumbnailNavBarView: ADBaseNavBarView {
     
-    var arrow: UIImageView!
+    var reloadAlbumBlock: ((ADAlbumModel)->Void)?
+    
+    let model: ADPhotoKitConfig
+    
+    var arrowImageView: UIImageView?
+    var albumListView: ADEmbedAlbumListView?
     
     override var title: String? {
         didSet {
@@ -20,7 +25,8 @@ class ADThumbnailNavBarView: ADBaseNavBarView {
         }
     }
     
-    init(style: ADPickerStyle) {
+    init(model: ADPhotoKitConfig, style: ADPickerStyle) {
+        self.model = model
         if style == .normal {
             super.init(rightItem: (nil,nil,ADLocale.LocaleKey.cancel.localeTextValue))
         }else{
@@ -35,7 +41,7 @@ class ADThumbnailNavBarView: ADBaseNavBarView {
     
     func reset() {
         UIView.animate(withDuration: 0.25) {
-            self.arrow.transform = .identity
+            self.arrowImageView?.transform = .identity
         }
     }
     
@@ -54,7 +60,7 @@ private extension ADThumbnailNavBarView {
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-6)
             make.height.equalTo(32)
-            make.width.lessThanOrEqualTo(self.snp.width).dividedBy(0.5)
+            make.width.lessThanOrEqualTo(self.snp.width).dividedBy(2).priority(.medium)
         }
         
         titleBg.addSubview(titleLabel)
@@ -64,9 +70,9 @@ private extension ADThumbnailNavBarView {
             make.centerY.equalToSuperview()
         }
         
-        arrow = UIImageView(image: Bundle.uiBundle?.image(name: "downArrow"))
-        titleBg.addSubview(arrow)
-        arrow.snp.makeConstraints { (make) in
+        arrowImageView = UIImageView(image: Bundle.uiBundle?.image(name: "downArrow"))
+        titleBg.addSubview(arrowImageView!)
+        arrowImageView!.snp.makeConstraints { (make) in
             make.size.equalTo(CGSize(width: 20, height: 20))
             make.centerY.equalToSuperview()
             make.right.equalToSuperview().offset(-5)
@@ -75,13 +81,31 @@ private extension ADThumbnailNavBarView {
     
     @objc
     func titleBgAction() {
-        if arrow.transform == .identity {
+        if arrowImageView?.transform == .identity {
+            var reload: Bool = false
+            if albumListView == nil {
+                reload = true
+                albumListView = ADEmbedAlbumListView(model: model)
+                albumListView!.selectAlbumBlock = { [weak self] album in
+                    self?.reset()
+                    if let al = album {
+                        self?.reloadAlbumBlock?(al)
+                    }
+                }
+            }
+            superview?.insertSubview(albumListView!, belowSubview: self)
+            albumListView?.snp.makeConstraints({ (make) in
+                make.left.right.bottom.equalToSuperview()
+                make.top.equalToSuperview().offset(topBarHeight)
+            })
+            albumListView?.show(reload: reload)
             UIView.animate(withDuration: 0.25) {
-                self.arrow.transform = CGAffineTransform(rotationAngle: .pi)
+                self.arrowImageView?.transform = CGAffineTransform(rotationAngle: .pi)
             }
         } else {
+            albumListView?.hide()
             UIView.animate(withDuration: 0.25) {
-                self.arrow.transform = .identity
+                self.arrowImageView?.transform = .identity
             }
         }
     }

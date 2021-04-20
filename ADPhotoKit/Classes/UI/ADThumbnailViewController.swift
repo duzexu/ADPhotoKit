@@ -24,7 +24,7 @@ struct ADThumbnailParams {
 class ADThumbnailViewController: UIViewController {
     
     let model: ADPhotoKitConfig
-    let albumList: ADAlbumModel
+    var album: ADAlbumModel
     let style: ADPickerStyle
     let selects: [PHAsset]
     
@@ -33,9 +33,9 @@ class ADThumbnailViewController: UIViewController {
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(model: ADPhotoKitConfig, albumList: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
+    init(model: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
         self.model = model
-        self.albumList = albumList
+        self.album = album
         self.style = style
         self.selects = selects
         super.init(nibName: nil, bundle: nil)
@@ -74,7 +74,7 @@ class ADThumbnailViewController: UIViewController {
             }
         }
         
-        reloadAssets()
+        reloadAlbum(album, initial: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -103,6 +103,23 @@ class ADThumbnailViewController: UIViewController {
             dataSource.reloadData()
         }
     }
+    
+    func reloadAlbum(_ album: ADAlbumModel, initial: Bool) {
+        if initial {
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selects, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+            dataSource.selectAssetChanged = { [weak self] count in
+                self?.toolBarView.selectCount = count
+            }
+        }else{
+            let selected = dataSource.selects.map { $0.asset }
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selected, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+            dataSource.selectAssetChanged = { [weak self] count in
+                self?.toolBarView.selectCount = count
+            }
+        }
+        
+        reloadAssets()
+    }
 
 }
 
@@ -128,21 +145,6 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        let navBarView = ADThumbnailNavBarView(style: style)
-        navBarView.title = albumList.title
-        navBarView.leftActionBlock = { [weak self] btn in
-            if let _ = self?.navigationController?.popViewController(animated: true) {
-            }else{
-                ADPhotoKitUI.config.canceled?()
-                self?.navigationController?.dismiss(animated: true, completion: nil)
-            }
-        }
-        view.addSubview(navBarView)
-        navBarView.snp.makeConstraints { (make) in
-            make.left.right.top.equalToSuperview()
-            make.height.equalTo(navBarView.height)
-        }
-        
         toolBarView = ADThumbnailToolBarView(model: model)
         toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
@@ -162,13 +164,25 @@ extension ADThumbnailViewController {
             }
         }
         
-        collectionView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: toolBarView.height, right: 0)
-        
-        dataSource = ADAssetListDataSource(reloadable: collectionView, album: albumList, select: selects, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
-        dataSource.selectAssetChanged = { [weak self] count in
-            self?.toolBarView.selectCount = count
+        let navBarView = ADThumbnailNavBarView(model: model, style: style)
+        navBarView.title = album.title
+        navBarView.leftActionBlock = { [weak self] btn in
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                ADPhotoKitUI.config.canceled?()
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
+        view.addSubview(navBarView)
+        navBarView.snp.makeConstraints { (make) in
+            make.left.right.top.equalToSuperview()
+            make.height.equalTo(navBarView.height)
+        }
+        navBarView.reloadAlbumBlock = { [weak self] model in
+            self?.reloadAlbum(model, initial: false)
         }
         
+        collectionView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: toolBarView.height, right: 0)
     }
     
 }

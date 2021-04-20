@@ -55,7 +55,7 @@ public enum ADAlbumType: CaseIterable {
     }
 }
 
-public class ADAlbumModel {
+public class ADAlbumModel: Equatable {
     
     public let title: String
     
@@ -147,6 +147,11 @@ public class ADAlbumModel {
         
         return (title ?? ADLocale.LocaleKey.noTitleAlbumListPlaceholder.localeTextValue,type ?? .custom)
     }
+    
+    public static func == (lhs: ADAlbumModel, rhs: ADAlbumModel) -> Bool {
+        return lhs.collection.localIdentifier == rhs.collection.localIdentifier
+    }
+    
 }
 
 extension ADAlbumModel: CustomStringConvertible {
