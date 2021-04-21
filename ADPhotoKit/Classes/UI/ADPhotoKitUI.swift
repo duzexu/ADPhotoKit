@@ -124,16 +124,16 @@ public class ADPhotoKitUI {
         config = configuration
         if style == .normal {
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let album = ADAlbumListController(model: configuration)
+                let album = ADAlbumListController(config: configuration)
                 let nav = ADPhotoNavController(rootViewController: album)
-                let thumbnail = ADThumbnailViewController(model: configuration, album: model, style: style, selects: assets)
+                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: assets)
                 nav.modalPresentationStyle = .fullScreen
                 nav.pushViewController(thumbnail, animated: false)
                 on.present(nav, animated: true, completion: nil)
             }
         }else{
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let thumbnail = ADThumbnailViewController(model: configuration, album: model, style: style, selects: assets)
+                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: assets)
                 let nav = ADPhotoNavController(rootViewController: thumbnail)
                 nav.modalPresentationStyle = .fullScreen
                 on.present(nav, animated: true, completion: nil)
@@ -176,23 +176,23 @@ extension ADPhotoKitUI {
     
 }
 
-class ADPhotoKitConfig {
+public class ADPhotoKitConfig {
 
-    let albumOpts: ADAlbumSelectOptions
-    let assetOpts: ADAssetSelectOptions
-    let browserOpts: ADAssetBrowserOptions
-    let params: ADThumbnailParams
+    public let albumOpts: ADAlbumSelectOptions
+    public let assetOpts: ADAssetSelectOptions
+    public let browserOpts: ADAssetBrowserOptions
+    public let params: ADThumbnailParams
+    
     let pickerSelect: ADPhotoKitUI.AssetSelectHandler?
     let browserSelect: ADPhotoKitUI.AssetableSelectHandler?
     let canceled: ADPhotoKitUI.AssetCancelHandler?
     
     var selectMediaImage: Bool = false
     
-    var isOriginal: Bool = false
+    public var isOriginal: Bool = false
     
     let fetchImageQueue: OperationQueue = OperationQueue()
     
-        
     init(albumOpts: ADAlbumSelectOptions = .default,
          assetOpts: ADAssetSelectOptions = .default,
          browserOpts: ADAssetBrowserOptions,

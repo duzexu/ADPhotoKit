@@ -71,7 +71,7 @@ class ADAssetBrowserController: UIViewController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
     open func didSelectsUpdate() {
@@ -170,10 +170,12 @@ private extension ADAssetBrowserController {
         }
         navBarView.rightActionBlock = { [weak self] btn in
             guard let strong = self else { return }
+            btn.layer.removeAllAnimations()
             if btn.isSelected {
                 self?.dataSource.deleteSelect(strong.dataSource.index)
             }else{
                 if strong.canSelectWithCurrentIndex() {
+                    btn.layer.add(ADPhotoKitUI.springAnimation(), forKey: nil)
                     self?.dataSource.appendSelect(strong.dataSource.index)
                 }
             }

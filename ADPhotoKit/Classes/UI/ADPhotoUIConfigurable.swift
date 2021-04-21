@@ -8,7 +8,32 @@
 import Foundation
 import Photos
 
-public protocol ADAlbumListConfigurable {
+public typealias ADNavBarable = (UIView & ADNavBarConfigurable)
+public protocol ADNavBarConfigurable {
+    
+    var height: CGFloat { get }
+    
+    var title: String? { set get }
+    
+    var leftActionBlock: ((UIButton)->Void)? { set get }
+    
+    var rightActionBlock: ((UIButton)->Void)? { set get }
+            
+}
+
+public typealias ADAlbumListNavBarable = (UIView & ADAlbumListNavBarConfigurable)
+public protocol ADAlbumListNavBarConfigurable {
+    
+    var height: CGFloat { get }
+    
+    var title: String? { set get }
+    
+    var leftActionBlock: ((UIButton)->Void)? { set get }
+    
+}
+
+public typealias ADAlbumListCellable = (UITableViewCell & ADAlbumListCellConfigurable)
+public protocol ADAlbumListCellConfigurable {
     
     var albumModel: ADAlbumModel! { set get }
     
@@ -45,19 +70,6 @@ public enum ADThumbnailSelectStatus {
             return false
         }
     }
-}
-
-public typealias ADNavBarable = (UIView & ADNavBarConfigurable)
-public protocol ADNavBarConfigurable {
-    
-    var height: CGFloat { get }
-    
-    var title: String? { set get }
-    
-    var leftActionBlock: ((UIButton)->Void)? { set get }
-    
-    var rightActionBlock: ((UIButton)->Void)? { set get }
-            
 }
 
 public protocol ADToolBarConfigurable {
@@ -135,4 +147,19 @@ public protocol ADAlertConfigurable {
     
     static func alert(on: UIViewController, title: String?, message: String?, completion: ((Int)->Void)?)
         
+}
+
+class ADPhotoUIConfigurable {
+    
+    static func albumListNavBar() -> ADAlbumListNavBarable {
+        return ADPhotoKitConfiguration.default.customAlbumListNavBar ?? ADAlbumListNavBarView()
+    }
+    
+    static func albumListCell(tableView: UITableView, indexPath: IndexPath) -> ADAlbumListCellable {
+        if ADPhotoKitConfiguration.default.customAlbumListCellBlock != nil {
+            assert(ADPhotoKitConfiguration.default.customAlbumListCellRegistor != nil, "you must set 'customAlbumListCellRegistor' and regist your custom cell")
+        }
+        return ADPhotoKitConfiguration.default.customAlbumListCellBlock?(tableView, indexPath) ?? tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCellable
+    }
+    
 }

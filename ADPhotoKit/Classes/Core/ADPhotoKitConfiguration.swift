@@ -28,6 +28,16 @@ public class ADPhotoKitConfiguration {
     
     /// 自定义ui
     public var customUIBundle: Bundle?
+    
+    public var statusBarStyle: UIStatusBarStyle?
+    
+    /// album
+    public var customAlbumListControllerBlock: ((ADAlbumListController)->Void)?
+    
+    public var customAlbumListNavBar: ADAlbumListNavBarable?
+    
+    public var customAlbumListCellRegistor: ((UITableView)->Void)?
+    public var customAlbumListCellBlock: ((UITableView, IndexPath)->ADAlbumListCellable)?
         
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600

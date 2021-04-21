@@ -116,6 +116,8 @@ private extension ADEmbedAlbumListView {
         
         tableView.regisiter(cell: ADAlbumListCell.self)
         
+        ADPhotoKitConfiguration.default.customAlbumListCellRegistor?(tableView)
+        
         dataSource = ADAlbumListDataSource(reloadable: tableView, options: model.albumOpts)
     }
     
@@ -143,7 +145,8 @@ extension ADEmbedAlbumListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCell
+        var cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
+        
         cell.style = .embed
         cell.configure(with: dataSource.list[indexPath.row])
         

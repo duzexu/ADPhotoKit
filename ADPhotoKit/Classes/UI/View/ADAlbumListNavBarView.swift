@@ -1,5 +1,5 @@
 //
-//  ADAlbumNavBarView.swift
+//  ADAlbumListNavBarView.swift
 //  ADPhotoKit
 //
 //  Created by xu on 2021/4/19.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADAlbumNavBarView: ADBaseNavBarView {
+class ADAlbumListNavBarView: ADBaseNavBarView, ADAlbumListNavBarConfigurable {
 
     init() {
         super.init(leftItem: nil, rightItem: (nil,nil,ADLocale.LocaleKey.cancel.localeTextValue))

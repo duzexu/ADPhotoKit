@@ -8,7 +8,7 @@
 import UIKit
 import Photos
 
-public class ADAlbumListCell: UITableViewCell {
+public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
 
     public var albumModel: ADAlbumModel!
     
@@ -31,6 +31,15 @@ public class ADAlbumListCell: UITableViewCell {
                     make.width.equalTo(albumImageView.snp.height)
                 }
             }
+        }
+    }
+    
+    public func configure(with model: ADAlbumModel) {
+        albumModel = model
+        albumTitleLabel.text = model.title
+        albumCountLabel.text = "(\(model.count))"
+        if let asset = model.lastestAsset {
+            albumImageView.setAsset(asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
         }
     }
     
@@ -94,19 +103,6 @@ public class ADAlbumListCell: UITableViewCell {
     public override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         accessoryView?.isHidden = !selected
-    }
-    
-}
-
-extension ADAlbumListCell: ADAlbumListConfigurable {
-    
-    public func configure(with model: ADAlbumModel) {
-        albumModel = model
-        albumTitleLabel.text = model.title
-        albumCountLabel.text = "(\(model.count))"
-        if let asset = model.lastestAsset {
-            albumImageView.setAsset(asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
-        }
     }
     
 }

@@ -8,15 +8,15 @@
 import UIKit
 import SnapKit
 
-class ADAlbumListController: UIViewController {
+public class ADAlbumListController: UIViewController {
     
-    let model: ADPhotoKitConfig
+    let config: ADPhotoKitConfig
     
-    var tableView: UITableView!
-    var dataSource: ADAlbumListDataSource!
+    public var tableView: UITableView!
+    public var dataSource: ADAlbumListDataSource!
     
-    init(model: ADPhotoKitConfig) {
-        self.model = model
+    init(config: ADPhotoKitConfig) {
+        self.config = config
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,12 +24,13 @@ class ADAlbumListController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        ADPhotoKitConfiguration.default.customAlbumListControllerBlock?(self)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         if dataSource.list.count == 0 {
@@ -39,8 +40,8 @@ class ADAlbumListController: UIViewController {
         }
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+    public override var preferredStatusBarStyle: UIStatusBarStyle {
+        return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
 }
@@ -68,10 +69,13 @@ extension ADAlbumListController {
         }
         
         tableView.regisiter(cell: ADAlbumListCell.self)
+        
+        ADPhotoKitConfiguration.default.customAlbumListCellRegistor?(tableView)
                 
-        let navBarView = ADAlbumNavBarView()
+        var navBarView = ADPhotoUIConfigurable.albumListNavBar()
         navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
         navBarView.leftActionBlock = { [weak self] btn in
+            ADPhotoKitUI.config.canceled?()
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
                 self?.navigationController?.dismiss(animated: true, completion: nil)
@@ -83,27 +87,28 @@ extension ADAlbumListController {
             make.height.equalTo(navBarView.height)
         }
         
-        dataSource = ADAlbumListDataSource(reloadable: tableView, options: model.albumOpts)
+        dataSource = ADAlbumListDataSource(reloadable: tableView, options: config.albumOpts)
     }
     
 }
 
 extension ADAlbumListController: UITableViewDelegate,UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSource.list.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCell
-
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
+        
+        cell.style = .normal
         cell.configure(with: dataSource.list[indexPath.row])
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let thumbnail = ADThumbnailViewController(model: model, album: dataSource.list[indexPath.row])
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let thumbnail = ADThumbnailViewController(config: config, album: dataSource.list[indexPath.row])
         navigationController?.pushViewController(thumbnail, animated: true)
     }
     

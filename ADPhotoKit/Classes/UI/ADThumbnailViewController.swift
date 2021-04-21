@@ -8,22 +8,22 @@
 import UIKit
 import PhotosUI
 
-struct ADThumbnailParams {
-    var maxCount: Int?
+public struct ADThumbnailParams {
+    public var maxCount: Int?
     
-    var minImageCount: Int?
-    var maxImageCount: Int?
+    public var minImageCount: Int?
+    public var maxImageCount: Int?
     
-    var minVideoCount: Int?
-    var maxVideoCount: Int?
+    public var minVideoCount: Int?
+    public var maxVideoCount: Int?
     
-    var minVideoTime: Int?
-    var maxVideoTime: Int?
+    public var minVideoTime: Int?
+    public var maxVideoTime: Int?
 }
 
 class ADThumbnailViewController: UIViewController {
     
-    let model: ADPhotoKitConfig
+    let config: ADPhotoKitConfig
     var album: ADAlbumModel
     let style: ADPickerStyle
     let selects: [PHAsset]
@@ -33,8 +33,8 @@ class ADThumbnailViewController: UIViewController {
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(model: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
-        self.model = model
+    init(config: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
+        self.config = config
         self.album = album
         self.style = style
         self.selects = selects
@@ -67,8 +67,8 @@ class ADThumbnailViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         
-        if model.assetOpts.contains(.slideSelect) {
-            if (model.params.maxCount ?? Int.max) > 1 {
+        if config.assetOpts.contains(.slideSelect) {
+            if (config.params.maxCount ?? Int.max) > 1 {
                 panGesture = UIPanGestureRecognizer(target: self, action: #selector(slideSelectAction(_:)))
                 view.addGestureRecognizer(panGesture!)
             }
@@ -89,7 +89,7 @@ class ADThumbnailViewController: UIViewController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
     func reloadAssets() {
@@ -106,13 +106,13 @@ class ADThumbnailViewController: UIViewController {
     
     func reloadAlbum(_ album: ADAlbumModel, initial: Bool) {
         if initial {
-            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selects, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
             dataSource.selectAssetChanged = { [weak self] count in
                 self?.toolBarView.selectCount = count
             }
         }else{
             let selected = dataSource.selects.map { $0.asset }
-            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selected, albumOpts: model.albumOpts, assetOpts: model.assetOpts)
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selected, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
             dataSource.selectAssetChanged = { [weak self] count in
                 self?.toolBarView.selectCount = count
             }
@@ -145,7 +145,7 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        toolBarView = ADThumbnailToolBarView(model: model)
+        toolBarView = ADThumbnailToolBarView(model: config)
         toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
@@ -154,17 +154,17 @@ extension ADThumbnailViewController {
         }
         toolBarView.browserActionBlock = { [weak self] in
             guard let strong = self else { return }
-            let browser = ADAssetModelBrowserController(model: strong.model, dataSource: strong.dataSource)
+            let browser = ADAssetModelBrowserController(model: strong.config, dataSource: strong.dataSource)
             strong.navigationController?.pushViewController(browser, animated: true)
         }
         toolBarView.doneActionBlock = { [weak self] in
             guard let strong = self else { return }
-            self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.model.assetOpts.contains(.selectAsGif)) { [weak self] in
+            self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif)) { [weak self] in
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
         
-        let navBarView = ADThumbnailNavBarView(model: model, style: style)
+        let navBarView = ADThumbnailNavBarView(model: config, style: style)
         navBarView.title = album.title
         navBarView.leftActionBlock = { [weak self] btn in
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -213,7 +213,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         if dataSource.enableCameraCell {
             if indexPath.row == dataSource.cameraCellIndex {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADCameraCell.reuseIdentifier, for: indexPath) as! ADCameraCell
-                if model.assetOpts.contains(.captureOnTakeAsset) {
+                if config.assetOpts.contains(.captureOnTakeAsset) {
                     cell.startCapture()
                 }
                 return cell
@@ -231,7 +231,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
         
-        let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+        let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
         let model = dataSource.list[modify.row]
         cell.configure(with: model, indexPath: indexPath)
         cell.selectAction = { [weak self] cell, sel in
@@ -239,7 +239,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 return
             }
             
-            let index = strong.model.albumOpts.contains(.ascending) ? cell.indexPath.row : indexPath.row-strong.dataSource.appendCellCount
+            let index = strong.config.albumOpts.contains(.ascending) ? cell.indexPath.row : indexPath.row-strong.dataSource.appendCellCount
             
             if sel { //取消选择
                 self?.dataSource.selectAssetAt(index: index)
@@ -262,19 +262,19 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         guard let c = cell as? ADThumbnailListCell else {
             return
         }
-        let index = model.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
+        let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
         let item = dataSource.list[index]
         if !c.selectStatus.isSelect {
             c.selectStatus = .select(index: nil)
             item.selectStatus = .select(index: nil)
             let selected = dataSource.selects.count
-            let max = model.params.maxCount ?? Int.max
+            let max = config.params.maxCount ?? Int.max
             if selected < max {
                 let itemIsImage = item.type.isImage
-                if model.assetOpts.contains(.mixSelect) {
+                if config.assetOpts.contains(.mixSelect) {
                     let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
-                    let maxVideoCount = model.params.maxVideoCount ?? Int.max
-                    let maxImageCount = model.params.maxImageCount ?? Int.max
+                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                    let maxImageCount = config.params.maxImageCount ?? Int.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         c.selectStatus = .deselect
                         item.selectStatus = .deselect
@@ -283,13 +283,13 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                         item.selectStatus = .deselect
                     }
                 }else{
-                    if item.type.isImage != model.selectMediaImage {
+                    if item.type.isImage != config.selectMediaImage {
                         c.selectStatus = .deselect
                         item.selectStatus = .deselect
                     }else{
                         let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
-                        let maxVideoCount = model.params.maxVideoCount ?? Int.max
-                        let maxImageCount = model.params.maxImageCount ?? Int.max
+                        let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                        let maxImageCount = config.params.maxImageCount ?? Int.max
                         if videoCount >= maxVideoCount, !itemIsImage {
                             c.selectStatus = .deselect
                             item.selectStatus = .deselect
@@ -300,13 +300,13 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                     }
                 }
                 if !itemIsImage {
-                    if let max = model.params.maxVideoTime {
+                    if let max = config.params.maxVideoTime {
                         if item.type.duration > max {
                             c.selectStatus = .deselect
                             item.selectStatus = .deselect
                         }
                     }
-                    if let min = model.params.minVideoTime {
+                    if let min = config.params.minVideoTime {
                         if item.type.duration < min {
                             c.selectStatus = .deselect
                             item.selectStatus = .deselect
@@ -329,11 +329,11 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
         }else if let c = cell as? ADThumbnailListCell {
-            if !model.assetOpts.contains(.allowPreview) {
+            if !config.assetOpts.contains(.allowPreview) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
-                let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
-                let browser = ADAssetModelBrowserController(model: model, dataSource: dataSource, index: modify.row)
+                let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+                let browser = ADAssetModelBrowserController(model: config, dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
         }
@@ -370,7 +370,7 @@ private extension ADThumbnailViewController {
     }
     
     func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailListCell) {
-        let index = model.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
+        let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
         let model = dataSource.list[index]
         //已经有第一个
         if let info = selectionInfo, let range = selectionRange {
@@ -438,11 +438,11 @@ private extension ADThumbnailViewController {
     }
     
     func autoScrollWhenSlideSelect(_ pan: UIPanGestureRecognizer) {
-        guard model.assetOpts.contains(.autoScroll) else {
+        guard config.assetOpts.contains(.autoScroll) else {
             return
         }
         
-        if let max = model.params.maxCount {
+        if let max = config.params.maxCount {
             guard dataSource.selects.count < max else {
                 cleanTimer()
                 return
@@ -515,14 +515,14 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
             picker.sourceType = .camera
             picker.cameraFlashMode = .off
             var mediaTypes = [String]()
-            if model.assetOpts.contains(.allowTakePhotoAsset) {
+            if config.assetOpts.contains(.allowTakePhotoAsset) {
                 mediaTypes.append("public.image")
             }
-            if model.assetOpts.contains(.allowTakeVideoAsset) {
+            if config.assetOpts.contains(.allowTakeVideoAsset) {
                 mediaTypes.append("public.movie")
             }
             picker.mediaTypes = mediaTypes
-            if let max = model.params.maxVideoTime {
+            if let max = config.params.maxVideoTime {
                 picker.videoMaximumDuration = TimeInterval(max)
             }
             showDetailViewController(picker, sender: nil)
@@ -564,12 +564,12 @@ extension ADThumbnailViewController: ADAssetBrowserTransitionContextTo {
     func transitionRect(identifier: String, convertTo: UIView) -> CGRect? {
         let indexPaths = collectionView.indexPathsForVisibleItems
         for indexPath in indexPaths {
-            if !model.albumOpts.contains(.ascending) {
+            if !config.albumOpts.contains(.ascending) {
                 guard indexPath.row >= dataSource.appendCellCount else {
                     continue
                 }
             }
-            let modify = model.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+            let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
             if dataSource.list[modify.row].asset.localIdentifier == identifier {
                 if let cell = collectionView.cellForItem(at: indexPath) {
                     return collectionView.convert(cell.frame, to: convertTo)

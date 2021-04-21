@@ -102,6 +102,10 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    func modifyIndexPath(_ indexPath: IndexPath) -> IndexPath {
+        return albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-appendCellCount, section: indexPath.section)
+    }
+    
     public func selectAssetAt(index: Int) {
         if index < list.count {
             let item = list[index]
