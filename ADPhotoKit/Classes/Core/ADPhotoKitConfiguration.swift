@@ -38,7 +38,33 @@ public class ADPhotoKitConfiguration {
     
     public var customAlbumListCellRegistor: ((UITableView)->Void)?
     public var customAlbumListCellBlock: ((UITableView, IndexPath)->ADAlbumListCellable)?
-        
+    
+    /// thumbnail
+    public var customThumbnailControllerBlock: ((ADThumbnailViewController)->Void)?
+    
+    public var customThumbnailNavBar: ADThumbnailNavBarable?
+    
+    public var customThumbnailToolBar: ADThumbnailToolBarable?
+    
+    public var customThumbnailCellRegistor: ((UICollectionView)->Void)?
+    public var customThumbnailCellBlock: ((UICollectionView, IndexPath)->ADThumbnailCellable)?
+    
+    /// browser
+    public var customBrowserControllerBlock: ((ADAssetBrowserController)->Void)?
+    
+    public var customBrowserNavBar: ADBrowserNavBarable?
+    
+    public var customBrowserToolBar: ADBrowserToolBarable?
+    
+    public var customBrowserCellRegistor: ((UICollectionView)->Void)?
+    public var customBrowserCellBlock: ((UICollectionView, IndexPath)->ADBrowserCellable)?
+    
+    /// hud
+    public var customProgressHUD: ADProgressHUDable?
+    
+    /// progress
+    public var customProgress: ADProgressableable?
+         
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600
     

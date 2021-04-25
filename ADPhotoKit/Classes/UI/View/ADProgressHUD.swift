@@ -105,6 +105,7 @@ private extension ADProgressHUD {
     func setupUI() {
         let view = UIView(frame: .zero)
         view.layer.cornerRadius = 5.0
+        view.layer.masksToBounds = true
         view.backgroundColor = style.bgColor()
         view.alpha = 0.8
         addSubview(view)

@@ -18,6 +18,10 @@ class ViewController: UIViewController {
             print(list)
         }
         ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor.rawValue:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius.rawValue:6])
+        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius.rawValue:8,ADThumbnailListCell.Key.indexColor.rawValue:UIColor.red])
+        ADThumbnailListCell.setAppearance(.borderColor(.red), for: .select)
+        ADThumbnailListCell.setAppearance(.borderWidth(4), for: .select)
+        ADThumbnailListCell.setAppearance(.coverColor(UIColor.darkGray), for: .disabled)
     }
 
     override func didReceiveMemoryWarning() {

@@ -7,12 +7,10 @@
 
 import UIKit
 
-class ADThumbnailNavBarView: ADBaseNavBarView {
+class ADThumbnailNavBarView: ADBaseNavBarView, ADThumbnailNavBarConfigurable {
     
     var reloadAlbumBlock: ((ADAlbumModel)->Void)?
-    
-    let model: ADPhotoKitConfig
-    
+        
     var arrowImageView: UIImageView?
     var albumListView: ADEmbedAlbumListView?
     
@@ -25,8 +23,7 @@ class ADThumbnailNavBarView: ADBaseNavBarView {
         }
     }
     
-    init(model: ADPhotoKitConfig, style: ADPickerStyle) {
-        self.model = model
+    required init(style: ADPickerStyle) {
         if style == .normal {
             super.init(rightItem: (nil,nil,ADLocale.LocaleKey.cancel.localeTextValue))
         }else{
@@ -85,7 +82,7 @@ private extension ADThumbnailNavBarView {
             var reload: Bool = false
             if albumListView == nil {
                 reload = true
-                albumListView = ADEmbedAlbumListView(model: model)
+                albumListView = ADEmbedAlbumListView(model: ADPhotoKitUI.config)
                 albumListView!.selectAlbumBlock = { [weak self] album in
                     self?.reset()
                     if let al = album {

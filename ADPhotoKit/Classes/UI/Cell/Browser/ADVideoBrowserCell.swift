@@ -9,7 +9,7 @@ import UIKit
 import Photos
 import AVFoundation
 
-class ADVideoBrowserCell: ADBrowserBaseCell {
+class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
     
     var indexPath: IndexPath?
     
@@ -18,7 +18,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell {
     
     var playBtn: UIButton!
     
-    var progressView: ADProgressView!
+    var progressView: ADProgressableable!
     
     var imageView: UIImageView!
     var errorLabel: UILabel!
@@ -118,7 +118,7 @@ private extension ADVideoBrowserCell {
             make.top.equalToSuperview().offset(60)
         }
         
-        progressView = ADProgressView(frame: .zero)
+        progressView = ADPhotoUIConfigurable.progress()
         contentView.addSubview(progressView)
         progressView.snp.makeConstraints { (make) in
             make.center.equalToSuperview()

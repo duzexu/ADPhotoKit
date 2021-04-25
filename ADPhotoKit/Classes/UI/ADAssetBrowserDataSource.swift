@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADAssetBrowserDataSource: NSObject {
+public class ADAssetBrowserDataSource: NSObject {
 
     public weak var listView: UICollectionView?
     public weak var selectView: UICollectionView?

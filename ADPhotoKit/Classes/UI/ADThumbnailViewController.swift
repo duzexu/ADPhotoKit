@@ -21,15 +21,15 @@ public struct ADThumbnailParams {
     public var maxVideoTime: Int?
 }
 
-class ADThumbnailViewController: UIViewController {
+public class ADThumbnailViewController: UIViewController {
     
     let config: ADPhotoKitConfig
     var album: ADAlbumModel
     let style: ADPickerStyle
     let selects: [PHAsset]
     
-    var collectionView: UICollectionView!
-    var dataSource: ADAssetListDataSource!
+    public var collectionView: UICollectionView!
+    public var dataSource: ADAssetListDataSource!
     
     var toolBarView: ADThumbnailToolBarable!
     
@@ -63,9 +63,10 @@ class ADThumbnailViewController: UIViewController {
     private var lastPanUpdateTime = CACurrentMediaTime()
     private var autoScrollInfo: (direction: AutoScrollDirection, speed: CGFloat) = (.none, 0)
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        ADPhotoKitConfiguration.default.customThumbnailControllerBlock?(self)
         
         if config.assetOpts.contains(.slideSelect) {
             if (config.params.maxCount ?? Int.max) > 1 {
@@ -77,25 +78,25 @@ class ADThumbnailViewController: UIViewController {
         reloadAlbum(album, initial: true)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
+    public override var preferredStatusBarStyle: UIStatusBarStyle {
         return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
     func reloadAssets() {
         if dataSource.list.isEmpty {
-            let hud = ADProgressHUD()
-            hud.show()
+            let hud = ADPhotoUIConfigurable.progressHUD()
+            hud.show(timeout: 0)
             dataSource.reloadData() {
                 hud.hide()
             }
@@ -145,7 +146,9 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
-        toolBarView = ADThumbnailToolBarView(model: config)
+        ADPhotoKitConfiguration.default.customThumbnailCellRegistor?(collectionView)
+        
+        toolBarView = ADPhotoUIConfigurable.thumbnailToolBar()
         toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
@@ -164,9 +167,16 @@ extension ADThumbnailViewController {
             }
         }
         
-        let navBarView = ADThumbnailNavBarView(model: config, style: style)
+        var navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style)
         navBarView.title = album.title
         navBarView.leftActionBlock = { [weak self] btn in
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                ADPhotoKitUI.config.canceled?()
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
+        navBarView.rightActionBlock = { [weak self] btn in
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
                 ADPhotoKitUI.config.canceled?()
@@ -189,27 +199,27 @@ extension ADThumbnailViewController {
 
 extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return ADPhotoKitConfiguration.default.thumbnailLayout.lineSpacing
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return ADAssetModel.thumbnailSize
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.list.count+dataSource.appendCellCount
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if dataSource.enableCameraCell {
             if indexPath.row == dataSource.cameraCellIndex {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADCameraCell.reuseIdentifier, for: indexPath) as! ADCameraCell
@@ -229,7 +239,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             }
         }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailListCell
+        var cell = ADPhotoUIConfigurable.thumbnailCell(collectionView: collectionView, indexPath: indexPath)
         
         let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
         let model = dataSource.list[modify.row]
@@ -258,7 +268,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let c = cell as? ADThumbnailListCell else {
             return
         }
@@ -320,7 +330,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath)
         if cell is ADCameraCell {
             presentCameraController()
@@ -529,11 +539,11 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
         }
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true) {
             if let image = info[.originalImage] as? UIImage {
-                let hud = ADProgressHUD()
-                hud.show()
+                let hud = ADPhotoUIConfigurable.progressHUD()
+                hud.show(timeout: 0)
                 ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
                     if suc {
                         self.dataSource.reloadData()
@@ -544,8 +554,8 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 }
             }
             if let url = info[.mediaURL] as? URL {
-                let hud = ADProgressHUD()
-                hud.show()
+                let hud = ADPhotoUIConfigurable.progressHUD()
+                hud.show(timeout: 0)
                 ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
                     if suc {
                         self.dataSource.reloadData()

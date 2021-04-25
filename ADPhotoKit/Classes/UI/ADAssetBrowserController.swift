@@ -20,18 +20,18 @@ extension ADAsset {
     }
 }
 
-class ADAssetBrowserController: UIViewController {
+public class ADAssetBrowserController: UIViewController {
     
     let model: ADPhotoKitConfig
     
     /// dataSource
-    var dataSource: ADAssetBrowserDataSource!
+    public var dataSource: ADAssetBrowserDataSource!
     
     /// ui
-    var collectionView: UICollectionView!
+    public var collectionView: UICollectionView!
     
     var controlsView: ADBrowserControlsView!
-    var navBarView: ADNavBarable!
+    var navBarView: ADBrowserNavBarable!
     var toolBarView: ADBrowserToolBarable!
     
     /// trans
@@ -47,30 +47,31 @@ class ADAssetBrowserController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        ADPhotoKitConfiguration.default.customBrowserControllerBlock?(self)
         setupTransition()
         collectionView.layoutIfNeeded()
         collectionView.scrollToItem(at: IndexPath(row: dataSource.index, section: 0), at: .centeredHorizontally, animated: false)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
     }
     
-    override var prefersStatusBarHidden: Bool {
+    public override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
+    public override var preferredStatusBarStyle: UIStatusBarStyle {
         return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
@@ -157,9 +158,11 @@ private extension ADAssetBrowserController {
         collectionView.regisiter(cell: ADImageBrowserCell.self)
         collectionView.regisiter(cell: ADVideoBrowserCell.self)
         
+        ADPhotoKitConfiguration.default.customBrowserCellRegistor?(collectionView)
+        
         dataSource?.listView = collectionView
         
-        navBarView = ADBrowserNavBarView(dataSource: dataSource)
+        navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource)
         navBarView.leftActionBlock = { [weak self] btn in
             self?.didSelectsUpdate()
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -180,7 +183,7 @@ private extension ADAssetBrowserController {
                 }
             }
         }
-        toolBarView = ADBrowserToolBarView(dataSource: dataSource)
+        toolBarView = ADPhotoUIConfigurable.browserToolBar(dataSource: dataSource)
         controlsView = ADBrowserControlsView(topView: navBarView, bottomView: toolBarView)
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { (make) in
@@ -213,55 +216,55 @@ private extension ADAssetBrowserController {
 
 extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return ADPhotoKitConfiguration.default.browseItemSpacing
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return ADPhotoKitConfiguration.default.browseItemSpacing
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: ADPhotoKitConfiguration.default.browseItemSpacing / 2, bottom: 0, right: ADPhotoKitConfiguration.default.browseItemSpacing / 2)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return view.frame.size
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.list.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let model = dataSource.list[indexPath.row]
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: model.browseAsset.reuseIdentifier, for: indexPath) as! ADBrowserBaseCell
+        var cell = ADPhotoUIConfigurable.browserCell(collectionView: collectionView, indexPath: indexPath, reuseIdentifier: model.browseAsset.reuseIdentifier)
         cell.singleTapBlock = { [weak self] in
             self?.hideOrShowControlsView()
         }
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let model = dataSource.list[indexPath.row]
         switch model.browseAsset {
         case let .image(source):
-            if let imageCell = cell as? ADImageBrowserCell {
+            if let imageCell = cell as? ADImageBrowserCellable {
                 imageCell.configure(with: source, indexPath: indexPath)
             }
         case let .video(source):
-            if let videoCell = cell as? ADVideoBrowserCell {
+            if let videoCell = cell as? ADVideoBrowserCellable {
                 videoCell.configure(with: source, indexPath: indexPath)
             }
         }
-        (cell as? ADBrowserBaseCell)?.cellWillDisplay()
+        (cell as? ADBrowserCellable)?.cellWillDisplay()
     }
     
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? ADBrowserBaseCell)?.cellDidEndDisplay()
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        (cell as? ADBrowserCellable)?.cellDidEndDisplay()
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offset = scrollView.contentOffset
         var idx = Int(offset.x / scrollView.bounds.width)
         idx = max(0, min(idx, dataSource.list.count-1))
@@ -274,14 +277,14 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
 
 extension ADAssetBrowserController: UINavigationControllerDelegate {
     
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if operation == .pop {
             return popTransition?.interactive == true ? ADAssetBrowserTransition() : nil
         }
         return nil
     }
     
-    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    public func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         return popTransition?.interactive == true ? popTransition : nil
     }
     
@@ -301,7 +304,7 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
     }
     
     func transitionDidCancel(view: UIView?) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserBaseCell
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellable
         cell.transationCancel(view: view!)
     }
     
@@ -317,7 +320,7 @@ extension ADAssetBrowserController: ADAssetBrowserTransitionContextFrom {
     }
     
     func transitionInfo(convertTo: UIView) -> (UIView, CGRect) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserBaseCell
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellable
         let info = cell.transationBegin()
         return (info.0, cell.convert(info.1, to: convertTo))
     }

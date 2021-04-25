@@ -17,19 +17,19 @@ extension ADAssetModel {
     }
 }
 
-class ADThumbnailListCell: UICollectionViewCell {
+public class ADThumbnailListCell: UICollectionViewCell {
         
-    var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
+    public var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
         didSet {
             selectStatusDidChange()
         }
     }
         
-    var selectAction: ((ADThumbnailListable,Bool)->Void)?
+    public var selectAction: ((ADThumbnailCellable,Bool)->Void)?
     
-    var assetModel: ADAssetModel!
+    public var assetModel: ADAssetModel!
     
-    var indexPath: IndexPath!
+    public var indexPath: IndexPath!
     
     // ui
     var imageView: UIImageView!
@@ -128,10 +128,36 @@ class ADThumbnailListCell: UICollectionViewCell {
                 selectBtn.isSelected = true
                 indexLabel.isHidden = false
                 indexLabel.text = "\(idx)"
+                contentView.layer.borderWidth = 0
+                if let set = ADThumbnailListCell.appearanceAttributes[.select] {
+                    for item in set {
+                        switch item {
+                        case let .borderColor(color):
+                            contentView.layer.borderColor = color.cgColor
+                        case let .borderWidth(width):
+                            contentView.layer.borderWidth = width
+                        case let .coverColor(color):
+                            coverView.backgroundColor = color
+                        }
+                    }
+                }
             }else{
                 coverView.isHidden = true
                 indexLabel.isHidden = true
                 selectBtn.isSelected = false
+                contentView.layer.borderWidth = 0
+                if let set = ADThumbnailListCell.appearanceAttributes[.normal] {
+                    for item in set {
+                        switch item {
+                        case let .borderColor(color):
+                            contentView.layer.borderColor = color.cgColor
+                        case let .borderWidth(width):
+                            contentView.layer.borderWidth = width
+                        case let .coverColor(color):
+                            coverView.backgroundColor = color
+                        }
+                    }
+                }
             }
         case .deselect:
             coverView.isHidden = false
@@ -139,6 +165,19 @@ class ADThumbnailListCell: UICollectionViewCell {
             indexLabel.isHidden = true
             selectBtn.isSelected = false
             selectBtn.isEnabled = false
+            contentView.layer.borderWidth = 0
+            if let set = ADThumbnailListCell.appearanceAttributes[.disabled] {
+                for item in set {
+                    switch item {
+                    case let .borderColor(color):
+                        contentView.layer.borderColor = color.cgColor
+                    case let .borderWidth(width):
+                        contentView.layer.borderWidth = width
+                    case let .coverColor(color):
+                        coverView.backgroundColor = color
+                    }
+                }
+            }
         }
     }
     
@@ -152,9 +191,9 @@ class ADThumbnailListCell: UICollectionViewCell {
     }
 }
 
-extension ADThumbnailListCell: ADThumbnailListConfigurable {
+extension ADThumbnailListCell: ADThumbnailCellConfigurable {
     
-    func configure(with model: ADAssetModel, indexPath: IndexPath? = nil) {
+    public func configure(with model: ADAssetModel, indexPath: IndexPath? = nil) {
         if let index = indexPath {
             self.indexPath = index
         }
@@ -184,8 +223,83 @@ extension ADThumbnailListCell: ADThumbnailListConfigurable {
         imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
     }
     
-    func cellSelectAction() {
+    public func cellSelectAction() {
         selectBtnAction(sender: selectBtn)
+    }
+    
+}
+
+/// UIAppearance
+extension ADThumbnailListCell {
+    
+    public enum Key: String {
+        case cornerRadius
+        case indexColor
+        case indexBgColor
+        case indexFont
+        case descColor
+        case descFont
+    }
+    
+    @objc
+    public func setAttributes(_ attrs: [String : Any]?) {
+        if let kvs = attrs {
+            for (k,v) in kvs {
+                if let key = Key(rawValue: k) {
+                    switch key {
+                    case .cornerRadius:
+                        contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                        contentView.layer.masksToBounds = true
+                    case .indexColor:
+                        indexLabel.textColor = (v as? UIColor) ?? .white
+                    case .indexBgColor:
+                        indexLabel.backgroundColor = (v as? UIColor) ?? UIColor(hex: 0x50A938)
+                    case .indexFont:
+                        indexLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 14)
+                    case .descColor:
+                        descLabel.textColor = (v as? UIColor) ?? .white
+                    case .descFont:
+                        descLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 13)
+                    }
+                }
+            }
+        }
+    }
+    
+    public enum State {
+        case normal
+        case select
+        case disabled
+    }
+    
+    public enum Appearance: Hashable {
+        case borderColor(UIColor)
+        case borderWidth(CGFloat)
+        case coverColor(UIColor)
+        
+        public func hash(into hasher: inout Hasher) {
+            var value: Int = 0
+            switch self {
+            case .borderColor(_):
+                value = 1
+            case .borderWidth(_):
+                value = 2
+            case .coverColor(_):
+                value = 3
+            }
+            hasher.combine(value)
+        }
+    }
+    
+    private(set) static var appearanceAttributes: [State:Set<Appearance>] = [:]
+    
+    public static func setAppearance(_ appearance: Appearance, for state: State) {
+        if var value = appearanceAttributes[state] {
+            value.insert(appearance)
+            appearanceAttributes[state] = value
+        }else{
+            appearanceAttributes[state] = Set<Appearance>(arrayLiteral: appearance)
+        }
     }
     
 }

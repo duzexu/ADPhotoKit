@@ -17,6 +17,10 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
         return hi
     }
     
+    var modifyHeight: CGFloat {
+        return bgView.frame.height
+    }
+    
     var isOriginal: Bool = false {
         didSet {
             originalBtn.isSelected = isOriginal

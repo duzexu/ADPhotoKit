@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADBrowserBaseCell: UICollectionViewCell {
+class ADBrowserBaseCell: UICollectionViewCell, ADBrowserCellConfigurable {
     
     var singleTapBlock: (() -> Void)?
     

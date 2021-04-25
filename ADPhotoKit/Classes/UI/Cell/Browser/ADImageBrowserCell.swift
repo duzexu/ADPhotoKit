@@ -49,7 +49,7 @@ extension ADImageSource {
     }
 }
 
-class ADImageBrowserCell: ADBrowserBaseCell {
+class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     
     var imageBrowserView: ADImageBrowserView!
     
@@ -126,7 +126,7 @@ class ADImageBrowserView: UIView {
     var contentView: UIView!
     var imageView: UIImageView!
     
-    var progressView: ADProgressView!
+    var progressView: ADProgressableable!
     
     private var identifier: String?
     
@@ -167,7 +167,7 @@ private extension ADImageBrowserView {
             make.edges.equalToSuperview()
         }
         
-        progressView = ADProgressView()
+        progressView = ADPhotoUIConfigurable.progress()
         progressView.isHidden = true
         addSubview(progressView)
         progressView.snp.makeConstraints { (make) in
