@@ -30,6 +30,8 @@ public protocol ADAlbumListNavBarConfigurable {
     
     var leftActionBlock: ((UIButton)->Void)? { set get }
     
+    var rightActionBlock: ((UIButton)->Void)? { set get }
+    
 }
 
 public typealias ADAlbumListCellable = (UITableViewCell & ADAlbumListCellConfigurable)
@@ -219,7 +221,7 @@ class ADPhotoUIConfigurable {
     }
     
     static func thumbnailToolBar() -> ADThumbnailToolBarable {
-        return ADPhotoKitConfiguration.default.customThumbnailToolBar ?? ADThumbnailToolBarView(model: ADPhotoKitUI.config)
+        return ADPhotoKitConfiguration.default.customThumbnailToolBar ?? ADThumbnailToolBarView(config: ADPhotoKitUI.config)
     }
     
     static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellable {

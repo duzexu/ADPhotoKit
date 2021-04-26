@@ -18,10 +18,9 @@ class ViewController: UIViewController {
             print(list)
         }
         ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor.rawValue:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius.rawValue:6])
-        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius.rawValue:8,ADThumbnailListCell.Key.indexColor.rawValue:UIColor.red])
-        ADThumbnailListCell.setAppearance(.borderColor(.red), for: .select)
-        ADThumbnailListCell.setAppearance(.borderWidth(4), for: .select)
-        ADThumbnailListCell.setAppearance(.coverColor(UIColor.darkGray), for: .disabled)
+        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius.rawValue:8,ADThumbnailListCell.Key.indexColor.rawValue:UIColor.lightText])
+        ADAddPhotoCell.appearance().setAttributes([ADAddPhotoCell.Key.cornerRadius.rawValue:8,ADAddPhotoCell.Key.bgColor.rawValue:UIColor.lightText])
+        ADCameraCell.appearance().setAttributes([ADCameraCell.Key.cornerRadius.rawValue:8,ADCameraCell.Key.bgColor.rawValue:UIColor.lightText])
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,11 +30,11 @@ class ViewController: UIViewController {
     
     @IBAction func showImagePicker(_ sender: UIButton) {
         if #available(iOS 14, *) {
-            ADPhotoKitUI.imagePicker(present: self, style: .embed, assetOpts: .defaultiOS14, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1),.videoTime(min: 10, max: nil)]) { (assets, value) in
+            ADPhotoKitUI.imagePicker(present: self, style: .embed, assetOpts: [.allowAddAsset,.allowTakePhotoAsset], params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
                 print(assets)
             }
-        }else{
-            ADPhotoKitUI.imagePicker(present: self, assetOpts: .default, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
+        } else {
+            ADPhotoKitUI.imagePicker(present: self, assetOpts: [.default], params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
                 print(assets)
             }
         }

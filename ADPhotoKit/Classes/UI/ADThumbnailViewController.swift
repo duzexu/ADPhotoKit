@@ -19,6 +19,9 @@ public struct ADThumbnailParams {
     
     public var minVideoTime: Int?
     public var maxVideoTime: Int?
+    
+    public var minRecordTime: Int?
+    public var maxRecordTime: Int?
 }
 
 public class ADThumbnailViewController: UIViewController {
@@ -157,13 +160,19 @@ extension ADThumbnailViewController {
         }
         toolBarView.browserActionBlock = { [weak self] in
             guard let strong = self else { return }
-            let browser = ADAssetModelBrowserController(model: strong.config, dataSource: strong.dataSource)
+            let browser = ADAssetModelBrowserController(config: strong.config, dataSource: strong.dataSource)
             strong.navigationController?.pushViewController(browser, animated: true)
         }
         toolBarView.doneActionBlock = { [weak self] in
             guard let strong = self else { return }
-            self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif)) { [weak self] in
-                self?.navigationController?.dismiss(animated: true, completion: nil)
+            if strong.config.browserOpts.contains(.fetchImage) {
+                self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif)) { [weak self] in
+                    self?.navigationController?.dismiss(animated: true, completion: nil)
+                }
+            }else{
+                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,nil,nil) }
+                ADPhotoKitUI.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
+                strong.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
         
@@ -177,11 +186,8 @@ extension ADThumbnailViewController {
             }
         }
         navBarView.rightActionBlock = { [weak self] btn in
-            if let _ = self?.navigationController?.popViewController(animated: true) {
-            }else{
-                ADPhotoKitUI.config.canceled?()
-                self?.navigationController?.dismiss(animated: true, completion: nil)
-            }
+            ADPhotoKitUI.config.canceled?()
+            self?.navigationController?.dismiss(animated: true, completion: nil)
         }
         view.addSubview(navBarView)
         navBarView.snp.makeConstraints { (make) in
@@ -195,6 +201,57 @@ extension ADThumbnailViewController {
         collectionView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: toolBarView.height, right: 0)
     }
     
+    func canSelectWithIndex(_ index: Int) -> Bool {
+        let selected = dataSource.selects.count
+        let max = config.params.maxCount ?? Int.max
+        let item = dataSource.list[index]
+        if selected < max {
+            let itemIsImage = item.type.isImage
+            if config.assetOpts.contains(.mixSelect) {
+                let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
+                let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                let maxImageCount = config.params.maxImageCount ?? Int.max
+                if videoCount >= maxVideoCount, !itemIsImage {
+                    return false
+                }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                    return false
+                }
+            }else{
+                if item.browseAsset.isImage != config.selectMediaImage {
+                    return false
+                }else{
+                    let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
+                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                    let maxImageCount = config.params.maxImageCount ?? Int.max
+                    if videoCount >= maxVideoCount, !itemIsImage {
+                        return false
+                    }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                        return false
+                    }
+                }
+            }
+            if !itemIsImage {
+                switch item.type {
+                case let .video(duration, _):
+                    if let maxTime = config.params.maxVideoTime {
+                        if duration > maxTime {
+                            return false
+                        }
+                    }
+                    if let minTime = config.params.minVideoTime {
+                        if duration < minTime {
+                            return false
+                        }
+                    }
+                default:
+                    break
+                }
+            }
+        }else{
+            return false
+        }
+        return true
+    }
 }
 
 extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -339,11 +396,11 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
         }else if let c = cell as? ADThumbnailListCell {
-            if !config.assetOpts.contains(.allowPreview) {
+            if !config.assetOpts.contains(.allowBrowser) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
                 let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
-                let browser = ADAssetModelBrowserController(model: config, dataSource: dataSource, index: modify.row)
+                let browser = ADAssetModelBrowserController(config: config, dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
         }
@@ -419,7 +476,11 @@ private extension ADThumbnailViewController {
                         let item = dataSource.list[i]
                         if i != info.begin {
                             if info.select && !item.selectStatus.isSelect && item.selectStatus.isEnable {
-                                dataSource.selectAssetAt(index: i)
+                                if canSelectWithIndex(i) {
+                                    dataSource.selectAssetAt(index: i)
+                                }else{
+                                    break
+                                }
                             }
                             if !info.select && item.selectStatus.isSelect {
                                 dataSource.deselectAssetAt(index: i)
@@ -532,7 +593,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 mediaTypes.append("public.movie")
             }
             picker.mediaTypes = mediaTypes
-            if let max = config.params.maxVideoTime {
+            if let max = config.params.maxRecordTime {
                 picker.videoMaximumDuration = TimeInterval(max)
             }
             showDetailViewController(picker, sender: nil)
@@ -554,6 +615,14 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 }
             }
             if let url = info[.mediaURL] as? URL {
+                if let min = self.config.params.minRecordTime {
+                    let asset = AVAsset(url: url)
+                    if Int(asset.duration.seconds) < min {
+                        ADAlert.alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min))
+                        return
+                    }
+                }
+                
                 let hud = ADPhotoUIConfigurable.progressHUD()
                 hud.show(timeout: 0)
                 ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in

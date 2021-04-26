@@ -82,7 +82,7 @@ private extension ADThumbnailNavBarView {
             var reload: Bool = false
             if albumListView == nil {
                 reload = true
-                albumListView = ADEmbedAlbumListView(model: ADPhotoKitUI.config)
+                albumListView = ADEmbedAlbumListView(config: ADPhotoKitUI.config)
                 albumListView!.selectAlbumBlock = { [weak self] album in
                     self?.reset()
                     if let al = album {

@@ -9,7 +9,9 @@ import Foundation
 import Photos
 
 public enum ADPickerStyle {
+    /// The display relationship between the album list and the thumbnail interface is push.
     case normal
+    /// The album list is embedded in the navigation of the thumbnail interface, click the drop-down display.
     case embed
 }
 
@@ -17,51 +19,53 @@ public struct ADAssetSelectOptions: OptionSet {
     public let rawValue: Int
     
     /// Whether photos and videos can be selected together.
-    static let mixSelect = ADAssetSelectOptions(rawValue: 1 << 0)
+    public static let mixSelect = ADAssetSelectOptions(rawValue: 1 << 0)
     /// Allow select Gif, it only controls whether it is displayed in Gif form.
-    static let selectAsGif = ADAssetSelectOptions(rawValue: 1 << 1)
+    public static let selectAsGif = ADAssetSelectOptions(rawValue: 1 << 1)
     /// Allow select LivePhoto, it only controls whether it is displayed in LivePhoto form.
-    static let selectAsLivePhoto = ADAssetSelectOptions(rawValue: 1 << 2)
+    public static let selectAsLivePhoto = ADAssetSelectOptions(rawValue: 1 << 2)
     /// You can slide select photos in album.
-    static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
+    public static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
     /// Will auto scroll to top or bottom when your finger at the top or bottom.
-    static let autoScroll = ADAssetSelectOptions(rawValue: 1 << 4)
+    public static let autoScroll = ADAssetSelectOptions(rawValue: 1 << 4)
     /// Allow take photo asset in the album.
-    static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 5)
+    public static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 5)
     /// Allow take video asset in the album.
-    static let allowTakeVideoAsset = ADAssetSelectOptions(rawValue: 1 << 6)
+    public static let allowTakeVideoAsset = ADAssetSelectOptions(rawValue: 1 << 6)
     /// Show the image captured by the camera is displayed on the camera button inside the album.
-    static let captureOnTakeAsset = ADAssetSelectOptions(rawValue: 1 << 7)
+    public static let captureOnTakeAsset = ADAssetSelectOptions(rawValue: 1 << 7)
     /// If user choose limited Photo mode, a button with '+' will be added. It will call PHPhotoLibrary.shared().presentLimitedLibraryPicker(from:) to add photo.
     @available(iOS 14, *)
-    static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 8)
-    /// iOS14 limited Photo mode, will show collection footer view in ZLThumbnailViewController.
+    public static let allowAddAsset = ADAssetSelectOptions(rawValue: 1 << 8)
+    /// iOS14 limited Photo mode, will show collection footer view in ADThumbnailViewController.
     /// Will go to system setting if clicked.
     @available(iOS 14, *)
-    static let allowAuthTips = ADAssetSelectOptions(rawValue: 1 << 9)
-    /// Allow access to the preview large image interface (That is, whether to allow access to the large image interface after clicking the thumbnail image).
-    static let allowPreview = ADAssetSelectOptions(rawValue: 1 << 10)
+    public static let allowAuthTips = ADAssetSelectOptions(rawValue: 1 << 9)
+    /// Allow access to the browse large image interface (That is, whether to allow access to the large image interface after clicking the thumbnail image).
+    public static let allowBrowser = ADAssetSelectOptions(rawValue: 1 << 10)
     /// Allow toolbar in thumbnail controller
-    static let thumbnailToolBar = ADAssetSelectOptions(rawValue: 1 << 11)
+    public static let thumbnailToolBar = ADAssetSelectOptions(rawValue: 1 << 11)
     /// Allow select full image.
-    static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 12)
+    public static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 12)
         
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.thumbnailToolBar,.allowPreview]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
     
-    @available(iOS 14, *)
-    public static let defaultiOS14: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,.selectAsLivePhoto,allowTakePhotoAsset,.allowAddAsset,.thumbnailToolBar,.allowAuthTips,.allowPreview]
 }
 
 public struct ADAssetBrowserOptions: OptionSet {
     public let rawValue: Int
     
+    /// Allow select full image.
     public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
+    /// Display the selected photos at the bottom of the browse large photos interface.
     public static let selectBrowser = ADAssetBrowserOptions(rawValue: 1 << 1)
+    /// Display the index of the selected photos.
     public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
+    /// Allow framework fetch image when callback.
     public static let fetchImage = ADAssetBrowserOptions(rawValue: 1 << 3)
     
     public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectBrowser, .selectIndex, .fetchImage]
@@ -80,6 +84,8 @@ public enum ADPhotoSelectParams: Hashable {
     case videoCount(min: Int?, max:Int?)
     /// 视频时长 最小 最大
     case videoTime(min: Int?, max: Int?)
+    /// record min and max video time
+    case recordTime(min: Int?, max: Int?)
     
     public func hash(into hasher: inout Hasher) {
         var value: Int = 0
@@ -92,6 +98,8 @@ public enum ADPhotoSelectParams: Hashable {
             value = 2
         case .videoTime:
             value = 3
+        case .recordTime:
+            value = 4
         }
         hasher.combine(value)
     }
@@ -100,7 +108,7 @@ public enum ADPhotoSelectParams: Hashable {
 public class ADPhotoKitUI {
     
     public typealias Asset = (asset: PHAsset, image: UIImage?, error: Error?)
-    /// return asset and is original image
+    /// return asset and original image or not
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
     public typealias AssetableSelectHandler = (([ADAssetBrowsable]) -> Void)
     public typealias AssetCancelHandler = (() -> Void)
@@ -150,7 +158,7 @@ public class ADPhotoKitUI {
                                     canceled: AssetCancelHandler? = nil) {
         let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
         config = configuration
-        let browser = ADAssetBrowserController(model: configuration, assets: assets, index: index, selects: selects)
+        let browser = ADAssetBrowserController(config: configuration, assets: assets, index: index, selects: selects)
         let nav = ADPhotoNavController(rootViewController: browser)
         nav.modalPresentationStyle = .fullScreen
         on.present(nav, animated: true, completion: nil)
@@ -221,6 +229,9 @@ public class ADPhotoKitConfig {
             case let .videoTime(min, max):
                 value.minVideoTime = min
                 value.maxVideoTime = max
+            case let .recordTime(min, max):
+                value.minRecordTime = min
+                value.maxRecordTime = max
             }
         }
         self.params = value

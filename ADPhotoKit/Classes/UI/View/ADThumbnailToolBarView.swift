@@ -12,7 +12,7 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     
     var height: CGFloat {
         var hi: CGFloat = 0
-        if model.assetOpts.contains(.thumbnailToolBar) {
+        if config.assetOpts.contains(.thumbnailToolBar) {
             hi += 55+tabBarOffset
             if authTipsEnable {
                 hi += 70
@@ -32,17 +32,17 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
             if selectCount > 0 {
                 doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(selectCount))", for: .normal)
                 doneBtn.isEnabled = true
-                previewBtn.isEnabled = true
+                browseBtn.isEnabled = true
             }else{
                 doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
                 doneBtn.isEnabled = false
-                previewBtn.isEnabled = false
+                browseBtn.isEnabled = false
             }
         }
     }
     
     var authTipsEnable: Bool {
-        if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited, model.assetOpts.contains(.allowAuthTips) {
+        if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited, config.assetOpts.contains(.allowAuthTips) {
             return true
         } else {
             return false
@@ -52,15 +52,15 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     var browserActionBlock: (()->Void)?
     var doneActionBlock: (()->Void)?
     
-    let model: ADPhotoKitConfig
+    let config: ADPhotoKitConfig
     
     /// ui
-    var previewBtn: UIButton!
+    var browseBtn: UIButton!
     var originalBtn: UIButton!
     var doneBtn: UIButton!
     
-    init(model: ADPhotoKitConfig) {
-        self.model = model
+    init(config: ADPhotoKitConfig) {
+        self.config = config
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
         
@@ -132,16 +132,16 @@ private extension ADThumbnailToolBarView {
             make.height.equalTo(55)
         }
         
-        previewBtn = createBtn(ADLocale.LocaleKey.preview.localeTextValue, #selector(previewAction))
-        btnsView.addSubview(previewBtn)
-        previewBtn.snp.makeConstraints { (make) in
+        browseBtn = createBtn(ADLocale.LocaleKey.preview.localeTextValue, #selector(previewAction))
+        btnsView.addSubview(browseBtn)
+        browseBtn.snp.makeConstraints { (make) in
             make.left.equalToSuperview().offset(15)
             make.height.equalTo(34)
             make.centerY.equalToSuperview()
         }
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
-        originalBtn.isHidden = !model.assetOpts.contains(.selectOriginal) && model.albumOpts.contains(.allowImage)
+        originalBtn.isHidden = !config.assetOpts.contains(.selectOriginal) && config.albumOpts.contains(.allowImage)
         originalBtn.isSelected = isOriginal
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)

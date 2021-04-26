@@ -11,10 +11,10 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
 
     var listData: ADAssetListDataSource
     
-    init(model: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
+    init(config: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
         let selects = dataSource.selects.compactMap { $0.index }
-        super.init(model: model, assets: dataSource.list, index: index, selects: selects)
+        super.init(config: config, assets: dataSource.list, index: index, selects: selects)
     }
     
     required init?(coder: NSCoder) {
@@ -27,8 +27,8 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     }
     
     override func finishSelection() {
-        if model.browserOpts.contains(.fetchImage) {
-            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: model.assetOpts.contains(.selectAsGif)) { [weak self] in
+        if config.browserOpts.contains(.fetchImage) {
+            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: config.assetOpts.contains(.selectAsGif)) { [weak self] in
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }else{
@@ -43,14 +43,14 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
         switch item.type {
         case let .video(duration, _):
             if super.canSelectWithCurrentIndex() {
-                if let max = model.params.maxVideoTime {
+                if let max = config.params.maxVideoTime {
                     if duration > max {
                         let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
                         ADAlert.alert(on: self, message: message)
                         return false
                     }
                 }
-                if let min = model.params.minVideoTime {
+                if let min = config.params.minVideoTime {
                     if duration < min {
                         let message = String(format: ADLocale.LocaleKey.shorterThanMaxVideoDuration.localeTextValue, min)
                         ADAlert.alert(on: self, message: message)

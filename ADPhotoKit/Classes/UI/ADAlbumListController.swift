@@ -81,6 +81,13 @@ extension ADAlbumListController {
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
+        navBarView.rightActionBlock = { [weak self] btn in
+            ADPhotoKitUI.config.canceled?()
+            if let _ = self?.navigationController?.popViewController(animated: true) {
+            }else{
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
         view.addSubview(navBarView)
         navBarView.snp.makeConstraints { (make) in
             make.left.right.top.equalToSuperview()

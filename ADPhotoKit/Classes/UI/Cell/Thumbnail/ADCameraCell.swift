@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-class ADCameraCell: UICollectionViewCell {
+public class ADCameraCell: UICollectionViewCell {
     
     var imageView: UIImageView!
     
@@ -19,13 +19,12 @@ class ADCameraCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = UIColor(white: 0.3, alpha: 1)
-        
         imageView = UIImageView(image: Bundle.uiBundle?.image(name: "takePhoto"))
+        imageView.backgroundColor = UIColor(white: 0.3, alpha: 1)
         imageView.contentMode = .center
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
-            make.center.equalToSuperview()
+            make.edges.equalToSuperview()
         }
         
     }
@@ -104,4 +103,31 @@ private extension ADCameraCell {
         
         session!.startRunning()
     }
+}
+
+/// UIAppearance
+extension ADCameraCell {
+    
+    public enum Key: String {
+        case cornerRadius /// 圆角
+        case bgColor /// 背景颜色
+    }
+    
+    @objc
+    public func setAttributes(_ attrs: [String : Any]?) {
+        if let kvs = attrs {
+            for (k,v) in kvs {
+                if let key = Key(rawValue: k) {
+                    switch key {
+                    case .cornerRadius:
+                        contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                        contentView.layer.masksToBounds = true
+                    case .bgColor:
+                        imageView.backgroundColor = (v as? UIColor) ?? UIColor(white: 0.3, alpha: 1)
+                    }
+                }
+            }
+        }
+    }
+    
 }

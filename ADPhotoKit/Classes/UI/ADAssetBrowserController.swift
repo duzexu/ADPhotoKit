@@ -22,7 +22,7 @@ extension ADAsset {
 
 public class ADAssetBrowserController: UIViewController {
     
-    let model: ADPhotoKitConfig
+    let config: ADPhotoKitConfig
     
     /// dataSource
     public var dataSource: ADAssetBrowserDataSource!
@@ -37,8 +37,8 @@ public class ADAssetBrowserController: UIViewController {
     /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
     
-    init(model: ADPhotoKitConfig, assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
-        self.model = model
+    init(config: ADPhotoKitConfig, assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
+        self.config = config
         self.dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
         super.init(nibName: nil, bundle: nil)
     }
@@ -85,14 +85,14 @@ public class ADAssetBrowserController: UIViewController {
     
     open func canSelectWithCurrentIndex() -> Bool {
         let selected = dataSource.selects.count
-        let max = model.params.maxCount ?? Int.max
+        let max = config.params.maxCount ?? Int.max
         let item = dataSource.current
         if selected < max {
             let itemIsImage = item.browseAsset.isImage
-            if model.assetOpts.contains(.mixSelect) {
+            if config.assetOpts.contains(.mixSelect) {
                 let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                let maxVideoCount = model.params.maxVideoCount ?? Int.max
-                let maxImageCount = model.params.maxImageCount ?? Int.max
+                let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                let maxImageCount = config.params.maxImageCount ?? Int.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
                     ADAlert.alert(on: self, message: message)
@@ -102,8 +102,8 @@ public class ADAssetBrowserController: UIViewController {
                     return false
                 }
             }else{
-                if item.browseAsset.isImage != model.selectMediaImage {
-                    if model.selectMediaImage {
+                if item.browseAsset.isImage != config.selectMediaImage {
+                    if config.selectMediaImage {
                         ADAlert.alert(on: self, message: "不能选择视频")
                     }else{
                         ADAlert.alert(on: self, message: "不能选择图片")
@@ -111,8 +111,8 @@ public class ADAssetBrowserController: UIViewController {
                     return false
                 }else{
                     let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                    let maxVideoCount = model.params.maxVideoCount ?? Int.max
-                    let maxImageCount = model.params.maxImageCount ?? Int.max
+                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
+                    let maxImageCount = config.params.maxImageCount ?? Int.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
                         ADAlert.alert(on: self, message: message)
