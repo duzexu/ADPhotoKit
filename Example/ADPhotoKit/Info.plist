@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>aaa</string>
+	<string>ADPhotokit will use you Camera</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Use photo</string>
+	<string>ADPhotokit will use you Photo Library</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ADPhotokit will use you Mic</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -34,6 +36,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

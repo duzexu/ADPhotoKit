@@ -110,34 +110,50 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
 /// UIAppearance
 extension ADAlbumListCell {
     
-    public enum Key: String {
-        case cornerRadius /// 封面圆角
-        case titleColor /// 标题颜色
-        case titleFont /// 标题
-        case countColor /// 数量颜色
-        case countFont //数量
+    public class Key: NSObject {
+        let rawValue: String
+        init(rawValue: String) {
+            self.rawValue = rawValue
+        }
+        static func == (lhs: Key, rhs: Key) -> Bool {
+            return lhs.rawValue == rhs.rawValue
+        }
     }
     
     @objc
-    public func setAttributes(_ attrs: [String : Any]?) {
+    public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {
             for (k,v) in kvs {
-                if let key = Key(rawValue: k) {
-                    switch key {
-                    case .cornerRadius:
-                        albumImageView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
-                    case .titleColor:
-                        albumTitleLabel.textColor = (v as? UIColor) ?? .white
-                    case .countColor:
-                        albumCountLabel.textColor = (v as? UIColor) ?? UIColor(hex: 0xB4B4B4)
-                    case .titleFont:
-                        albumTitleLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 17)
-                    case .countFont:
-                        albumCountLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 16)
-                    }
+                if k == .cornerRadius {
+                    albumImageView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                }
+                if k == .titleColor {
+                    albumTitleLabel.textColor = (v as? UIColor) ?? .white
+                }
+                if k == .titleFont {
+                    albumTitleLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 17)
+                }
+                if k == .countColor {
+                    albumCountLabel.textColor = (v as? UIColor) ?? UIColor(hex: 0xB4B4B4)
+                }
+                if k == .countFont {
+                    albumCountLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 16)
                 }
             }
         }
     }
     
+}
+
+extension ADAlbumListCell.Key {
+    /// Int, default 0
+    public static let cornerRadius = ADAlbumListCell.Key(rawValue: "cornerRadius")
+    /// UIColor, default .white
+    public static let titleColor = ADAlbumListCell.Key(rawValue: "titleColor")
+    /// UIFont, default UIFont.systemFont(ofSize: 17)
+    public static let titleFont = ADAlbumListCell.Key(rawValue: "titleFont")
+    /// UIColor, default UIColor(hex: 0xB4B4B4)
+    public static let countColor = ADAlbumListCell.Key(rawValue: "countColor")
+    /// UIFont, default UIFont.systemFont(ofSize: 16)
+    public static let countFont = ADAlbumListCell.Key(rawValue: "countFont")
 }

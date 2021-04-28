@@ -5,24 +5,59 @@
 [![License](https://img.shields.io/cocoapods/l/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 [![Platform](https://img.shields.io/cocoapods/p/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 
-## Example
+ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album.
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+### Features
+
+* [ ] 
+
+### Usage
+
+```swift
+ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
+    // do something
+}
+```
+
+## Learn More
+
+To lean more use of ADPhotoKit, take a look at the example.
 
 ## Requirements
 
-## Installation
+* iOS 10.0
+* Swift 5.0+
+
+### Installation
 
 ADPhotoKit is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'ADPhotoKit'
+source 'https://cdn.cocoapods.org/'
+platform :ios, '10.0'
+use_frameworks!
+
+target 'MyApp' do
+  pod 'ADPhotoKit'
+end
 ```
 
-## Author
+<font color=#B30E44>**You need to add the following key-value pairs in your app's Info.plist**</font>
 
-zexu007@qq.com, zexu007@qq.com
+```swift
+// If you don’t add this key-value pair, multiple languages are not supported, and the system PhotoKitUI language defaults to English
+Localized resources can be mixed   YES
+// You must add follow in your app's Info.plist
+Privacy - Photo Library Usage Description
+// If you `assetOpts` contain `allowTakePhotoAsset`, you must add follow
+Privacy - Camera Usage Description
+// If you `assetOpts` contain `allowTakeVideoAsset`, you must add follow
+Privacy - Microphone Usage Description
+```
+### Thanks
+
+Some code and resource are copy from **ZLPhotoBrowser**
 
 ## License
 

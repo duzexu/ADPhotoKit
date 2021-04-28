@@ -232,35 +232,38 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
 /// UIAppearance
 extension ADThumbnailListCell {
     
-    public enum Key: String {
-        case cornerRadius
-        case indexColor
-        case indexBgColor
-        case indexFont
-        case descColor
-        case descFont
+    public class Key: NSObject {
+        let rawValue: String
+        init(rawValue: String) {
+            self.rawValue = rawValue
+        }
+        static func == (lhs: Key, rhs: Key) -> Bool {
+            return lhs.rawValue == rhs.rawValue
+        }
     }
     
     @objc
-    public func setAttributes(_ attrs: [String : Any]?) {
+    public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {
             for (k,v) in kvs {
-                if let key = Key(rawValue: k) {
-                    switch key {
-                    case .cornerRadius:
-                        contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
-                        contentView.layer.masksToBounds = true
-                    case .indexColor:
-                        indexLabel.textColor = (v as? UIColor) ?? .white
-                    case .indexBgColor:
-                        indexLabel.backgroundColor = (v as? UIColor) ?? UIColor(hex: 0x50A938)
-                    case .indexFont:
-                        indexLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 14)
-                    case .descColor:
-                        descLabel.textColor = (v as? UIColor) ?? .white
-                    case .descFont:
-                        descLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 13)
-                    }
+                if k == .cornerRadius {
+                    contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                    contentView.layer.masksToBounds = true
+                }
+                if k == .indexColor {
+                    indexLabel.textColor = (v as? UIColor) ?? .white
+                }
+                if k == .indexBgColor {
+                    indexLabel.backgroundColor = (v as? UIColor) ?? UIColor(hex: 0x50A938)
+                }
+                if k == .indexFont {
+                    indexLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 14)
+                }
+                if k == .descColor {
+                    descLabel.textColor = (v as? UIColor) ?? .white
+                }
+                if k == .descFont {
+                    descLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 13)
                 }
             }
         }
@@ -302,6 +305,21 @@ extension ADThumbnailListCell {
         }
     }
     
+}
+
+extension ADThumbnailListCell.Key {
+    /// Int, default 0
+    public static let cornerRadius = ADThumbnailListCell.Key(rawValue: "cornerRadius")
+    /// UIColor, default .white
+    public static let indexColor = ADThumbnailListCell.Key(rawValue: "indexColor")
+    /// UIColor, default UIColor(hex: 0x50A938)
+    public static let indexBgColor = ADThumbnailListCell.Key(rawValue: "indexBgColor")
+    /// UIFont, default UIFont.systemFont(ofSize: 14)
+    public static let indexFont = ADThumbnailListCell.Key(rawValue: "indexFont")
+    /// UIColor, default .white
+    public static let descColor = ADThumbnailListCell.Key(rawValue: "descColor")
+    /// UIFont, default UIFont.systemFont(ofSize: 13)
+    public static let descFont = ADThumbnailListCell.Key(rawValue: "descFont")
 }
 
 extension ADPhotoKitConfig {

@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'ADPhotoKit'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of ADPhotoKit.'
+  s.summary          = 'A library for select photos from album implemented by pure-Swift.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+  ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album.
                        DESC
 
   s.homepage         = 'https://github.com/zexu007@qq.com/ADPhotoKit'
@@ -42,15 +42,12 @@ TODO: Add long description of the pod here.
   s.subspec "UI" do |ui|
     ui.dependency 'ADPhotoKit/Core'
     ui.dependency 'SnapKit'
-    ui.dependency 'Kingfisher'
+    ui.dependency 'Kingfisher', '~> 6.0'
     ui.source_files  = ["ADPhotoKit/Classes/UI/**/*.swift"]
     ui.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_UI'}
     ui.resource_bundles = {
       'ADPhotoKitUI' => ['ADPhotoKit/Assets/UI/**/*']
     }
   end
-
-  # s.source_files = 'ADPhotoKit/Classes/**/*'
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  
 end

@@ -206,7 +206,7 @@ public protocol ADAlertConfigurable {
 class ADPhotoUIConfigurable {
     
     static func albumListNavBar() -> ADAlbumListNavBarable {
-        return ADPhotoKitConfiguration.default.customAlbumListNavBar ?? ADAlbumListNavBarView()
+        return ADPhotoKitConfiguration.default.customAlbumListNavBarBlock?() ?? ADAlbumListNavBarView()
     }
     
     static func albumListCell(tableView: UITableView, indexPath: IndexPath) -> ADAlbumListCellable {
@@ -217,11 +217,11 @@ class ADPhotoUIConfigurable {
     }
     
     static func thumbnailNavBar(style: ADPickerStyle) -> ADThumbnailNavBarable {
-        return ADPhotoKitConfiguration.default.customThumbnailNavBar ?? ADThumbnailNavBarView(style: style)
+        return ADPhotoKitConfiguration.default.customThumbnailNavBarBlock?(style) ?? ADThumbnailNavBarView(style: style)
     }
     
     static func thumbnailToolBar() -> ADThumbnailToolBarable {
-        return ADPhotoKitConfiguration.default.customThumbnailToolBar ?? ADThumbnailToolBarView(config: ADPhotoKitUI.config)
+        return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(ADPhotoKitUI.config) ?? ADThumbnailToolBarView(config: ADPhotoKitUI.config)
     }
     
     static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellable {
@@ -232,11 +232,11 @@ class ADPhotoUIConfigurable {
     }
     
     static func browserNavBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserNavBarable {
-        return ADPhotoKitConfiguration.default.customBrowserNavBar ?? ADBrowserNavBarView(dataSource: dataSource)
+        return ADPhotoKitConfiguration.default.customBrowserNavBarBlock?(dataSource) ?? ADBrowserNavBarView(dataSource: dataSource)
     }
     
     static func browserToolBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserToolBarable {
-        return ADPhotoKitConfiguration.default.customBrowserToolBar ?? ADBrowserToolBarView(dataSource: dataSource)
+        return ADPhotoKitConfiguration.default.customBrowserToolBarBlock?(dataSource) ?? ADBrowserToolBarView(dataSource: dataSource)
     }
     
     static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, reuseIdentifier: String) -> ADBrowserCellable {
@@ -247,11 +247,11 @@ class ADPhotoUIConfigurable {
     }
     
     static func progressHUD() -> ADProgressHUDable {
-        return ADPhotoKitConfiguration.default.customProgressHUD ?? ADProgressHUD()
+        return ADPhotoKitConfiguration.default.customProgressHUDBlock?() ?? ADProgressHUD()
     }
     
     static func progress() -> ADProgressableable {
-        return ADPhotoKitConfiguration.default.customProgress ?? ADProgressView()
+        return ADPhotoKitConfiguration.default.customProgressBlock?() ?? ADProgressView()
     }
     
 }

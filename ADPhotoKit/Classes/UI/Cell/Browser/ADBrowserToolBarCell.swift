@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADBrowserToolBarCell: UICollectionViewCell {
+public class ADBrowserToolBarCell: UICollectionViewCell {
     
     var imageView: UIImageView!
     
@@ -84,4 +84,51 @@ class ADBrowserToolBarCell: UICollectionViewCell {
         
     }
     
+}
+
+/// UIAppearance
+extension ADBrowserToolBarCell {
+    
+    public class Key: NSObject {
+        let rawValue: String
+        init(rawValue: String) {
+            self.rawValue = rawValue
+        }
+        static func == (lhs: Key, rhs: Key) -> Bool {
+            return lhs.rawValue == rhs.rawValue
+        }
+    }
+    
+    @objc
+    public func setAttributes(_ attrs: [Key : Any]?) {
+        if let kvs = attrs {
+            for (k,v) in kvs {
+                if k == .cornerRadius {
+                    layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                    layer.masksToBounds = true
+                }
+                if k == .tagColor {
+                    tagLabel.textColor = (v as? UIColor) ?? .white
+                }
+                if k == .tagFont {
+                    tagLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 17)
+                }
+                if k == .borderColor {
+                    layer.borderColor = (v as? UIColor)?.cgColor ?? UIColor(hex: 0x50A938)?.cgColor
+                }
+            }
+        }
+    }
+    
+}
+
+extension ADBrowserToolBarCell.Key {
+    /// Int, default 0
+    public static let cornerRadius = ADBrowserToolBarCell.Key(rawValue: "cornerRadius")
+    /// UIColor, default .white
+    public static let tagColor = ADBrowserToolBarCell.Key(rawValue: "tagColor")
+    /// UIFont, default UIFont.systemFont(ofSize: 13)
+    public static let tagFont = ADBrowserToolBarCell.Key(rawValue: "tagFont")
+    /// UIColor, default UIColor(hex: 0x50A938)
+    public static let borderColor = ADBrowserToolBarCell.Key(rawValue: "borderColor")
 }

@@ -110,7 +110,9 @@ public class ADPhotoKitUI {
     public typealias Asset = (asset: PHAsset, image: UIImage?, error: Error?)
     /// return asset and original image or not
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
+    /// return browsable asset array
     public typealias AssetableSelectHandler = (([ADAssetBrowsable]) -> Void)
+    /// cancel select
     public typealias AssetCancelHandler = (() -> Void)
     
     public class func imagePicker(present on: UIViewController,

@@ -29,6 +29,10 @@ public class ADPhotoManager {
         let allowImage = options.contains(.allowImage)
         let allowVideo = options.contains(.allowVideo)
         
+        if !allowImage && !allowVideo {
+            fatalError("you must add 'allowImage' or 'allowVideo' to options.")
+        }
+        
         let option = PHFetchOptions()
         if !allowImage {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.video.rawValue)
@@ -149,7 +153,7 @@ public class ADPhotoManager {
     
     /// 获取资源文件
     @discardableResult
-    class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler? = nil, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
+    public class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler? = nil, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
         switch type {
         case let .image(size, resizeMode, synchronous):
             return fetchImage(for: asset, size: size, resizeMode: resizeMode, synchronous: synchronous, progress: progress, completion: completion)
@@ -169,7 +173,7 @@ public class ADPhotoManager {
         
     /// Fetch image for asset.
     @discardableResult
-    class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADImageCompletionHandler) -> PHImageRequestID {
+    public class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADImageCompletionHandler) -> PHImageRequestID {
         let option = PHImageRequestOptions()
         option.resizeMode = resizeMode
         option.isNetworkAccessAllowed = true
@@ -194,7 +198,7 @@ public class ADPhotoManager {
     }
     
     @discardableResult
-    class func fetchOriginImageData(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADDataCompletionHandler) -> PHImageRequestID {
+    public class func fetchOriginImageData(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADDataCompletionHandler) -> PHImageRequestID {
         let option = PHImageRequestOptions()
         if (asset.value(forKey: "filename") as? String)?.hasSuffix("GIF") == true {
             option.version = .original
@@ -218,7 +222,7 @@ public class ADPhotoManager {
     }
     
     @discardableResult
-    class func fetchLivePhoto(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADLivePhotoCompletionHandler) -> PHImageRequestID {
+    public class func fetchLivePhoto(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADLivePhotoCompletionHandler) -> PHImageRequestID {
         let option = PHLivePhotoRequestOptions()
         option.version = .current
         option.deliveryMode = .opportunistic
@@ -236,7 +240,7 @@ public class ADPhotoManager {
     }
     
     @discardableResult
-    class func fetchVideo(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADPlayItemCompletionHandler) -> PHImageRequestID {
+    public class func fetchVideo(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADPlayItemCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
         option.isNetworkAccessAllowed = true
         option.progressHandler = { (pro, error, stop, info) in
@@ -270,7 +274,7 @@ public class ADPhotoManager {
     }
     
     @discardableResult
-    class func fetchAVAsset(forVideo asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
+    public class func fetchAVAsset(forVideo asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
         option.version = .original
         option.deliveryMode = .automatic
@@ -299,7 +303,7 @@ public class ADPhotoManager {
         }
     }
     
-    class func fetchFilePath(asset: PHAsset, completion: @escaping ADFilePathCompletionHandler) {
+    public class func fetchFilePath(asset: PHAsset, completion: @escaping ADFilePathCompletionHandler) {
         asset.requestContentEditingInput(with: nil) { (input, info) in
             var path = input?.fullSizeImageURL?.absoluteString
             if path == nil, let dir = asset.value(forKey: "directory") as? String, let name = asset.value(forKey: "filename") as? String {

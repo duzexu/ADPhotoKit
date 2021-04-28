@@ -26,15 +26,16 @@ public class ADPhotoKitConfiguration {
     
     #if Module_UI
     
-    /// 自定义ui
+    /// 自定义图片
     public var customUIBundle: Bundle?
     
+    /// 状态栏样式
     public var statusBarStyle: UIStatusBarStyle?
     
     /// album
-    public var customAlbumListControllerBlock: ((ADAlbumListController)->Void)?
+    public var customAlbumListControllerBlock: ((ADAlbumListController) -> Void)?
     
-    public var customAlbumListNavBar: ADAlbumListNavBarable?
+    public var customAlbumListNavBarBlock: (() -> ADAlbumListNavBarable)?
     
     public var customAlbumListCellRegistor: ((UITableView)->Void)?
     public var customAlbumListCellBlock: ((UITableView, IndexPath)->ADAlbumListCellable)?
@@ -42,9 +43,9 @@ public class ADPhotoKitConfiguration {
     /// thumbnail
     public var customThumbnailControllerBlock: ((ADThumbnailViewController)->Void)?
     
-    public var customThumbnailNavBar: ADThumbnailNavBarable?
+    public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarable)?
     
-    public var customThumbnailToolBar: ADThumbnailToolBarable?
+    public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarable)?
     
     public var customThumbnailCellRegistor: ((UICollectionView)->Void)?
     public var customThumbnailCellBlock: ((UICollectionView, IndexPath)->ADThumbnailCellable)?
@@ -52,18 +53,18 @@ public class ADPhotoKitConfiguration {
     /// browser
     public var customBrowserControllerBlock: ((ADAssetBrowserController)->Void)?
     
-    public var customBrowserNavBar: ADBrowserNavBarable?
+    public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarable)?
     
-    public var customBrowserToolBar: ADBrowserToolBarable?
+    public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarable)?
     
     public var customBrowserCellRegistor: ((UICollectionView)->Void)?
     public var customBrowserCellBlock: ((UICollectionView, IndexPath)->ADBrowserCellable)?
     
     /// hud
-    public var customProgressHUD: ADProgressHUDable?
+    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
     
     /// progress
-    public var customProgress: ADProgressableable?
+    public var customProgressBlock: (() -> ADProgressableable)?
          
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600
@@ -74,10 +75,13 @@ public class ADPhotoKitConfiguration {
         public var columnCount: Int = 4
     }
     
+    /// thumbnail layout
     public var thumbnailLayout = ThumbnailControllerLayout()
     
+    /// browser layout
     public var browseItemSpacing: CGFloat = 40
     
+    /// fetch image timeout
     public var fetchTimeout: TimeInterval = 20
     
     #endif

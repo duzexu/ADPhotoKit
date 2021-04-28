@@ -31,25 +31,36 @@ public class ADAddPhotoCell: UICollectionViewCell {
 /// UIAppearance
 extension ADAddPhotoCell {
     
-    public enum Key: String {
-        case cornerRadius /// 圆角
-        case bgColor /// 背景颜色
+    public class Key: NSObject {
+        let rawValue: String
+        init(rawValue: String) {
+            self.rawValue = rawValue
+        }
+        static func == (lhs: Key, rhs: Key) -> Bool {
+            return lhs.rawValue == rhs.rawValue
+        }
     }
     
     @objc
-    public func setAttributes(_ attrs: [String : Any]?) {
+    public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {
             for (k,v) in kvs {
-                if let key = Key(rawValue: k) {
-                    switch key {
-                    case .cornerRadius:
-                        imageView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
-                    case .bgColor:
-                        imageView.backgroundColor = (v as? UIColor) ?? UIColor(white: 0.3, alpha: 1)
-                    }
+                if k == .bgColor {
+                    imageView.backgroundColor = (v as? UIColor) ?? UIColor(white: 0.3, alpha: 1)
+                }
+                if k == .cornerRadius {
+                    contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)
+                    contentView.layer.masksToBounds = true
                 }
             }
         }
     }
     
+}
+
+extension ADAddPhotoCell.Key {
+    /// Int, default 0
+    public static let cornerRadius = ADAddPhotoCell.Key(rawValue: "cornerRadius")
+    /// UIColor, default UIColor(white: 0.3, alpha: 1)
+    public static let bgColor = ADAddPhotoCell.Key(rawValue: "bgColor")
 }

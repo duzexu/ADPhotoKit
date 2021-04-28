@@ -17,10 +17,11 @@ class ViewController: UIViewController {
         ADPhotoManager.allPhotoAlbumList() { (list) in
             print(list)
         }
-        ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor.rawValue:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius.rawValue:6])
-        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius.rawValue:8,ADThumbnailListCell.Key.indexColor.rawValue:UIColor.lightText])
-        ADAddPhotoCell.appearance().setAttributes([ADAddPhotoCell.Key.cornerRadius.rawValue:8,ADAddPhotoCell.Key.bgColor.rawValue:UIColor.lightText])
-        ADCameraCell.appearance().setAttributes([ADCameraCell.Key.cornerRadius.rawValue:8,ADCameraCell.Key.bgColor.rawValue:UIColor.lightText])
+        ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius:6])
+        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius:8,ADThumbnailListCell.Key.indexColor:UIColor.lightText])
+        ADAddPhotoCell.appearance().setAttributes([ADAddPhotoCell.Key.cornerRadius:8,ADAddPhotoCell.Key.bgColor:UIColor.lightText])
+        ADCameraCell.appearance().setAttributes([ADCameraCell.Key.cornerRadius:8, ADCameraCell.Key.bgColor:UIColor.gray])
+        ADBrowserToolBarCell.appearance().setAttributes([ADBrowserToolBarCell.Key.cornerRadius:8, ADBrowserToolBarCell.Key.borderColor:UIColor.red])
     }
 
     override func didReceiveMemoryWarning() {
@@ -30,7 +31,7 @@ class ViewController: UIViewController {
     
     @IBAction func showImagePicker(_ sender: UIButton) {
         if #available(iOS 14, *) {
-            ADPhotoKitUI.imagePicker(present: self, style: .embed, assetOpts: [.allowAddAsset,.allowTakePhotoAsset], params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
+            ADPhotoKitUI.imagePicker(present: self, style: .embed, assetOpts: .default, params: [.maxCount(max: 9),.imageCount(min: 1, max: 8),.videoCount(min: 0, max: 1)]) { (assets, value) in
                 print(assets)
             }
         } else {
