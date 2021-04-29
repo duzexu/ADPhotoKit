@@ -38,7 +38,11 @@ public class ADAssetListDataSource: NSObject {
     
     public var cameraCellIndex: Int {
         if albumOpts.contains(.ascending) {
-            return list.count + appendCellCount - 2
+            if appendCellCount >= 2 {
+                return list.count + appendCellCount - 2
+            }else{
+                return list.count + appendCellCount - 1
+            }
         }else{
             return 0
         }

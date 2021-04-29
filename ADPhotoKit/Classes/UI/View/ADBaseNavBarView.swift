@@ -66,8 +66,10 @@ private extension ADBaseNavBarView {
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
-            make.left.bottom.equalToSuperview()
-            make.size.equalTo(CGSize(width: 60, height: 44))
+            make.bottom.equalToSuperview()
+            make.left.equalToSuperview().offset(15)
+            make.height.equalTo(44)
+            make.width.greaterThanOrEqualTo(60)
         }
         
         if let left = leftItem {
@@ -85,8 +87,10 @@ private extension ADBaseNavBarView {
         rightBtnItem.addTarget(self, action: #selector(rightBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(rightBtnItem)
         rightBtnItem.snp.makeConstraints { (make) in
-            make.right.bottom.equalToSuperview()
-            make.size.equalTo(CGSize(width: 60, height: 44))
+            make.bottom.equalToSuperview()
+            make.right.equalToSuperview().offset(-15)
+            make.height.equalTo(44)
+            make.width.greaterThanOrEqualTo(60)
         }
         
         if let right = rightItem {

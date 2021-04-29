@@ -11,17 +11,17 @@ public class ADPhotoKitConfiguration {
     
     public static var `default` = ADPhotoKitConfiguration()
     
-    /// 指定语言
+    /// Set framework language, if set nil, framework will use system language. Default is nil.
     public var locale: Locale? {
         didSet {
             Bundle.resetLocaleBundle()
         }
     }
     
-    /// 自定义语言文案
+    /// You can custom display text for diffent language on yourself.
     public var customLocaleValue: [Locale:[ADLocale.LocaleKey: String]]?
     
-    /// 自定义相簿顺序 默认 ADAlbumType.allCases 顺序
+    /// Custom album orders, if type not contain, it will not display. Default is ordered by `ADAlbumType.allCases` 's order.
     public var customAlbumOrders: [ADAlbumType]?
     
     #if Module_UI
@@ -29,7 +29,7 @@ public class ADPhotoKitConfiguration {
     /// 自定义图片
     public var customUIBundle: Bundle?
     
-    /// 状态栏样式
+    /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
     
     /// album

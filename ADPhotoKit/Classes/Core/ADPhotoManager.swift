@@ -11,8 +11,11 @@ import Photos
 public struct ADAlbumSelectOptions: OptionSet {
     public let rawValue: Int
     
+    /// If contain, assets will return with lastest time at last, if not, the results will revert. Default is not contain.
     public static let ascending = ADAlbumSelectOptions(rawValue: 1 << 0)
+    /// If contain, results will have image assets. Default is contain.
     public static let allowImage = ADAlbumSelectOptions(rawValue: 1 << 1)
+    /// If contain, results will have video assets. Default is contain.
     public static let allowVideo = ADAlbumSelectOptions(rawValue: 1 << 2)
     
     public static let `default`: ADAlbumSelectOptions = [.allowImage, .allowVideo]
@@ -78,6 +81,10 @@ public class ADPhotoManager {
     public class func cameraRollAlbum(options: ADAlbumSelectOptions = .default, completion: @escaping ( (ADAlbumModel) -> Void )) {
         let allowImage = options.contains(.allowImage)
         let allowVideo = options.contains(.allowVideo)
+        
+        if !allowImage && !allowVideo {
+            fatalError("you must add 'allowImage' or 'allowVideo' to options.")
+        }
         
         let option = PHFetchOptions()
         if !allowImage {
@@ -248,9 +255,7 @@ public class ADPhotoManager {
                 progress?(pro, error, stop, info)
             }
         }
-        
-        // https://github.com/longitachi/ZLPhotoBrowser/issues/369#issuecomment-728679135
-        
+                
         if asset.isInCloud {
             return PHImageManager.default().requestExportSession(forVideo: asset, options: option, exportPreset: AVAssetExportPresetHighestQuality, resultHandler: { (session, info) in
                 // iOS11 and earlier, callback is not on the main thread.

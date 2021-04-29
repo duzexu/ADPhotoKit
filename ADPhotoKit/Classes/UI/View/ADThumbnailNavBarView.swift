@@ -57,7 +57,7 @@ private extension ADThumbnailNavBarView {
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-6)
             make.height.equalTo(32)
-            make.width.lessThanOrEqualTo(self.snp.width).dividedBy(2).priority(.medium)
+            make.width.lessThanOrEqualTo(screenWidth/2)
         }
         
         titleBg.addSubview(titleLabel)
