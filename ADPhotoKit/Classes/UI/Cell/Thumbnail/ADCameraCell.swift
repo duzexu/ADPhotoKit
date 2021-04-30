@@ -19,8 +19,8 @@ public class ADCameraCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        contentView.backgroundColor = UIColor(white: 0.3, alpha: 1)
         imageView = UIImageView(image: Bundle.uiBundle?.image(name: "takePhoto"))
-        imageView.backgroundColor = UIColor(white: 0.3, alpha: 1)
         imageView.contentMode = .center
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
@@ -123,7 +123,7 @@ extension ADCameraCell {
         if let kvs = attrs {
             for (k,v) in kvs {
                 if k == .bgColor {
-                    imageView.backgroundColor = (v as? UIColor) ?? UIColor(white: 0.3, alpha: 1)
+                    contentView.backgroundColor = (v as? UIColor) ?? UIColor(white: 0.3, alpha: 1)
                 }
                 if k == .cornerRadius {
                     contentView.layer.cornerRadius = CGFloat((v as? Int) ?? 0)

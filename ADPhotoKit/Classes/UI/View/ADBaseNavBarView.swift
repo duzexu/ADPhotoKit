@@ -60,7 +60,7 @@ private extension ADBaseNavBarView {
         }
         
         leftBtnItem = UIButton(type: .custom)
-        leftBtnItem.contentMode = .left
+        leftBtnItem.contentHorizontalAlignment = .left
         leftBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         leftBtnItem.setTitleColor(.white, for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
@@ -81,7 +81,7 @@ private extension ADBaseNavBarView {
         }
         
         rightBtnItem = UIButton(type: .custom)
-        rightBtnItem.contentMode = .right
+        rightBtnItem.contentHorizontalAlignment = .right
         rightBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         rightBtnItem.setTitleColor(.white, for: .normal)
         rightBtnItem.addTarget(self, action: #selector(rightBtnItemAction(sender:)), for: .touchUpInside)

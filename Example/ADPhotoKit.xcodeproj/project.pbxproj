@@ -13,6 +13,10 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		9551F0A7263A98D80089C8DE /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0A6263A98D80089C8DE /* LanguageViewController.swift */; };
+		9551F0B2263BA9130089C8DE /* ConfigModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0B1263BA9130089C8DE /* ConfigModel.swift */; };
+		9551F0B6263BACB70089C8DE /* ConfigCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0B5263BACB70089C8DE /* ConfigCell.swift */; };
+		9551F0B9263C0AF10089C8DE /* Stepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0B8263C0AF10089C8DE /* Stepper.swift */; };
+		9551F0BC263C0F600089C8DE /* Ranger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0BB263C0F600089C8DE /* Ranger.swift */; };
 		BFEB069A60BB41EC33CB7F50 /* Pods_ADPhotoKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24853DA6C7C8D2739F567EE4 /* Pods_ADPhotoKit_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +34,10 @@
 		6F6E6C84A9FE07B23F93C7EB /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		781C69769B128467B470C297 /* ADPhotoKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ADPhotoKit.podspec; path = ../ADPhotoKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9551F0A6263A98D80089C8DE /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
+		9551F0B1263BA9130089C8DE /* ConfigModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigModel.swift; sourceTree = "<group>"; };
+		9551F0B5263BACB70089C8DE /* ConfigCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigCell.swift; sourceTree = "<group>"; };
+		9551F0B8263C0AF10089C8DE /* Stepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stepper.swift; sourceTree = "<group>"; };
+		9551F0BB263C0F600089C8DE /* Ranger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ranger.swift; sourceTree = "<group>"; };
 		A1D674AD92CA2F57D0C42C9D /* Pods-ADPhotoKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ADPhotoKit_Tests.release.xcconfig"; path = "Target Support Files/Pods-ADPhotoKit_Tests/Pods-ADPhotoKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		AD6AD32727AAE9474B8F3EE1 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		F4DFDAA40DFA764DB6B4FEC5 /* Pods_ADPhotoKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ADPhotoKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +89,10 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				9551F0B1263BA9130089C8DE /* ConfigModel.swift */,
+				9551F0B8263C0AF10089C8DE /* Stepper.swift */,
+				9551F0BB263C0F600089C8DE /* Ranger.swift */,
+				9551F0B5263BACB70089C8DE /* ConfigCell.swift */,
 				9551F0A6263A98D80089C8DE /* LanguageViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -246,6 +258,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				9551F0BC263C0F600089C8DE /* Ranger.swift in Sources */,
+				9551F0B9263C0AF10089C8DE /* Stepper.swift in Sources */,
+				9551F0B2263BA9130089C8DE /* ConfigModel.swift in Sources */,
+				9551F0B6263BACB70089C8DE /* ConfigCell.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				9551F0A7263A98D80089C8DE /* LanguageViewController.swift in Sources */,
 			);

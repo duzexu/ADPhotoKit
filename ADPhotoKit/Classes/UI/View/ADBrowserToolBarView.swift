@@ -69,6 +69,8 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
 private extension ADBrowserToolBarView {
     
     func setupUI() {
+        clipsToBounds = true
+        
         bgView = UIView()
         bgView.backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
         addSubview(bgView)
@@ -158,22 +160,22 @@ private extension ADBrowserToolBarView {
             switch source {
             case .network(_):
                 editBtn.isHidden = true
-                originalBtn.isHidden = true
+                originalBtn.alpha = 0
             case let .album(ass):
                 if ass.isGif || ass.isLivePhoto {
                     editBtn.isHidden = true
-                    originalBtn.isHidden = true
+                    originalBtn.alpha = 0
                 }else{
                     editBtn.isHidden = false
-                    originalBtn.isHidden = false
+                    originalBtn.alpha = 1
                 }
             case .local:
                 editBtn.isHidden = true
-                originalBtn.isHidden = true
+                originalBtn.alpha = 0
             }
         case .video(_):
             editBtn.isHidden = true
-            originalBtn.isHidden = true
+            originalBtn.alpha = 0
         }
     }
     

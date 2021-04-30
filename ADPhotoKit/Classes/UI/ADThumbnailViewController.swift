@@ -217,7 +217,7 @@ extension ADThumbnailViewController {
                     return false
                 }
             }else{
-                if item.browseAsset.isImage != config.selectMediaImage {
+                if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     return false
                 }else{
                     let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
@@ -350,7 +350,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                         item.selectStatus = .deselect
                     }
                 }else{
-                    if item.type.isImage != config.selectMediaImage {
+                    if let selectMediaImage = config.selectMediaImage, item.type.isImage != selectMediaImage {
                         c.selectStatus = .deselect
                         item.selectStatus = .deselect
                     }else{

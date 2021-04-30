@@ -327,8 +327,7 @@ extension ADPhotoKitConfig {
     fileprivate func displaySelectBtn(model: ADAssetModel) -> Bool {
         if let max = params.maxCount {
             if max > 1 {
-                if !assetOpts.contains(.mixSelect) {
-                    let type = selectMediaImage
+                if !assetOpts.contains(.mixSelect), let type = selectMediaImage {
                     return model.type.isImage == type
                 }else{
                     return true

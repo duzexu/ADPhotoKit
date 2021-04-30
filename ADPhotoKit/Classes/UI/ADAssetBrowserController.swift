@@ -39,7 +39,7 @@ public class ADAssetBrowserController: UIViewController {
     
     init(config: ADPhotoKitConfig, assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
         self.config = config
-        self.dataSource = ADAssetBrowserDataSource(options: .default, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
+        self.dataSource = ADAssetBrowserDataSource(options: config.browserOpts, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -102,8 +102,8 @@ public class ADAssetBrowserController: UIViewController {
                     return false
                 }
             }else{
-                if item.browseAsset.isImage != config.selectMediaImage {
-                    if config.selectMediaImage {
+                if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
+                    if selectMediaImage {
                         ADAlert.alert(on: self, message: "不能选择视频")
                     }else{
                         ADAlert.alert(on: self, message: "不能选择图片")

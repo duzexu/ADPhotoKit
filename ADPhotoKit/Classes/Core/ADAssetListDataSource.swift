@@ -121,6 +121,11 @@ public class ADAssetListDataSource: NSObject {
                 selects.append(selected)
                 item.selectStatus = .select(index: selects.count)
             }
+            if selects.count == 1 {
+                if let model = selects.randomElement() {
+                    ADPhotoKitUI.config.selectMediaImage = ADAssetModel(asset: model.asset).type.isImage
+                }
+            }
             selectAssetChanged?(selects.count)
         }
     }
@@ -140,6 +145,9 @@ public class ADAssetListDataSource: NSObject {
                     }
                 }
             }
+            if selects.count == 0 {
+                ADPhotoKitUI.config.selectMediaImage = nil
+            }
             selectAssetChanged?(selects.count)
         }
     }
@@ -155,6 +163,14 @@ public class ADAssetListDataSource: NSObject {
             }else{
                 item.selectStatus = .select(index: nil)
             }
+        }
+        if selects.count == 1 {
+            if let model = selects.randomElement() {
+                ADPhotoKitUI.config.selectMediaImage = ADAssetModel(asset: model.asset).type.isImage
+            }
+        }
+        if selects.count == 0 {
+            ADPhotoKitUI.config.selectMediaImage = nil
         }
         selectAssetChanged?(selects.count)
         if let view = reloadable as? UICollectionView {

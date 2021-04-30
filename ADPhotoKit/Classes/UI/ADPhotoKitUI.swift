@@ -26,7 +26,7 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let selectAsLivePhoto = ADAssetSelectOptions(rawValue: 1 << 2)
     /// You can slide select photos in album.
     public static let slideSelect = ADAssetSelectOptions(rawValue: 1 << 3)
-    /// Will auto scroll to top or bottom when your finger at the top or bottom.
+    /// If `slideSelect` contain, Will auto scroll to top or bottom when your finger at the top or bottom.
     public static let autoScroll = ADAssetSelectOptions(rawValue: 1 << 4)
     /// Allow take photo asset in the album.
     public static let allowTakePhotoAsset = ADAssetSelectOptions(rawValue: 1 << 5)
@@ -63,7 +63,7 @@ public struct ADAssetBrowserOptions: OptionSet {
     public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
     /// Display the selected photos at the bottom of the browse large photos interface.
     public static let selectBrowser = ADAssetBrowserOptions(rawValue: 1 << 1)
-    /// Display the index of the selected photos.
+    /// Display the index of the selected photos at navbar.
     public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
     /// Allow framework fetch image when callback.
     public static let fetchImage = ADAssetBrowserOptions(rawValue: 1 << 3)
@@ -75,19 +75,27 @@ public struct ADAssetBrowserOptions: OptionSet {
     }
 }
 
-public enum ADPhotoSelectParams: Hashable {
-    /// 最多选择数量
+public enum ADPhotoSelectParams: Hashable, Equatable {
+    /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
     case maxCount(max: Int?)
-    /// 图片选择数量 最小 最大
+    /// Limit the min and max image count you can select. Set `nil` means no limit. Default is no limit.
     case imageCount(min: Int?, max:Int?)
-    /// 视频数量 最小 最大
+    /// Limit the min and max video count you can select. Set `nil` means no limit. Default is no limit.
     case videoCount(min: Int?, max:Int?)
-    /// 视频时长 最小 最大
+    /// Limit the min and max video time you can select. Set `nil` means no limit. Default is no limit.
     case videoTime(min: Int?, max: Int?)
-    /// record min and max video time
+    /// Limit the min and max video time you can record. Set `nil` means no limit. Default is no limit.
     case recordTime(min: Int?, max: Int?)
     
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    public var hashValue: Int {
         var value: Int = 0
         switch self {
         case .maxCount:
@@ -101,7 +109,7 @@ public enum ADPhotoSelectParams: Hashable {
         case .recordTime:
             value = 4
         }
-        hasher.combine(value)
+        return value
     }
 }
 
@@ -127,9 +135,6 @@ public class ADPhotoKitUI {
         let configuration = ADPhotoKitConfig(albumOpts: albumOpts, assetOpts: assetOpts, browserOpts: browserOpts, params: params, pickerSelect: selected, browserSelect: nil, canceled: canceled)
         if let asset = assets.randomElement() {
             configuration.selectMediaImage = ADAssetModel(asset: asset).type.isImage
-        }
-        if albumOpts.contains(.allowImage) {
-            configuration.selectMediaImage = true
         }
         config = configuration
         if style == .normal {
@@ -197,9 +202,9 @@ public class ADPhotoKitConfig {
     let browserSelect: ADPhotoKitUI.AssetableSelectHandler?
     let canceled: ADPhotoKitUI.AssetCancelHandler?
     
-    var selectMediaImage: Bool = false
+    var selectMediaImage: Bool?
     
-    public var isOriginal: Bool = false
+    var isOriginal: Bool = false
     
     let fetchImageQueue: OperationQueue = OperationQueue()
     
@@ -225,15 +230,27 @@ public class ADPhotoKitConfig {
             case let .imageCount(min, max):
                 value.minImageCount = min
                 value.maxImageCount = max
+                if let l = min, let r = max {
+                    assert(l <= r, "min count must less than or equal max")
+                }
             case let .videoCount(min, max):
                 value.minVideoCount = min
                 value.maxVideoCount = max
+                if let l = min, let r = max {
+                    assert(l <= r, "min count must less than or equal max")
+                }
             case let .videoTime(min, max):
                 value.minVideoTime = min
                 value.maxVideoTime = max
+                if let l = min, let r = max {
+                    assert(l <= r, "min time must less than or equal max")
+                }
             case let .recordTime(min, max):
                 value.minRecordTime = min
                 value.maxRecordTime = max
+                if let l = min, let r = max {
+                    assert(l <= r, "min time must less than or equal max")
+                }
             }
         }
         self.params = value
