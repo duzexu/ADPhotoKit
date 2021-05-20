@@ -27,9 +27,7 @@ public protocol ADAlbumListNavBarConfigurable {
     var height: CGFloat { get }
     
     var title: String? { set get }
-    
-    var leftActionBlock: ((UIButton)->Void)? { set get }
-    
+        
     var rightActionBlock: ((UIButton)->Void)? { set get }
     
 }

@@ -46,3 +46,10 @@ extension Bundle {
     }()
     
 }
+
+extension Bundle {
+    static func image(name: String) -> UIImage? {
+        let bundle = ADPhotoKitConfiguration.default.customUIBundle
+        return bundle?.image(name: name) ?? moduleUI?.image(name: name)
+    }
+}

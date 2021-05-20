@@ -26,11 +26,22 @@ public class ADPhotoKitConfiguration {
     
     #if Module_UI
     
-    /// 自定义图片
+    /// You can custom image Bundle by this property or simple replace image in `ADPhotoKitUI.bundle`
     public var customUIBundle: Bundle?
     
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
+    
+    /// hud
+    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
+    
+    /// progress
+    public var customProgressBlock: (() -> ADProgressableable)?
+
+    /// fetch image timeout
+    public var fetchTimeout: TimeInterval = 20
+    
+    /* ================= album ================= */
     
     /// album
     public var customAlbumListControllerBlock: ((ADAlbumListController) -> Void)?
@@ -39,8 +50,22 @@ public class ADPhotoKitConfiguration {
     
     public var customAlbumListCellRegistor: ((UITableView)->Void)?
     public var customAlbumListCellBlock: ((UITableView, IndexPath)->ADAlbumListCellable)?
+        
+    /* =============== thumbnail =============== */
     
-    /// thumbnail
+    /// The max speed (pt/s) of auto scroll. Defaults to 600.
+    public var autoScrollMaxSpeed: CGFloat = 600
+    
+    public struct ThumbnailControllerLayout {
+        public var itemSpacing: CGFloat = 2
+        public var lineSpacing: CGFloat = 2
+        // max is 5
+        public var columnCount: Int = 4
+    }
+    
+    /// thumbnail layout
+    public var thumbnailLayout = ThumbnailControllerLayout()
+    
     public var customThumbnailControllerBlock: ((ADThumbnailViewController)->Void)?
     
     public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarable)?
@@ -50,7 +75,11 @@ public class ADPhotoKitConfiguration {
     public var customThumbnailCellRegistor: ((UICollectionView)->Void)?
     public var customThumbnailCellBlock: ((UICollectionView, IndexPath)->ADThumbnailCellable)?
     
-    /// browser
+    /* =============== browser =============== */
+        
+    /// browser layout
+    public var browseItemSpacing: CGFloat = 40
+    
     public var customBrowserControllerBlock: ((ADAssetBrowserController)->Void)?
     
     public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarable)?
@@ -59,31 +88,7 @@ public class ADPhotoKitConfiguration {
     
     public var customBrowserCellRegistor: ((UICollectionView)->Void)?
     public var customBrowserCellBlock: ((UICollectionView, IndexPath)->ADBrowserCellable)?
-    
-    /// hud
-    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
-    
-    /// progress
-    public var customProgressBlock: (() -> ADProgressableable)?
-         
-    /// The max speed (pt/s) of auto scroll. Defaults to 600.
-    public var autoScrollMaxSpeed: CGFloat = 600
-    
-    public struct ThumbnailControllerLayout {
-        public var itemSpacing: CGFloat = 2
-        public var lineSpacing: CGFloat = 2
-        public var columnCount: Int = 4
-    }
-    
-    /// thumbnail layout
-    public var thumbnailLayout = ThumbnailControllerLayout()
-    
-    /// browser layout
-    public var browseItemSpacing: CGFloat = 40
-    
-    /// fetch image timeout
-    public var fetchTimeout: TimeInterval = 20
-    
+        
     #endif
 
 }

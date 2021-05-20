@@ -34,7 +34,7 @@ extension UIImageView {
         }
     }
     
-    func setAsset(_ asset: PHAsset,
+    public func setAsset(_ asset: PHAsset,
                   size: CGSize? = nil,
                   placeholder: UIImage? = nil,
                   progress: ((Double) -> Void)? = nil,
@@ -77,7 +77,7 @@ extension UIImageView {
         }
     }
     
-    func setVideoUrlAsset(_ url: URL) {
+    public func setVideoUrlAsset(_ url: URL) {
         let assert = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: assert)
         generator.appliesPreferredTrackTransform = true

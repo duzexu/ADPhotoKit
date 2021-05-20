@@ -119,10 +119,10 @@ private extension ADVideoBrowserCell {
         }
         
         progressView = ADPhotoUIConfigurable.progress()
+        progressView.isHidden = true
         contentView.addSubview(progressView)
         progressView.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
-            make.size.equalTo(CGSize(width: 60, height: 60))
         }
         
         playBtn = UIButton(type: .custom)

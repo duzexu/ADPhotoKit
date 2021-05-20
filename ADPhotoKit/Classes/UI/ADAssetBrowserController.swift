@@ -81,6 +81,7 @@ public class ADAssetBrowserController: UIViewController {
     
     open func finishSelection() {
         ADPhotoKitUI.config.browserSelect?(dataSource.selects)
+        navigationController?.dismiss(animated: true, completion: nil)
     }
     
     open func canSelectWithCurrentIndex() -> Bool {

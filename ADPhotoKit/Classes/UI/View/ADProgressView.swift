@@ -27,6 +27,10 @@ class ADProgressView: UIView, ADProgressConfigurable {
         progressLayer.lineWidth = 4
         
         layer.addSublayer(progressLayer)
+        
+        self.snp.makeConstraints { (make) in
+            make.size.equalTo(CGSize(width: 40, height: 40))
+        }
     }
     
     required init?(coder: NSCoder) {

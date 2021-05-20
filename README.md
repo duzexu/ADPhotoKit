@@ -21,7 +21,7 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 
 ## Learn More
 
-To lean more use of ADPhotoKit, take a look at the example.
+To lean more use of ADPhotoKit,refer to the example.
 
 ## Requirements
 

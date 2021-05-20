@@ -56,7 +56,6 @@ extension ADAlbumListController {
         tableView.backgroundColor = .clear
         tableView.tableFooterView = UIView()
         tableView.separatorColor = UIColor(hex: 0x3C3C3C)
-        tableView.contentInset = UIEdgeInsets(top: topBarHeight, left: 0, bottom: tabBarOffset, right: 0)
         tableView.rowHeight = 65
         tableView.delegate = self
         tableView.dataSource = self
@@ -74,13 +73,6 @@ extension ADAlbumListController {
                 
         var navBarView = ADPhotoUIConfigurable.albumListNavBar()
         navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
-        navBarView.leftActionBlock = { [weak self] btn in
-            ADPhotoKitUI.config.canceled?()
-            if let _ = self?.navigationController?.popViewController(animated: true) {
-            }else{
-                self?.navigationController?.dismiss(animated: true, completion: nil)
-            }
-        }
         navBarView.rightActionBlock = { [weak self] btn in
             ADPhotoKitUI.config.canceled?()
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -93,6 +85,8 @@ extension ADAlbumListController {
             make.left.right.top.equalToSuperview()
             make.height.equalTo(navBarView.height)
         }
+        
+        tableView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: tabBarOffset, right: 0)
         
         dataSource = ADAlbumListDataSource(reloadable: tableView, options: config.albumOpts)
     }

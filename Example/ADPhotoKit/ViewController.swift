@@ -10,6 +10,22 @@ import UIKit
 import ADPhotoKit
 import ProgressHUD
 
+struct NetImage: ADAssetBrowsable {
+    var browseAsset: ADAsset {
+        return .image(.network(URL(string: url)!))
+    }
+    
+    let url: String
+}
+
+struct NetVideo: ADAssetBrowsable {
+    var browseAsset: ADAsset {
+        return .video(.network(URL(string: url)!))
+    }
+    
+    let url: String
+}
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
@@ -24,15 +40,20 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let rightBtnItem = UIBarButtonItem(title: "Image Picker", style: .plain, target: self, action: #selector(presentImagePicker(_:)))
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 20
+        let browser = UIButton(type: .system)
+        browser.setTitle("AssetBrowser", for: .normal)
+        browser.addTarget(self, action: #selector(presentAssetBrowser(_:)), for: .touchUpInside)
+        stack.addArrangedSubview(browser)
+        let picker = UIButton(type: .system)
+        picker.setTitle("ImagePicker", for: .normal)
+        picker.addTarget(self, action: #selector(presentImagePicker(_:)), for: .touchUpInside)
+        stack.addArrangedSubview(picker)
+        let rightBtnItem = UIBarButtonItem(customView: stack)
         navigationItem.rightBarButtonItem = rightBtnItem
         setupConfig()
-        
-        ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor:UIColor.lightGray,ADAlbumListCell.Key.cornerRadius:6])
-        ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius:8,ADThumbnailListCell.Key.indexColor:UIColor.lightText])
-        ADAddPhotoCell.appearance().setAttributes([ADAddPhotoCell.Key.cornerRadius:8,ADAddPhotoCell.Key.bgColor:UIColor.lightText])
-        ADCameraCell.appearance().setAttributes([ADCameraCell.Key.cornerRadius:8, ADCameraCell.Key.bgColor:UIColor.gray])
-        ADBrowserToolBarCell.appearance().setAttributes([ADBrowserToolBarCell.Key.cornerRadius:8, ADBrowserToolBarCell.Key.borderColor:UIColor.red])
     }
     
     func setupConfig() {
@@ -334,6 +355,7 @@ class ViewController: UIViewController {
         let maxCount = ConfigModel(title: "MaxCount", mode: .stepper(0)) { [weak self] (value) in
             if let count = value as? Int {
                 self?.params.insert(.maxCount(max: count))
+                ProgressHUD.showSuccess("Update Success!")
             }
         }
         paramsModels.append(maxCount)
@@ -341,23 +363,230 @@ class ViewController: UIViewController {
         let imageCount = ConfigModel(title: "ImageCount", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
                 self?.params.insert(.imageCount(min: trup.0, max: trup.1))
+                ProgressHUD.showSuccess("Update Success!")
             }
         }
         paramsModels.append(imageCount)
         
+        let videoCount = ConfigModel(title: "VideoCount", mode: .range(0, 0)) { [weak self] (value) in
+            if let trup = value as? (Int,Int) {
+                self?.params.insert(.videoCount(min: trup.0, max: trup.1))
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        paramsModels.append(videoCount)
+        
+        let videoTime = ConfigModel(title: "VideoTime", mode: .range(0, 0)) { [weak self] (value) in
+            if let trup = value as? (Int,Int) {
+                self?.params.insert(.videoTime(min: trup.0, max: trup.1))
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        paramsModels.append(videoTime)
+        
+        let recordTime = ConfigModel(title: "RecordTime", mode: .range(0, 0)) { [weak self] (value) in
+            if let trup = value as? (Int,Int) {
+                self?.params.insert(.recordTime(min: trup.0, max: trup.1))
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        paramsModels.append(recordTime)
+        
         let paramsConfig = ConfigSection(title: "ParamsConfig", models: paramsModels)
         dataSource.append(paramsConfig)
+        
+        var uiModels: [ConfigModel] = []
+        
+        let statusBar = ConfigModel(title: "StatusBar", mode: .segment(["Light","Dark"], 0)) { (index) in
+            if let idx = index as? Int {
+                if idx == 0 {
+                    ADPhotoKitConfiguration.default.statusBarStyle = .lightContent
+                }else{
+                    ADPhotoKitConfiguration.default.statusBarStyle = .default
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        uiModels.append(statusBar)
+        
+        let thumbnailColumnCount = ConfigModel(title: "Thumbnail ColumnCount", mode: .stepper(4)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.thumbnailLayout.columnCount = count
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        uiModels.append(thumbnailColumnCount)
+        
+        let thumbnailItemSpace = ConfigModel(title: "Thumbnail ItemSpace", mode: .stepper(2)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.thumbnailLayout.itemSpacing = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        uiModels.append(thumbnailItemSpace)
+        
+        let thumbnailLineSpace = ConfigModel(title: "Thumbnail LineSpace", mode: .stepper(2)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.thumbnailLayout.lineSpacing = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        uiModels.append(thumbnailLineSpace)
+        
+        let browserItemSpace = ConfigModel(title: "Browser ItemSpace", mode: .stepper(40)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.browseItemSpacing = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        uiModels.append(browserItemSpace)
+        
+        let albumListCell = ConfigModel(title: "AlbumListCell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADAlbumListCell.appearance().setAttributes([ADAlbumListCell.Key.titleColor:UIColor.white,ADAlbumListCell.Key.cornerRadius:6])
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+        }
+        uiModels.append(albumListCell)
+        
+        let thumbnailListCell = ConfigModel(title: "ThumbnailListCell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADThumbnailListCell.appearance().setAttributes([ADThumbnailListCell.Key.cornerRadius:8,ADThumbnailListCell.Key.indexColor:UIColor.lightText])
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+        }
+        uiModels.append(thumbnailListCell)
+        
+        let addPhotoCell = ConfigModel(title: "AddPhotoCell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADAddPhotoCell.appearance().setAttributes([ADAddPhotoCell.Key.cornerRadius:8,ADAddPhotoCell.Key.bgColor:UIColor.lightText])
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+        }
+        uiModels.append(addPhotoCell)
+        
+        let cameraCell = ConfigModel(title: "CameraCell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADCameraCell.appearance().setAttributes([ADCameraCell.Key.cornerRadius:8, ADCameraCell.Key.bgColor:UIColor.gray])
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+        }
+        uiModels.append(cameraCell)
+        
+        let browserToolBarCell = ConfigModel(title: "BrowserToolBar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADBrowserToolBarCell.appearance().setAttributes([ADBrowserToolBarCell.Key.cornerRadius:8, ADBrowserToolBarCell.Key.borderColor:UIColor.red])
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+        }
+        uiModels.append(browserToolBarCell)
+        
+        let uiConfig = ConfigSection(title: "UIConfig", models: uiModels)
+        dataSource.append(uiConfig)
+        
+        var customModels: [ConfigModel] = []
+        
+        let progressHud = ConfigModel(title: "Hud", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customProgressHUDBlock = {
+                        return CustomProgressHUD()
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customProgressHUDBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(progressHud)
+        
+        let progress = ConfigModel(title: "Progress", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customProgressBlock = {
+                        return Progress()
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customProgressBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(progress)
+        
+        let albumVC = ConfigModel(title: "Album Controller", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customAlbumListControllerBlock = { vc in
+                        vc.tableView.backgroundColor = UIColor.darkGray
+                        vc.tableView.rowHeight = 80
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customAlbumListControllerBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(albumVC)
+        
+        let albumNav = ConfigModel(title: "Album Navbar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customAlbumListNavBarBlock = {
+                        return AlbumNavBar()
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customAlbumListNavBarBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(albumNav)
+        
+        let albumCell = ConfigModel(title: "Album Cell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customAlbumListCellRegistor = {
+                        tb in
+                        tb.register(UINib(nibName: "AlbumCell", bundle: nil), forCellReuseIdentifier: "AlbumCell")
+                    }
+                    ADPhotoKitConfiguration.default.customAlbumListCellBlock = { tb,index in
+                        return tb.dequeueReusableCell(withIdentifier: "AlbumCell", for: index) as! AlbumCell
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customAlbumListCellRegistor = nil
+                    ADPhotoKitConfiguration.default.customAlbumListCellBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(albumCell)
+        
+        
+        
+        let customConfig = ConfigSection(title: "CustomUIConfig", models: customModels)
+        dataSource.append(customConfig)
     }
 
     @IBAction func presentImagePicker(_ sender: UIButton) {
-        if #available(iOS 14, *) {
-            ADPhotoKitUI.imagePicker(present: self, style: pickerStyle, albumOpts: albumOptions, assetOpts: assetOptions, browserOpts: browserOptions, params: params) { (assets, value) in
-                print(assets)
-            }
-        } else {
-            ADPhotoKitUI.imagePicker(present: self, style: pickerStyle, albumOpts: albumOptions, assetOpts: assetOptions, browserOpts: browserOptions, params: params) { (assets, value) in
-                print(assets)
-            }
+        ADPhotoKitUI.imagePicker(present: self, style: pickerStyle, albumOpts: albumOptions, assetOpts: assetOptions, browserOpts: browserOptions, params: params) { (assets, value) in
+            print(assets)
+        }
+    }
+    
+    @IBAction func presentAssetBrowser(_ sender: UIButton) {
+        ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://cdn.pixabay.com/photo/2020/10/14/18/35/sign-post-5655110_1280.png"),NetImage(url: "https://pic.netbian.com/uploads/allimg/190518/174718-1558172838db13.jpg"),NetImage(url: "http://5b0988e595225.cdn.sohucs.com/images/20190420/1d1070881fd540db817b2a3bdd967f37.gif"),NetVideo(url: "https://freevod.nf.migu.cn/mORsHmtum1AysKe3Ry%2FUb5rA1WelPRwa%2BS7ylo4qQCjcD5a2YuwiIC7rpFwwdGcgkgMxZVi%2FVZ%2Fnxf6NkQZ75HC0xnJ5rlB8UwiH8cZUuvErkVufDlxxLUBF%2FIgUEwjiq%2F%2FV%2FoxBQBVMUzAZaWTvOE5dxUFh4V3Oa489Ec%2BPw0IhEGuR64SuKk3MOszdFg0Q/600575Y9FGZ040325.mp4?msisdn=2a257d4c-1ee0-4ad8-8081-b1650c26390a&spid=600906&sid=50816168212200&timestamp=20201026155427&encrypt=70fe12c7473e6d68075e9478df40f207&k=dc156224f8d0835e&t=1603706067279&ec=2&flag=+&FN=%E5%B0%86%E6%95%85%E4%BA%8B%E5%86%99%E6%88%90%E6%88%91%E4%BB%AC")]) { (assets) in
+            print(assets)
         }
     }
 

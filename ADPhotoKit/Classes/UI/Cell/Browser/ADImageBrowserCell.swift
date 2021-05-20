@@ -171,7 +171,6 @@ private extension ADImageBrowserView {
         progressView.isHidden = true
         addSubview(progressView)
         progressView.snp.makeConstraints { (make) in
-            make.size.equalTo(CGSize(width: 40, height: 40))
             make.center.equalToSuperview()
         }
         
