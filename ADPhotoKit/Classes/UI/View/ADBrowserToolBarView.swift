@@ -43,7 +43,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     
     private var token: NSKeyValueObservation?
 
-    init(dataSource: ADAssetBrowserDataSource) {
+    required init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
         super.init(frame: .zero)
         

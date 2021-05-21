@@ -15,7 +15,7 @@ public protocol ADNavBarConfigurable {
     
     var title: String? { set get }
     
-    var leftActionBlock: ((UIButton)->Void)? { set get }
+    var leftActionBlock: (()->Void)? { set get }
     
     var rightActionBlock: ((UIButton)->Void)? { set get }
             
@@ -50,7 +50,7 @@ public protocol ADThumbnailNavBarConfigurable {
     
     var title: String? { set get }
     
-    var leftActionBlock: ((UIButton)->Void)? { set get }
+    var leftActionBlock: (()->Void)? { set get }
     
     var rightActionBlock: ((UIButton)->Void)? { set get }
     
@@ -115,7 +115,7 @@ public protocol ADThumbnailCellConfigurable {
 
     var selectAction: ((ADThumbnailCellable,Bool)->Void)? { set get }
     
-    func configure(with model: ADAssetModel, indexPath: IndexPath?)
+    func configure(with model: ADAssetModel)
     
     func cellSelectAction()
     
@@ -139,12 +139,12 @@ public protocol ADBrowserCellConfigurable {
 
 public typealias ADImageBrowserCellable = (UICollectionViewCell & ADImageBrowserCellConfigurable)
 public protocol ADImageBrowserCellConfigurable: ADBrowserCellConfigurable {
-    func configure(with source: ADImageSource, indexPath: IndexPath?)
+    func configure(with source: ADImageSource)
 }
 
 public typealias ADVideoBrowserCellable = (UICollectionViewCell & ADVideoBrowserCellConfigurable)
 public protocol ADVideoBrowserCellConfigurable: ADBrowserCellConfigurable {
-    func configure(with source: ADVideoSource, indexPath: IndexPath?)
+    func configure(with source: ADVideoSource)
 }
 
 public typealias ADBrowserNavBarable = (UIView & ADBrowserNavBarConfigurable)
@@ -154,9 +154,9 @@ public protocol ADBrowserNavBarConfigurable {
     
     var title: String? { set get }
     
-    var leftActionBlock: ((UIButton)->Void)? { set get }
+    var leftActionBlock: (()->Void)? { set get }
     
-    var rightActionBlock: ((UIButton)->Void)? { set get }
+    var selectActionBlock: ((Bool)->Bool)? { set get }
     
     init(dataSource: ADAssetBrowserDataSource)
         
@@ -174,6 +174,8 @@ public protocol ADBrowserToolBarConfigurable {
     var editActionBlock: (()->Void)? { set get }
     
     var doneActionBlock: (()->Void)? { set get }
+    
+    init(dataSource: ADAssetBrowserDataSource)
         
 }
 
@@ -237,11 +239,11 @@ class ADPhotoUIConfigurable {
         return ADPhotoKitConfiguration.default.customBrowserToolBarBlock?(dataSource) ?? ADBrowserToolBarView(dataSource: dataSource)
     }
     
-    static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, reuseIdentifier: String) -> ADBrowserCellable {
+    static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, asset: ADAsset) -> ADBrowserCellable {
         if ADPhotoKitConfiguration.default.customBrowserCellBlock != nil {
             assert(ADPhotoKitConfiguration.default.customBrowserCellRegistor != nil, "you must set 'customBrowserCellRegistor' and regist your custom cell")
         }
-        return ADPhotoKitConfiguration.default.customBrowserCellBlock?(collectionView, indexPath) ?? collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ADBrowserCellable
+        return ADPhotoKitConfiguration.default.customBrowserCellBlock?(collectionView, indexPath, asset) ?? collectionView.dequeueReusableCell(withReuseIdentifier: asset.reuseIdentifier, for: indexPath) as! ADBrowserCellable
     }
     
     static func progressHUD() -> ADProgressHUDable {

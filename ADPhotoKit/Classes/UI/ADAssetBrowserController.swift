@@ -164,7 +164,7 @@ private extension ADAssetBrowserController {
         dataSource?.listView = collectionView
         
         navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource)
-        navBarView.leftActionBlock = { [weak self] btn in
+        navBarView.leftActionBlock = { [weak self] in
             self?.didSelectsUpdate()
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
@@ -172,17 +172,18 @@ private extension ADAssetBrowserController {
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
-        navBarView.rightActionBlock = { [weak self] btn in
-            guard let strong = self else { return }
-            btn.layer.removeAllAnimations()
-            if btn.isSelected {
+        navBarView.selectActionBlock = { [weak self] value in
+            guard let strong = self else { return false }
+            if value {
                 self?.dataSource.deleteSelect(strong.dataSource.index)
             }else{
                 if strong.canSelectWithCurrentIndex() {
-                    btn.layer.add(ADPhotoKitUI.springAnimation(), forKey: nil)
                     self?.dataSource.appendSelect(strong.dataSource.index)
+                }else{
+                    return false
                 }
             }
+            return true
         }
         toolBarView = ADPhotoUIConfigurable.browserToolBar(dataSource: dataSource)
         controlsView = ADBrowserControlsView(topView: navBarView, bottomView: toolBarView)
@@ -239,7 +240,7 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let model = dataSource.list[indexPath.row]
-        var cell = ADPhotoUIConfigurable.browserCell(collectionView: collectionView, indexPath: indexPath, reuseIdentifier: model.browseAsset.reuseIdentifier)
+        var cell = ADPhotoUIConfigurable.browserCell(collectionView: collectionView, indexPath: indexPath, asset: model.browseAsset)
         cell.singleTapBlock = { [weak self] in
             self?.hideOrShowControlsView()
         }
@@ -251,11 +252,11 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
         switch model.browseAsset {
         case let .image(source):
             if let imageCell = cell as? ADImageBrowserCellable {
-                imageCell.configure(with: source, indexPath: indexPath)
+                imageCell.configure(with: source)
             }
         case let .video(source):
             if let videoCell = cell as? ADVideoBrowserCellable {
-                videoCell.configure(with: source, indexPath: indexPath)
+                videoCell.configure(with: source)
             }
         }
         (cell as? ADBrowserCellable)?.cellWillDisplay()

@@ -54,9 +54,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     var imageBrowserView: ADImageBrowserView!
     
     var livePhotoBrowserView: ADLivePhotoBrowserView!
-    
-    var indexPath: IndexPath?
-        
+            
     override init(frame: CGRect) {
         super.init(frame: frame)
         imageBrowserView = ADImageBrowserView(frame: .zero)
@@ -81,8 +79,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with source: ADImageSource, indexPath: IndexPath? = nil) {
-        self.indexPath = indexPath
+    func configure(with source: ADImageSource) {
         imageBrowserView.isHidden = source.isLivePhoto
         livePhotoBrowserView.isHidden = !source.isLivePhoto
         if source.isLivePhoto {

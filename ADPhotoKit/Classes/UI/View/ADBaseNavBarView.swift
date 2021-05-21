@@ -21,7 +21,7 @@ class ADBaseNavBarView: UIView, ADNavBarConfigurable {
         }
     }
     
-    var leftActionBlock: ((UIButton)->Void)?
+    var leftActionBlock: (()->Void)?
     var rightActionBlock: ((UIButton)->Void)?
     
     var leftBtnItem: UIButton!
@@ -105,7 +105,7 @@ private extension ADBaseNavBarView {
 
 extension ADBaseNavBarView {
     @objc func leftBtnItemAction(sender: UIButton) {
-        leftActionBlock?(sender)
+        leftActionBlock?()
     }
     
     @objc func rightBtnItemAction(sender: UIButton) {

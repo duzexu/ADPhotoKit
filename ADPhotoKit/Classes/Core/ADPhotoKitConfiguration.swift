@@ -48,8 +48,8 @@ public class ADPhotoKitConfiguration {
     
     public var customAlbumListNavBarBlock: (() -> ADAlbumListNavBarable)?
     
-    public var customAlbumListCellRegistor: ((UITableView)->Void)?
-    public var customAlbumListCellBlock: ((UITableView, IndexPath)->ADAlbumListCellable)?
+    public var customAlbumListCellRegistor: ((UITableView) -> Void)?
+    public var customAlbumListCellBlock: ((UITableView, IndexPath) -> ADAlbumListCellable)?
         
     /* =============== thumbnail =============== */
     
@@ -66,28 +66,28 @@ public class ADPhotoKitConfiguration {
     /// thumbnail layout
     public var thumbnailLayout = ThumbnailControllerLayout()
     
-    public var customThumbnailControllerBlock: ((ADThumbnailViewController)->Void)?
+    public var customThumbnailControllerBlock: ((ADThumbnailViewController) -> Void)?
     
     public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarable)?
     
     public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarable)?
     
-    public var customThumbnailCellRegistor: ((UICollectionView)->Void)?
-    public var customThumbnailCellBlock: ((UICollectionView, IndexPath)->ADThumbnailCellable)?
+    public var customThumbnailCellRegistor: ((UICollectionView) -> Void)?
+    public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellable)?
     
     /* =============== browser =============== */
         
     /// browser layout
     public var browseItemSpacing: CGFloat = 40
     
-    public var customBrowserControllerBlock: ((ADAssetBrowserController)->Void)?
+    public var customBrowserControllerBlock: ((ADAssetBrowserController) -> Void)?
     
     public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarable)?
     
     public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarable)?
     
-    public var customBrowserCellRegistor: ((UICollectionView)->Void)?
-    public var customBrowserCellBlock: ((UICollectionView, IndexPath)->ADBrowserCellable)?
+    public var customBrowserCellRegistor: ((UICollectionView) -> Void)?
+    public var customBrowserCellBlock: ((UICollectionView, IndexPath, ADAsset) -> ADBrowserCellable)?
         
     #endif
 

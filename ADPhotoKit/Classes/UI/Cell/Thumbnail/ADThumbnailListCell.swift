@@ -193,10 +193,7 @@ public class ADThumbnailListCell: UICollectionViewCell {
 
 extension ADThumbnailListCell: ADThumbnailCellConfigurable {
     
-    public func configure(with model: ADAssetModel, indexPath: IndexPath? = nil) {
-        if let index = indexPath {
-            self.indexPath = index
-        }
+    public func configure(with model: ADAssetModel) {
         assetModel = model
         selectStatus = model.selectStatus
         selectBtn.isHidden = !ADPhotoKitUI.config.displaySelectBtn(model: model)

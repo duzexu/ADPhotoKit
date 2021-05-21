@@ -8,6 +8,7 @@
 
 import UIKit
 import ADPhotoKit
+import Photos
 import ProgressHUD
 
 struct NetImage: ADAssetBrowsable {
@@ -36,7 +37,10 @@ class ViewController: UIViewController {
     var browserOptions: ADAssetBrowserOptions = .default
     var params: Set<ADPhotoSelectParams> = []
     
+    var selected: [ADPhotoKitUI.Asset] = []
+    
     private var dataSource: [ConfigSection] = []
+    private var keepSelect: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,13 +48,33 @@ class ViewController: UIViewController {
         stack.axis = .horizontal
         stack.spacing = 20
         let browser = UIButton(type: .system)
-        browser.setTitle("AssetBrowser", for: .normal)
+        browser.setTitle("Browser", for: .normal)
         browser.addTarget(self, action: #selector(presentAssetBrowser(_:)), for: .touchUpInside)
         stack.addArrangedSubview(browser)
         let picker = UIButton(type: .system)
-        picker.setTitle("ImagePicker", for: .normal)
+        picker.setTitle("Picker", for: .normal)
         picker.addTarget(self, action: #selector(presentImagePicker(_:)), for: .touchUpInside)
         stack.addArrangedSubview(picker)
+        let selected = UIButton(type: .system)
+        selected.setTitle("ShowSel", for: .normal)
+        selected.addTarget(self, action: #selector(presentSelectAsset(_:)), for: .touchUpInside)
+        stack.addArrangedSubview(selected)
+        let control = UIView()
+        let label = UILabel()
+        label.text = "KeepSelect"
+        label.font = UIFont.systemFont(ofSize: 10)
+        control.addSubview(label)
+        let sw = UISwitch()
+        control.addSubview(sw)
+        sw.addTarget(self, action: #selector(switchAction(sender:)), for: .touchUpInside)
+        label.snp.makeConstraints { (make) in
+            make.top.equalToSuperview()
+            make.bottom.equalTo(sw.snp.top)
+        }
+        sw.snp.makeConstraints { (make) in
+            make.left.bottom.right.equalToSuperview()
+        }
+        stack.addArrangedSubview(control)
         let rightBtnItem = UIBarButtonItem(customView: stack)
         navigationItem.rightBarButtonItem = rightBtnItem
         setupConfig()
@@ -572,14 +596,142 @@ class ViewController: UIViewController {
         }
         customModels.append(albumCell)
         
+        let thumbnailVC = ConfigModel(title: "Thumbnail Controller", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customThumbnailControllerBlock = { vc in
+                        vc.collectionView.backgroundColor = UIColor.darkGray
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customThumbnailControllerBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(thumbnailVC)
         
+        let thumbnailNav = ConfigModel(title: "Thumbnail Navbar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customThumbnailNavBarBlock = { style in
+                        return ThumbnailNavBar(style: style)
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customThumbnailNavBarBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(thumbnailNav)
+        
+        let thumbnailTool = ConfigModel(title: "Thumbnail Toolbar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customThumbnailToolBarBlock = { config in
+                        return ThumbnailToolBar()
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customThumbnailToolBarBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(thumbnailTool)
+        
+        let thumbnailCell = ConfigModel(title: "Thumbnail Cell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customThumbnailCellRegistor = {
+                        cl in
+                        cl.register(UINib(nibName: "ThumbnailCell", bundle: nil), forCellWithReuseIdentifier: "ThumbnailCell")
+                    }
+                    ADPhotoKitConfiguration.default.customThumbnailCellBlock = { cl,index in
+                        return cl.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: index) as! ThumbnailCell
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customThumbnailCellRegistor = nil
+                    ADPhotoKitConfiguration.default.customThumbnailCellBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(thumbnailCell)
+        
+        let browserVC = ConfigModel(title: "Browser Controller", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customBrowserControllerBlock = { vc in
+                        vc.collectionView.backgroundColor = UIColor.darkGray
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customBrowserControllerBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(browserVC)
+        
+        let browserNav = ConfigModel(title: "Browser Navbar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customBrowserNavBarBlock = { dataSource in
+                        return BrowserNavBar(dataSource: dataSource)
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customBrowserNavBarBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(browserNav)
+        
+        let browserTool = ConfigModel(title: "Browser Toolbar", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customBrowserToolBarBlock = { dataSource in
+                        return BrowserToolBar(dataSource: dataSource)
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customBrowserToolBarBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(browserTool)
+        
+        let browserCell = ConfigModel(title: "Browser Cell", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customBrowserCellRegistor = {
+                        cl in
+                        cl.register(UINib(nibName: "ImageBrowserCell", bundle: nil), forCellWithReuseIdentifier: "ImageBrowserCell")
+                        cl.register(UINib(nibName: "VideoBrowserCell", bundle: nil), forCellWithReuseIdentifier: "VideoBrowserCell")
+                    }
+                    ADPhotoKitConfiguration.default.customBrowserCellBlock = { cl,index,asset in
+                        switch asset {
+                        case .image(_):
+                            return cl.dequeueReusableCell(withReuseIdentifier: "ImageBrowserCell", for: index) as! ImageBrowserCell
+                        case .video(_):
+                            return cl.dequeueReusableCell(withReuseIdentifier: "VideoBrowserCell", for: index) as! VideoBrowserCell
+                        }
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customBrowserCellRegistor = nil
+                    ADPhotoKitConfiguration.default.customBrowserCellBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(browserCell)
         
         let customConfig = ConfigSection(title: "CustomUIConfig", models: customModels)
         dataSource.append(customConfig)
     }
 
     @IBAction func presentImagePicker(_ sender: UIButton) {
-        ADPhotoKitUI.imagePicker(present: self, style: pickerStyle, albumOpts: albumOptions, assetOpts: assetOptions, browserOpts: browserOptions, params: params) { (assets, value) in
+        let s = keepSelect ? selected.map { $0.asset } : []
+        ADPhotoKitUI.imagePicker(present: self, style: pickerStyle, assets: s, albumOpts: albumOptions, assetOpts: assetOptions, browserOpts: browserOptions, params: params) { [weak self] (assets, value) in
+            self?.selected = assets
             print(assets)
         }
     }
@@ -589,7 +741,16 @@ class ViewController: UIViewController {
             print(assets)
         }
     }
+    
+    @IBAction func presentSelectAsset(_ sender: UIButton) {
+        ADPhotoKitUI.assetBrowser(present: self, assets: selected.map { $0.asset }) { (assets) in
+            print(assets)
+        }
+    }
 
+    @IBAction func switchAction(sender: UISwitch) {
+        keepSelect = sender.isOn
+    }
 }
 
 extension ViewController: UITableViewDelegate,UITableViewDataSource {

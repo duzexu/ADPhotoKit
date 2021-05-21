@@ -8,6 +8,8 @@
 import UIKit
 
 class ADBrowserNavBarView: ADBaseNavBarView, ADBrowserNavBarConfigurable {
+    
+    var selectActionBlock: ((Bool)->Bool)?
         
     weak var dataSource: ADAssetBrowserDataSource?
     
@@ -35,6 +37,15 @@ class ADBrowserNavBarView: ADBaseNavBarView, ADBrowserNavBarConfigurable {
 private extension ADBrowserNavBarView {
     
     func setupChildUI() {
+        rightActionBlock = { [weak self] btn in
+            btn.layer.removeAllAnimations()
+            let select = btn.isSelected
+            if let value = self?.selectActionBlock?(select), value {
+                if !select {
+                    btn.layer.add(ADPhotoKitUI.springAnimation(), forKey: nil)
+                }
+            }
+        }
         rightBtnItem.isSelected = dataSource?.isSelected ?? false
         selectToken = dataSource?.observe(\.isSelected, options: .new, changeHandler: { [weak self] (dataSource, change) in
             guard let selected = change.newValue else { return }

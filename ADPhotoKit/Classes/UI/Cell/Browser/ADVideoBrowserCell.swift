@@ -10,9 +10,7 @@ import Photos
 import AVFoundation
 
 class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
-    
-    var indexPath: IndexPath?
-    
+        
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer!
     
@@ -40,8 +38,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func configure(with source: ADVideoSource, indexPath: IndexPath? = nil) {
-        self.indexPath = indexPath
+    func configure(with source: ADVideoSource) {
         if identifier != source.identifier {
             identifier = source.identifier
             configureCell(source: source)

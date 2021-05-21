@@ -178,7 +178,7 @@ extension ADThumbnailViewController {
         
         var navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style)
         navBarView.title = album.title
-        navBarView.leftActionBlock = { [weak self] btn in
+        navBarView.leftActionBlock = { [weak self] in
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
                 ADPhotoKitUI.config.canceled?()
@@ -300,7 +300,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
         let model = dataSource.list[modify.row]
-        cell.configure(with: model, indexPath: indexPath)
+        cell.indexPath = indexPath
+        cell.configure(with: model)
         cell.selectAction = { [weak self] cell, sel in
             guard let strong = self else {
                 return
@@ -315,7 +316,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             }
             
             /// 单独刷新这个cell 防止选择动画停止
-            cell.configure(with: strong.dataSource.list[index], indexPath: nil)
+            cell.configure(with: strong.dataSource.list[index])
             
             var indexs = strong.collectionView.indexPathsForVisibleItems
             indexs.removeAll {$0 == cell.indexPath}
@@ -326,7 +327,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let c = cell as? ADThumbnailListCell else {
+        guard var c = cell as? ADThumbnailCellable else {
             return
         }
         let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
@@ -395,7 +396,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             if #available(iOS 14, *) {
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
-        }else if let c = cell as? ADThumbnailListCell {
+        }else if let c = cell as? ADThumbnailCellable {
             if !config.assetOpts.contains(.allowBrowser) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
@@ -419,7 +420,7 @@ private extension ADThumbnailViewController {
         guard let indexPath = collectionView.indexPathForItem(at: point) else {
             return
         }
-        let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailListCell
+        let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailCellable
         if pan.state == .began {
             if cell != nil {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
@@ -436,7 +437,7 @@ private extension ADThumbnailViewController {
         }
     }
     
-    func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailListCell) {
+    func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailCellable) {
         let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
         let model = dataSource.list[index]
         //已经有第一个
