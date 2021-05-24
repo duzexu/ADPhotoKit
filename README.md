@@ -4,14 +4,26 @@
 [![Version](https://img.shields.io/cocoapods/v/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 [![License](https://img.shields.io/cocoapods/l/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 [![Platform](https://img.shields.io/cocoapods/p/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
+![Language](https://img.shields.io/badge/Language-%20Swift%20-E57141.svg)
 
-ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album.
+ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album. Default appearance is Wechat-like.
 
 ### Features
 
-* [ ] 
+* [x] Supports both single and multiple selection.
+* [x] Supports filtering albums and sorting by type.
+* [x] iCloud Support.
+* [x] Multi-language.
+* [x] Highly customizable base on protocol(UI/Image/Color/Font).
+* [x] UIAppearance support.
+* [x] Supports batch export PHAsset to image.
+* [ ] Custom camera.
+* [ ] Image editor.
+* [ ] Video editor.
 
 ### Usage
+
+The simplest use-case is present the image picker on your controller:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
@@ -19,14 +31,18 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 }
 ```
 
+For more configuration you can set, you can see [ADPhotoKitConfiguration](./ADPhotoKit/Classes/Core/ADPhotoKitConfiguration.swift) and [ADPhotoKitUI](./ADPhotoKit/Classes/UI/ADPhotoKitUI.swift)
+
 ## Learn More
 
-To lean more use of ADPhotoKit,refer to the example.
+To lean more use of ADPhotoKit, refer to the example.
 
 ## Requirements
 
 * iOS 10.0
 * Swift 5.0+
+
+> Objective-C is not supported. Swift is the future and dropping Obj-C is the price to pay to keep our velocity on this library :)
 
 ### Installation
 
@@ -55,9 +71,24 @@ Privacy - Camera Usage Description
 // If you `assetOpts` contain `allowTakeVideoAsset`, you must add follow
 Privacy - Microphone Usage Description
 ```
-### Thanks
+
+### Subspecs
+
+There are 2 subspecs available now:
+
+| Subspec | Description |
+|---|---|
+| Core | Required. This subspec provides raw data. |
+| UI | Optional. The subspec provides ui for photo select. |
+
+You can install only some of the ADPhotoKit modules. By default, you get all subspecs.
+
+## Thanks
 
 Some code and resource are copy from **ZLPhotoBrowser**
+
+## Contributing to this project
+If you have feature requests or bug reports, feel free to help out by sending pull requests or by creating new issues.
 
 ## License
 

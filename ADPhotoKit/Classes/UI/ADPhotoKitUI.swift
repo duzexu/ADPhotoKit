@@ -163,6 +163,9 @@ public class ADPhotoKitUI {
                                     options: ADAssetBrowserOptions = .default,
                                     selected: @escaping AssetableSelectHandler,
                                     canceled: AssetCancelHandler? = nil) {
+        if assets.count == 0 {
+            fatalError("assets count must>0")
+        }
         let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
         config = configuration
         let browser = ADAssetBrowserController(config: configuration, assets: assets, index: index, selects: selects)
