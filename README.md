@@ -8,7 +8,7 @@
 
 ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album. Default appearance is Wechat-like.
 
-### Features
+## Features
 
 * [x] Supports both single and multiple selection.
 * [x] Supports filtering albums and sorting by type.
@@ -21,7 +21,7 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 * [ ] Image editor.
 * [ ] Video editor.
 
-### Usage
+## Usage
 
 The simplest use-case is present the image picker on your controller:
 
@@ -83,13 +83,11 @@ There are 2 subspecs available now:
 
 You can install only some of the ADPhotoKit modules. By default, you get all subspecs.
 
-## Thanks
-
-Some code and resource are copy from **ZLPhotoBrowser**
-
-## Contributing to this project
+## Contributing
 If you have feature requests or bug reports, feel free to help out by sending pull requests or by creating new issues.
 
 ## License
 
 ADPhotoKit is available under the MIT license. See the LICENSE file for more info.
+
+> Some code and resource are copy from **ZLPhotoBrowser**

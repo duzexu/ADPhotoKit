@@ -68,6 +68,7 @@
 		95792A8A26579A9200AE8ED5 /* ImageBrowserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBrowserCell.xib; sourceTree = "<group>"; };
 		95792A8E26579AA300AE8ED5 /* VideoBrowserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoBrowserCell.swift; sourceTree = "<group>"; };
 		95792A8F26579AA300AE8ED5 /* VideoBrowserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VideoBrowserCell.xib; sourceTree = "<group>"; };
+		95CADD19265CD0A100009D1B /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		A1D674AD92CA2F57D0C42C9D /* Pods-ADPhotoKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ADPhotoKit_Tests.release.xcconfig"; path = "Target Support Files/Pods-ADPhotoKit_Tests/Pods-ADPhotoKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		AD6AD32727AAE9474B8F3EE1 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		F4DFDAA40DFA764DB6B4FEC5 /* Pods_ADPhotoKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ADPhotoKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				781C69769B128467B470C297 /* ADPhotoKit.podspec */,
+				95CADD19265CD0A100009D1B /* Package.swift */,
 				6F6E6C84A9FE07B23F93C7EB /* README.md */,
 				AD6AD32727AAE9474B8F3EE1 /* LICENSE */,
 			);
