@@ -23,13 +23,13 @@ let package = Package(
     targets: [
         .target(
             name: "ADPhotoKit",
+            dependencies: [
+                "SnapKit","Kingfisher"
+            ],
             path: "ADPhotoKit/Classes",
             resources: [
                 .process("ADPhotoKit/Assets")
             ],
-            dependencies: [
-                "SnapKit","Kingfisher"
-            ]
         ),
     ],
 )
