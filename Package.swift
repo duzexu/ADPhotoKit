@@ -16,7 +16,7 @@ let package = Package(
     ],
     
     dependencies: [
-        .package(url: "https://github.com/SnapKit/SnapKit.git", .upToNextMajor(from: "5.0.1"),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", .upToNextMajor(from: "5.0.1")),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "6.0.0"),
     ],
     
@@ -29,11 +29,7 @@ let package = Package(
             ],
             dependencies: [
                 "SnapKit","Kingfisher"
-        ]),
+            ]
+        ),
     ],
-    
-    // 库支持 Swift 语言版本
-    swiftLanguageVersions: [
-        .v5
-    ]
 )
