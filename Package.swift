@@ -30,6 +30,6 @@ let package = Package(
             resources: [
                 .process("ADPhotoKit/Assets")
             ],
-        ),
-    ],
+        )
+    ]
 )
