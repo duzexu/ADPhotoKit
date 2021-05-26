@@ -24,11 +24,30 @@ jobs:
         uses: SwiftDocOrg/swift-doc@master
         with:
           inputs: "ADPhotoKit/Classes"
-          module-name: ADPhotoKit
-          output: "Documentation"
+          module-name: "ADPhotoKit"
+          output: "Wiki"
       - name: Upload Documentation to Wiki
         uses: SwiftDocOrg/github-wiki-publish-action@v1
         with:
-          path: "Documentation"
+          path: "Wiki"
         env:
           GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          
+      - name: Generate Documentation
+        uses: SwiftDocOrg/swift-doc@master
+        with:
+          inputs: "ADPhotoKit/Classes"
+          module-name: "ADPhotoKit"
+          output: "Documentation"
+          format: "html"
+          base-url: https://duzexu.github.io/ADPhotoKit/
+          
+      - name: Permissions
+        run: sudo chown -R $USER:$USER /home/runner/work/
+ 
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          publish_dir: Documentation
+          enable_jekyll: true
