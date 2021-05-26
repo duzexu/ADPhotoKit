@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADPhotoKit - ADLocale.LocaleKey</title>
+    <link rel="stylesheet" type="text/css" href="https://duzexu.github.io/ADPhotoKit/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="https://duzexu.github.io/ADPhotoKit/">
+            <strong>
+                ADPhotoKit
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Member Of</a></li><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#enumeration cases">Enumeration Cases</a><ul><li class="case"><a href="#adlocale.localekey.previewcamera">preview​Camera</a></li><li class="case"><a href="#adlocale.localekey.previewcamerarecord">preview​Camera​Record</a></li><li class="case"><a href="#adlocale.localekey.previewalbum">preview​Album</a></li><li class="case"><a href="#adlocale.localekey.cancel">cancel</a></li><li class="case"><a href="#adlocale.localekey.nophototips">no​Photo​Tips</a></li><li class="case"><a href="#adlocale.localekey.loading">loading</a></li><li class="case"><a href="#adlocale.localekey.hudloading">hud​Loading</a></li><li class="case"><a href="#adlocale.localekey.done">done</a></li><li class="case"><a href="#adlocale.localekey.ok">ok</a></li><li class="case"><a href="#adlocale.localekey.timeout">timeout</a></li><li class="case"><a href="#adlocale.localekey.nophotolibratyauthority">no​Photo​Libraty​Authority</a></li><li class="case"><a href="#adlocale.localekey.nocameraauthority">no​Camera​Authority</a></li><li class="case"><a href="#adlocale.localekey.nomicrophoneauthority">no​Microphone​Authority</a></li><li class="case"><a href="#adlocale.localekey.cameraunavailable">camera​Unavailable</a></li><li class="case"><a href="#adlocale.localekey.photo">photo</a></li><li class="case"><a href="#adlocale.localekey.originalphoto">original​Photo</a></li><li class="case"><a href="#adlocale.localekey.back">back</a></li><li class="case"><a href="#adlocale.localekey.edit">edit</a></li><li class="case"><a href="#adlocale.localekey.editfinish">edit​Finish</a></li><li class="case"><a href="#adlocale.localekey.revert">revert</a></li><li class="case"><a href="#adlocale.localekey.preview">preview</a></li><li class="case"><a href="#adlocale.localekey.notallowmixselect">not​Allow​Mix​Select</a></li><li class="case"><a href="#adlocale.localekey.save">save</a></li><li class="case"><a href="#adlocale.localekey.saveimageerror">save​Image​Error</a></li><li class="case"><a href="#adlocale.localekey.savevideoerror">save​Video​Error</a></li><li class="case"><a href="#adlocale.localekey.exceededmaxselectcount">exceeded​Max​Select​Count</a></li><li class="case"><a href="#adlocale.localekey.exceededmaxvideoselectcount">exceeded​Max​Video​Select​Count</a></li><li class="case"><a href="#adlocale.localekey.lessthanminvideoselectcount">less​Than​Min​Video​Select​Count</a></li><li class="case"><a href="#adlocale.localekey.longerthanmaxvideoduration">longer​Than​Max​Video​Duration</a></li><li class="case"><a href="#adlocale.localekey.shorterthanmaxvideoduration">shorter​Than​Max​Video​Duration</a></li><li class="case"><a href="#adlocale.localekey.icloudvideoloadfaild">iCloud​Video​Load​Faild</a></li><li class="case"><a href="#adlocale.localekey.imageloadfailed">image​Load​Failed</a></li><li class="case"><a href="#adlocale.localekey.customcameratips">custom​Camera​Tips</a></li><li class="case"><a href="#adlocale.localekey.customcameratakephototips">custom​Camera​Take​Photo​Tips</a></li><li class="case"><a href="#adlocale.localekey.customcamerarecordvideotips">custom​Camera​Record​Video​Tips</a></li><li class="case"><a href="#adlocale.localekey.minrecordtimetips">min​Record​Time​Tips</a></li><li class="case"><a href="#adlocale.localekey.cameraroll">camera​Roll</a></li><li class="case"><a href="#adlocale.localekey.panoramas">panoramas</a></li><li class="case"><a href="#adlocale.localekey.videos">videos</a></li><li class="case"><a href="#adlocale.localekey.favorites">favorites</a></li><li class="case"><a href="#adlocale.localekey.timelapses">timelapses</a></li><li class="case"><a href="#adlocale.localekey.recentlyadded">recently​Added</a></li><li class="case"><a href="#adlocale.localekey.bursts">bursts</a></li><li class="case"><a href="#adlocale.localekey.slomovideos">slomo​Videos</a></li><li class="case"><a href="#adlocale.localekey.selfportraits">self​Portraits</a></li><li class="case"><a href="#adlocale.localekey.screenshots">screenshots</a></li><li class="case"><a href="#adlocale.localekey.deptheffect">depth​Effect</a></li><li class="case"><a href="#adlocale.localekey.livephotos">live​Photos</a></li><li class="case"><a href="#adlocale.localekey.animated">animated</a></li><li class="case"><a href="#adlocale.localekey.myphotostream">my​Photo​Stream</a></li><li class="case"><a href="#adlocale.localekey.notitlealbumlistplaceholder">no​Title​Album​List​Placeholder</a></li><li class="case"><a href="#adlocale.localekey.unabletoaccessallphotos">unable​ToAccess​All​Photos</a></li><li class="case"><a href="#adlocale.localekey.textstickerremovetips">text​Sticker​Remove​Tips</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adlocale.localekey.localetextvalue">locale​Text​Value</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Enumeration</small>
+    <code class="name">ADLocale.​Locale​Key</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">enum</span> <span class="type">LocaleKey</span>: <span class="type">String</span> </code></pre>
+</div>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        <figure>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: %31 Pages: 1 -->
+<svg width="872pt" height="116pt"
+ viewBox="0.00 0.00 872.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
+<title>%31</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-112 868,-112 868,4 -4,4"/>
+<!-- ADLocale.LocaleKey -->
+<g id="node1" class="node enumeration current">
+<title>ADLocale.LocaleKey</title>
+<g id="a_node1"><a xlink:href="https://duzexu.github.io/ADPhotoKit/ADLocale_LocaleKey" xlink:title="ADLocale.LocaleKey">
+<path fill="none" stroke="#000000" stroke-width="3" d="M528,-108C528,-108 336,-108 336,-108 330,-108 324,-102 324,-96 324,-96 324,-84 324,-84 324,-78 330,-72 336,-72 336,-72 528,-72 528,-72 534,-72 540,-78 540,-84 540,-84 540,-96 540,-96 540,-102 534,-108 528,-108"/>
+<text text-anchor="middle" x="432" y="-86.3" font-family="Menlo" font-size="14.00" fill="#000000">ADLocale.LocaleKey</text>
+</a>
+</g>
+</g>
+<!-- String -->
+<g id="node2" class="node unknown">
+<title>String</title>
+<path fill="none" stroke="#000000" d="M528,-36C528,-36 336,-36 336,-36 330,-36 324,-30 324,-24 324,-24 324,-12 324,-12 324,-6 330,0 336,0 336,0 528,0 528,0 534,0 540,-6 540,-12 540,-12 540,-24 540,-24 540,-30 534,-36 528,-36"/>
+<text text-anchor="middle" x="432" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">String</text>
+</g>
+<!-- ADLocale.LocaleKey&#45;&gt;String -->
+<g id="edge1" class="edge conformsTo">
+<title>ADLocale.LocaleKey&#45;&gt;String</title>
+<path fill="none" stroke="#000000" d="M432,-71.8314C432,-64.131 432,-54.9743 432,-46.4166"/>
+<polygon fill="#000000" stroke="#000000" points="435.5001,-46.4132 432,-36.4133 428.5001,-46.4133 435.5001,-46.4132"/>
+</g>
+</g>
+</svg>
+
+
+    <figcaption hidden>Inheritance graph for ADLocale.LocaleKey.</figcaption>
+</figure>
+        <h3>Member Of</h3>
+<dl>
+    <dt class="class"><code><a href="https://duzexu.github.io/ADPhotoKit/ADLocale">ADLocale</a></code></dt>
+<dd></dd>
+</dl>
+<h3>Conforms To</h3>
+<dl>
+    <dt class="unknown"><code>String</code></dt>
+</dl>
+</section>
+    <section id="enumeration cases">
+        <h2>Enumeration Cases</h2>
+
+        <div role="article" class="case" id="adlocale.localekey.previewcamera">
+    <h3>
+        <code>preview​Camera</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">previewCamera</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Camera (拍照)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.previewcamerarecord">
+    <h3>
+        <code>preview​Camera​Record</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">previewCameraRecord</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Record (拍摄)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.previewalbum">
+    <h3>
+        <code>preview​Album</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">previewAlbum</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Album (相册)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.cancel">
+    <h3>
+        <code>cancel</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">cancel</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Cancel (取消)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.nophototips">
+    <h3>
+        <code>no​Photo​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">noPhotoTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>No Photo (无照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.loading">
+    <h3>
+        <code>loading</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">loading</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>loading, waiting please (加载中，请稍后)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.hudloading">
+    <h3>
+        <code>hud​Loading</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">hudLoading</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>waiting... (正在处理...)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.done">
+    <h3>
+        <code>done</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">done</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Done (确定)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.ok">
+    <h3>
+        <code>ok</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">ok</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>OK (确定)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.timeout">
+    <h3>
+        <code>timeout</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">timeout</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Request timed out (请求超时)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.nophotolibratyauthority">
+    <h3>
+        <code>no​Photo​Libraty​Authority</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">noPhotoLibratyAuthority</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Allow %@ to access your album in &quot;Settings&quot;-&gt;&quot;Privacy&quot;-&gt;&quot;Photos&quot;
+(请在iPhone的&quot;设置-隐私-照片&quot;选项中，允许%@访问你的照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.nocameraauthority">
+    <h3>
+        <code>no​Camera​Authority</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">noCameraAuthority</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Please allow %@ to access your device's camera in &quot;Settings&quot;-&gt;&quot;Privacy&quot;-&gt;&quot;Camera&quot;
+(请在iPhone的&quot;设置-隐私-相机&quot;选项中，允许%@访问你的相机)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.nomicrophoneauthority">
+    <h3>
+        <code>no​Microphone​Authority</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">noMicrophoneAuthority</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Please allow %@ to access your device's microphone in &quot;Settings&quot;-&gt;&quot;Privacy&quot;-&gt;&quot;Microphone&quot;
+(请在iPhone的&quot;设置-隐私-麦克风&quot;选项中，允许%@访问你的麦克风)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.cameraunavailable">
+    <h3>
+        <code>camera​Unavailable</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">cameraUnavailable</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Camera is unavailable (相机不可用)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.photo">
+    <h3>
+        <code>photo</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">photo</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Photos (照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.originalphoto">
+    <h3>
+        <code>original​Photo</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">originalPhoto</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Full Image (原图)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.back">
+    <h3>
+        <code>back</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">back</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Back (返回)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.edit">
+    <h3>
+        <code>edit</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">edit</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Edit (编辑)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.editfinish">
+    <h3>
+        <code>edit​Finish</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">editFinish</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Done (完成)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.revert">
+    <h3>
+        <code>revert</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">revert</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Undo (还原)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.preview">
+    <h3>
+        <code>preview</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">preview</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Preview (预览)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.notallowmixselect">
+    <h3>
+        <code>not​Allow​Mix​Select</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">notAllowMixSelect</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Unable to select video (不能同时选择照片和视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.save">
+    <h3>
+        <code>save</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">save</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Save (保存)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.saveimageerror">
+    <h3>
+        <code>save​Image​Error</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">saveImageError</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Failed to save the image (图片保存失败)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.savevideoerror">
+    <h3>
+        <code>save​Video​Error</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">saveVideoError</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Failed to save the video (视频保存失败)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.exceededmaxselectcount">
+    <h3>
+        <code>exceeded​Max​Select​Count</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">exceededMaxSelectCount</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Max select count: %ld (最多只能选择%ld张图片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.exceededmaxvideoselectcount">
+    <h3>
+        <code>exceeded​Max​Video​Select​Count</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">exceededMaxVideoSelectCount</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Max count for video selection: %ld (最多只能选择%ld个视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.lessthanminvideoselectcount">
+    <h3>
+        <code>less​Than​Min​Video​Select​Count</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">lessThanMinVideoSelectCount</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Min count for video selection: %ld (最少选择%ld个视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.longerthanmaxvideoduration">
+    <h3>
+        <code>longer​Than​Max​Video​Duration</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">longerThanMaxVideoDuration</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Unable to select video with a duration longer than %lds
+(不能选择超过%ld秒的视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.shorterthanmaxvideoduration">
+    <h3>
+        <code>shorter​Than​Max​Video​Duration</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">shorterThanMaxVideoDuration</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Unable to select video with a duration shorter than %lds
+(不能选择低于%ld秒的视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.icloudvideoloadfaild">
+    <h3>
+        <code>iCloud​Video​Load​Faild</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">iCloudVideoLoadFaild</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Unable to sync from iCloud (iCloud无法同步)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.imageloadfailed">
+    <h3>
+        <code>image​Load​Failed</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">imageLoadFailed</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>loading failed (图片加载失败)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.customcameratips">
+    <h3>
+        <code>custom​Camera​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">customCameraTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Tap to take photo and hold to record video (轻触拍照，按住摄像)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.customcameratakephototips">
+    <h3>
+        <code>custom​Camera​Take​Photo​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">customCameraTakePhotoTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Tap to take photo (轻触拍照)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.customcamerarecordvideotips">
+    <h3>
+        <code>custom​Camera​Record​Video​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">customCameraRecordVideoTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>hold to record video (按住摄像)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.minrecordtimetips">
+    <h3>
+        <code>min​Record​Time​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">minRecordTimeTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Record at least %lds (至少录制%ld秒)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.cameraroll">
+    <h3>
+        <code>camera​Roll</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">cameraRoll</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Recents (所有照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.panoramas">
+    <h3>
+        <code>panoramas</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">panoramas</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Panoramas (全景照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.videos">
+    <h3>
+        <code>videos</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">videos</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Videos (视频)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.favorites">
+    <h3>
+        <code>favorites</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">favorites</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Favorites (个人收藏)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.timelapses">
+    <h3>
+        <code>timelapses</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">timelapses</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Time-Lapse (延时摄影)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.recentlyadded">
+    <h3>
+        <code>recently​Added</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">recentlyAdded</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Recently Added (最近添加)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.bursts">
+    <h3>
+        <code>bursts</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">bursts</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bursts (连拍快照)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.slomovideos">
+    <h3>
+        <code>slomo​Videos</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">slomoVideos</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Slo-mo (慢动作)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.selfportraits">
+    <h3>
+        <code>self​Portraits</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">selfPortraits</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Selfies (自拍)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.screenshots">
+    <h3>
+        <code>screenshots</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">screenshots</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Screenshots (屏幕快照)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.deptheffect">
+    <h3>
+        <code>depth​Effect</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">depthEffect</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Portrait (人像)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.livephotos">
+    <h3>
+        <code>live​Photos</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">livePhotos</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Live Photo</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.animated">
+    <h3>
+        <code>animated</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">animated</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Animated (动图)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.myphotostream">
+    <h3>
+        <code>my​Photo​Stream</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">myPhotoStream</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>My Photo Stream (我的照片流)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.notitlealbumlistplaceholder">
+    <h3>
+        <code>no​Title​Album​List​Placeholder</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">noTitleAlbumListPlaceholder</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>All Photos (所有照片)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.unabletoaccessallphotos">
+    <h3>
+        <code>unable​ToAccess​All​Photos</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">unableToAccessAllPhotos</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Unable to access all photos, go to settings (无法访问所有照片，前往设置)</p>
+
+</div>
+</div>
+<div role="article" class="case" id="adlocale.localekey.textstickerremovetips">
+    <h3>
+        <code>text​Sticker​Remove​Tips</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">case</span> <span class="variable">textStickerRemoveTips</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Drag here to remove (拖到此处删除)</p>
+
+</div>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="adlocale.localekey.localetextvalue">
+    <h3>
+        <code>locale​Text​Value</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">localeTextValue</span>: <span class="type">String</span> </code></pre>
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-05-26T09:04:41+0000">May 26, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+</p>
+    </footer>
+</body>
+</html>

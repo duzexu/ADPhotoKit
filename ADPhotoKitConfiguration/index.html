@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADPhotoKit - ADPhotoKitConfiguration</title>
+    <link rel="stylesheet" type="text/css" href="https://duzexu.github.io/ADPhotoKit/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="https://duzexu.github.io/ADPhotoKit/">
+            <strong>
+                ADPhotoKit
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Nested Types</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adphotokitconfiguration.`default`">`default`</a></li><li class="variable"><a href="#adphotokitconfiguration.locale">locale</a></li><li class="variable"><a href="#adphotokitconfiguration.customlocalevalue">custom​Locale​Value</a></li><li class="variable"><a href="#adphotokitconfiguration.customalbumorders">custom​Album​Orders</a></li><li class="variable"><a href="#adphotokitconfiguration.customuibundle">custom​UIBundle</a></li><li class="variable"><a href="#adphotokitconfiguration.statusbarstyle">status​Bar​Style</a></li><li class="variable"><a href="#adphotokitconfiguration.customprogresshudblock">custom​Progress​HUDBlock</a></li><li class="variable"><a href="#adphotokitconfiguration.customprogressblock">custom​Progress​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.fetchtimeout">fetch​Timeout</a></li><li class="variable"><a href="#adphotokitconfiguration.customalbumlistcontrollerblock">custom​Album​List​Controller​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.customalbumlistnavbarblock">custom​Album​List​Nav​Bar​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.customalbumlistcellregistor">custom​Album​List​Cell​Registor</a></li><li class="variable"><a href="#adphotokitconfiguration.customalbumlistcellblock">custom​Album​List​Cell​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.autoscrollmaxspeed">auto​Scroll​Max​Speed</a></li><li class="variable"><a href="#adphotokitconfiguration.thumbnaillayout">thumbnail​Layout</a></li><li class="variable"><a href="#adphotokitconfiguration.customthumbnailcontrollerblock">custom​Thumbnail​Controller​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.customthumbnailnavbarblock">custom​Thumbnail​Nav​Bar​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.customthumbnailtoolbarblock">custom​Thumbnail​Tool​Bar​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.customthumbnailcellregistor">custom​Thumbnail​Cell​Registor</a></li><li class="variable"><a href="#adphotokitconfiguration.customthumbnailcellblock">custom​Thumbnail​Cell​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.browseitemspacing">browse​Item​Spacing</a></li><li class="variable"><a href="#adphotokitconfiguration.custombrowsercontrollerblock">custom​Browser​Controller​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.custombrowsernavbarblock">custom​Browser​Nav​Bar​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.custombrowsertoolbarblock">custom​Browser​Tool​Bar​Block</a></li><li class="variable"><a href="#adphotokitconfiguration.custombrowsercellregistor">custom​Browser​Cell​Registor</a></li><li class="variable"><a href="#adphotokitconfiguration.custombrowsercellblock">custom​Browser​Cell​Block</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Class</small>
+    <code class="name">ADPhoto​Kit​Configuration</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ADPhotoKitConfiguration</span> </code></pre>
+</div>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        
+        <h3>Nested Types</h3>
+<dl>
+    <dt class="structure"><code><a href="https://duzexu.github.io/ADPhotoKit/ADPhotoKitConfiguration_ThumbnailControllerLayout">ADPhotoKitConfiguration.ThumbnailControllerLayout</a></code></dt>
+<dd></dd>
+</dl>
+</section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="adphotokitconfiguration.`default`">
+    <h3>
+        <code>`default`</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">`default`</span> </code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.locale">
+    <h3>
+        <code>locale</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">locale</span>: <span class="type">Locale</span>? </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Set framework language, if set nil, framework will use system language. Default is nil.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customlocalevalue">
+    <h3>
+        <code>custom​Locale​Value</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customLocaleValue</span>: [<span class="type">Locale</span>:[<span class="type">ADLocale</span>.<span class="type">LocaleKey</span>: <span class="type">String</span>]]?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>You can custom display text for diffent language on yourself.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customalbumorders">
+    <h3>
+        <code>custom​Album​Orders</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumOrders</span>: [<span class="type">ADAlbumType</span>]?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Custom album orders, if type not contain, it will not display. Default is ordered by <code>ADAlbumType.allCases</code> 's order.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customuibundle">
+    <h3>
+        <code>custom​UIBundle</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customUIBundle</span>: <span class="type">Bundle</span>?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>You can custom image Bundle by this property or simple replace image in <code>ADPhotoKitUI.bundle</code></p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.statusbarstyle">
+    <h3>
+        <code>status​Bar​Style</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">statusBarStyle</span>: <span class="type">UIStatusBarStyle</span>?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Set status bar style, Default is .lightContent.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customprogresshudblock">
+    <h3>
+        <code>custom​Progress​HUDBlock</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customProgressHUDBlock</span>: (() -&gt; <span class="type">ADProgressHUDable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>hud</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customprogressblock">
+    <h3>
+        <code>custom​Progress​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customProgressBlock</span>: (() -&gt; <span class="type">ADProgressableable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>progress</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.fetchtimeout">
+    <h3>
+        <code>fetch​Timeout</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">fetchTimeout</span>: <span class="type">TimeInterval</span> = <span class="number literal">20</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>fetch image timeout</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customalbumlistcontrollerblock">
+    <h3>
+        <code>custom​Album​List​Controller​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListControllerBlock</span>: ((<span class="type">ADAlbumListController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>album</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customalbumlistnavbarblock">
+    <h3>
+        <code>custom​Album​List​Nav​Bar​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListNavBarBlock</span>: (() -&gt; <span class="type">ADAlbumListNavBarable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customalbumlistcellregistor">
+    <h3>
+        <code>custom​Album​List​Cell​Registor</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListCellRegistor</span>: ((<span class="type">UITableView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customalbumlistcellblock">
+    <h3>
+        <code>custom​Album​List​Cell​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListCellBlock</span>: ((<span class="type">UITableView</span>, <span class="type">IndexPath</span>) -&gt; <span class="type">ADAlbumListCellable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.autoscrollmaxspeed">
+    <h3>
+        <code>auto​Scroll​Max​Speed</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">autoScrollMaxSpeed</span>: <span class="type">CGFloat</span> = <span class="number literal">600</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The max speed (pt/s) of auto scroll. Defaults to 600.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.thumbnaillayout">
+    <h3>
+        <code>thumbnail​Layout</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">thumbnailLayout</span> </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>thumbnail layout</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customthumbnailcontrollerblock">
+    <h3>
+        <code>custom​Thumbnail​Controller​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailControllerBlock</span>: ((<span class="type">ADThumbnailViewController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customthumbnailnavbarblock">
+    <h3>
+        <code>custom​Thumbnail​Nav​Bar​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailNavBarBlock</span>: ((<span class="type">ADPickerStyle</span>) -&gt; <span class="type">ADThumbnailNavBarable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customthumbnailtoolbarblock">
+    <h3>
+        <code>custom​Thumbnail​Tool​Bar​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailToolBarBlock</span>: ((<span class="type">ADPhotoKitConfig</span>) -&gt; <span class="type">ADThumbnailToolBarable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customthumbnailcellregistor">
+    <h3>
+        <code>custom​Thumbnail​Cell​Registor</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailCellRegistor</span>: ((<span class="type">UICollectionView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.customthumbnailcellblock">
+    <h3>
+        <code>custom​Thumbnail​Cell​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailCellBlock</span>: ((<span class="type">UICollectionView</span>, <span class="type">IndexPath</span>) -&gt; <span class="type">ADThumbnailCellable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.browseitemspacing">
+    <h3>
+        <code>browse​Item​Spacing</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">browseItemSpacing</span>: <span class="type">CGFloat</span> = <span class="number literal">40</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>browser layout</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.custombrowsercontrollerblock">
+    <h3>
+        <code>custom​Browser​Controller​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserControllerBlock</span>: ((<span class="type">ADAssetBrowserController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.custombrowsernavbarblock">
+    <h3>
+        <code>custom​Browser​Nav​Bar​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserNavBarBlock</span>: ((<span class="type">ADAssetBrowserDataSource</span>) -&gt; <span class="type">ADBrowserNavBarable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.custombrowsertoolbarblock">
+    <h3>
+        <code>custom​Browser​Tool​Bar​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserToolBarBlock</span>: ((<span class="type">ADAssetBrowserDataSource</span>) -&gt; <span class="type">ADBrowserToolBarable</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.custombrowsercellregistor">
+    <h3>
+        <code>custom​Browser​Cell​Registor</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserCellRegistor</span>: ((<span class="type">UICollectionView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="adphotokitconfiguration.custombrowsercellblock">
+    <h3>
+        <code>custom​Browser​Cell​Block</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserCellBlock</span>: ((<span class="type">UICollectionView</span>, <span class="type">IndexPath</span>, <span class="type">ADAsset</span>) -&gt; <span class="type">ADBrowserCellable</span>)?</code></pre>
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-05-26T09:04:42+0000">May 26, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+</p>
+    </footer>
+</body>
+</html>
