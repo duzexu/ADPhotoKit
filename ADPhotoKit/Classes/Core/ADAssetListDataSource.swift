@@ -8,16 +8,28 @@
 import Foundation
 import Photos
 
+/// The data source of asset controller. It get assets you request and reload the associate reloadable view when assets changed.
 public class ADAssetListDataSource: NSObject {
     
+    /// The associate reloadable view conform to `ADDataSourceReloadable`.
     public weak var reloadable: ADDataSourceReloadable?
+    
+    /// Options to set the album type and order.
     public let albumOpts: ADAlbumSelectOptions
+    
+    /// Options to control the asset select condition and ui.
     public let assetOpts: ADAssetSelectOptions
+    
+    /// The album select to get assets.
     public let album: ADAlbumModel
     
+    /// Assets array request from album.
     public var list: [ADAssetModel] = []
+    
+    /// Assets you select.
     public var selects: [ADSelectAssetModel] = []
     
+    /// The cell count except assets.
     public var appendCellCount: Int {
         var count: Int = 0
         if enableCameraCell {
@@ -31,11 +43,12 @@ public class ADAssetListDataSource: NSObject {
         return count
     }
     
-    /// 显示拍照按钮
+    /// Indicate whether show camera cell in CameraRoll. if `true`, camera roll page will show camera cell.
     public var enableCameraCell: Bool {
         return album.isCameraRoll && (assetOpts.contains(.allowTakePhotoAsset) || assetOpts.contains(.allowTakeVideoAsset))
     }
     
+    /// The index for camera cell.
     public var cameraCellIndex: Int {
         if albumOpts.contains(.ascending) {
             if appendCellCount >= 2 {
@@ -48,12 +61,13 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
-    /// 显示添加按钮
+    /// Indicate whether show add asset in CameraRoll when user choose limited Photo mode. if `true`, camera roll page will show add asset cell.
     @available(iOS 14, *)
     public var enableAddAssetCell: Bool {
         return album.isCameraRoll && PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited && assetOpts.contains(.allowAddAsset)
     }
     
+    /// The index for add seest cell.
     public var addAssetCellIndex: Int {
         if albumOpts.contains(.ascending) {
             return list.count + appendCellCount - 1
@@ -62,8 +76,16 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    /// Called when select asset or deselect asset.
     public var selectAssetChanged: ((Int)->Void)?
     
+    /// Create data source with associate reloadable view, album model, select assets and options.
+    /// - Parameters:
+    ///   - reloadable: Associate reloadable view.
+    ///   - album: Album to get assets.
+    ///   - select: Selected assets.
+    ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
     public init(reloadable: ADDataSourceReloadable,
                 album: ADAlbumModel,
                 select: [PHAsset],
@@ -84,6 +106,8 @@ public class ADAssetListDataSource: NSObject {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
+    /// Reload the associate view with fetch assets.
+    /// - Parameter completion: Called when the reload finished.
     public func reloadData(completion: (() -> Void)? = nil) {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }
@@ -106,10 +130,15 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
-    func modifyIndexPath(_ indexPath: IndexPath) -> IndexPath {
+    /// Return modify indexPath when camera cell or add asset cell is enable.
+    /// - Parameter indexPath: Orginal indexPath.
+    /// - Returns: Modify indexPath.
+    public func modifyIndexPath(_ indexPath: IndexPath) -> IndexPath {
         return albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-appendCellCount, section: indexPath.section)
     }
     
+    /// Select the asset.
+    /// - Parameter index: Index whitch asset is select.
     public func selectAssetAt(index: Int) {
         if index < list.count {
             let item = list[index]
@@ -130,6 +159,8 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    /// Deselect the asset.
+    /// - Parameter index: Index whitch asset is deselect.
     public func deselectAssetAt(index: Int) {
         if index < list.count {
             let item = list[index]
@@ -152,6 +183,10 @@ public class ADAssetListDataSource: NSObject {
         }
     }
     
+    /// Reload asset `selectStatus` with select indexs. Use this method when return from browser controller.
+    /// - Parameters:
+    ///   - indexs: Select asset indexs.
+    ///   - current: Current browser index.
     public func reloadSelectAssetIndexs(_ indexs: [Int], current: Int) {
         selects.removeAll()
         for (idx,item) in list.enumerated() {

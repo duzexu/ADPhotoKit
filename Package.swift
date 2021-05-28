@@ -29,6 +29,10 @@ let package = Package(
             path: "ADPhotoKit/Classes",
             resources: [
                 .process("ADPhotoKit/Assets")
+            ],
+            swiftSettings: [
+                .define("Module_UI", .when(configuration: .release)),
+                .define("Module_UI", .when(configuration: .debug))
             ]
         )
     ]

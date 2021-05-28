@@ -8,12 +8,22 @@
 import Foundation
 import Photos
 
+/// The data source of album controller. It get albums you request and reload the associate reloadable view when album changed.
 public class ADAlbumListDataSource: NSObject {
-    
+        
+    /// The associate reloadable view conform to `ADDataSourceReloadable`.
     public weak var reloadable: ADDataSourceReloadable?
+    
+    /// Options to set the album type and order.
     public let options: ADAlbumSelectOptions
+    
+    /// Albums array request from `PHAssetCollection`.
     public var list: [ADAlbumModel] = []
     
+    /// Create data source with associate reloadable view and options.
+    /// - Parameters:
+    ///   - reloadable: Associate reloadable view.
+    ///   - options: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
     public init(reloadable: ADDataSourceReloadable, options: ADAlbumSelectOptions = .default) {
         self.reloadable = reloadable
         self.options = options
@@ -27,6 +37,8 @@ public class ADAlbumListDataSource: NSObject {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
+    /// Reload the associate view with fetch albums.
+    /// - Parameter completion: Called when the reload finished.
     public func reloadData(completion: (() -> Void)? = nil) {
         DispatchQueue.global().async { [weak self] in
             guard let strong = self else { return }

@@ -8,6 +8,7 @@
 import UIKit
 import Photos
 
+/// Options to set the album type and order.
 public struct ADAlbumSelectOptions: OptionSet {
     public let rawValue: Int
     

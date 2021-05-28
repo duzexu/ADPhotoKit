@@ -15,6 +15,7 @@ public enum ADPickerStyle {
     case embed
 }
 
+/// Options to control the asset select condition and ui.
 public struct ADAssetSelectOptions: OptionSet {
     public let rawValue: Int
     

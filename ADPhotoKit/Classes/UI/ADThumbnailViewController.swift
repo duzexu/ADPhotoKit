@@ -298,7 +298,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         
         var cell = ADPhotoUIConfigurable.thumbnailCell(collectionView: collectionView, indexPath: indexPath)
         
-        let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+        let modify = dataSource.modifyIndexPath(indexPath)
         let model = dataSource.list[modify.row]
         cell.indexPath = indexPath
         cell.configure(with: model)
@@ -330,7 +330,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         guard var c = cell as? ADThumbnailCellable else {
             return
         }
-        let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
+        let index = dataSource.modifyIndexPath(indexPath).row
         let item = dataSource.list[index]
         if !c.selectStatus.isSelect {
             c.selectStatus = .select(index: nil)
@@ -400,7 +400,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             if !config.assetOpts.contains(.allowBrowser) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
-                let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+                let modify = dataSource.modifyIndexPath(indexPath)
                 let browser = ADAssetModelBrowserController(config: config, dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
@@ -438,7 +438,7 @@ private extension ADThumbnailViewController {
     }
     
     func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailCellable) {
-        let index = config.albumOpts.contains(.ascending) ? indexPath.row : indexPath.row-dataSource.appendCellCount
+        let index = dataSource.modifyIndexPath(indexPath).row
         let model = dataSource.list[index]
         //已经有第一个
         if let info = selectionInfo, let range = selectionRange {
@@ -649,7 +649,7 @@ extension ADThumbnailViewController: ADAssetBrowserTransitionContextTo {
                     continue
                 }
             }
-            let modify = config.albumOpts.contains(.ascending) ? indexPath : IndexPath(row: indexPath.row-dataSource.appendCellCount, section: indexPath.section)
+            let modify = dataSource.modifyIndexPath(indexPath)
             if dataSource.list[modify.row].asset.localIdentifier == identifier {
                 if let cell = collectionView.cellForItem(at: indexPath) {
                     return collectionView.convert(cell.frame, to: convertTo)

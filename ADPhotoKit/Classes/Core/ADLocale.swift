@@ -7,12 +7,14 @@
 
 import UIKit
 
+/// Class for language localizable.
 public class ADLocale {
     
     class var current: Locale {
         return ADPhotoKitConfiguration.default.locale ?? Locale.current
     }
     
+    /// Key for localizable.
     public enum LocaleKey: String {
         /// Camera (拍照)
         case previewCamera
@@ -126,6 +128,7 @@ public class ADLocale {
         /// Drag here to remove (拖到此处删除)
         case textStickerRemoveTips
         
+        /// Return key's localizable text.
         public var localeTextValue: String {
             if let value = ADPhotoKitConfiguration.default.customLocaleValue?[ADLocale.current]?[self] {
                 return value
