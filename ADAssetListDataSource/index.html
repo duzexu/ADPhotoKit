@@ -26,7 +26,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#adassetlistdatasource.init(reloadable:album:select:albumopts:assetopts:)">init(reloadable:​album:​select:​album​Opts:​asset​Opts:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adassetlistdatasource.reloadable">reloadable</a></li><li class="variable"><a href="#adassetlistdatasource.albumopts">album​Opts</a></li><li class="variable"><a href="#adassetlistdatasource.assetopts">asset​Opts</a></li><li class="variable"><a href="#adassetlistdatasource.album">album</a></li><li class="variable"><a href="#adassetlistdatasource.list">list</a></li><li class="variable"><a href="#adassetlistdatasource.selects">selects</a></li><li class="variable"><a href="#adassetlistdatasource.appendcellcount">append​Cell​Count</a></li><li class="variable"><a href="#adassetlistdatasource.enablecameracell">enable​Camera​Cell</a></li><li class="variable"><a href="#adassetlistdatasource.cameracellindex">camera​Cell​Index</a></li><li class="variable"><a href="#adassetlistdatasource.enableaddassetcell">enable​Add​Asset​Cell</a></li><li class="variable"><a href="#adassetlistdatasource.addassetcellindex">add​Asset​Cell​Index</a></li><li class="variable"><a href="#adassetlistdatasource.selectassetchanged">select​Asset​Changed</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#adassetlistdatasource.reloaddata(completion:)">reload​Data(completion:​)</a></li><li class="function"><a href="#adassetlistdatasource.selectassetat(index:)">select​Asset​At(index:​)</a></li><li class="function"><a href="#adassetlistdatasource.deselectassetat(index:)">deselect​Asset​At(index:​)</a></li><li class="function"><a href="#adassetlistdatasource.reloadselectassetindexs(_:current:)">reload​Select​Asset​Indexs(_:​current:​)</a></li><li class="function"><a href="#adassetlistdatasource.photolibrarydidchange(_:)">photo​Library​Did​Change(_:​)</a></li></ul></li></ol>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#adassetlistdatasource.init(reloadable:album:select:albumopts:assetopts:)">init(reloadable:​album:​select:​album​Opts:​asset​Opts:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adassetlistdatasource.reloadable">reloadable</a></li><li class="variable"><a href="#adassetlistdatasource.albumopts">album​Opts</a></li><li class="variable"><a href="#adassetlistdatasource.assetopts">asset​Opts</a></li><li class="variable"><a href="#adassetlistdatasource.album">album</a></li><li class="variable"><a href="#adassetlistdatasource.list">list</a></li><li class="variable"><a href="#adassetlistdatasource.selects">selects</a></li><li class="variable"><a href="#adassetlistdatasource.appendcellcount">append​Cell​Count</a></li><li class="variable"><a href="#adassetlistdatasource.enablecameracell">enable​Camera​Cell</a></li><li class="variable"><a href="#adassetlistdatasource.cameracellindex">camera​Cell​Index</a></li><li class="variable"><a href="#adassetlistdatasource.enableaddassetcell">enable​Add​Asset​Cell</a></li><li class="variable"><a href="#adassetlistdatasource.addassetcellindex">add​Asset​Cell​Index</a></li><li class="variable"><a href="#adassetlistdatasource.selectassetchanged">select​Asset​Changed</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#adassetlistdatasource.reloaddata(completion:)">reload​Data(completion:​)</a></li><li class="function"><a href="#adassetlistdatasource.modifyindexpath(_:)">modify​Index​Path(_:​)</a></li><li class="function"><a href="#adassetlistdatasource.selectassetat(index:)">select​Asset​At(index:​)</a></li><li class="function"><a href="#adassetlistdatasource.deselectassetat(index:)">deselect​Asset​At(index:​)</a></li><li class="function"><a href="#adassetlistdatasource.reloadselectassetindexs(_:current:)">reload​Select​Asset​Indexs(_:​current:​)</a></li><li class="function"><a href="#adassetlistdatasource.photolibrarydidchange(_:)">photo​Library​Did​Change(_:​)</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -40,6 +40,10 @@
 <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ADAssetListDataSource</span>: <span class="type">NSObject</span> </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>The data source of asset controller. It get assets you request and reload the associate reloadable view when assets changed.</p>
+
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         <figure>
@@ -48,11 +52,11 @@
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.40.1 (20161225.0304)
  -->
-<!-- Title: %89 Pages: 1 -->
+<!-- Title: %189 Pages: 1 -->
 <svg width="873pt" height="116pt"
  viewBox="0.00 0.00 872.90 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
-<title>%89</title>
+<title>%189</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-112 868.8981,-112 868.8981,4 -4,4"/>
 <!-- ADAssetListDataSource -->
 <g id="node1" class="node class current">
@@ -70,7 +74,7 @@
 <text text-anchor="middle" x="221.5738" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">PHPhotoLibraryChangeObserver</text>
 </g>
 <!-- ADAssetListDataSource&#45;&gt;PHPhotoLibraryChangeObserver -->
-<g id="edge2" class="edge conformsTo">
+<g id="edge1" class="edge conformsTo">
 <title>ADAssetListDataSource&#45;&gt;PHPhotoLibraryChangeObserver</title>
 <path fill="none" stroke="#000000" d="M390.0872,-71.9243C359.0609,-61.9959 320.4035,-49.6255 287.9432,-39.2382"/>
 <polygon fill="#000000" stroke="#000000" points="288.6746,-35.7975 278.0836,-36.0831 286.5411,-42.4645 288.6746,-35.7975"/>
@@ -82,7 +86,7 @@
 <text text-anchor="middle" x="670.5738" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">NSObject</text>
 </g>
 <!-- ADAssetListDataSource&#45;&gt;NSObject -->
-<g id="edge1" class="edge conformsTo">
+<g id="edge2" class="edge conformsTo">
 <title>ADAssetListDataSource&#45;&gt;NSObject</title>
 <path fill="none" stroke="#000000" d="M502.8093,-71.9243C533.6977,-61.9959 572.1834,-49.6255 604.4994,-39.2382"/>
 <polygon fill="#000000" stroke="#000000" points="605.8659,-42.4754 614.3151,-36.0831 603.7238,-35.8112 605.8659,-42.4754"/>
@@ -113,6 +117,53 @@
                 <span class="variable">albumOpts</span>: <span class="type">ADAlbumSelectOptions</span>,
                 <span class="variable">assetOpts</span>: <span class="type">ADAssetSelectOptions</span>) </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Create data source with associate reloadable view, album model, select assets and options.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>reloadable</th>
+    <td><code class="type">ADData​Source​Reloadable</code></td>
+    <td><p>Associate reloadable view.</p>
+</td>
+</tr>
+<tr>
+    <th>album</th>
+    <td><code class="type">ADAlbum​Model</code></td>
+    <td><p>Album to get assets.</p>
+</td>
+</tr>
+<tr>
+    <th>select</th>
+    <td><code class="type">[PHAsset]</code></td>
+    <td><p>Selected assets.</p>
+</td>
+</tr>
+<tr>
+    <th>album​Opts</th>
+    <td><code class="type">ADAlbum​Select​Options</code></td>
+    <td><p>Options to limit album type and order. It is <code>ADAlbumSelectOptions.default</code> by default.</p>
+</td>
+</tr>
+<tr>
+    <th>asset​Opts</th>
+    <td><code class="type">ADAsset​Select​Options</code></td>
+    <td><p>Options to control the asset select condition and ui. It is <code>ADAssetSelectOptions.default</code> by default.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
     </section>
     <section id="properties">
@@ -125,6 +176,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">weak</span> <span class="keyword">var</span> <span class="variable">reloadable</span>: <span class="type">ADDataSourceReloadable</span>?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>The associate reloadable view conform to <code>ADDataSourceReloadable</code>.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.albumopts">
     <h3>
@@ -132,6 +187,10 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">albumOpts</span>: <span class="type">ADAlbumSelectOptions</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Options to set the album type and order.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.assetopts">
@@ -141,6 +200,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">assetOpts</span>: <span class="type">ADAssetSelectOptions</span></code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Options to control the asset select condition and ui.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.album">
     <h3>
@@ -148,6 +211,10 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">album</span>: <span class="type">ADAlbumModel</span></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The album select to get assets.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.list">
@@ -157,6 +224,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">list</span>: [<span class="type">ADAssetModel</span>] = []</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Assets array request from album.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.selects">
     <h3>
@@ -165,6 +236,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">selects</span>: [<span class="type">ADSelectAssetModel</span>] = []</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Assets you select.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.appendcellcount">
     <h3>
@@ -172,6 +247,10 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">appendCellCount</span>: <span class="type">Int</span> </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The cell count except assets.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.enablecameracell">
@@ -182,7 +261,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">enableCameraCell</span>: <span class="type">Bool</span> </code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>显示拍照按钮</p>
+    <p>Indicate whether show camera cell in CameraRoll. if <code>true</code>, camera roll page will show camera cell.</p>
 
 </div>
 </div>
@@ -192,6 +271,10 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">cameraCellIndex</span>: <span class="type">Int</span> </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The index for camera cell.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.enableaddassetcell">
@@ -203,7 +286,7 @@
     <span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">enableAddAssetCell</span>: <span class="type">Bool</span> </code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>显示添加按钮</p>
+    <p>Indicate whether show add asset in CameraRoll when user choose limited Photo mode. if <code>true</code>, camera roll page will show add asset cell.</p>
 
 </div>
 </div>
@@ -214,6 +297,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">addAssetCellIndex</span>: <span class="type">Int</span> </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>The index for add seest cell.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adassetlistdatasource.selectassetchanged">
     <h3>
@@ -221,6 +308,10 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">selectAssetChanged</span>: ((<span class="type">Int</span>)-&gt;<span class="type">Void</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Called when select asset or deselect asset.</p>
+
 </div>
 </div>
     </section>
@@ -234,6 +325,63 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">reloadData</span>(<span class="variable">completion</span>: (() -&gt; <span class="type">Void</span>)? = <span class="keyword">nil</span>) </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Reload the associate view with fetch assets.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>completion</th>
+    <td><code class="type">(() -&gt; Void)?</code></td>
+    <td><p>Called when the reload finished.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+</div>
+<div role="article" class="function" id="adassetlistdatasource.modifyindexpath(_:)">
+    <h3>
+        <code>modify​Index​Path(_:​)</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">modifyIndexPath</span>(<span class="keyword">_</span> <span class="variable">indexPath</span>: <span class="type">IndexPath</span>) -&gt; <span class="type">IndexPath</span> </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Return modify indexPath when camera cell or add asset cell is enable.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>index​Path</th>
+    <td><code class="type">Index​Path</code></td>
+    <td><p>Orginal indexPath.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+  <h4>Returns</h4>
+  <p>Modify indexPath.</p>
+
 </div>
 <div role="article" class="function" id="adassetlistdatasource.selectassetat(index:)">
     <h3>
@@ -242,6 +390,29 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">selectAssetAt</span>(<span class="variable">index</span>: <span class="type">Int</span>) </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Select the asset.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>index</th>
+    <td><code class="type">Int</code></td>
+    <td><p>Index whitch asset is select.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="function" id="adassetlistdatasource.deselectassetat(index:)">
     <h3>
@@ -250,6 +421,29 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">deselectAssetAt</span>(<span class="variable">index</span>: <span class="type">Int</span>) </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Deselect the asset.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>index</th>
+    <td><code class="type">Int</code></td>
+    <td><p>Index whitch asset is deselect.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="function" id="adassetlistdatasource.reloadselectassetindexs(_:current:)">
     <h3>
@@ -258,6 +452,35 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">reloadSelectAssetIndexs</span>(<span class="keyword">_</span> <span class="variable">indexs</span>: [<span class="type">Int</span>], <span class="variable">current</span>: <span class="type">Int</span>) </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Reload asset <code>selectStatus</code> with select indexs. Use this method when return from browser controller.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>indexs</th>
+    <td><code class="type">[Int]</code></td>
+    <td><p>Select asset indexs.</p>
+</td>
+</tr>
+<tr>
+    <th>current</th>
+    <td><code class="type">Int</code></td>
+    <td><p>Current browser index.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="function" id="adassetlistdatasource.photolibrarydidchange(_:)">
     <h3>
@@ -276,7 +499,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2021-05-26T09:04:42+0000">May 26, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+    Generated on <time datetime="2021-05-28T10:54:00+0000">May 28, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
 </p>
     </footer>
 </body>
