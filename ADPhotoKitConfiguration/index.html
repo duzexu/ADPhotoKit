@@ -40,13 +40,18 @@
 <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ADPhotoKitConfiguration</span> </code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Class to modify ADPhotoKit's configuration.</p>
+
+</div>
 <section id="relationships">
     <h2 hidden>Relationships</h2>
         
         <h3>Nested Types</h3>
 <dl>
     <dt class="structure"><code><a href="https://duzexu.github.io/ADPhotoKit/ADPhotoKitConfiguration_ThumbnailControllerLayout">ADPhotoKitConfiguration.ThumbnailControllerLayout</a></code></dt>
-<dd></dd>
+<dd><p>Layout to control thumbnail controller collection appearance.</p>
+</dd>
 </dl>
 </section>
     <section id="properties">
@@ -58,6 +63,11 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">`default`</span> </code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Represents a shared configuration used across ADPhotoKit.
+Use this instance for modify configuration.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.locale">
@@ -80,7 +90,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customLocaleValue</span>: [<span class="type">Locale</span>:[<span class="type">ADLocale</span>.<span class="type">LocaleKey</span>: <span class="type">String</span>]]?</code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>You can custom display text for diffent language on yourself.</p>
+    <p>You can custom display text for diffent language on yourself. Default is nil.</p>
 
 </div>
 </div>
@@ -104,7 +114,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customUIBundle</span>: <span class="type">Bundle</span>?</code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>You can custom image Bundle by this property or simple replace image in <code>ADPhotoKitUI.bundle</code></p>
+    <p>You can custom image Bundle by this property or simple replace image in <code>ADPhotoKitUI.bundle</code>. Default is <code>ADPhotoKitUI.bundle</code>.</p>
 
 </div>
 </div>
@@ -128,7 +138,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customProgressHUDBlock</span>: (() -&gt; <span class="type">ADProgressHUDable</span>)?</code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>hud</p>
+    <p>Bolck to generate <code>ProgressHUD</code>. Default to use hud in framework.</p>
 
 </div>
 </div>
@@ -140,7 +150,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customProgressBlock</span>: (() -&gt; <span class="type">ADProgressableable</span>)?</code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>progress</p>
+    <p>Bolck to generate <code>ProgressView</code>. Default to use view in framework.</p>
 
 </div>
 </div>
@@ -152,7 +162,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">fetchTimeout</span>: <span class="type">TimeInterval</span> = <span class="number literal">20</span></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>fetch image timeout</p>
+    <p>Timeout for request images from select assets. Defaults is 20.</p>
 
 </div>
 </div>
@@ -164,7 +174,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListControllerBlock</span>: ((<span class="type">ADAlbumListController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>album</p>
+    <p>Block to config <code>ADAlbumListController</code>.</p>
 
 </div>
 </div>
@@ -175,6 +185,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListNavBarBlock</span>: (() -&gt; <span class="type">ADAlbumListNavBarable</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to generate <code>AlbumListNavBar</code>. Default to use <code>ADAlbumListNavBarView</code>.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customalbumlistcellregistor">
     <h3>
@@ -183,6 +197,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListCellRegistor</span>: ((<span class="type">UITableView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to regist cells used in albumlist controller.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customalbumlistcellblock">
     <h3>
@@ -190,6 +208,16 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customAlbumListCellBlock</span>: ((<span class="type">UITableView</span>, <span class="type">IndexPath</span>) -&gt; <span class="type">ADAlbumListCellable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to return custom album list cell.</p>
+
+</div>
+<div class="discussion">
+    <aside class="Note">
+    <p>If use your custom cells, you must regist cells first by set <code>customAlbumListCellRegistor</code> block.</p>
+
+</aside>
 </div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.autoscrollmaxspeed">
@@ -212,7 +240,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">thumbnailLayout</span> </code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>thumbnail layout</p>
+    <p>Control thumbnail controller collection appearance.</p>
 
 </div>
 </div>
@@ -223,6 +251,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailControllerBlock</span>: ((<span class="type">ADThumbnailViewController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Block to config <code>ADThumbnailViewController</code>.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customthumbnailnavbarblock">
     <h3>
@@ -230,6 +262,11 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailNavBarBlock</span>: ((<span class="type">ADPickerStyle</span>) -&gt; <span class="type">ADThumbnailNavBarable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to generate <code>ThumbnailNavBar</code>. Default to use <code>ADThumbnailNavBarView</code>.
+The parameter <code>ADPickerStyle</code> is the style of bar.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customthumbnailtoolbarblock">
@@ -239,6 +276,11 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailToolBarBlock</span>: ((<span class="type">ADPhotoKitConfig</span>) -&gt; <span class="type">ADThumbnailToolBarable</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to generate <code>ThumbnailToolBar</code>. Default to use <code>ADThumbnailToolBarView</code>.
+The parameter <code>ADPhotoKitConfig</code> is the config pass through.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customthumbnailcellregistor">
     <h3>
@@ -247,6 +289,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailCellRegistor</span>: ((<span class="type">UICollectionView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to regist cells used in thumbnail controller.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.customthumbnailcellblock">
     <h3>
@@ -254,6 +300,16 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customThumbnailCellBlock</span>: ((<span class="type">UICollectionView</span>, <span class="type">IndexPath</span>) -&gt; <span class="type">ADThumbnailCellable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to return custom thumbnail collection cell.</p>
+
+</div>
+<div class="discussion">
+    <aside class="Note">
+    <p>If use your custom cells, you must regist cells first by set <code>customThumbnailCellRegistor</code> block.</p>
+
+</aside>
 </div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.browseitemspacing">
@@ -264,7 +320,7 @@
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">browseItemSpacing</span>: <span class="type">CGFloat</span> = <span class="number literal">40</span></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>browser layout</p>
+    <p>Space between browser controller item.</p>
 
 </div>
 </div>
@@ -275,6 +331,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserControllerBlock</span>: ((<span class="type">ADAssetBrowserController</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Block to config <code>ADAssetBrowserController</code>.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.custombrowsernavbarblock">
     <h3>
@@ -282,6 +342,11 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserNavBarBlock</span>: ((<span class="type">ADAssetBrowserDataSource</span>) -&gt; <span class="type">ADBrowserNavBarable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to generate <code>BrowserNavBar</code>. Default to use <code>ADBrowserNavBarView</code>.
+The parameter <code>ADAssetBrowserDataSource</code> is the datasource of browser controller.</p>
+
 </div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.custombrowsertoolbarblock">
@@ -291,6 +356,11 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserToolBarBlock</span>: ((<span class="type">ADAssetBrowserDataSource</span>) -&gt; <span class="type">ADBrowserToolBarable</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to generate <code>BrowserToolBar</code>. Default to use <code>ADBrowserToolBarView</code>.
+The parameter <code>ADAssetBrowserDataSource</code> is the datasource of browser controller.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.custombrowsercellregistor">
     <h3>
@@ -299,6 +369,10 @@
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserCellRegistor</span>: ((<span class="type">UICollectionView</span>) -&gt; <span class="type">Void</span>)?</code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to regist cells used in browser controller.</p>
+
+</div>
 </div>
 <div role="article" class="variable" id="adphotokitconfiguration.custombrowsercellblock">
     <h3>
@@ -306,6 +380,17 @@
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customBrowserCellBlock</span>: ((<span class="type">UICollectionView</span>, <span class="type">IndexPath</span>, <span class="type">ADAsset</span>) -&gt; <span class="type">ADBrowserCellable</span>)?</code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Bolck to return custom browser collection cell.
+The parameter <code>ADAsset</code> is the asset to browser.</p>
+
+</div>
+<div class="discussion">
+    <aside class="Note">
+    <p>If use your custom cells, you must regist cells first by set <code>customBrowserCellRegistor</code> block.</p>
+
+</aside>
 </div>
 </div>
     </section>
@@ -317,7 +402,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2021-05-28T10:53:59+0000">May 28, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+    Generated on <time datetime="2021-06-01T10:47:04+0000">June 1, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
 </p>
     </footer>
 </body>
