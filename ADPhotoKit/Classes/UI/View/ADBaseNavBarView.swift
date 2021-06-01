@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADBaseNavBarView: UIView, ADNavBarConfigurable {
+class ADBaseNavBarView: UIView {
     
     typealias ButtonItem = (normal: UIImage?, select: UIImage?, title: String?)
 

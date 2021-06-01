@@ -7,32 +7,50 @@
 
 import UIKit
 
+/// The data source of browser controller. It reload the associate reloadable view when selet or deselect asset, browser index change, select order change.
 public class ADAssetBrowserDataSource: NSObject {
-
+    
+    /// Associate browser view.
     public weak var listView: UICollectionView?
+    /// Associate select preview view.
     public weak var selectView: UICollectionView?
     
+    /// Options to control the asset browser condition and ui.
     public let options: ADAssetBrowserOptions
     
+    /// Assets to browser.
     public let list: [ADAssetBrowsable]
+    /// Select assets.
     public var selects: [ADAssetBrowsable] = []
+    /// Select asset's index.
     public var selectIndexs: [Int] = []
-
-    @objc
-    public dynamic var index: Int = 0
     
+    /// Current browser asset.
     public var current: ADAssetBrowsable {
         return list[index]
     }
-    
+
+    /// Current browser asset index in `list`.
+    @objc
+    public dynamic var index: Int = 0
+        
+    /// Current browser asset is select or not.
     @objc
     public dynamic var isSelected: Bool = false
     
+    /// Current browser asset index in `selects`.
     @objc
     public dynamic var selectIndex: Int = -1
     
+    /// Called when selet or deselect asset.
     public var selectAssetChanged: ((Int)->Void)?
-        
+    
+    /// Create data source with browser data, options and select info.
+    /// - Parameters:
+    ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - list: Asset array to browser.
+    ///   - index: Current asset index in `list`.
+    ///   - selects: Assets selected.
     public init(options: ADAssetBrowserOptions,
                 list: [ADAssetBrowsable],
                 index: Int = 0,
@@ -50,7 +68,9 @@ public class ADAssetBrowserDataSource: NSObject {
         super.init()
     }
     
-    func didIndexChange(_ idx: Int) {
+    /// Change current browser index.
+    /// - Parameter idx: Asset index in `list` to browser.
+    public func didIndexChange(_ idx: Int) {
         index = idx
         isSelected = selectIndexs.contains(index)
         if let index = selects.firstIndex(where: { $0.browseAsset == current.browseAsset }) {
@@ -67,12 +87,16 @@ public class ADAssetBrowserDataSource: NSObject {
         }
     }
     
-    func didSelectIndexChange(_ idx: Int) {
+    /// Change select browser index.
+    /// - Parameter idx: Asset index in `selects` to browser.
+    public func didSelectIndexChange(_ idx: Int) {
         didIndexChange(selectIndexs[idx])
         listView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
     }
     
-    func appendSelect(_ idx: Int) {
+    /// Select the asset.
+    /// - Parameter idx: Index whitch asset is select.
+    public func appendSelect(_ idx: Int) {
         selectIndexs.append(idx)
         selects.append(list[idx])
         isSelected = selectIndexs.contains(index)
@@ -88,7 +112,9 @@ public class ADAssetBrowserDataSource: NSObject {
         }
     }
     
-    func deleteSelect(_ idx: Int) {
+    /// Deselect the asset.
+    /// - Parameter index: Index whitch asset is deselect.
+    public func deleteSelect(_ idx: Int) {
         if let i = selectIndexs.firstIndex(where: { $0 == idx }) {
             selectIndex = -1
             selectIndexs.remove(at: i)
@@ -102,7 +128,12 @@ public class ADAssetBrowserDataSource: NSObject {
         }
     }
     
-    func moveSelect(from fIdx: Int, to tIdx: Int, reload: Bool = false) {
+    /// Change select assets order.
+    /// - Parameters:
+    ///   - fIdx: Index move from.
+    ///   - tIdx: Index move to.
+    ///   - reload: Indicator reload `selectView` or not.
+    public func moveSelect(from fIdx: Int, to tIdx: Int, reload: Bool = false) {
         selectIndex = tIdx
         if reload {
             selectView?.performBatchUpdates({

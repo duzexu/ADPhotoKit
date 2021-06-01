@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Associate reloadable view.
 public protocol ADDataSourceReloadable: class {
     
     func reloadData()

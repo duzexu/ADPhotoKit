@@ -26,15 +26,20 @@ public struct ADAlbumSelectOptions: OptionSet {
     }
 }
 
+/// Main manager class of ADPhotoKit Core. It provide a set of convenience methods to fetch asset from system album.
+/// You can use this class to fetch or save asset.
 public class ADPhotoManager {
-
-    /// 获取所有的相册列表
+    
+    /// Fetch all album.
+    /// - Parameters:
+    ///   - options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - completion: Called after finish fetching.
     public class func allPhotoAlbumList(options: ADAlbumSelectOptions = .default, completion: (([ADAlbumModel]) -> Void)) {
         let allowImage = options.contains(.allowImage)
         let allowVideo = options.contains(.allowVideo)
         
         if !allowImage && !allowVideo {
-            fatalError("you must add 'allowImage' or 'allowVideo' to options.")
+            fatalError("you must add 'allowImage' or 'allowVideo' to options at least one.")
         }
         
         let option = PHFetchOptions()
@@ -78,7 +83,10 @@ public class ADPhotoManager {
         completion(albumListByOrder(albumList))
     }
     
-    /// 获取最近项目相册
+    /// Fetch cameraRoll album.
+    /// - Parameters:
+    ///   - options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - completion: Called after finish fetching.
     public class func cameraRollAlbum(options: ADAlbumSelectOptions = .default, completion: @escaping ( (ADAlbumModel) -> Void )) {
         let allowImage = options.contains(.allowImage)
         let allowVideo = options.contains(.allowVideo)
@@ -106,7 +114,12 @@ public class ADPhotoManager {
         }
     }
     
-    /// 获取相册中的资源信息
+    /// Fetch assets in album.
+    /// - Parameters:
+    ///   - result: Fetch result associate with album.
+    ///   - options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - limitCount: Max count to fetch.
+    /// - Returns: Assets in album.
     public class func fetchAssets(in result: PHFetchResult<PHAsset>, options: ADAlbumSelectOptions = .default, limitCount: Int = .max) -> [ADAssetModel] {
         let ascending = options.contains(.ascending)
         let allowImage = options.contains(.allowImage)
@@ -136,30 +149,49 @@ public class ADPhotoManager {
         return models
     }
     
+    /// Type of fetch result.
     public enum AssetResultType {
-        /// size为nil 获取原图
+        /// Fetch result by `UIImage`.
+        /// - Parameter size: Size of the image fetch, If nil, will fetch original image.
+        /// - Parameter resizeMode: Image resize mode.
+        /// - Parameter synchronous: Return only a single result, blocking until available (or failure).
         case image(size: CGSize?, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false)
+        /// Fetch result by original `Data`.
         case originImageData
-        
+        /// Fetch result by `PHLivePhoto`.
         case livePhoto
-        
+        /// Fetch result by `AVPlayerItem`.
         case video
-        
+        /// Fetch result by `AVAsset`.
         case assert
-        
+        /// Fetch result by filePath.
         case filePath
     }
     
+    /// Provide caller a way to be told how much progress has been made prior to delivering the data when it comes from iCloud.
     public typealias ADAssetProgressHandler = (Double, Error?, UnsafeMutablePointer<ObjCBool>, [AnyHashable : Any]?) -> Void
+    /// A block that is called after fetch complete.
     public typealias ADAssetCompletionHandler = (Any?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch image complete.
     public typealias ADImageCompletionHandler = (UIImage?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch data complete.
     public typealias ADDataCompletionHandler = (Data?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch livePhoto complete.
     public typealias ADLivePhotoCompletionHandler = (PHLivePhoto?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch playItem complete.
     public typealias ADPlayItemCompletionHandler = (AVPlayerItem?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch AVAsset complete.
     public typealias ADAVAssertCompletionHandler = (AVAsset?, [AnyHashable: Any]?, Bool) -> Void
+    /// A block that is called after fetch file path complete.
     public typealias ADFilePathCompletionHandler = (String?, [AnyHashable: Any]?, Bool) -> Void
     
-    /// 获取资源文件
+    /// Fetch assset's data by type.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - type: Type of fetch result.
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetch(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler? = nil, completion: @escaping ADAssetCompletionHandler) -> PHImageRequestID? {
         switch type {
@@ -180,6 +212,14 @@ public class ADPhotoManager {
     }
         
     /// Fetch image for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - size: Size of the image fetch, If nil, will fetch original image.
+    ///   - resizeMode: Image resize mode.
+    ///   - synchronous: Return only a single result, blocking until available (or failure).
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADImageCompletionHandler) -> PHImageRequestID {
         let option = PHImageRequestOptions()
@@ -205,6 +245,12 @@ public class ADPhotoManager {
         }
     }
     
+    /// Fetch origin data for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchOriginImageData(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADDataCompletionHandler) -> PHImageRequestID {
         let option = PHImageRequestOptions()
@@ -229,6 +275,12 @@ public class ADPhotoManager {
         }
     }
     
+    /// Fetch livePhoto for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchLivePhoto(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADLivePhotoCompletionHandler) -> PHImageRequestID {
         let option = PHLivePhotoRequestOptions()
@@ -247,6 +299,12 @@ public class ADPhotoManager {
         }
     }
     
+    /// Fetch video for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchVideo(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADPlayItemCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
@@ -279,6 +337,12 @@ public class ADPhotoManager {
         }
     }
     
+    /// Fetch AVAsset for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.
+    ///   - completion: Called after fetch result.
+    /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchAVAsset(forVideo asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
@@ -309,6 +373,10 @@ public class ADPhotoManager {
         }
     }
     
+    /// Fetch file path for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - completion: Called after fetch result.
     public class func fetchFilePath(asset: PHAsset, completion: @escaping ADFilePathCompletionHandler) {
         asset.requestContentEditingInput(with: nil) { (input, info) in
             var path = input?.fullSizeImageURL?.absoluteString
@@ -346,6 +414,9 @@ extension ADPhotoManager {
 extension ADPhotoManager {
     
     /// Save image to album.
+    /// - Parameters:
+    ///   - image: Image to save.
+    ///   - completion: Called after image saved.
     public class func saveImageToAlbum(image: UIImage, completion: ( (Bool, PHAsset?) -> Void )? ) {
         let status = PHPhotoLibrary.authorizationStatus()
         
@@ -371,6 +442,9 @@ extension ADPhotoManager {
     }
     
     /// Save video to album.
+    /// - Parameters:
+    ///   - url: Video asset's path.
+    ///   - completion: Called after video saved.
     public class func saveVideoToAlbum(url: URL, completion: ( (Bool, PHAsset?) -> Void )? ) {
         let status = PHPhotoLibrary.authorizationStatus()
         
@@ -410,6 +484,8 @@ extension ADPhotoManager {
 /// Authority related.
 extension ADPhotoManager {
     
+    /// Check authority access to system album.
+    /// - Returns: If have authority.
     public class func photoAuthority() -> Bool {
         return PHPhotoLibrary.authorizationStatus() == .authorized
     }

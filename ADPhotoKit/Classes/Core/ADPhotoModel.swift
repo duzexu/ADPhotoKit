@@ -8,20 +8,34 @@
 import UIKit
 import Photos
 
+/// Album type.
 public enum ADAlbumType: CaseIterable {
-    case cameraRoll //最近项目
-    case favorites //个人收藏
-    case videos //视频
-    case selfPortraits //自拍
-    case livePhotos //实况照片
-    case depthEffect //人像
-    case panoramas //全景
-    case timelapses //延时摄影
-    case slomoVideos //慢动作
-    case screenshots //截屏
-    case bursts //连拍快照
-    case animated //动图
-    case custom //用户或APP建立
+    /// Recent (最近项目)
+    case cameraRoll
+    /// Favorites (个人收藏)
+    case favorites
+    /// Videos (视频)
+    case videos
+    /// Selfie (自拍)
+    case selfPortraits
+    /// LivePhoto (实况照片)
+    case livePhotos
+    /// Portrait (人像)
+    case depthEffect
+    /// Panoramic (全景)
+    case panoramas
+    /// Time-lapse (延时摄影)
+    case timelapses
+    /// Slow motion (慢动作)
+    case slomoVideos
+    /// Screenshot (截屏)
+    case screenshots
+    /// Continuous shooting (连拍快照)
+    case bursts
+    /// Gif (动图)
+    case animated
+    /// User created (用户或APP建立)
+    case custom
     
     var localeKey: ADLocale.LocaleKey? {
         switch self {
@@ -55,29 +69,42 @@ public enum ADAlbumType: CaseIterable {
     }
 }
 
+/// Model contain album info.
 public class ADAlbumModel: Equatable {
     
+    /// Album title.
     public let title: String
     
+    /// Album type.
     public let type: ADAlbumType
     
+    /// Assets count contain in album.
     public var count: Int {
         return result.count
     }
     
+    /// Property use to get asset in album.
     public var result: PHFetchResult<PHAsset>
     
+    /// Property description the album.
     public let collection: PHAssetCollection
     
+    /// Options that fetch album list.
     public let option: PHFetchOptions
     
-    /// 是否是最近项目
+    /// Indicate album is `Recent` album.
     public let isCameraRoll: Bool
     
+    /// Lastest asset in album.
     public var lastestAsset: PHAsset? {
         return result.lastObject
     }
-        
+    
+    /// Create album info model.
+    /// - Parameters:
+    ///   - result: Property use to get asset in album.
+    ///   - collection: Property description the album.
+    ///   - option: Options that fetch album list.
     public init(result: PHFetchResult<PHAsset>, collection: PHAssetCollection, option: PHFetchOptions) {
         let info = ADAlbumModel.collectionInfo(collection)
         self.title = info.0
@@ -160,8 +187,10 @@ extension ADAlbumModel: CustomStringConvertible {
     }
 }
 
+/// Model contain asset info.
 public class ADAssetModel: Equatable {
     
+    /// Type of asset.
     public enum MediaType: Equatable {
         case unknown
         case image
@@ -169,11 +198,13 @@ public class ADAssetModel: Equatable {
         case livePhoto
         case video(duration: Int = 0, format: String = "")
         
-        var isImage: Bool {
+        /// Asset is image.
+        public var isImage: Bool {
             return value < 4
         }
         
-        var duration: Int {
+        /// If asset is video, return video duration, else return 0.
+        public var duration: Int {
             switch self {
             case let .video(duration,_):
                 return duration
@@ -202,14 +233,20 @@ public class ADAssetModel: Equatable {
         }
     }
     
+    /// An identifier which persistently identifies the object on a given device.
     public let identifier: String
     
+    /// Asset associte with model.
     public let asset: PHAsset
     
+    /// Media type of asset.
     public var type: MediaType = .unknown
-            
+    
+    /// Asset's select status.
     public var selectStatus: ADThumbnailSelectStatus = .select(index: nil)
     
+    /// Create asset info model.
+    /// - Parameter asset: Asset to bind.
     public init(asset: PHAsset) {
         self.identifier = asset.localIdentifier
         self.asset = asset
@@ -261,14 +298,20 @@ public class ADAssetModel: Equatable {
     
 }
 
+/// Warp of select asset.
 public class ADSelectAssetModel: Equatable {
     
+    /// PHAsset's identifier.
     public let identifier: String
     
+    /// Asset warp by model.
     public let asset: PHAsset
     
+    /// Index of asset in select array.
     public var index: Int?
     
+    /// Create warp model with asset.
+    /// - Parameter asset: Asset to warp.
     public init(asset: PHAsset) {
         self.identifier = asset.localIdentifier
         self.asset = asset

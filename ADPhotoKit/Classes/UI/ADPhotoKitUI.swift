@@ -57,6 +57,7 @@ public struct ADAssetSelectOptions: OptionSet {
     
 }
 
+/// Options to control the asset browser condition and ui.
 public struct ADAssetBrowserOptions: OptionSet {
     public let rawValue: Int
     
@@ -76,6 +77,7 @@ public struct ADAssetBrowserOptions: OptionSet {
     }
 }
 
+/// Params to control the asset select condition.
 public enum ADPhotoSelectParams: Hashable, Equatable {
     /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
     case maxCount(max: Int?)
@@ -195,6 +197,7 @@ extension ADPhotoKitUI {
     
 }
 
+/// Parsing the input config to `ADPhotoKitConfig` and pass through the internal methods.
 public class ADPhotoKitConfig {
 
     public let albumOpts: ADAlbumSelectOptions

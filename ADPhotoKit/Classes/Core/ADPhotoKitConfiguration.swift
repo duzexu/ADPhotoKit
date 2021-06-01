@@ -7,8 +7,11 @@
 
 import Foundation
 
+/// Class to modify ADPhotoKit's configuration.
 public class ADPhotoKitConfiguration {
     
+    /// Represents a shared configuration used across ADPhotoKit.
+    /// Use this instance for modify configuration.
     public static var `default` = ADPhotoKitConfiguration()
     
     /// Set framework language, if set nil, framework will use system language. Default is nil.
@@ -18,7 +21,7 @@ public class ADPhotoKitConfiguration {
         }
     }
     
-    /// You can custom display text for diffent language on yourself.
+    /// You can custom display text for diffent language on yourself. Default is nil.
     public var customLocaleValue: [Locale:[ADLocale.LocaleKey: String]]?
     
     /// Custom album orders, if type not contain, it will not display. Default is ordered by `ADAlbumType.allCases` 's order.
@@ -26,29 +29,33 @@ public class ADPhotoKitConfiguration {
     
     #if Module_UI
     
-    /// You can custom image Bundle by this property or simple replace image in `ADPhotoKitUI.bundle`
+    /// You can custom image Bundle by this property or simple replace image in `ADPhotoKitUI.bundle`. Default is `ADPhotoKitUI.bundle`.
     public var customUIBundle: Bundle?
     
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
     
-    /// hud
+    /// Bolck to generate `ProgressHUD`. Default to use hud in framework.
     public var customProgressHUDBlock: (() -> ADProgressHUDable)?
     
-    /// progress
+    /// Bolck to generate `ProgressView`. Default to use view in framework.
     public var customProgressBlock: (() -> ADProgressableable)?
 
-    /// fetch image timeout
+    /// Timeout for request images from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20
     
     /* ================= album ================= */
     
-    /// album
+    /// Block to config `ADAlbumListController`.
     public var customAlbumListControllerBlock: ((ADAlbumListController) -> Void)?
     
+    /// Bolck to generate `AlbumListNavBar`. Default to use `ADAlbumListNavBarView`.
     public var customAlbumListNavBarBlock: (() -> ADAlbumListNavBarable)?
     
+    /// Bolck to regist cells used in albumlist controller.
     public var customAlbumListCellRegistor: ((UITableView) -> Void)?
+    /// Bolck to return custom album list cell.
+    /// - Note: If use your custom cells, you must regist cells first by set `customAlbumListCellRegistor` block.
     public var customAlbumListCellBlock: ((UITableView, IndexPath) -> ADAlbumListCellable)?
         
     /* =============== thumbnail =============== */
@@ -56,37 +63,57 @@ public class ADPhotoKitConfiguration {
     /// The max speed (pt/s) of auto scroll. Defaults to 600.
     public var autoScrollMaxSpeed: CGFloat = 600
     
+    /// Layout to control thumbnail controller collection appearance.
     public struct ThumbnailControllerLayout {
+        /// Space between item. Default is 2.
         public var itemSpacing: CGFloat = 2
+        /// Space between line. Default is 2.
         public var lineSpacing: CGFloat = 2
-        // max is 5
+        /// Item count per line. Default is 4. Max is 5.
         public var columnCount: Int = 4
     }
     
-    /// thumbnail layout
+    /// Control thumbnail controller collection appearance.
     public var thumbnailLayout = ThumbnailControllerLayout()
     
+    /// Block to config `ADThumbnailViewController`.
     public var customThumbnailControllerBlock: ((ADThumbnailViewController) -> Void)?
     
+    /// Bolck to generate `ThumbnailNavBar`. Default to use `ADThumbnailNavBarView`.
+    /// The parameter `ADPickerStyle` is the style of bar.
     public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarable)?
     
+    /// Bolck to generate `ThumbnailToolBar`. Default to use `ADThumbnailToolBarView`.
+    /// The parameter `ADPhotoKitConfig` is the config pass through.
     public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarable)?
     
+    /// Bolck to regist cells used in thumbnail controller.
     public var customThumbnailCellRegistor: ((UICollectionView) -> Void)?
+    /// Bolck to return custom thumbnail collection cell.
+    /// - Note: If use your custom cells, you must regist cells first by set `customThumbnailCellRegistor` block.
     public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellable)?
     
     /* =============== browser =============== */
         
-    /// browser layout
+    /// Space between browser controller item.
     public var browseItemSpacing: CGFloat = 40
     
+    /// Block to config `ADAssetBrowserController`.
     public var customBrowserControllerBlock: ((ADAssetBrowserController) -> Void)?
     
+    /// Bolck to generate `BrowserNavBar`. Default to use `ADBrowserNavBarView`.
+    /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
     public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarable)?
     
+    /// Bolck to generate `BrowserToolBar`. Default to use `ADBrowserToolBarView`.
+    /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
     public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarable)?
     
+    /// Bolck to regist cells used in browser controller.
     public var customBrowserCellRegistor: ((UICollectionView) -> Void)?
+    /// Bolck to return custom browser collection cell.
+    /// The parameter `ADAsset` is the asset to browser.
+    /// - Note: If use your custom cells, you must regist cells first by set `customBrowserCellRegistor` block.
     public var customBrowserCellBlock: ((UICollectionView, IndexPath, ADAsset) -> ADBrowserCellable)?
         
     #endif
