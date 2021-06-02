@@ -14,7 +14,6 @@
             </strong>
             <span>Documentation</span>
         </a>
-        <sup>Beta</sup>
     </header>
 
     <!--
@@ -26,7 +25,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#nested type aliases">Nested Type Aliases</a><ul><li class="typealias"><a href="#adphotokitui.asset">Asset</a></li><li class="typealias"><a href="#adphotokitui.assetselecthandler">Asset​Select​Handler</a></li><li class="typealias"><a href="#adphotokitui.assetableselecthandler">Assetable​Select​Handler</a></li><li class="typealias"><a href="#adphotokitui.assetcancelhandler">Asset​Cancel​Handler</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#adphotokitui.imagepicker(present:style:assets:albumopts:assetopts:browseropts:params:selected:canceled:)">image​Picker(present:​style:​assets:​album​Opts:​asset​Opts:​browser​Opts:​params:​selected:​canceled:​)</a></li><li class="function"><a href="#adphotokitui.assetbrowser(present:assets:index:selects:options:selected:canceled:)">asset​Browser(present:​assets:​index:​selects:​options:​selected:​canceled:​)</a></li></ul></li></ol>
+            <ol><li><a href="#nested type aliases">Nested Type Aliases</a><ul><li class="typealias"><a href="#adphotokitui.asset">Asset</a></li><li class="typealias"><a href="#adphotokitui.assetselecthandler">Asset​Select​Handler</a></li><li class="typealias"><a href="#adphotokitui.assetableselecthandler">Assetable​Select​Handler</a></li><li class="typealias"><a href="#adphotokitui.assetcancelhandler">Asset​Cancel​Handler</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adphotokitui.config">config</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#adphotokitui.imagepicker(present:style:assets:albumopts:assetopts:browseropts:params:selected:canceled:)">image​Picker(present:​style:​assets:​album​Opts:​asset​Opts:​browser​Opts:​params:​selected:​canceled:​)</a></li><li class="function"><a href="#adphotokitui.assetbrowser(present:assets:index:selects:options:selected:canceled:)">asset​Browser(present:​assets:​index:​selects:​options:​selected:​canceled:​)</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -38,7 +37,11 @@
 </h1>
 
 <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ADPhotoKitUI</span> </code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ADPhotoKitUI</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Main class of ADPhotoKit UI. It provide methods to show asset picker or asset browser.</p>
+
 </div>
 
     <section id="nested type aliases">
@@ -46,45 +49,102 @@
 
         <div role="article" class="typealias" id="adphotokitui.asset">
     <h3>
-        <code>Asset</code>
+        <code><a href="#adphotokitui.asset">Asset</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">Asset</span> = (<span class="variable">asset</span>: <span class="type">PHAsset</span>, <span class="variable">image</span>: <span class="type">UIImage</span>?, <span class="variable">error</span>: <span class="type">Error</span>?)</code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">Asset</span> = (<span class="variable">asset</span>: <span class="type">PHAsset</span>, <span class="variable">image</span>: <span class="type">UIImage</span>?, <span class="variable">error</span>: <span class="type">Error</span>?) </body></html></code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Warp of select asset.</p>
+
+</div>
+<div class="discussion">
+    <aside class="note" title="Note">
+    <p>If <code>browserOpts</code> not contain <code>.fetchImage</code>, fetch will not perform and asset will return immediately, <code>image</code> and <code>error</code> will be <code>nil</code>.</p>
+
+</aside>
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>asset</th>
+    <td></td>
+    <td><p>Asset select from system.</p>
+</td>
+</tr>
+<tr>
+    <th>image</th>
+    <td></td>
+    <td><p>Image fetch with asset. It's <code>nil</code> if <code>browserOpts</code> not contain <code>.fetchImage</code> or error occur when fetching.</p>
+</td>
+</tr>
+<tr>
+    <th>error</th>
+    <td></td>
+    <td><p>Error info when fetch error. It's not <code>nil</code> when error occur when fetching.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="typealias" id="adphotokitui.assetselecthandler">
     <h3>
-        <code>Asset​Select​Handler</code>
+        <code><a href="#adphotokitui.assetselecthandler">Asset​Select​Handler</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetSelectHandler</span> = (([<span class="type">Asset</span>],<span class="type">Bool</span>) -&gt; <span class="type">Void</span>)</code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetSelectHandler</span> = (([<span class="type">Asset</span>],<span class="type">Bool</span>) -&gt; <span class="type">Void</span>) </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>return asset and original image or not</p>
+    <p>Return select assets and if original or not.</p>
 
 </div>
 </div>
 <div role="article" class="typealias" id="adphotokitui.assetableselecthandler">
     <h3>
-        <code>Assetable​Select​Handler</code>
+        <code><a href="#adphotokitui.assetableselecthandler">Assetable​Select​Handler</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetableSelectHandler</span> = (([<span class="type">ADAssetBrowsable</span>]) -&gt; <span class="type">Void</span>)</code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetableSelectHandler</span> = (([<a href="https://duzexu.github.io/ADPhotoKit/ADAssetBrowsable"><span class="type">ADAssetBrowsable</span></a>]) -&gt; <span class="type">Void</span>) </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>return browsable asset array</p>
+    <p>Return browsable asset array.</p>
 
 </div>
 </div>
 <div role="article" class="typealias" id="adphotokitui.assetcancelhandler">
     <h3>
-        <code>Asset​Cancel​Handler</code>
+        <code><a href="#adphotokitui.assetcancelhandler">Asset​Cancel​Handler</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetCancelHandler</span> = (() -&gt; <span class="type">Void</span>)</code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">AssetCancelHandler</span> = (() -&gt; <span class="type">Void</span>) </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>cancel select</p>
+    <p>Cancel select.</p>
+
+</div>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="adphotokitui.config">
+    <h3>
+        <code><a href="#adphotokitui.config">config</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">config</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADPhotoKitConfig"><span class="type">ADPhotoKitConfig</span></a>! </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Config pass through.</p>
 
 </div>
 </div>
@@ -94,33 +154,163 @@
 
         <div role="article" class="function" id="adphotokitui.imagepicker(present:style:assets:albumopts:assetopts:browseropts:params:selected:canceled:)">
     <h3>
-        <code>image​Picker(present:​style:​assets:​album​Opts:​asset​Opts:​browser​Opts:​params:​selected:​canceled:​)</code>
+        <code><a href="#adphotokitui.imagepicker(present:style:assets:albumopts:assetopts:browseropts:params:selected:canceled:)">image​Picker(present:​style:​assets:​album​Opts:​asset​Opts:​browser​Opts:​params:​selected:​canceled:​)</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="keyword">func</span> <span class="function">imagePicker</span>(<span class="variable">present</span> <span class="variable">on</span>: <span class="type">UIViewController</span>,
-                                    <span class="variable">style</span>: <span class="type">ADPickerStyle</span> = .<span class="variable">normal</span>,
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">class</span> <span class="keyword">func</span> <span class="function">imagePicker</span>(<span class="variable">present</span> <span class="variable">on</span>: <span class="type">UIViewController</span>,
+                                    <span class="variable">style</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADPickerStyle"><span class="type">ADPickerStyle</span></a> = .<span class="variable">normal</span>,
                                     <span class="variable">assets</span>: [<span class="type">PHAsset</span>] = [],
-                                    <span class="variable">albumOpts</span>: <span class="type">ADAlbumSelectOptions</span> = .<span class="variable">default</span>,
-                                    <span class="variable">assetOpts</span>: <span class="type">ADAssetSelectOptions</span> = .<span class="variable">default</span>,
-                                    <span class="variable">browserOpts</span>: <span class="type">ADAssetBrowserOptions</span> = .<span class="variable">default</span>,
-                                    <span class="variable">params</span>: <span class="type">Set</span>&lt;<span class="type">ADPhotoSelectParams</span>&gt; = [],
+                                    <span class="variable">albumOpts</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADAlbumSelectOptions"><span class="type">ADAlbumSelectOptions</span></a> = .<span class="variable">default</span>,
+                                    <span class="variable">assetOpts</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADAssetSelectOptions"><span class="type">ADAssetSelectOptions</span></a> = .<span class="variable">default</span>,
+                                    <span class="variable">browserOpts</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADAssetBrowserOptions"><span class="type">ADAssetBrowserOptions</span></a> = .<span class="variable">default</span>,
+                                    <span class="variable">params</span>: <span class="type">Set</span>&lt;<a href="https://duzexu.github.io/ADPhotoKit/ADPhotoSelectParams"><span class="type">ADPhotoSelectParams</span></a>&gt; = [],
                                     <span class="variable">selected</span>: <span class="attribute">@</span><span class="attribute">escaping</span> <span class="type">AssetSelectHandler</span>,
-                                    <span class="variable">canceled</span>: <span class="type">AssetCancelHandler</span>? = <span class="keyword">nil</span>) </code></pre>
+                                    <span class="variable">canceled</span>: <span class="type">AssetCancelHandler</span>? = <span class="keyword">nil</span>)  </body></html></code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Show picker to select assets.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>on</th>
+    <td><code class="type">UIView​Controller</code></td>
+    <td><p>The controller to show picker.</p>
+</td>
+</tr>
+<tr>
+    <th>style</th>
+    <td><code class="type">ADPicker​Style</code></td>
+    <td><p>Style to display picker.</p>
+</td>
+</tr>
+<tr>
+    <th>assets</th>
+    <td><code class="type">[PHAsset]</code></td>
+    <td><p>Assets have been selected.</p>
+</td>
+</tr>
+<tr>
+    <th>album​Opts</th>
+    <td><code class="type">ADAlbum​Select​Options</code></td>
+    <td><p>Options to limit album type and order. It is <code>ADAlbumSelectOptions.default</code> by default.</p>
+</td>
+</tr>
+<tr>
+    <th>asset​Opts</th>
+    <td><code class="type">ADAsset​Select​Options</code></td>
+    <td><p>Options to control the asset select condition and ui. It is <code>ADAssetSelectOptions.default</code> by default.</p>
+</td>
+</tr>
+<tr>
+    <th>browser​Opts</th>
+    <td><code class="type">ADAsset​Browser​Options</code></td>
+    <td><p>Options to control browser controller. It is <code>ADAssetBrowserOptions.default</code> by default.</p>
+</td>
+</tr>
+<tr>
+    <th>params</th>
+    <td><code class="type">Set&lt;ADPhoto​Select​Params&gt;</code></td>
+    <td><p>Params to control the asset select condition.</p>
+</td>
+</tr>
+<tr>
+    <th>selected</th>
+    <td><code class="type">@escaping Asset​Select​Handler</code></td>
+    <td><p>Called after selection finish.</p>
+</td>
+</tr>
+<tr>
+    <th>canceled</th>
+    <td><code class="type">Asset​Cancel​Handler?</code></td>
+    <td><p>Called when cancel select.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
 <div role="article" class="function" id="adphotokitui.assetbrowser(present:assets:index:selects:options:selected:canceled:)">
     <h3>
-        <code>asset​Browser(present:​assets:​index:​selects:​options:​selected:​canceled:​)</code>
+        <code><a href="#adphotokitui.assetbrowser(present:assets:index:selects:options:selected:canceled:)">asset​Browser(present:​assets:​index:​selects:​options:​selected:​canceled:​)</a></code>
     </h3>
     <div class="declaration">
-<pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">class</span> <span class="keyword">func</span> <span class="function">assetBrowser</span>(<span class="variable">present</span> <span class="variable">on</span>: <span class="type">UIViewController</span>,
-                                    <span class="variable">assets</span>:  [<span class="type">ADAssetBrowsable</span>],
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">class</span> <span class="keyword">func</span> <span class="function">assetBrowser</span>(<span class="variable">present</span> <span class="variable">on</span>: <span class="type">UIViewController</span>,
+                                    <span class="variable">assets</span>:  [<a href="https://duzexu.github.io/ADPhotoKit/ADAssetBrowsable"><span class="type">ADAssetBrowsable</span></a>],
                                     <span class="variable">index</span>: <span class="type">Int</span>? = <span class="keyword">nil</span>,
                                     <span class="variable">selects</span>: [<span class="type">Int</span>] = [],
-                                    <span class="variable">options</span>: <span class="type">ADAssetBrowserOptions</span> = .<span class="variable">default</span>,
+                                    <span class="variable">options</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADAssetBrowserOptions"><span class="type">ADAssetBrowserOptions</span></a> = .<span class="variable">default</span>,
                                     <span class="variable">selected</span>: <span class="attribute">@</span><span class="attribute">escaping</span> <span class="type">AssetableSelectHandler</span>,
-                                    <span class="variable">canceled</span>: <span class="type">AssetCancelHandler</span>? = <span class="keyword">nil</span>) </code></pre>
+                                    <span class="variable">canceled</span>: <span class="type">AssetCancelHandler</span>? = <span class="keyword">nil</span>)  </body></html></code></pre>
 </div>
+<div class="summary" role="doc-abstract">
+    <p>Show controller to browser and select assets.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>on</th>
+    <td><code class="type">UIView​Controller</code></td>
+    <td><p>The controller to show browser.</p>
+</td>
+</tr>
+<tr>
+    <th>assets</th>
+    <td><code class="type">[ADAsset​Browsable]</code></td>
+    <td><p>Assets to browser.</p>
+</td>
+</tr>
+<tr>
+    <th>index</th>
+    <td><code class="type">Int?</code></td>
+    <td><p>Current browser asset index.</p>
+</td>
+</tr>
+<tr>
+    <th>selects</th>
+    <td><code class="type">[Int]</code></td>
+    <td><p>Indexs of assets have been selected.</p>
+</td>
+</tr>
+<tr>
+    <th>options</th>
+    <td><code class="type">ADAsset​Browser​Options</code></td>
+    <td><p>Options to control browser controller. It is <code>ADAssetBrowserOptions.default</code> by default.</p>
+</td>
+</tr>
+<tr>
+    <th>selected</th>
+    <td><code class="type">@escaping Assetable​Select​Handler</code></td>
+    <td><p>Called after selection finish.</p>
+</td>
+</tr>
+<tr>
+    <th>canceled</th>
+    <td><code class="type">Asset​Cancel​Handler?</code></td>
+    <td><p>Called when cancel select.</p>
+</td>
+</tr>
+  </tbody>
+</table>
 </div>
     </section>
 
@@ -131,7 +321,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2021-06-01T10:47:04+0000">June 1, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.6</span>.
+    Generated on <time datetime="2021-06-02T10:04:13+0000">June 2, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
