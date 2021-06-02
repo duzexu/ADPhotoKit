@@ -8,11 +8,14 @@
 import UIKit
 import SnapKit
 
+/// Controller to display albums.
 public class ADAlbumListController: UIViewController {
     
     let config: ADPhotoKitConfig
     
+    /// Use to show albums.
     public var tableView: UITableView!
+    /// Data source contain album models.
     public var dataSource: ADAlbumListDataSource!
     
     init(config: ADPhotoKitConfig) {

@@ -8,22 +8,34 @@
 import UIKit
 import PhotosUI
 
+/// Parsing the input `Set<ADPhotoSelectParams>` to `ADThumbnailParams` and pass through the internal methods.
 public struct ADThumbnailParams {
+    
+    /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
     public var maxCount: Int?
     
+    /// Limit the min image count you can select. Set `nil` means no limit. Default is no limit.
     public var minImageCount: Int?
+    /// Limit the max image count you can select. Set `nil` means no limit. Default is no limit.
     public var maxImageCount: Int?
     
+    /// Limit the min video count you can select. Set `nil` means no limit. Default is no limit.
     public var minVideoCount: Int?
+    /// Limit the max video count you can select. Set `nil` means no limit. Default is no limit.
     public var maxVideoCount: Int?
     
+    /// Limit the min video time you can select. Set `nil` means no limit. Default is no limit.
     public var minVideoTime: Int?
+    /// Limit the max video time you can select. Set `nil` means no limit. Default is no limit.
     public var maxVideoTime: Int?
     
+    /// Limit the min video time you can record. Set `nil` means no limit. Default is no limit.
     public var minRecordTime: Int?
+    /// Limit the max video time you can record. Set `nil` means no limit. Default is no limit.
     public var maxRecordTime: Int?
 }
 
+/// Controller to display assets in album.
 public class ADThumbnailViewController: UIViewController {
     
     let config: ADPhotoKitConfig
@@ -31,7 +43,9 @@ public class ADThumbnailViewController: UIViewController {
     let style: ADPickerStyle
     let selects: [PHAsset]
     
+    /// View to display asset.
     public var collectionView: UICollectionView!
+    /// The data source of album assets.
     public var dataSource: ADAssetListDataSource!
     
     var toolBarView: ADThumbnailToolBarable!
@@ -619,7 +633,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 if let min = self.config.params.minRecordTime {
                     let asset = AVAsset(url: url)
                     if Int(asset.duration.seconds) < min {
-                        ADAlert.alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min))
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min), completion: nil)
                         return
                     }
                 }

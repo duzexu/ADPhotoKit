@@ -20,14 +20,15 @@ extension ADAsset {
     }
 }
 
+/// Controller to browser asset in big mode.
 public class ADAssetBrowserController: UIViewController {
     
     let config: ADPhotoKitConfig
     
-    /// dataSource
+    /// The data source of browser assets.
     public var dataSource: ADAssetBrowserDataSource!
     
-    /// ui
+    /// View to display asset.
     public var collectionView: UICollectionView!
     
     var controlsView: ADBrowserControlsView!
@@ -75,15 +76,19 @@ public class ADAssetBrowserController: UIViewController {
         return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
+    /// Called when return to thumbnail controller. Subclass can override to refresh thumbnail controller.
     open func didSelectsUpdate() {
         
     }
     
+    /// Called when finish selection. Subclass can override to do something.
     open func finishSelection() {
         ADPhotoKitUI.config.browserSelect?(dataSource.selects)
         navigationController?.dismiss(animated: true, completion: nil)
     }
     
+    /// Indicated current asset can select or not. Subclass can override to do something.
+    /// - Returns: If `true`, means you can select. Otherwise can't.
     open func canSelectWithCurrentIndex() -> Bool {
         let selected = dataSource.selects.count
         let max = config.params.maxCount ?? Int.max
@@ -96,18 +101,18 @@ public class ADAssetBrowserController: UIViewController {
                 let maxImageCount = config.params.maxImageCount ?? Int.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                    ADAlert.alert(on: self, message: message)
+                    ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
                     return false
                 }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                    ADAlert.alert(on: self, message: "最多选择\(maxImageCount)个图片")
+                    ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
                     return false
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     if selectMediaImage {
-                        ADAlert.alert(on: self, message: "不能选择视频")
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "不能选择视频", completion: nil)
                     }else{
-                        ADAlert.alert(on: self, message: "不能选择图片")
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "不能选择图片", completion: nil)
                     }
                     return false
                 }else{
@@ -116,17 +121,17 @@ public class ADAssetBrowserController: UIViewController {
                     let maxImageCount = config.params.maxImageCount ?? Int.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                        ADAlert.alert(on: self, message: message)
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                        ADAlert.alert(on: self, message: "最多选择\(maxImageCount)个图片")
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
                         return false
                     }
                 }
             }
         }else{
             let message = String(format: ADLocale.LocaleKey.exceededMaxSelectCount.localeTextValue, max)
-            ADAlert.alert(on: self, message: message)
+            ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
             return false
         }
         return true

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Class to modify ADPhotoKit's configuration.
 public class ADPhotoKitConfiguration {
@@ -40,6 +41,9 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `ProgressView`. Default to use view in framework.
     public var customProgressBlock: (() -> ADProgressableable)?
+    
+    /// Custom alert. Default to use alert in framework.
+    public var customAlert: ADAlertConfigurable.Type?
 
     /// Timeout for request images from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20

@@ -17,18 +17,23 @@ extension ADAssetModel {
     }
 }
 
+/// Cell for display asset in thumbnail controller.
 public class ADThumbnailListCell: UICollectionViewCell {
-        
+    
+    /// Thumbnail cell select status.
     public var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
         didSet {
             selectStatusDidChange()
         }
     }
-        
+    
+    /// Called when cell select or deselect. The parameter `Bool` represent asset is selet or not.
     public var selectAction: ((ADThumbnailCellable,Bool)->Void)?
     
+    /// Asset model to config cell interface.
     public var assetModel: ADAssetModel!
     
+    /// Cell indexPath in collection view.
     public var indexPath: IndexPath!
     
     // ui
@@ -193,6 +198,8 @@ public class ADThumbnailListCell: UICollectionViewCell {
 
 extension ADThumbnailListCell: ADThumbnailCellConfigurable {
     
+    /// Config cell with asset model.
+    /// - Parameter model: Asset info.
     public func configure(with model: ADAssetModel) {
         assetModel = model
         selectStatus = model.selectStatus
@@ -220,6 +227,7 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
         imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
     }
     
+    /// Select or deselect cell.
     public func cellSelectAction() {
         selectBtnAction(sender: selectBtn)
     }
@@ -229,6 +237,7 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
 /// UIAppearance
 extension ADThumbnailListCell {
     
+    /// Key for attribute.
     public class Key: NSObject {
         let rawValue: String
         init(rawValue: String) {
@@ -239,6 +248,8 @@ extension ADThumbnailListCell {
         }
     }
     
+    /// You may specify the corner radius, index color, index font, desc font, and desc color properties for the cell in the attributes dictionary, using the keys found in `ADThumbnailListCell.Key`.
+    /// - Parameter attrs: Attributes dictionary.
     @objc
     public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {
@@ -266,12 +277,17 @@ extension ADThumbnailListCell {
         }
     }
     
+    /// State of cell.
     public enum State {
+        /// cell is normal.
         case normal
+        /// cell is select.
         case select
+        /// cell is deselect.
         case disabled
     }
     
+    /// Appearance of cell.
     public enum Appearance: Hashable {
         case borderColor(UIColor)
         case borderWidth(CGFloat)
@@ -293,6 +309,10 @@ extension ADThumbnailListCell {
     
     private(set) static var appearanceAttributes: [State:Set<Appearance>] = [:]
     
+    /// Config appearance for diffent cell state.
+    /// - Parameters:
+    ///   - appearance: Appearance of cell.
+    ///   - state: State of cell.
     public static func setAppearance(_ appearance: Appearance, for state: State) {
         if var value = appearanceAttributes[state] {
             value.insert(appearance)

@@ -10,6 +10,8 @@ import Photos
 import PhotosUI
 
 extension PHAsset {
+    
+    /// Prefered size to browse.
     public var browserSize: CGSize {
         let scale: CGFloat = 2
         if whRatio > 1 {
@@ -49,6 +51,7 @@ extension ADImageSource {
     }
 }
 
+/// Cell for browse image asset in browser controller.
 class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     
     var imageBrowserView: ADImageBrowserView!

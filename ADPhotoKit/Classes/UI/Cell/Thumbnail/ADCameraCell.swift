@@ -8,6 +8,7 @@
 import UIKit
 import AVFoundation
 
+/// Cell for take asset in thumbnail controller.
 public class ADCameraCell: UICollectionViewCell {
     
     var imageView: UIImageView!
@@ -108,6 +109,7 @@ private extension ADCameraCell {
 /// UIAppearance
 extension ADCameraCell {
     
+    /// Key for attribute.
     public class Key: NSObject {
         let rawValue: String
         init(rawValue: String) {
@@ -118,6 +120,8 @@ extension ADCameraCell {
         }
     }
     
+    /// You may specify the corner radius, bg color properties for the cell in the attributes dictionary, using the keys found in `ADCameraCell.Key`.
+    /// - Parameter attrs: Attributes dictionary.
     @objc
     public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {

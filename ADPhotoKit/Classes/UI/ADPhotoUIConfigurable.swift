@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import Photos
 
 /// Albumlist controller's navigation bar.
@@ -300,6 +301,10 @@ class ADPhotoUIConfigurable {
     
     static func progress() -> ADProgressableable {
         return ADPhotoKitConfiguration.default.customProgressBlock?() ?? ADProgressView()
+    }
+    
+    static func alert() -> ADAlertConfigurable.Type {
+        return ADPhotoKitConfiguration.default.customAlert ?? ADAlert.self
     }
     
 }

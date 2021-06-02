@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import UIKit
 import Photos
 
-/// The data source of asset controller. It get assets you request and reload the associate reloadable view when assets changed.
+/// The data source of asset model controller. It get assets you request and reload the associate reloadable view when assets changed.
 public class ADAssetListDataSource: NSObject {
     
     /// The associate reloadable view conform to `ADDataSourceReloadable`.

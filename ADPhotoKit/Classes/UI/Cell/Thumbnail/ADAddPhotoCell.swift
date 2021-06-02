@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Cell for add asset in thumbnail controller.
 public class ADAddPhotoCell: UICollectionViewCell {
     
     var imageView: UIImageView!
@@ -31,6 +32,7 @@ public class ADAddPhotoCell: UICollectionViewCell {
 /// UIAppearance
 extension ADAddPhotoCell {
     
+    /// Key for attribute.
     public class Key: NSObject {
         let rawValue: String
         init(rawValue: String) {
@@ -41,6 +43,8 @@ extension ADAddPhotoCell {
         }
     }
     
+    /// You may specify the corner radius, bg color properties for the cell in the attributes dictionary, using the keys found in `ADAddPhotoCell.Key`.
+    /// - Parameter attrs: Attributes dictionary.
     @objc
     public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {

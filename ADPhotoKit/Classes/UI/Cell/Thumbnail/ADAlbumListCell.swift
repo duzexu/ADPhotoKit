@@ -8,10 +8,13 @@
 import UIKit
 import Photos
 
+/// Cell for display album in album list controller.
 public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
-
+    
+    /// Album model to config cell interface.
     public var albumModel: ADAlbumModel!
     
+    /// Album display style.
     public var style: ADPickerStyle! = .normal {
         didSet {
             if style == .normal {
@@ -34,6 +37,8 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         }
     }
     
+    /// Config cell with album model.
+    /// - Parameter model: Album info.
     public func configure(with model: ADAlbumModel) {
         albumModel = model
         albumTitleLabel.text = model.title
@@ -110,6 +115,7 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
 /// UIAppearance
 extension ADAlbumListCell {
     
+    /// Key for attribute.
     public class Key: NSObject {
         let rawValue: String
         init(rawValue: String) {
@@ -120,6 +126,8 @@ extension ADAlbumListCell {
         }
     }
     
+    /// You may specify the corner radius, title color, title font, count font, and count color properties for the cell in the attributes dictionary, using the keys found in `ADAlbumListCell.Key`.
+    /// - Parameter attrs: Attributes dictionary.
     @objc
     public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {

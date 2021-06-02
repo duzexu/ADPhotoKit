@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import Photos
 
 /// The data source of album controller. It get albums you request and reload the associate reloadable view when album changed.

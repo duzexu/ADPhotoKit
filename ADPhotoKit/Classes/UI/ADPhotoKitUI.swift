@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import UIKit
 import Photos
 
+/// Style to display picker.
 public enum ADPickerStyle {
     /// The display relationship between the album list and the thumbnail interface is push.
     case normal
@@ -116,16 +118,34 @@ public enum ADPhotoSelectParams: Hashable, Equatable {
     }
 }
 
+/// Main class of ADPhotoKit UI. It provide methods to show asset picker or asset browser.
 public class ADPhotoKitUI {
     
+    /// Warp of select asset.
+    /// - Parameters:
+    ///     - asset: Asset select from system.
+    ///     - image: Image fetch with asset. It's `nil` if `browserOpts` not contain `.fetchImage` or error occur when fetching.
+    ///     - error: Error info when fetch error. It's not `nil` when error occur when fetching.
+    /// - Note: If `browserOpts` not contain `.fetchImage`, fetch will not perform and asset will return immediately, `image` and `error` will be `nil`.
     public typealias Asset = (asset: PHAsset, image: UIImage?, error: Error?)
-    /// return asset and original image or not
+    /// Return select assets and if original or not.
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
-    /// return browsable asset array
+    /// Return browsable asset array.
     public typealias AssetableSelectHandler = (([ADAssetBrowsable]) -> Void)
-    /// cancel select
+    /// Cancel select.
     public typealias AssetCancelHandler = (() -> Void)
     
+    /// Show picker to select assets.
+    /// - Parameters:
+    ///   - on: The controller to show picker.
+    ///   - style: Style to display picker.
+    ///   - assets: Assets have been selected.
+    ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
+    ///   - browserOpts: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - params: Params to control the asset select condition.
+    ///   - selected: Called after selection finish.
+    ///   - canceled: Called when cancel select.
     public class func imagePicker(present on: UIViewController,
                                     style: ADPickerStyle = .normal,
                                     assets: [PHAsset] = [],
@@ -159,6 +179,15 @@ public class ADPhotoKitUI {
         }
     }
     
+    /// Show controller to browser and select assets.
+    /// - Parameters:
+    ///   - on: The controller to show browser.
+    ///   - assets: Assets to browser.
+    ///   - index: Current browser asset index.
+    ///   - selects: Indexs of assets have been selected.
+    ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - selected: Called after selection finish.
+    ///   - canceled: Called when cancel select.
     public class func assetBrowser(present on: UIViewController,
                                     assets:  [ADAssetBrowsable],
                                     index: Int? = nil,
@@ -177,7 +206,8 @@ public class ADPhotoKitUI {
         on.present(nav, animated: true, completion: nil)
     }
     
-    static var config: ADPhotoKitConfig!
+    /// Config pass through.
+    public static var config: ADPhotoKitConfig!
 }
 
 extension ADPhotoKitUI {

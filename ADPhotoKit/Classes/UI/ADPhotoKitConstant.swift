@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 let isPad:Bool = { return UIDevice.current.userInterfaceIdiom == .pad }()
 let isPhone:Bool = { return UIDevice.current.userInterfaceIdiom == .phone }()

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import Kingfisher
 import Photos
 
@@ -34,6 +35,13 @@ extension UIImageView {
         }
     }
     
+    /// Sets an image to imageView with `PHAsset`.
+    /// - Parameters:
+    ///   - asset: Asset to fetch image.
+    ///   - size: Size of fetch image.
+    ///   - placeholder: A placeholder to show while retrieving the image from asset.
+    ///   - progress: Progress of fetching request.
+    ///   - completionHandler: Called after fetch result.
     public func setAsset(_ asset: PHAsset,
                   size: CGSize? = nil,
                   placeholder: UIImage? = nil,
@@ -77,6 +85,8 @@ extension UIImageView {
         }
     }
     
+    /// Sets an image to imageView with video url.
+    /// - Parameter url: Video url.
     public func setVideoUrlAsset(_ url: URL) {
         let assert = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: assert)

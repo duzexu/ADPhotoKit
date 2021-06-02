@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Select preview view cell in browser controller.
 public class ADBrowserToolBarCell: UICollectionViewCell {
     
     var imageView: UIImageView!
@@ -89,6 +90,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
 /// UIAppearance
 extension ADBrowserToolBarCell {
     
+    /// Key for attribute.
     public class Key: NSObject {
         let rawValue: String
         init(rawValue: String) {
@@ -99,6 +101,8 @@ extension ADBrowserToolBarCell {
         }
     }
     
+    /// You may specify the corner radius, tag color, tag font,and border color properties for the cell in the attributes dictionary, using the keys found in `ADBrowserToolBarCell.Key`.
+    /// - Parameter attrs: Attributes dictionary.
     @objc
     public func setAttributes(_ attrs: [Key : Any]?) {
         if let kvs = attrs {

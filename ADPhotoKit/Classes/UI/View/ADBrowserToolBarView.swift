@@ -35,7 +35,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     /// ui
     var bgView: UIView!
     
-    var editBtn: UIButton!
+    var editBtn: UIButton?
     var originalBtn: UIButton!
     var doneBtn: UIButton!
     
@@ -93,6 +93,7 @@ private extension ADBrowserToolBarView {
             make.height.equalTo(55)
         }
         
+        #if Module_Edit
         editBtn = createBtn(ADLocale.LocaleKey.edit.localeTextValue, #selector(editAction))
         btnsView.addSubview(editBtn)
         editBtn.snp.makeConstraints { (make) in
@@ -100,6 +101,7 @@ private extension ADBrowserToolBarView {
             make.height.equalTo(34)
             make.centerY.equalToSuperview()
         }
+        #endif
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
         originalBtn.isHidden = !(dataSource?.options.contains(.selectOriginal) ?? false)
@@ -159,22 +161,22 @@ private extension ADBrowserToolBarView {
         case let .image(source):
             switch source {
             case .network(_):
-                editBtn.isHidden = true
+                editBtn?.isHidden = true
                 originalBtn.alpha = 0
             case let .album(ass):
                 if ass.isGif || ass.isLivePhoto {
-                    editBtn.isHidden = true
+                    editBtn?.isHidden = true
                     originalBtn.alpha = 0
                 }else{
-                    editBtn.isHidden = false
+                    editBtn?.isHidden = false
                     originalBtn.alpha = 1
                 }
             case .local:
-                editBtn.isHidden = true
+                editBtn?.isHidden = true
                 originalBtn.alpha = 0
             }
         case .video(_):
-            editBtn.isHidden = true
+            editBtn?.isHidden = true
             originalBtn.alpha = 0
         }
     }

@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Subclass of `ADAssetBrowserController` to browser `PHAsset` in big mode.
 class ADAssetModelBrowserController: ADAssetBrowserController {
 
     var listData: ADAssetListDataSource
@@ -46,14 +47,14 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                 if let max = config.params.maxVideoTime {
                     if duration > max {
                         let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
-                        ADAlert.alert(on: self, message: message)
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }
                 }
                 if let min = config.params.minVideoTime {
                     if duration < min {
                         let message = String(format: ADLocale.LocaleKey.shorterThanMaxVideoDuration.localeTextValue, min)
-                        ADAlert.alert(on: self, message: message)
+                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }
                 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Associate reloadable view.
 public protocol ADDataSourceReloadable: class {

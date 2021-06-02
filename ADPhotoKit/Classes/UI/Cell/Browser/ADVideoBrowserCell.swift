@@ -9,6 +9,7 @@ import UIKit
 import Photos
 import AVFoundation
 
+/// Cell for browse video asset in browser controller.
 class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
         
     var player: AVPlayer?

@@ -9,7 +9,7 @@ import UIKit
 
 class ADProgressHUD: UIView, ADProgressHUDConfigurable {
     
-    public enum HUDStyle: Int {
+    enum HUDStyle: Int {
         
         case light
         
@@ -61,11 +61,11 @@ class ADProgressHUD: UIView, ADProgressHUDConfigurable {
         
     }
     
-    public let style: HUDStyle
+    let style: HUDStyle
     
-    public var timeoutBlock: (() -> Void)?
+    var timeoutBlock: (() -> Void)?
     
-    public init(style: HUDStyle = .lightBlur) {
+    init(style: HUDStyle = .lightBlur) {
         self.style = style
         super.init(frame: UIScreen.main.bounds)
         self.setupUI()
