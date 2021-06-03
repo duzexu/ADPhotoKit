@@ -33,7 +33,9 @@ extension Bundle {
         
         #if SWIFT_PACKAGE
         // For SWIFT_PACKAGE.
-        candidates.append(Bundle.module.bundleURL)
+        if let url = Bundle.module?.bundleURL {
+            candidates.append(url)
+        }
         #endif
 
         for candidate in candidates {

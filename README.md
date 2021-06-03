@@ -10,6 +10,7 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 
 ## Features
 
+* [x] Well documentation.
 * [x] Supports both single and multiple selection.
 * [x] Supports filtering albums and sorting by type.
 * [x] iCloud Support.
@@ -35,7 +36,7 @@ For more configuration you can set, you can see [ADPhotoKitConfiguration](./ADPh
 
 ## Learn More
 
-To lean more use of ADPhotoKit, refer to the example.
+To lean more use of ADPhotoKit, refer to the example and [API Reference](https://duzexu.github.io/ADPhotoKit/).
 
 ## Requirements
 
@@ -45,6 +46,8 @@ To lean more use of ADPhotoKit, refer to the example.
 > Objective-C is not supported. Swift is the future and dropping Obj-C is the price to pay to keep our velocity on this library :)
 
 ### Installation
+
+#### CocoaPods
 
 ADPhotoKit is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
@@ -59,6 +62,25 @@ target 'MyApp' do
 end
 ```
 
+##### Subspecs
+
+There are 2 subspecs available now:
+
+| Subspec | Description |
+|---|---|
+| Core | Required. This subspec provides raw data. |
+| UI | Optional. The subspec provides ui for photo select. |
+
+You can install only some of the ADPhotoKit modules. By default, you get all subspecs.
+
+#### Swift Package Manager
+
+* File > Swift Packages > Add Package Dependency
+* Add https://github.com/duzexu/ADPhotoKit.git
+* Select "Branch" with "master"
+
+#### Note
+
 <font color=#B30E44>**You need to add the following key-value pairs in your app's Info.plist**</font>
 
 ```swift
@@ -72,18 +94,8 @@ Privacy - Camera Usage Description
 Privacy - Microphone Usage Description
 ```
 
-### Subspecs
-
-There are 2 subspecs available now:
-
-| Subspec | Description |
-|---|---|
-| Core | Required. This subspec provides raw data. |
-| UI | Optional. The subspec provides ui for photo select. |
-
-You can install only some of the ADPhotoKit modules. By default, you get all subspecs.
-
 ## Contributing
+
 If you have feature requests or bug reports, feel free to help out by sending pull requests or by creating new issues.
 
 ## License
