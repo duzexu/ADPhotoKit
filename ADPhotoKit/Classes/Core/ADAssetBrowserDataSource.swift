@@ -105,11 +105,13 @@ public class ADAssetBrowserDataSource: NSObject {
         selectView?.insertItems(at: [ip])
         selectView?.scrollToItem(at: ip, at: .centeredHorizontally, animated: true)
         selectAssetChanged?(selects.count)
+        #if Module_UI
         if selects.count == 1 {
             if let model = selects.randomElement() {
                 ADPhotoKitUI.config.selectMediaImage = model.browseAsset.isImage
             }
         }
+        #endif
     }
     
     /// Deselect the asset.
@@ -122,9 +124,11 @@ public class ADAssetBrowserDataSource: NSObject {
             isSelected = selectIndexs.contains(index)
             selectView?.deleteItems(at: [IndexPath(row: i, section: 0)])
             selectAssetChanged?(selects.count)
+            #if Module_UI
             if selects.count == 0 {
                 ADPhotoKitUI.config.selectMediaImage = nil
             }
+            #endif
         }
     }
     
