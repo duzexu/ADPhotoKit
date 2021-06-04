@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import Kingfisher
 import Photos
 
 /// Represents an asset source for browser.

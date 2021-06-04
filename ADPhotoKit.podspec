@@ -21,10 +21,10 @@ Pod::Spec.new do |s|
   ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album.
                        DESC
 
-  s.homepage         = 'https://github.com/zexu007@qq.com/ADPhotoKit'
+  s.homepage         = 'https://github.com/duzexu/ADPhotoKit.git'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'zexu007@qq.com' => 'zexu007@qq.com' }
-  s.source           = { :git => 'https://github.com/zexu007@qq.com/ADPhotoKit.git', :tag => s.version.to_s }
+  s.author           = { 'duzexu' => 'zexu007@qq.com' }
+  s.source           = { :git => 'https://github.com/duzexu/ADPhotoKit.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'

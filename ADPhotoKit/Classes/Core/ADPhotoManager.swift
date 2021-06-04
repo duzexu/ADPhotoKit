@@ -8,24 +8,6 @@
 import UIKit
 import Photos
 
-/// Options to set the album type and order.
-public struct ADAlbumSelectOptions: OptionSet {
-    public let rawValue: Int
-    
-    /// If contain, assets will return with lastest time at last, if not, the results will revert. Default is not contain.
-    public static let ascending = ADAlbumSelectOptions(rawValue: 1 << 0)
-    /// If contain, results will have image assets. Default is contain.
-    public static let allowImage = ADAlbumSelectOptions(rawValue: 1 << 1)
-    /// If contain, results will have video assets. Default is contain.
-    public static let allowVideo = ADAlbumSelectOptions(rawValue: 1 << 2)
-    
-    public static let `default`: ADAlbumSelectOptions = [.allowImage, .allowVideo]
-    
-    public init(rawValue: Int) {
-        self.rawValue = rawValue
-    }
-}
-
 /// Main manager class of ADPhotoKit Core. It provide a set of convenience methods to fetch asset from system album.
 /// You can use this class to fetch or save asset.
 public class ADPhotoManager {

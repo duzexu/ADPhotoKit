@@ -1,8 +1,8 @@
 PODS:
-  - ADPhotoKit (0.1.0):
-    - ADPhotoKit/UI (= 0.1.0)
-  - ADPhotoKit/Core (0.1.0)
-  - ADPhotoKit/UI (0.1.0):
+  - ADPhotoKit (1.0.0):
+    - ADPhotoKit/UI (= 1.0.0)
+  - ADPhotoKit/Core (1.0.0)
+  - ADPhotoKit/UI (1.0.0):
     - ADPhotoKit/Core
     - Kingfisher (~> 6.0)
     - SnapKit
@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ADPhotoKit: ffee6a5239d0c5e248ee58962ed9de4ad9928f4b
+  ADPhotoKit: 8f41dba882b59af8d66f75c4629e5d4c2421f76f
   Kingfisher: e71c6fac2aebb1262888cabc2cb13d313362a48f
   ProgressHUD: e603e8b8622c47d8818b9fb38b3cfe9d3e7ca421
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
