@@ -21,7 +21,7 @@ public class ADCameraCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = UIColor(white: 0.3, alpha: 1)
-        imageView = UIImageView(image: Bundle.uiBundle?.image(name: "takePhoto"))
+        imageView = UIImageView(image: Bundle.image(name: "takePhoto"))
         imageView.contentMode = .center
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in

@@ -20,7 +20,7 @@ class ADAssetBrowserTransition: NSObject, UIViewControllerAnimatedTransitioning 
     
 }
 
-protocol ADAssetBrowserInteractiveTransitionDelegate: class {
+protocol ADAssetBrowserInteractiveTransitionDelegate: AnyObject {
     func transitionShouldStart(_ point: CGPoint) -> Bool
     
     func transitionDidStart()
@@ -36,13 +36,13 @@ extension ADAssetBrowserInteractiveTransitionDelegate {
     }
 }
 
-protocol ADAssetBrowserTransitionContextFrom: class {
+protocol ADAssetBrowserTransitionContextFrom: AnyObject {
     var contextIdentifier: String { get }
     
     func transitionInfo(convertTo: UIView) -> (UIView,CGRect)
 }
 
-protocol ADAssetBrowserTransitionContextTo: class {
+protocol ADAssetBrowserTransitionContextTo: AnyObject {
     func transitionRect(identifier: String, convertTo: UIView) -> CGRect?
 }
 

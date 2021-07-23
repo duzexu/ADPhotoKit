@@ -11,6 +11,10 @@ import AVFoundation
 
 /// Cell for browse video asset in browser controller.
 class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
+    
+    override var editData: ADAssetEditData? {
+        return nil
+    }
         
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer!
@@ -103,7 +107,7 @@ private extension ADVideoBrowserCell {
         
         let attStr = NSMutableAttributedString()
         let attach = NSTextAttachment()
-        attach.image = Bundle.uiBundle?.image(name: "videoLoadFailed")
+        attach.image = Bundle.image(name: "videoLoadFailed")
         attach.bounds = CGRect(x: 0, y: -10, width: 30, height: 30)
         attStr.append(NSAttributedString(attachment: attach))
         let errorText = NSAttributedString(string: ADLocale.LocaleKey.iCloudVideoLoadFaild.localeTextValue, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12)])
@@ -124,7 +128,7 @@ private extension ADVideoBrowserCell {
         }
         
         playBtn = UIButton(type: .custom)
-        playBtn.setImage(Bundle.uiBundle?.image(name: "playVideo"), for: .normal)
+        playBtn.setImage(Bundle.image(name: "playVideo"), for: .normal)
         playBtn.setImage(UIImage(), for: .selected)
         playBtn.addTarget(self, action: #selector(playBtnAction(sender:)), for: .touchUpInside)
         contentView.addSubview(playBtn)

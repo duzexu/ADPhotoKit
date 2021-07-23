@@ -54,6 +54,14 @@ extension ADImageSource {
 /// Cell for browse image asset in browser controller.
 class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     
+    override var editData: ADAssetEditData? {
+        if !imageBrowserView.isHidden {
+            return .image(imageBrowserView.imageView.image)
+        }else{
+            return .image(livePhotoBrowserView.imageView.image)
+        }
+    }
+    
     var imageBrowserView: ADImageBrowserView!
     
     var livePhotoBrowserView: ADLivePhotoBrowserView!
@@ -119,7 +127,7 @@ class ADImageBrowserView: UIView {
             }
         }
     }
-    
+        
     var singleTapBlock: (() -> Void)?
     
     var scrollView: UIScrollView!
@@ -204,11 +212,11 @@ private extension ADImageBrowserView {
             progressView.progress = 0
             resizeView(pixelWidth: CGFloat(asset.pixelWidth), pixelHeight: CGFloat(asset.pixelHeight))
             if asset.isGif { //gif 情况下优先加载一个小的缩略图
-                imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
+                imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
                     self?.loadOriginImageData(asset: asset)
                 })
             }else{
-                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.uiBundle?.image(name: "defaultphoto")) { [weak self] (progress) in
+                imageView.setAsset(asset, size: asset.browserSize, placeholder: Bundle.image(name: "defaultphoto")) { [weak self] (progress) in
                     if progress >= 1 {
                         self?.progressView.isHidden = true
                     }else{
@@ -393,7 +401,7 @@ private extension ADLivePhotoBrowserView {
         if let id = requestID {
             PHImageManager.default().cancelImageRequest(id)
         }
-        imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
+        imageView.setAsset(asset, size: CGSize(width: asset.browserSize.width/2, height: asset.browserSize.height/2), placeholder: Bundle.image(name: "defaultphoto"), completionHandler:  { [weak self] (img) in
             self?.loadLivePhotoData(asset: asset)
         })
     }

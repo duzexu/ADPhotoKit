@@ -93,10 +93,10 @@ private extension ADBrowserToolBarView {
             make.height.equalTo(55)
         }
         
-        #if Module_Edit
+        #if Module_ImageEdit
         editBtn = createBtn(ADLocale.LocaleKey.edit.localeTextValue, #selector(editAction))
-        btnsView.addSubview(editBtn)
-        editBtn.snp.makeConstraints { (make) in
+        btnsView.addSubview(editBtn!)
+        editBtn!.snp.makeConstraints { (make) in
             make.left.equalToSuperview().offset(15)
             make.height.equalTo(34)
             make.centerY.equalToSuperview()
@@ -106,8 +106,8 @@ private extension ADBrowserToolBarView {
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
         originalBtn.isHidden = !(dataSource?.options.contains(.selectOriginal) ?? false)
         originalBtn.isSelected = isOriginal
-        originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
-        originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
+        originalBtn.setImage(Bundle.image(name: "btn_original_circle"), for: .normal)
+        originalBtn.setImage(Bundle.image(name: "btn_original_selected"), for: .selected)
         originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
         originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
         btnsView.addSubview(originalBtn)
@@ -157,12 +157,16 @@ private extension ADBrowserToolBarView {
     }
     
     func reload(asset: ADAssetBrowsable) {
+        editBtn?.isHidden = true
         switch asset.browseAsset {
         case let .image(source):
             switch source {
             case .network(_):
                 editBtn?.isHidden = true
                 originalBtn.alpha = 0
+                #if Module_ImageEdit
+                editBtn?.isHidden = false
+                #endif
             case let .album(ass):
                 if ass.isGif || ass.isLivePhoto {
                     editBtn?.isHidden = true
@@ -171,9 +175,17 @@ private extension ADBrowserToolBarView {
                     editBtn?.isHidden = false
                     originalBtn.alpha = 1
                 }
+                #if Module_ImageEdit
+                if ass.mediaType == .image {
+                    editBtn?.isHidden = false
+                }
+                #endif
             case .local:
                 editBtn?.isHidden = true
                 originalBtn.alpha = 0
+                #if Module_ImageEdit
+                editBtn?.isHidden = false
+                #endif
             }
         case .video(_):
             editBtn?.isHidden = true

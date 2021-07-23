@@ -30,23 +30,37 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   s.requires_arc          = true
   s.frameworks            = 'UIKit','Photos','PhotosUI','AVFoundation'
-  s.default_subspec = 'UI'
+  s.default_subspec = 'CoreUI'
   
-  s.subspec "Core" do |c|
-    c.source_files  = ["ADPhotoKit/Classes/Core/**/*.swift"]
-    c.resource_bundles = {
-      'ADPhotoKitCore' => ['ADPhotoKit/Assets/Core/**/*']
+  s.subspec "Base" do |b|
+    b.source_files  = ["ADPhotoKit/Classes/Base/**/*.swift"]
+    b.resource_bundles = {
+      'ADPhotoKitBase' => ['ADPhotoKit/Assets/Base/**/*']
     }
   end
   
-  s.subspec "UI" do |ui|
+  s.subspec "Core" do |c|
+    c.dependency 'ADPhotoKit/Base'
+    c.source_files  = ["ADPhotoKit/Classes/Core/**/*.swift"]
+  end
+  
+  s.subspec "CoreUI" do |ui|
     ui.dependency 'ADPhotoKit/Core'
     ui.dependency 'SnapKit'
     ui.dependency 'Kingfisher', '~> 6.0'
-    ui.source_files  = ["ADPhotoKit/Classes/UI/**/*.swift"]
+    ui.source_files  = ["ADPhotoKit/Classes/CoreUI/**/*.swift"]
     ui.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_UI'}
     ui.resource_bundles = {
-      'ADPhotoKitUI' => ['ADPhotoKit/Assets/UI/**/*']
+      'ADPhotoKitCoreUI' => ['ADPhotoKit/Assets/CoreUI/**/*']
+    }
+  end
+  
+  s.subspec "ImageEdit" do |img|
+    img.dependency 'SnapKit'
+    img.source_files  = ["ADPhotoKit/Classes/ImageEdit/**/*.swift"]
+    img.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_ImageEdit'}
+    img.resource_bundles = {
+      'ADPhotoKitImageEdit' => ['ADPhotoKit/Assets/ImageEdit/**/*']
     }
   end
   

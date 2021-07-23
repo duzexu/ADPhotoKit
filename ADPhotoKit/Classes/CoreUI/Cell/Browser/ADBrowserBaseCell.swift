@@ -11,6 +11,10 @@ class ADBrowserBaseCell: UICollectionViewCell, ADBrowserCellConfigurable {
     
     var singleTapBlock: (() -> Void)?
     
+    var editData: ADAssetEditData? {
+        return nil
+    }
+    
     func cellWillDisplay() {
         
     }

@@ -12,6 +12,11 @@ import ADPhotoKit
 import Photos
 
 class VideoBrowserCell: UICollectionViewCell, ADVideoBrowserCellConfigurable {
+    
+    var editData: ADAssetEditData? {
+        return nil
+    }
+    
     func configure(with source: ADVideoSource) {
         switch source {
         case let .network(url):

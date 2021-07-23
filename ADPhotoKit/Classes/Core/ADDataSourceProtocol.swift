@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 /// Associate reloadable view.
-public protocol ADDataSourceReloadable: class {
+public protocol ADDataSourceReloadable: AnyObject {
     
     func reloadData()
     

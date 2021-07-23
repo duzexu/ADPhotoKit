@@ -90,7 +90,7 @@ private extension ADThumbnailToolBarView {
                 make.height.equalTo(70)
             }
             
-            let icon = UIImageView(image: Bundle.uiBundle?.image(name: "warning"))
+            let icon = UIImageView(image: Bundle.image(name: "warning"))
             tipsView.addSubview(icon)
             icon.snp.makeConstraints { (make) in
                 make.left.equalToSuperview().offset(18)
@@ -113,7 +113,7 @@ private extension ADThumbnailToolBarView {
                 make.height.equalTo(40)
             }
             
-            let arrow = UIImageView(image: Bundle.uiBundle?.image(name: "right_arrow"))
+            let arrow = UIImageView(image: Bundle.image(name: "right_arrow"))
             tipsView.addSubview(arrow)
             arrow.snp.makeConstraints { (make) in
                 make.right.equalToSuperview().offset(-13)
@@ -143,8 +143,8 @@ private extension ADThumbnailToolBarView {
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
         originalBtn.isHidden = !config.assetOpts.contains(.selectOriginal) && config.albumOpts.contains(.allowImage)
         originalBtn.isSelected = isOriginal
-        originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_circle"), for: .normal)
-        originalBtn.setImage(Bundle.uiBundle?.image(name: "btn_original_selected"), for: .selected)
+        originalBtn.setImage(Bundle.image(name: "btn_original_circle"), for: .normal)
+        originalBtn.setImage(Bundle.image(name: "btn_original_selected"), for: .selected)
         originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
         originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
         btnsView.addSubview(originalBtn)

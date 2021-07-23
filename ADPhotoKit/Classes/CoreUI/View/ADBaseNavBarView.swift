@@ -28,7 +28,7 @@ class ADBaseNavBarView: UIView {
     var rightBtnItem: UIButton!
     var titleLabel: UILabel!
 
-    init(leftItem: ButtonItem? = (Bundle.uiBundle?.image(name: "navBack"),nil,nil), rightItem: ButtonItem? = nil) {
+    init(leftItem: ButtonItem? = (Bundle.image(name: "navBack"),nil,nil), rightItem: ButtonItem? = nil) {
         super.init(frame: .zero)
         setupUI(leftItem: leftItem, rightItem: rightItem)
     }

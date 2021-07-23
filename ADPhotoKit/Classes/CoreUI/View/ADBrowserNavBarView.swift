@@ -18,7 +18,7 @@ class ADBrowserNavBarView: ADBaseNavBarView, ADBrowserNavBarConfigurable {
 
     required init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
-        super.init(rightItem: (Bundle.uiBundle?.image(name: "btn_circle"), Bundle.uiBundle?.image(name: "btn_selected"),nil))
+        super.init(rightItem: (Bundle.image(name: "btn_circle"), Bundle.image(name: "btn_selected"),nil))
         
         setupChildUI()
     }

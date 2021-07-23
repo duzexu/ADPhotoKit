@@ -196,6 +196,12 @@ private extension ADAssetBrowserController {
         controlsView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
+        #if Module_ImageEdit
+        toolBarView.editActionBlock = { [weak self] in
+            let edit = ADImageEditController(image: UIImage())
+            self?.navigationController?.pushViewController(edit, animated: false)
+        }
+        #endif
         toolBarView.doneActionBlock = { [weak self] in
             self?.finishSelection()
         }

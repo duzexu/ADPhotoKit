@@ -64,9 +64,9 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
                     tagLabel.text = "GIF"
                 }else if asset.isLivePhoto {
                     tagImageView.isHidden = false
-                    tagImageView.image = Bundle.uiBundle?.image(name: "livePhoto")
+                    tagImageView.image = Bundle.image(name: "livePhoto")
                 }
-                imageView.setAsset(asset, size: CGSize(width: 60*UIScreen.main.scale, height: 60*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+                imageView.setAsset(asset, size: CGSize(width: 60*UIScreen.main.scale, height: 60*UIScreen.main.scale), placeholder: Bundle.image(name: "defaultphoto"))
             case let .local(img,_):
                 imageView.image = img
             }
@@ -76,8 +76,8 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
                 imageView.setVideoUrlAsset(url)
             case let .album(asset):
                 tagImageView.isHidden = false
-                tagImageView.image = Bundle.uiBundle?.image(name: "video")
-                imageView.setAsset(asset, size: CGSize(width: 60*UIScreen.main.scale, height: 60*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+                tagImageView.image = Bundle.image(name: "video")
+                imageView.setAsset(asset, size: CGSize(width: 60*UIScreen.main.scale, height: 60*UIScreen.main.scale), placeholder: Bundle.image(name: "defaultphoto"))
             case let .local(url):
                 imageView.setVideoUrlAsset(url)
             }

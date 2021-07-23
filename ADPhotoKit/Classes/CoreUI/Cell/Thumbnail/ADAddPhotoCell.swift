@@ -14,7 +14,7 @@ public class ADAddPhotoCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        imageView = UIImageView(image: Bundle.uiBundle?.image(name: "addPhoto"))
+        imageView = UIImageView(image: Bundle.image(name: "addPhoto"))
         imageView.backgroundColor = UIColor(white: 0.3, alpha: 1)
         imageView.contentMode = .center
         contentView.addSubview(imageView)

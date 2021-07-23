@@ -28,10 +28,13 @@ public class ADPhotoKitConfiguration {
     /// Custom album orders, if type not contain, it will not display. Default is ordered by `ADAlbumType.allCases` 's order.
     public var customAlbumOrders: [ADAlbumType]?
     
+    /// Custom alert. Default to use alert in framework.
+    public var customAlert: ADAlertConfigurable.Type?
+    
     #if Module_UI
     
-    /// You can custom image Bundle by this property or simple replace image in `ADPhotoKitUI.bundle`. Default is `ADPhotoKitUI.bundle`.
-    public var customUIBundle: Bundle?
+    /// You can custom `core` image Bundle by this property or simple replace image in `ADPhotoKitCoreUI.bundle`. Default is `ADPhotoKitCoreUI.bundle`.
+    public var customCoreUIBundle: Bundle?
     
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
@@ -41,9 +44,6 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `ProgressView`. Default to use view in framework.
     public var customProgressBlock: (() -> ADProgressableable)?
-    
-    /// Custom alert. Default to use alert in framework.
-    public var customAlert: ADAlertConfigurable.Type?
 
     /// Timeout for request images from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20
@@ -120,6 +120,13 @@ public class ADPhotoKitConfiguration {
     /// - Note: If use your custom cells, you must regist cells first by set `customBrowserCellRegistor` block.
     public var customBrowserCellBlock: ((UICollectionView, IndexPath, ADAsset) -> ADBrowserCellable)?
         
+    #endif
+    
+    #if Module_ImageEdit
+    
+    /// You can custom `image edit` image Bundle by this property or simple replace image in `ADPhotoKitImageEdit.bundle`. Default is `ADPhotoKitImageEdit.bundle`.
+    public var customImageEditBundle: Bundle?
+    
     #endif
 
 }

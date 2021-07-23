@@ -133,7 +133,7 @@ public class ADLocale {
             if let value = ADPhotoKitConfiguration.default.customLocaleValue?[ADLocale.current]?[self] {
                 return value
             }
-            return Bundle.ad_LocalizedString(rawValue)
+            return Bundle.localizedString(rawValue)
         }
     }
 

@@ -67,7 +67,7 @@ private extension ADThumbnailNavBarView {
             make.centerY.equalToSuperview()
         }
         
-        arrowImageView = UIImageView(image: Bundle.uiBundle?.image(name: "downArrow"))
+        arrowImageView = UIImageView(image: Bundle.image(name: "downArrow"))
         titleBg.addSubview(arrowImageView!)
         arrowImageView!.snp.makeConstraints { (make) in
             make.size.equalTo(CGSize(width: 20, height: 20))

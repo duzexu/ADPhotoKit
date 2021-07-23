@@ -97,6 +97,12 @@ public protocol ADThumbnailCellConfigurable {
     
 }
 
+/// Asset raw data for edit.
+public enum ADAssetEditData {
+    case image(UIImage?)
+    case video(URL)
+}
+
 /// Browser controller's collection view cell.
 /// - Note: Don't use this protocol directly. User `ADImageBrowserCellable` or `ADVideoBrowserCellable` instead.
 public typealias ADBrowserCellable = (UICollectionViewCell & ADBrowserCellConfigurable)
@@ -105,6 +111,10 @@ public protocol ADBrowserCellConfigurable {
     
     /// Called when tap cell.
     var singleTapBlock: (() -> Void)? { set get }
+    
+    /// Return raw data used to edit.
+    var editData: ADAssetEditData? { get }
+    
     /// Call when cell will display.
     func cellWillDisplay()
     /// Call when cell did end display.

@@ -44,7 +44,7 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         albumTitleLabel.text = model.title
         albumCountLabel.text = "(\(model.count))"
         if let asset = model.lastestAsset {
-            albumImageView.setAsset(asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+            albumImageView.setAsset(asset, size: CGSize(width: 65*UIScreen.main.scale, height: 65*UIScreen.main.scale), placeholder: Bundle.image(name: "defaultphoto"))
         }
     }
     
@@ -101,7 +101,7 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         }
         
         accessory = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-        accessory.image = Bundle.uiBundle?.image(name: "albumSelect")
+        accessory.image = Bundle.image(name: "albumSelect")
         accessory.isHidden = true
     }
     

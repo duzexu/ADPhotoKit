@@ -72,8 +72,8 @@ public class ADThumbnailListCell: UICollectionViewCell {
         }
         
         selectBtn = UIButton(type: .custom)
-        selectBtn.setBackgroundImage(Bundle.uiBundle?.image(name: "btn_unselected"), for: .normal)
-        selectBtn.setBackgroundImage(Bundle.uiBundle?.image(name: "btn_selected"), for: .selected)
+        selectBtn.setBackgroundImage(Bundle.image(name: "btn_unselected"), for: .normal)
+        selectBtn.setBackgroundImage(Bundle.image(name: "btn_selected"), for: .selected)
         selectBtn.addTarget(self, action: #selector(selectBtnAction(sender:)), for: .touchUpInside)
         contentView.addSubview(selectBtn)
         selectBtn.snp.makeConstraints { (make) in
@@ -96,7 +96,7 @@ public class ADThumbnailListCell: UICollectionViewCell {
         }
         
         bottomMaskView = UIImageView(frame: .zero)
-        bottomMaskView.image = Bundle.uiBundle?.image(name: "shadow")
+        bottomMaskView.image = Bundle.image(name: "shadow")
         contentView.addSubview(bottomMaskView)
         bottomMaskView.snp.makeConstraints { (make) in
             make.left.right.bottom.equalToSuperview()
@@ -216,15 +216,15 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
             descLabel.text = "GIF"
         case .livePhoto:
             bottomMaskView.isHidden = !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto)
-            tagImageView.image = Bundle.uiBundle?.image(name: "livePhoto")
+            tagImageView.image = Bundle.image(name: "livePhoto")
             descLabel.text = "Live"
         case let .video(_, format):
-            tagImageView.image = Bundle.uiBundle?.image(name: "video")
+            tagImageView.image = Bundle.image(name: "video")
             bottomMaskView.isHidden = false
             descLabel.text = format
         }
         
-        imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.uiBundle?.image(name: "defaultphoto"))
+        imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.image(name: "defaultphoto"))
     }
     
     /// Select or deselect cell.
