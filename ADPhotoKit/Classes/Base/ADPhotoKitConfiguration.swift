@@ -127,6 +127,10 @@ public class ADPhotoKitConfiguration {
     /// You can custom `image edit` image Bundle by this property or simple replace image in `ADPhotoKitImageEdit.bundle`. Default is `ADPhotoKitImageEdit.bundle`.
     public var customImageEditBundle: Bundle?
     
+    public var defaultImageEditTool: ADImageEditTool = .all
+    
+    public var customImageEditTools: [ImageEditTool]?
+    
     #endif
 
 }

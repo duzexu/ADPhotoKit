@@ -7,14 +7,25 @@
 
 import Foundation
 
-protocol ImageProcessor {
+public protocol ImageProcessor: AnyObject {
     
     func process() -> UIImage?
     
 }
 
-protocol ImageEditTool: ImageProcessor {
+public protocol ImageEditTool: ImageProcessor {
     
+    var image: UIImage { get }
+    var selectImage: UIImage? { get }
+    var isSelected: Bool { set get }
+    
+    var toolConfigView: UIView? { set get }
+    
+    func toolDidSelect(ctx: UIViewController?) -> Bool
+        
 }
 
+public extension ImageEditTool {
+    var selectImage: UIImage? { return nil }
+}
 
