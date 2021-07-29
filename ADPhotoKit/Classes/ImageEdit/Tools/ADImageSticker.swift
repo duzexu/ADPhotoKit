@@ -20,7 +20,10 @@ class ADImageSticker: ImageEditTool {
     
     var isSelected: Bool = false
     
-    var toolConfigView: UIView?
+    var contentStatus: ((Bool) -> Void)?
+    
+    var toolConfigView: (UIView & ToolConfigable)?
+    var toolInteractView: (UIView & ToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
@@ -49,6 +52,7 @@ class ADImageSticker: ImageEditTool {
     
     init(style: Style) {
         self.style = style
+        toolInteractView = ADStickerInteractView.share
     }
     
 }

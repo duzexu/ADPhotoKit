@@ -11,6 +11,8 @@ class ADImageEditControlsView: UIView {
     
     weak var vc: UIViewController?
     
+    var contentStatus: ((Bool) -> Void)?
+    
     private let tools: [ImageEditTool]
     private var selectToolIndex: Int? {
         didSet {
@@ -29,6 +31,12 @@ class ADImageEditControlsView: UIView {
                     }
                 }
                 toolsCollectionView.reloadData()
+            }else{
+                if let old = oldValue {
+                    tools[old].isSelected = false
+                    tools[old].toolConfigView?.removeFromSuperview()
+                }
+                toolsCollectionView.reloadData()
             }
         }
     }
@@ -37,13 +45,48 @@ class ADImageEditControlsView: UIView {
     private var bottomShadow: CAGradientLayer!
     private var toolConfigContainer: UIView!
     private var toolsCollectionView: UICollectionView!
+    private var userInteractionBtns: [UIButton] = []
 
     init(vc: UIViewController, tools: [ImageEditTool]) {
         self.vc = vc
         self.tools = tools
         super.init(frame: .zero)
+        isUserInteractionEnabled = false
+        
+        for item in tools {
+            item.contentStatus = { [weak self] lock in
+                self?.contentStatus?(lock)
+            }
+        }
         
         setupUI()
+    }
+    
+    func singleTap(with point: CGPoint) -> Bool {
+        guard alpha == 1 else {
+            return false
+        }
+        for item in userInteractionBtns {
+            if item.frame.contains(point) {
+                item.sendActions(for: .touchUpInside)
+                return true
+            }
+        }
+        for sub in toolConfigContainer.subviews {
+            if let tool = sub as? ToolConfigable {
+                if tool.singleTap(with: point) {
+                    return true
+                }
+            }
+        }
+        if toolsCollectionView.frame.contains(point) {
+            let sub = convert(point, to: toolsCollectionView)
+            if let indexPath = toolsCollectionView.indexPathForItem(at: sub) {
+                collectionView(toolsCollectionView, didSelectItemAt: indexPath)
+                return true
+            }
+        }
+        return false
     }
     
     required init?(coder: NSCoder) {
@@ -92,6 +135,8 @@ private extension ADImageEditControlsView {
             make.width.greaterThanOrEqualTo(60)
         }
         
+        userInteractionBtns.append(leftBtnItem)
+        
         let confirmBtn = UIButton(type: .custom)
         confirmBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
         confirmBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x50A938)!), for: .normal)
@@ -108,6 +153,8 @@ private extension ADImageEditControlsView {
             make.right.equalToSuperview().offset(-20)
             make.height.equalTo(34)
         }
+        
+        userInteractionBtns.append(confirmBtn)
         
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 30, height: 30)
@@ -159,7 +206,9 @@ extension ADImageEditControlsView: UICollectionViewDataSource, UICollectionViewD
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let tool = tools[indexPath.row]
-        if tool.toolDidSelect(ctx: vc) {
+        if tool.isSelected {
+            selectToolIndex = nil
+        }else if tool.toolDidSelect(ctx: vc) {
             selectToolIndex = indexPath.row
         }
     }

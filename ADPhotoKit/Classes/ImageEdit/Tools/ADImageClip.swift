@@ -15,7 +15,10 @@ class ADImageClip: ImageEditTool {
     
     var isSelected: Bool = false
     
-    var toolConfigView: UIView?
+    var contentStatus: ((Bool) -> Void)?
+    
+    var toolConfigView: (UIView & ToolConfigable)?
+    var toolInteractView: (UIView & ToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         let clip = ADImageClipController()

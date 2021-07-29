@@ -196,12 +196,29 @@ private extension ADAssetBrowserController {
         controlsView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
-        #if Module_ImageEdit
-        toolBarView.editActionBlock = { [weak self] in
-            let edit = ADImageEditController(image: UIImage())
-            self?.navigationController?.pushViewController(edit, animated: false)
+        
+        func editAssetAction() {
+            if let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as? ADBrowserBaseCell {
+                if let edit = cell.editData {
+                    switch edit {
+                    case let .image(img):
+                        #if Module_ImageEdit
+                        if let image = img {
+                            let vc = ADImageEditController(image: image)
+                            navigationController?.pushViewController(vc, animated: false)
+                        }
+                        #endif
+                        break
+                    case .video(_):
+                        break
+                    }
+                }
+            }
         }
-        #endif
+        
+        toolBarView.editActionBlock = {
+            editAssetAction()
+        }
         toolBarView.doneActionBlock = { [weak self] in
             self?.finishSelection()
         }

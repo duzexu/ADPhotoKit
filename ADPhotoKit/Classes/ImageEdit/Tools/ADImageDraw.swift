@@ -12,13 +12,21 @@ class ADImageDraw: ImageEditTool {
     var image: UIImage
     var selectImage: UIImage?
     
-    var isSelected: Bool = false
+    var isSelected: Bool = false {
+        didSet {
+            toolInteractView?.isUserInteractionEnabled = isSelected
+            contentStatus?(isSelected)
+        }
+    }
     
-    var toolConfigView: UIView?
+    var contentStatus: ((Bool) -> Void)?
+    
+    var toolConfigView: (UIView & ToolConfigable)?
+    var toolInteractView: (UIView & ToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
-        case .line(_):
+        case .line:
             break
         case .mosaic:
             break
@@ -27,8 +35,8 @@ class ADImageDraw: ImageEditTool {
     }
     
     enum Style {
-        case line([UIColor])
-        case mosaic
+        case line([UIColor],Int)
+        case mosaic(UIImage)
     }
     
     func process() -> UIImage? {
@@ -40,14 +48,20 @@ class ADImageDraw: ImageEditTool {
     init(style: Style) {
         self.style = style
         switch style {
-        case .line(_):
-            toolConfigView = UIView()
+        case let .line(colors,index):
+            let colorSelect = ADDrawColorsView(colors: colors, select: index)
+            toolInteractView = ADDrawInteractView(style: .line({
+                return colorSelect.selectColor
+            }))
+            toolConfigView = colorSelect
             image = Bundle.image(name: "drawLine", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "drawLine_selected", module: .imageEdit)
-        case .mosaic:
+        case let .mosaic(img):
+            toolInteractView = ADDrawInteractView(style: .mosaic(img))
             image = Bundle.image(name: "mosaic", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "mosaic_selected", module: .imageEdit)
         }
+        toolInteractView?.isOpaque = false
     }
     
 }
