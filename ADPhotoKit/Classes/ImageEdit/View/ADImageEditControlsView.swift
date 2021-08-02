@@ -13,7 +13,7 @@ class ADImageEditControlsView: UIView {
     
     var contentStatus: ((Bool) -> Void)?
     
-    private let tools: [ImageEditTool]
+    private let tools: [ADImageEditTool]
     private var selectToolIndex: Int? {
         didSet {
             if let new = selectToolIndex {
@@ -47,7 +47,7 @@ class ADImageEditControlsView: UIView {
     private var toolsCollectionView: UICollectionView!
     private var userInteractionBtns: [UIButton] = []
 
-    init(vc: UIViewController, tools: [ImageEditTool]) {
+    init(vc: UIViewController, tools: [ADImageEditTool]) {
         self.vc = vc
         self.tools = tools
         super.init(frame: .zero)
@@ -73,7 +73,7 @@ class ADImageEditControlsView: UIView {
             }
         }
         for sub in toolConfigContainer.subviews {
-            if let tool = sub as? ToolConfigable {
+            if let tool = sub as? ADToolConfigable {
                 if tool.singleTap(with: point) {
                     return true
                 }

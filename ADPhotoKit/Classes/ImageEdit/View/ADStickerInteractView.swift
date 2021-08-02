@@ -7,18 +7,16 @@
 
 import UIKit
 
-public class ADStickerInteractView: UIView, ToolInteractable {
+public class ADStickerInteractView: UIView, ADToolInteractable {
     
     public var zIndex: Int {
-        return InteractZIndex.Top.rawValue
+        return ADInteractZIndex.Top.rawValue
     }
     
-    public var interactPolicy: InteractPolicy {
+    public var policy: ADInteractPolicy {
         return .simult
     }
-    
-    public var isInteracting: Bool = false
-    
+        
     public func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool {
         for item in container.subviews.reversed() {
             if item.frame.contains(point) {
@@ -42,7 +40,7 @@ public class ADStickerInteractView: UIView, ToolInteractable {
         return false
     }
     
-    public func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
         switch type {
         case let .pan(_, trans):
             target?.translation(by: CGPoint(x: trans.x/scale, y: trans.y/scale))
@@ -72,15 +70,11 @@ public class ADStickerInteractView: UIView, ToolInteractable {
     
     private weak var target: ADStickerContentView?
     
-    typealias ViewState = (center: CGPoint, scale: CGFloat)
-    
-    var state: ViewState?
-    
     func addContent(_ view: ADStickerContentView) {
-        if let scale = state?.scale {
+        if let scale = ADImageEditConfigurable.contentViewState?.scale {
             view.pinch(by: 1/scale)
         }
-        let center = state?.center ?? CGPoint(x: bounds.width/2, y: bounds.height/2)
+        let center = ADImageEditConfigurable.contentViewState?.center ?? CGPoint(x: bounds.width/2, y: bounds.height/2)
         view.center = center
         container.addSubview(view)
         view.beginActive()
@@ -88,7 +82,7 @@ public class ADStickerInteractView: UIView, ToolInteractable {
     
 }
 
-class ADStickerContentView: UIView {
+public class ADStickerContentView: UIView {
     
     var isActive: Bool = false
     
@@ -130,10 +124,10 @@ class ADStickerContentView: UIView {
     
 }
 
-class ADImageStickerContentView: ADStickerContentView {
+public class ADImageStickerContentView: ADStickerContentView {
     
-    init(image: UIImage) {
-        super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -20, dy: -20))
+    public init(image: UIImage) {
+        super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -10, dy: -10))
         
         let imageView = UIImageView(image: image)
         addSubview(imageView)
@@ -149,4 +143,20 @@ class ADImageStickerContentView: ADStickerContentView {
 
 class ADTextStickerContentView: ADStickerContentView {
     
+    init(text: String) {
+        super.init(frame: .zero)
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 30)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.lineBreakMode = .byCharWrapping
+        addSubview(label)
+        label.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20))
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }

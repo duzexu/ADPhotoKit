@@ -127,9 +127,9 @@ public class ADPhotoKitConfiguration {
     /// You can custom `image edit` image Bundle by this property or simple replace image in `ADPhotoKitImageEdit.bundle`. Default is `ADPhotoKitImageEdit.bundle`.
     public var customImageEditBundle: Bundle?
     
-    public var systemImageEditTool: ADImageEditTool = .all
+    public var systemImageEditTools: ADImageEditTools = .all
     
-    public var customImageEditTools: [ImageEditTool]?
+    public var customImageEditTools: [ADImageEditTool]?
     
     public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0x50A938)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x8B69EA)!]
     
@@ -140,6 +140,8 @@ public class ADPhotoKitConfiguration {
     public var mosaicDrawWidth: CGFloat = 25
     
     public var customImageStickerSelectVC: ADImageStickerSelectable?
+    
+    public var customTextStickerEditVC: ADTextStickerEditable?
     
     #endif
 

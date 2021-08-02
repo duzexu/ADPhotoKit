@@ -7,16 +7,16 @@
 
 import UIKit
 
-public struct ADImageEditTool: OptionSet {
+public struct ADImageEditTools: OptionSet {
     public let rawValue: Int
     
-    public static let lineDraw = ADImageEditTool(rawValue: 1 << 0)
-    public static let imageStkr = ADImageEditTool(rawValue: 1 << 1)
-    public static let textStkr = ADImageEditTool(rawValue: 1 << 2)
-    public static let clip = ADImageEditTool(rawValue: 1 << 3)
-    public static let mosaicDraw = ADImageEditTool(rawValue: 1 << 4)
+    public static let lineDraw = ADImageEditTools(rawValue: 1 << 0)
+    public static let imageStkr = ADImageEditTools(rawValue: 1 << 1)
+    public static let textStkr = ADImageEditTools(rawValue: 1 << 2)
+    public static let clip = ADImageEditTools(rawValue: 1 << 3)
+    public static let mosaicDraw = ADImageEditTools(rawValue: 1 << 4)
     
-    public static let all: ADImageEditTool = [.lineDraw, .imageStkr, .textStkr, .clip, .mosaicDraw]
+    public static let all: ADImageEditTools = [.lineDraw, .imageStkr, .textStkr, .clip, .mosaicDraw]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue
@@ -71,8 +71,8 @@ class ADImageEditController: UIViewController {
 extension ADImageEditController {
     
     func setupUI() {
-        var tools: [ImageEditTool] = []
-        let tool = ADPhotoKitConfiguration.default.systemImageEditTool
+        var tools: [ADImageEditTool] = []
+        let tool = ADPhotoKitConfiguration.default.systemImageEditTools
         if tool.contains(.lineDraw) {
             if ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex > ADPhotoKitConfiguration.default.lineDrawColors.count {
                 fatalError("`defaultLineDrawColorIndex` must less then `lineDrawColors`'s count")

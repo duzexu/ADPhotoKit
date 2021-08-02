@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ADImageSticker: ImageEditTool {
+class ADImageSticker: ADImageEditTool {
     
     var image: UIImage {
         switch style {
@@ -22,13 +22,16 @@ class ADImageSticker: ImageEditTool {
     
     var contentStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ToolConfigable)?
-    var toolInteractView: (UIView & ToolInteractable)?
+    var toolConfigView: (UIView & ADToolConfigable)?
+    var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text(_):
-            let sticker = ADImageEditConfigurable.imageStickerSelectVC()
+            let sticker = ADImageEditConfigurable.textStickerEditVC()
+            sticker.textDidEdit = { text in
+                
+            }
             sticker.modalPresentationStyle = .overCurrentContext
             ctx?.present(sticker, animated: true, completion: nil)
         case .image(_):

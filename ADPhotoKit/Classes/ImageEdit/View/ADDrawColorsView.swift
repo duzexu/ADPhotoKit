@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ADDrawColorsView: UIView, ToolConfigable {
+class ADDrawColorsView: UIView, ADToolConfigable {
     
     class ColorCell: UIView {
         

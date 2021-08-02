@@ -13,7 +13,7 @@ public protocol ImageProcessor: AnyObject {
     
 }
 
-public protocol ImageEditTool: ImageProcessor {
+public protocol ADImageEditTool: ImageProcessor {
     
     var image: UIImage { get }
     var selectImage: UIImage? { get }
@@ -21,60 +21,58 @@ public protocol ImageEditTool: ImageProcessor {
     
     var contentStatus: ((Bool) -> Void)? { set get }
     
-    var toolConfigView: (UIView & ToolConfigable)? { set get }
-    var toolInteractView: (UIView & ToolInteractable)? { set get }
+    var toolConfigView: (UIView & ADToolConfigable)? { set get }
+    var toolInteractView: (UIView & ADToolInteractable)? { set get }
     
     func toolDidSelect(ctx: UIViewController?) -> Bool
         
 }
 
-public extension ImageEditTool {
+public extension ADImageEditTool {
     var selectImage: UIImage? { return nil }
 }
 
-public protocol ToolConfigable {
+public protocol ADToolConfigable {
     func singleTap(with point: CGPoint) -> Bool
 }
 
-extension ToolConfigable {
+extension ADToolConfigable {
     public func singleTap(with point: CGPoint) -> Bool {
         return false
     }
 }
 
-public enum InteractZIndex: Int {
+public enum ADInteractZIndex: Int {
     case Top = 100
     case Mid = 50
     case Bottom = 0
 }
 
-public enum InteractPolicy {
+public enum ADInteractPolicy {
     case simult //同时相应
     case single
     case none
 }
 
-public enum InteractType {
+public enum ADInteractType {
     case pan(loc: CGPoint, trans: CGPoint)
     case pinch(CGFloat)
     case rotate(CGFloat)
 }
 
-public protocol ToolInteractable {
+public protocol ADToolInteractable {
     
     var zIndex: Int { get }
     
-    var interactPolicy: InteractPolicy { get }
-    
-    var isInteracting: Bool { set get }
-    
+    var policy: ADInteractPolicy { get }
+        
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
         
-    func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State)
+    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State)
 }
 
-extension ToolInteractable {
-    public func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State) { }
+extension ADToolInteractable {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) { }
 }
 
 public typealias ADImageStickerSelectable = (UIViewController & ADImageStickerSelectConfigurable)
@@ -84,10 +82,25 @@ public protocol ADImageStickerSelectConfigurable: AnyObject {
     
 }
 
-class ADImageEditConfigurable {
+public typealias ADTextStickerEditable = (UIViewController & ADTextStickerEditConfigurable)
+public protocol ADTextStickerEditConfigurable: AnyObject {
+    
+    var textDidEdit: ((String) -> Void)? { get set }
+    
+}
+
+public class ADImageEditConfigurable {
+    
+    public typealias ViewState = (center: CGPoint, scale: CGFloat)
+    
+    public static var contentViewState: ViewState?
     
     static func imageStickerSelectVC() -> ADImageStickerSelectable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController()
+    }
+    
+    static func textStickerEditVC() -> ADTextStickerEditable {
+        return ADPhotoKitConfiguration.default.customTextStickerEditVC ?? ADTextStickerEditController()
     }
     
 }

@@ -13,9 +13,10 @@ class ADImageEditContentView: UIView {
     var contentView: UIView!
     var interactContainer: UIView!
     
-    private var interactTools: [ImageEditTool] = []
+    private var interactTools: [ADImageEditTool] = []
+    private var target: ADImageEditTool?
 
-    init(image: UIImage, tools: [ImageEditTool]) {
+    init(image: UIImage, tools: [ADImageEditTool]) {
         super.init(frame: .zero)
         setupUI(image: image)
         
@@ -29,7 +30,7 @@ class ADImageEditContentView: UIView {
             }
         }
         let order = interactContainer.subviews.sorted { v1, v2 in
-            return (v1 as! ToolInteractable).zIndex < (v2 as! ToolInteractable).zIndex
+            return (v1 as! ADToolInteractable).zIndex < (v2 as! ADToolInteractable).zIndex
         }
         for item in order {
             interactContainer.bringSubviewToFront(item)
@@ -42,16 +43,16 @@ class ADImageEditContentView: UIView {
     func gestureShouldBegin(_ gestureRecognizer: UIGestureRecognizer, point: CGPoint) -> Bool {
         let isSingleTap = gestureRecognizer.isKind(of: UITapGestureRecognizer.self)
         for tool in interactTools {
-            if !isSingleTap && tool.toolInteractView!.isInteracting {
+            if !isSingleTap && target != nil {
                 return true
             }
             
             let convert = convert(point, to: tool.toolInteractView!)
-            switch tool.toolInteractView!.interactPolicy {
+            switch tool.toolInteractView!.policy {
             case .simult: // Allow interact with simult tool view
                 if tool.toolInteractView!.shouldInteract(gestureRecognizer, point: convert) {
                     if !isSingleTap {
-                        tool.toolInteractView!.isInteracting = true
+                        target = tool
                     }
                     return true
                 }
@@ -59,7 +60,7 @@ class ADImageEditContentView: UIView {
                 // Only allow interact with select tool view
                 if tool.isSelected && tool.toolInteractView!.shouldInteract(gestureRecognizer, point: convert) {
                     if !isSingleTap {
-                        tool.toolInteractView!.isInteracting = true
+                        target = tool
                     }
                     return true
                 }
@@ -70,22 +71,19 @@ class ADImageEditContentView: UIView {
         return false
     }
     
-    func interact(with type: InteractType, state: UIGestureRecognizer.State) {
-        for tool in interactTools {
-            if tool.toolInteractView!.isInteracting {
-                switch type {
-                case let .pan(point,trans):
-                    let convert = convert(point, to: tool.toolInteractView!)
-                    tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale, state: state)
-                default:
-                    tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale, state: state)
-                }
-                switch state {
-                case .ended,.failed,.cancelled:
-                    tool.toolInteractView?.isInteracting = false
-                default:
-                    break
-                }
+    func interact(with type: ADInteractType, state: UIGestureRecognizer.State) {
+        if let tool = target {
+            switch type {
+            case let .pan(point,trans):
+                let convert = convert(point, to: tool.toolInteractView!)
+                tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale, state: state)
+            default:
+                tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale, state: state)
+            }
+            switch state {
+            case .ended,.failed,.cancelled:
+                target = nil
+            default:
                 break
             }
         }
@@ -141,7 +139,7 @@ private extension ADImageEditContentView {
     
     func updateState() {
         let center = convert(CGPoint(x: bounds.width/2, y: bounds.height/2), to: interactContainer)
-        ADStickerInteractView.share.state = (center,scrollView.zoomScale)
+        ADImageEditConfigurable.contentViewState = (center,scrollView.zoomScale)
     }
     
     func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {

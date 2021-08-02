@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ADImageDraw: ImageEditTool {
+class ADImageDraw: ADImageEditTool {
     
     var image: UIImage
     var selectImage: UIImage?
@@ -20,8 +20,8 @@ class ADImageDraw: ImageEditTool {
     
     var contentStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ToolConfigable)?
-    var toolInteractView: (UIView & ToolInteractable)?
+    var toolConfigView: (UIView & ADToolConfigable)?
+    var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {

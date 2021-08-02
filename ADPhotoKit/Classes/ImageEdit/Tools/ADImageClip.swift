@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ADImageClip: ImageEditTool {
+class ADImageClip: ADImageEditTool {
     
     var image: UIImage {
         return Bundle.image(name: "clip", module: .imageEdit) ?? UIImage()
@@ -17,8 +17,8 @@ class ADImageClip: ImageEditTool {
     
     var contentStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ToolConfigable)?
-    var toolInteractView: (UIView & ToolInteractable)?
+    var toolConfigView: (UIView & ADToolConfigable)?
+    var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         let clip = ADImageClipController()

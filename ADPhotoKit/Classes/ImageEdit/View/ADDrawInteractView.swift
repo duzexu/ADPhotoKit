@@ -7,23 +7,21 @@
 
 import UIKit
 
-class ADDrawInteractView: UIView, ToolInteractable {
+class ADDrawInteractView: UIView, ADToolInteractable {
     
     var zIndex: Int {
         switch style {
         case .line:
-            return InteractZIndex.Bottom.rawValue+1
+            return ADInteractZIndex.Bottom.rawValue+1
         case .mosaic:
-            return InteractZIndex.Bottom.rawValue
+            return ADInteractZIndex.Bottom.rawValue
         }
     }
     
-    var interactPolicy: InteractPolicy {
+    var policy: ADInteractPolicy {
         return .single
     }
-    
-    var isInteracting: Bool = false
-    
+        
     enum Style {
         case line((() -> UIColor))
         case mosaic(UIImage)
@@ -70,7 +68,7 @@ class ADDrawInteractView: UIView, ToolInteractable {
         return false
     }
     
-    public func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
         switch type {
         case let .pan(point, _):
             switch style {
