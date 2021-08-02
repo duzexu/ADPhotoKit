@@ -28,11 +28,15 @@ class ADImageSticker: ImageEditTool {
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text(_):
-            let sticker = ADTextStickerEditController()
+            let sticker = ADImageEditConfigurable.imageStickerSelectVC()
             sticker.modalPresentationStyle = .overCurrentContext
             ctx?.present(sticker, animated: true, completion: nil)
         case .image(_):
-            let sticker = ADImageStickerSelectController()
+            let sticker = ADImageEditConfigurable.imageStickerSelectVC()
+            sticker.imageDidSelect = { image in
+                let content = ADImageStickerContentView(image: image)
+                ADStickerInteractView.share.addContent(content)
+            }
             sticker.modalPresentationStyle = .overCurrentContext
             ctx?.present(sticker, animated: true, completion: nil)
         }

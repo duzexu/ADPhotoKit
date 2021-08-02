@@ -32,13 +32,15 @@ class ADImageEditController: UIViewController {
     
     private var isControlShow: Bool = true {
         didSet {
-            if isControlShow {
-                UIView.animate(withDuration: 0.25) {
-                    self.controlsView.alpha = 1
-                }
-            }else{
-                UIView.animate(withDuration: 0.25) {
-                    self.controlsView.alpha = 0
+            if isControlShow != oldValue {
+                if isControlShow {
+                    UIView.animate(withDuration: 0.25) {
+                        self.controlsView.alpha = 1
+                    }
+                }else{
+                    UIView.animate(withDuration: 0.25) {
+                        self.controlsView.alpha = 0
+                    }
                 }
             }
         }
@@ -111,10 +113,22 @@ extension ADImageEditController {
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
         view.addGestureRecognizer(singleTap)
 
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
-        view.addGestureRecognizer(pan)
+        let panGes = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
+        panGes.delegate = self
+        view.addGestureRecognizer(panGes)
 
-        singleTap.require(toFail: pan)
+        singleTap.require(toFail: panGes)
+        
+        let pinchGes = UIPinchGestureRecognizer(target: self, action: #selector(pinchAction(_:)))
+        pinchGes.delegate = self
+        view.addGestureRecognizer(pinchGes)
+        
+        let rotationGes = UIRotationGestureRecognizer(target: self, action: #selector(rotateAction(_:)))
+        rotationGes.delegate = self
+        view.addGestureRecognizer(rotationGes)
+        
+        contentView.scrollView.pinchGestureRecognizer?.require(toFail: pinchGes)
+        contentView.scrollView.panGestureRecognizer.require(toFail: panGes)
     }
     
 }
@@ -126,12 +140,17 @@ extension ADImageEditController {
         if controlsView.singleTap(with: point) {
             return
         }
+        if contentView.gestureShouldBegin(tap, point: point) {
+            return
+        }
         isControlShow = !isControlShow
     }
     
-    @objc func panAction(_ pan: UITapGestureRecognizer) {
+    @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
-        contentView.move(to: point, state: pan.state)
+        let trans = pan.translation(in: view)
+        contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
+        pan.setTranslation(.zero, in: view)
         switch pan.state {
         case .began:
             isControlShow = false
@@ -144,4 +163,45 @@ extension ADImageEditController {
         }
     }
     
+    @objc func pinchAction(_ pinch: UIPinchGestureRecognizer) {
+        contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
+        pinch.scale = 1
+        switch pinch.state {
+        case .began:
+            isControlShow = false
+        case .changed:
+            break
+        case .ended, .cancelled, .failed:
+            isControlShow = true
+        default:
+            break
+        }
+    }
+    
+    @objc func rotateAction(_ rotate: UIRotationGestureRecognizer) {
+        contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
+        rotate.rotation = 0
+        switch rotate.state {
+        case .began:
+            isControlShow = false
+        case .changed:
+            break
+        case .ended, .cancelled, .failed:
+            isControlShow = true
+        default:
+            break
+        }
+    }
+    
+}
+
+extension ADImageEditController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let point = gestureRecognizer.location(in: view)
+        return contentView.gestureShouldBegin(gestureRecognizer, point: point)
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
 }

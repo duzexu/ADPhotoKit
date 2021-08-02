@@ -48,13 +48,46 @@ public enum InteractZIndex: Int {
     case Bottom = 0
 }
 
+public enum InteractPolicy {
+    case simult //同时相应
+    case single
+    case none
+}
+
+public enum InteractType {
+    case pan(loc: CGPoint, trans: CGPoint)
+    case pinch(CGFloat)
+    case rotate(CGFloat)
+}
+
 public protocol ToolInteractable {
     
     var zIndex: Int { get }
     
-    func move(to point: CGPoint, scale: CGFloat, state: UIPanGestureRecognizer.State)
+    var interactPolicy: InteractPolicy { get }
+    
+    var isInteracting: Bool { set get }
+    
+    func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
+        
+    func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State)
 }
 
 extension ToolInteractable {
-    public func move(to point: CGPoint, scale: CGFloat, state: UIPanGestureRecognizer.State) { }
+    public func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State) { }
+}
+
+public typealias ADImageStickerSelectable = (UIViewController & ADImageStickerSelectConfigurable)
+public protocol ADImageStickerSelectConfigurable: AnyObject {
+    
+    var imageDidSelect: ((UIImage) -> Void)? { get set }
+    
+}
+
+class ADImageEditConfigurable {
+    
+    static func imageStickerSelectVC() -> ADImageStickerSelectable {
+        return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController()
+    }
+    
 }

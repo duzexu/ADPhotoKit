@@ -139,6 +139,8 @@ public class ADPhotoKitConfiguration {
     
     public var mosaicDrawWidth: CGFloat = 25
     
+    public var customImageStickerSelectVC: ADImageStickerSelectable?
+    
     #endif
 
 }

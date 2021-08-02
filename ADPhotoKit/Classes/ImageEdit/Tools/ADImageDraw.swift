@@ -14,7 +14,6 @@ class ADImageDraw: ImageEditTool {
     
     var isSelected: Bool = false {
         didSet {
-            toolInteractView?.isUserInteractionEnabled = isSelected
             contentStatus?(isSelected)
         }
     }

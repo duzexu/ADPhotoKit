@@ -18,6 +18,12 @@ class ADDrawInteractView: UIView, ToolInteractable {
         }
     }
     
+    var interactPolicy: InteractPolicy {
+        return .single
+    }
+    
+    var isInteracting: Bool = false
+    
     enum Style {
         case line((() -> UIColor))
         case mosaic(UIImage)
@@ -57,38 +63,50 @@ class ADDrawInteractView: UIView, ToolInteractable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func move(to point: CGPoint, scale: CGFloat, state: UIPanGestureRecognizer.State) {
-        switch style {
-        case let .line(color):
-            switch state {
-            case .began:
-                let width = ADPhotoKitConfiguration.default.lineDrawWidth
-                let path = DrawPath(color: color(), width: width/scale, point: point)
-                paths.append(path)
-                setNeedsDisplay()
-            case .changed:
-                paths.last?.move(to: point)
-                setNeedsDisplay()
-            case .ended, .cancelled, .failed:
-                break
-            default:
-                break
+    func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool {
+        if gesture.isKind(of: UIPanGestureRecognizer.self) {
+            return true
+        }
+        return false
+    }
+    
+    public func interact(with type: InteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+        switch type {
+        case let .pan(point, _):
+            switch style {
+            case let .line(color):
+                switch state {
+                case .began:
+                    let width = ADPhotoKitConfiguration.default.lineDrawWidth
+                    let path = DrawPath(color: color(), width: width/scale, point: point)
+                    paths.append(path)
+                    setNeedsDisplay()
+                case .changed:
+                    paths.last?.move(to: point)
+                    setNeedsDisplay()
+                case .ended, .cancelled, .failed:
+                    break
+                default:
+                    break
+                }
+            case .mosaic:
+                switch state {
+                case .began:
+                    let width = ADPhotoKitConfiguration.default.mosaicDrawWidth
+                    let path = DrawPath(color: .black, width: width/scale, point: point)
+                    paths.append(path)
+                    pathMaskView?.paths = paths
+                case .changed:
+                    paths.last?.move(to: point)
+                    pathMaskView?.paths = paths
+                case .ended, .cancelled, .failed:
+                    break
+                default:
+                    break
+                }
             }
-        case .mosaic:
-            switch state {
-            case .began:
-                let width = ADPhotoKitConfiguration.default.mosaicDrawWidth
-                let path = DrawPath(color: .black, width: width/scale, point: point)
-                paths.append(path)
-                pathMaskView?.paths = paths
-            case .changed:
-                paths.last?.move(to: point)
-                pathMaskView?.paths = paths
-            case .ended, .cancelled, .failed:
-                break
-            default:
-                break
-            }
+        default:
+            break
         }
     }
     

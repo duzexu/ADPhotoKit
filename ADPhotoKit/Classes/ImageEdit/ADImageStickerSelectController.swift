@@ -7,8 +7,10 @@
 
 import UIKit
 
-class ADImageStickerSelectController: UIViewController {
+class ADImageStickerSelectController: UIViewController, ADImageStickerSelectConfigurable {
     
+    var imageDidSelect: ((UIImage) -> Void)?
+
     var imagesView: UIView!
 
     override func viewDidLoad() {
@@ -29,6 +31,7 @@ class ADImageStickerSelectController: UIViewController {
 
 extension ADImageStickerSelectController {
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
+        imageDidSelect?(Bundle.image(name: "imageSticker1", module: .imageEdit)!)
         dismiss(animated: true, completion: nil)
     }
 }
