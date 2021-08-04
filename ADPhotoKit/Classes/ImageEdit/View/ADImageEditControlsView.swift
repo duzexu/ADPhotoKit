@@ -129,8 +129,9 @@ private extension ADImageEditControlsView {
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
-            make.top.equalToSuperview().offset(statusBarHeight)
-            make.left.equalToSuperview().offset(15)
+            let top = isPhoneX ? 2 + statusBarHeight : 2
+            make.top.equalToSuperview().offset(top)
+            make.left.equalToSuperview().offset(30)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }

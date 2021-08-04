@@ -65,6 +65,9 @@ class ADImageEditController: UIViewController {
         view.backgroundColor = UIColor.black
     }
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
 
 }
 
@@ -75,11 +78,14 @@ extension ADImageEditController {
         let tool = ADPhotoKitConfiguration.default.systemImageEditTools
         if tool.contains(.lineDraw) {
             if ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex > ADPhotoKitConfiguration.default.lineDrawColors.count {
-                fatalError("`defaultLineDrawColorIndex` must less then `lineDrawColors`'s count")
+                fatalError("`lineDrawDefaultColorIndex` must less then `lineDrawColors`'s count")
             }
             tools.append(ADImageDraw(style: .line(ADPhotoKitConfiguration.default.lineDrawColors, ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex)))
         }
         if tool.contains(.imageStkr) {
+            if ADPhotoKitConfiguration.default.customImageStickerSelectVC == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
+                fatalError("`imageStickerDataSource` must not be `nil`")
+            }
             tools.append(ADImageSticker(style: .image([])))
         }
         if tool.contains(.textStkr) {
@@ -205,3 +211,30 @@ extension ADImageEditController: UIGestureRecognizerDelegate {
         return true
     }
 }
+
+extension ADImageEditController: UIViewControllerTransitioningDelegate {
+    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        let controller = ADPresentationController(presentedViewController: presented, presenting: presenting)
+        controller.appearance = self
+        return controller
+    }
+}
+
+extension ADImageEditController: ADAppearanceDelegate {
+    func presentationTransitionWillBegin() {
+        isControlShow = false
+    }
+    
+    func presentationTransitionDidEnd() {
+        
+    }
+    
+    func presentationDismissalWillBegin() {
+        isControlShow = true
+    }
+    
+    func presentationDismissalDidEnd() {
+        
+    }
+}
+

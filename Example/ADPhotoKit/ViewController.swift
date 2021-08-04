@@ -44,6 +44,42 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // image sticker
+        var sections: [ADImageStickerDataSource.StickerSection] = []
+        do {
+            var items: [ADImageStickerDataSource.StickerItem] = []
+            for i in 0..<6 {
+                items.append(ADImageStickerDataSource.StickerItem(image: UIImage(contentsOfFile: Bundle.main.path(forResource: "like_\(i)", ofType: "jpeg")!)!))
+            }
+            let section = ADImageStickerDataSource.StickerSection(icon: UIImage(named: "icons_outlined_like")!, name: "添加的单个表情", items: items, itemNameOn: false)
+            sections.append(section)
+        }
+        do {
+            var items: [ADImageStickerDataSource.StickerItem] = []
+            for i in 0..<24 {
+                items.append(ADImageStickerDataSource.StickerItem(image: UIImage(named: "pig_\(i)")!, name: "pig_\(i)"))
+            }
+            let section = ADImageStickerDataSource.StickerSection(icon: UIImage(named: "pig_21")!, name: "小小胖滚家族", items: items)
+            sections.append(section)
+        }
+        do {
+            var items: [ADImageStickerDataSource.StickerItem] = []
+            for i in 0..<10 {
+                items.append(ADImageStickerDataSource.StickerItem(image: UIImage(named: "dog_\(i)")!, name: "dog_\(i)"))
+            }
+            let section = ADImageStickerDataSource.StickerSection(icon: UIImage(named: "dog_3")!, name: "柴犬的日常", items: items)
+            sections.append(section)
+        }
+        do {
+            var items: [ADImageStickerDataSource.StickerItem] = []
+            for i in 0..<16 {
+                items.append(ADImageStickerDataSource.StickerItem(image: UIImage(named: "agg_\(i)")!, name: "agg_\(i)"))
+            }
+            let section = ADImageStickerDataSource.StickerSection(icon: UIImage(named: "agg_cover")!, name: "抹茶蛋蛋2", items: items)
+            sections.append(section)
+        }
+        ADPhotoKitConfiguration.default.imageStickerDataSource = ADImageStickerDataSource(sections: sections)
+        
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 20

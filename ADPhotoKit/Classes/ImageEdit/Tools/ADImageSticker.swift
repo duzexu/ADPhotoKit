@@ -29,10 +29,11 @@ class ADImageSticker: ADImageEditTool {
         switch style {
         case .text(_):
             let sticker = ADImageEditConfigurable.textStickerEditVC()
-            sticker.textDidEdit = { text in
+            sticker.textDidEdit = { text, color in
                 
             }
-            sticker.modalPresentationStyle = .overCurrentContext
+            sticker.modalPresentationStyle = .custom
+            sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
             ctx?.present(sticker, animated: true, completion: nil)
         case .image(_):
             let sticker = ADImageEditConfigurable.imageStickerSelectVC()
@@ -40,7 +41,8 @@ class ADImageSticker: ADImageEditTool {
                 let content = ADImageStickerContentView(image: image)
                 ADStickerInteractView.share.addContent(content)
             }
-            sticker.modalPresentationStyle = .overCurrentContext
+            sticker.modalPresentationStyle = .custom
+            sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
             ctx?.present(sticker, animated: true, completion: nil)
         }
         return false

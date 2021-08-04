@@ -82,10 +82,12 @@ public protocol ADImageStickerSelectConfigurable: AnyObject {
     
 }
 
+public typealias ADTextStickerColor = (textColor: UIColor, bgColor: UIColor)
+
 public typealias ADTextStickerEditable = (UIViewController & ADTextStickerEditConfigurable)
 public protocol ADTextStickerEditConfigurable: AnyObject {
     
-    var textDidEdit: ((String) -> Void)? { get set }
+    var textDidEdit: ((String, ADTextStickerColor) -> Void)? { get set }
     
 }
 
@@ -96,7 +98,7 @@ public class ADImageEditConfigurable {
     public static var contentViewState: ViewState?
     
     static func imageStickerSelectVC() -> ADImageStickerSelectable {
-        return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController()
+        return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
     }
     
     static func textStickerEditVC() -> ADTextStickerEditable {
