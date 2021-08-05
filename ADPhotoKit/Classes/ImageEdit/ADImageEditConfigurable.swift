@@ -67,12 +67,12 @@ public protocol ADToolInteractable {
     var policy: ADInteractPolicy { get }
         
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
-        
-    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State)
+    
+    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool
 }
 
 extension ADToolInteractable {
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) { }
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool { return true }
 }
 
 public typealias ADImageStickerSelectable = (UIViewController & ADImageStickerSelectConfigurable)

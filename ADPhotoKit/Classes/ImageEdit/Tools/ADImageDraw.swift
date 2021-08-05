@@ -49,9 +49,16 @@ class ADImageDraw: ADImageEditTool {
         switch style {
         case let .line(colors,index):
             let colorSelect = ADDrawColorsView(colors: colors, select: index)
-            toolInteractView = ADDrawInteractView(style: .line({
-                return colorSelect.selectColor
+            let interact = ADDrawInteractView(style: .line({ [weak colorSelect] in
+                return colorSelect?.selectColor ?? .clear
             }))
+            colorSelect.revokeAction = { [weak interact] in
+                interact?.revoke()
+            }
+            interact.lineCountChange = { [weak colorSelect] count in
+                colorSelect?.lineCount = count
+            }
+            toolInteractView = interact
             toolConfigView = colorSelect
             image = Bundle.image(name: "drawLine", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "drawLine_selected", module: .imageEdit)

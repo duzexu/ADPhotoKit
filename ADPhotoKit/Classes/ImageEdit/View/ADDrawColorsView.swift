@@ -13,6 +13,13 @@ class ADDrawColorsView: UIView, ADToolConfigable {
         return colors[select]
     }
     
+    var revokeAction: (() -> Void)?
+    var lineCount: Int = 0 {
+        didSet {
+            revokeBtn.isEnabled = lineCount > 0
+        }
+    }
+    
     let colors: [UIColor]
     var select: Int = 0 {
         didSet {
@@ -44,6 +51,7 @@ class ADDrawColorsView: UIView, ADToolConfigable {
         }
         
         revokeBtn = UIButton(type: .custom)
+        revokeBtn.isEnabled = false
         revokeBtn.setImage(Bundle.image(name: "revoke", module: .imageEdit), for: .normal)
         
         for (i,color) in colors.enumerated() {
@@ -60,7 +68,7 @@ class ADDrawColorsView: UIView, ADToolConfigable {
         if stackView.frame.contains(point) {
             let sub = convert(point, to: stackView)
             if revokeBtn.frame.contains(sub) {
-                print("点击撤销")
+                revokeAction?()
                 return true
             }
             for (i,cell) in colorCells.enumerated() {

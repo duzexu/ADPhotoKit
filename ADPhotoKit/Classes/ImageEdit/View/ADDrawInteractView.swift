@@ -27,6 +27,8 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         case mosaic(UIImage)
     }
     
+    var lineCountChange: ((Int) -> Void)?
+    
     let style: Style
         
     var paths: [DrawPath] = []
@@ -68,7 +70,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool {
         switch type {
         case let .pan(point, _):
             switch style {
@@ -83,7 +85,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
                     paths.last?.move(to: point)
                     setNeedsDisplay()
                 case .ended, .cancelled, .failed:
-                    break
+                    lineCountChange?(paths.count)
                 default:
                     break
                 }
@@ -98,7 +100,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
                     paths.last?.move(to: point)
                     pathMaskView?.paths = paths
                 case .ended, .cancelled, .failed:
-                    break
+                    lineCountChange?(paths.count)
                 default:
                     break
                 }
@@ -106,6 +108,19 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         default:
             break
         }
+        return true
+    }
+    
+    func revoke() {
+        switch style {
+        case .line(_):
+            paths.removeLast()
+            setNeedsDisplay()
+        case .mosaic:
+            paths.removeLast()
+            pathMaskView?.paths = paths
+        }
+        lineCountChange?(paths.count)
     }
     
     override func layoutSubviews() {

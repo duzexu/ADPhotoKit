@@ -71,22 +71,25 @@ class ADImageEditContentView: UIView {
         return false
     }
     
-    func interact(with type: ADInteractType, state: UIGestureRecognizer.State) {
+    func interact(with type: ADInteractType, state: UIGestureRecognizer.State) -> Bool {
         if let tool = target {
+            defer {
+                switch state {
+                case .ended,.failed,.cancelled:
+                    target = nil
+                default:
+                    break
+                }
+            }
             switch type {
             case let .pan(point,trans):
                 let convert = convert(point, to: tool.toolInteractView!)
-                tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale, state: state)
+                return tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale, state: state)
             default:
-                tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale, state: state)
-            }
-            switch state {
-            case .ended,.failed,.cancelled:
-                target = nil
-            default:
-                break
+                return tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale, state: state)
             }
         }
+        return true
     }
     
     required init?(coder: NSCoder) {
@@ -130,6 +133,7 @@ private extension ADImageEditContentView {
         }
         
         interactContainer = UIView()
+        interactContainer.clipsToBounds = true
         interactContainer.isUserInteractionEnabled = false
         contentView.addSubview(interactContainer)
         interactContainer.snp.makeConstraints { make in

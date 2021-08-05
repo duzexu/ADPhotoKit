@@ -61,6 +61,7 @@ class ADImageEditController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        ADStickerInteractView.share.clear()
         setupUI()
         view.backgroundColor = UIColor.black
     }
@@ -155,7 +156,7 @@ extension ADImageEditController {
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
         let trans = pan.translation(in: view)
-        contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
+        contentView.interactContainer.clipsToBounds = contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
         pan.setTranslation(.zero, in: view)
         switch pan.state {
         case .began:
@@ -170,7 +171,7 @@ extension ADImageEditController {
     }
     
     @objc func pinchAction(_ pinch: UIPinchGestureRecognizer) {
-        contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
+        contentView.interactContainer.clipsToBounds = contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
         pinch.scale = 1
         switch pinch.state {
         case .began:
@@ -185,7 +186,7 @@ extension ADImageEditController {
     }
     
     @objc func rotateAction(_ rotate: UIRotationGestureRecognizer) {
-        contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
+        contentView.interactContainer.clipsToBounds = contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
         rotate.rotation = 0
         switch rotate.state {
         case .began:
