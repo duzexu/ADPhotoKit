@@ -23,7 +23,7 @@ class ADImageDraw: ADImageEditTool {
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
     
-    func toolDidSelect(ctx: UIViewController?) -> Bool {
+    func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
         switch style {
         case .line:
             break

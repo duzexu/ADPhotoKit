@@ -20,10 +20,12 @@ class ADImageClip: ADImageEditTool {
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
     
-    func toolDidSelect(ctx: UIViewController?) -> Bool {
-        let clip = ADImageClipController()
-        clip.modalPresentationStyle = .overCurrentContext
-        ctx?.present(clip, animated: true, completion: nil)
+    func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
+        if let image = ctx?.process() {
+            let clip = ADImageClipController(image: image)
+            clip.modalPresentationStyle = .overCurrentContext
+            ctx?.present(clip, animated: true, completion: nil)
+        }
         return false
     }
     

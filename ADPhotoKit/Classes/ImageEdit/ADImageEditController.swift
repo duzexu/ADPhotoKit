@@ -202,6 +202,12 @@ extension ADImageEditController {
     
 }
 
+extension ADImageEditController: ImageProcessor {
+    func process() -> UIImage? {
+        return image
+    }
+}
+
 extension ADImageEditController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let point = gestureRecognizer.location(in: view)

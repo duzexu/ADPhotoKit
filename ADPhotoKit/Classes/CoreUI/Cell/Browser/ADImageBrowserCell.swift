@@ -242,7 +242,7 @@ private extension ADImageBrowserView {
         let imageSize = CGSize(width: pixelWidth, height: pixelHeight)
         
         var frame: CGRect = .zero
-        var contenSize: CGSize = .zero
+        var contentSize: CGSize = .zero
         
         let viewW = screenWidth
         let viewH = screenHeight
@@ -299,20 +299,20 @@ private extension ADImageBrowserView {
         contentView.frame = frame
         
         if UIApplication.shared.statusBarOrientation.isLandscape {
-            contenSize = CGSize(width: width, height: max(viewH, frame.height))
+            contentSize = CGSize(width: width, height: max(viewH, frame.height))
             if frame.height < viewH {
                 contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
             } else {
                 contentView.frame = CGRect(origin: CGPoint(x: (viewW-frame.width)/2, y: 0), size: frame.size)
             }
         } else {
-            contenSize = frame.size
+            contentSize = frame.size
             if frame.width < viewW || frame.height < viewH {
                 contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
             }
         }
         
-        scrollView.contentSize = contenSize
+        scrollView.contentSize = contentSize
         scrollView.contentOffset = .zero
     }
     

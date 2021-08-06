@@ -7,6 +7,7 @@
 
 import Foundation
 
+public typealias ADImageProcessorable = (UIViewController & ImageProcessor)
 public protocol ImageProcessor: AnyObject {
     
     func process() -> UIImage?
@@ -24,7 +25,7 @@ public protocol ADImageEditTool: ImageProcessor {
     var toolConfigView: (UIView & ADToolConfigable)? { set get }
     var toolInteractView: (UIView & ADToolInteractable)? { set get }
     
-    func toolDidSelect(ctx: UIViewController?) -> Bool
+    func toolDidSelect(ctx: ADImageProcessorable?) -> Bool
         
 }
 

@@ -132,78 +132,242 @@ class ADClipDarkView: UIView {
 
 class ADClipGrideView: UIView {
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        clipsToBounds = false
+    struct GrideEdge: OptionSet {
+        let rawValue: Int
+        
+        static let top = GrideEdge(rawValue: 1 << 0)
+        static let left = GrideEdge(rawValue: 1 << 1)
+        static let right = GrideEdge(rawValue: 1 << 2)
+        static let bottom = GrideEdge(rawValue: 1 << 3)
+    }
+    
+    let safeRect: CGRect
+    
+    var clipRect: CGRect!
+    
+    private let interactWidth: CGFloat = 60
+    private let minSize: CGFloat = 60
+    
+    private var dimView: ADClipDarkView!
+    private var contentV: UIView!
+    private var panEdge: GrideEdge = []
+    private var lastPoint: CGPoint?
+    
+    init(safeInsets: UIEdgeInsets) {
+        safeRect = UIScreen.main.bounds.inset(by: safeInsets)
+        super.init(frame: .zero)
         isUserInteractionEnabled = false
+        dimView = ADClipDarkView(frame: .zero)
+        addSubview(dimView)
+        dimView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        contentV = UIView(frame: .zero)
+        let c = ContentView(inset: 10)
+        contentV.addSubview(c)
+        c.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(-10)
+        }
+        contentV.frame = safeRect
+        addSubview(contentV)
+        clipRect = safeRect
+        dimView.clearRect = clipRect
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setNeedsDisplay()
+    func shouldInteract(with point: CGPoint) -> Bool {
+        let frame = contentV.frame
+        let inner = frame.insetBy(dx: interactWidth/2, dy: interactWidth/2)
+        let outer = frame.insetBy(dx: -interactWidth/2, dy: -interactWidth/2)
+        if inner.contains(point) || !outer.contains(point) {
+            return false
+        }
+        return true
     }
     
-    override func draw(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        context?.setFillColor(UIColor.clear.cgColor)
-        context?.setStrokeColor(UIColor.white.cgColor)
-        context?.setLineWidth(1)
-
-        context?.beginPath()
-        var dw: CGFloat = 3
-        for _ in 0..<4 {
-            context?.move(to: CGPoint(x: rect.origin.x+dw, y: rect.origin.y+3))
-            context?.addLine(to: CGPoint(x: rect.origin.x+dw, y: rect.origin.y+rect.height-3))
-            dw += (rect.size.width - 6) / 3
+    func interact(with point: CGPoint, state: UIGestureRecognizer.State) {
+        if state == .began {
+            lastPoint = point
+            panEdge = panEdge(with: point)
+        }else if state == .changed {
+            let diff = CGPoint(x: point.x - lastPoint!.x, y: point.y - lastPoint!.y)
+            var new: CGRect = contentV.frame
+            if panEdge.contains(.top) {
+                new.origin.y += diff.y
+                if new.origin.y < safeRect.minY {
+                    new.origin.y = safeRect.minY
+                }else{
+                    new.size.height += -diff.y
+                    if new.size.height < minSize {
+                        new.size.height = minSize
+                        new.origin.y = contentV.frame.maxY - minSize
+                    }
+                }
+            }
+            if panEdge.contains(.bottom) {
+                new.size.height += diff.y
+                if new.size.height > safeRect.maxY - new.minY  {
+                    new.size.height = safeRect.maxY - new.minY
+                }
+                if new.size.height < minSize {
+                    new.size.height = minSize
+                }
+            }
+            if panEdge.contains(.left) {
+                new.origin.x += diff.x
+                if new.origin.x < safeRect.minX {
+                    new.origin.x = safeRect.minX
+                }else{
+                    new.size.width += -diff.x
+                    if new.size.width < minSize {
+                        new.size.width = minSize
+                        new.origin.x = contentV.frame.maxX - minSize
+                    }
+                }
+            }
+            if panEdge.contains(.right) {
+                new.size.width += diff.x
+                if new.size.width > safeRect.maxX - new.minX  {
+                    new.size.width = safeRect.maxX - new.minX
+                }
+                if new.size.width < minSize {
+                    new.size.width = minSize
+                }
+            }
+            contentV.frame = new
+            clipRect = new
+            lastPoint = point
+        }else{
+            panEdge = []
         }
-
-        var dh: CGFloat = 3
-        for _ in 0..<4 {
-            context?.move(to: CGPoint(x: rect.origin.x+3, y: rect.origin.y+dh))
-            context?.addLine(to: CGPoint(x: rect.origin.x+rect.width-3, y: rect.origin.y+dh))
-            dh += (rect.size.height - 6) / 3
+    }
+    
+    private func update() {
+        UIView.animate(withDuration: 0.25) {
+            self.contentV.frame = self.clipRect
         }
+    }
+    
+    private func panEdge(with point: CGPoint) -> GrideEdge {
+        let rect = clipRect.insetBy(dx: -interactWidth/2, dy: -interactWidth/2)
+        let xMinIn = (point.x > rect.minX && point.x < rect.minX + interactWidth)
+        let xMaxIn = (point.x > rect.maxX - interactWidth  && point.x < rect.maxX)
+        let yMinIn = (point.y > rect.minY && point.y < rect.minY + interactWidth)
+        let yMaxIn = (point.y > rect.maxY - interactWidth  && point.y < rect.maxY)
+        
+        if xMinIn {
+            if yMinIn {
+                return [.top, .left]
+            }else if yMaxIn {
+                return [.bottom, .left]
+            }else{
+                return .left
+            }
+        }else if xMaxIn {
+            if yMinIn {
+                return [.top, .right]
+            }else if yMaxIn {
+                return [.bottom, .right]
+            }else{
+                return .right
+            }
+        }else{
+            if yMinIn {
+                return .top
+            }else if yMaxIn {
+                return .bottom
+            }
+        }
+        return []
+    }
+    
+    class ContentView: UIView {
+        
+        let inset: CGFloat
+        
+        init(inset: CGFloat) {
+            self.inset = inset
+            super.init(frame: .zero)
+            clipsToBounds = false
+            layer.masksToBounds = false
+            isOpaque = false
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            setNeedsDisplay()
+        }
+        
+        override func draw(_ rect: CGRect) {
+            let insetRect = rect.insetBy(dx: inset, dy: inset)
+            let context = UIGraphicsGetCurrentContext()
+            context?.setFillColor(UIColor.clear.cgColor)
+            context?.setStrokeColor(UIColor.white.cgColor)
+            context?.setLineWidth(1)
+            
+            context?.setShadow(offset: .zero, blur: 6, color: UIColor.black.cgColor)
+            let path = UIBezierPath(rect: insetRect)
+            context?.addPath(path.cgPath)
+            context?.strokePath()
+            context?.setShadow(offset: .zero, blur: 0)
+            
+            context?.beginPath()
+            var dw: CGFloat = 0
+            for _ in 0..<4 {
+                context?.move(to: CGPoint(x: insetRect.origin.x+dw, y: insetRect.origin.y))
+                context?.addLine(to: CGPoint(x: insetRect.origin.x+dw, y: insetRect.origin.y+insetRect.height))
+                dw += insetRect.size.width / 3
+            }
 
-        context?.strokePath()
+            var dh: CGFloat = 0
+            for _ in 0..<4 {
+                context?.move(to: CGPoint(x: insetRect.origin.x, y: insetRect.origin.y+dh))
+                context?.addLine(to: CGPoint(x: insetRect.origin.x+insetRect.width, y: insetRect.origin.y+dh))
+                dh += insetRect.size.height / 3
+            }
 
-        context?.setLineWidth(3)
+            context?.strokePath()
 
-        let boldLineLength: CGFloat = 20
-        // 左上
-        context?.move(to: CGPoint(x: 0, y: 1.5))
-        context?.addLine(to: CGPoint(x: boldLineLength, y: 1.5))
+            context?.setLineWidth(3)
 
-        context?.move(to: CGPoint(x: 1.5, y: 0))
-        context?.addLine(to: CGPoint(x: 1.5, y: boldLineLength))
+            let boldLineLength: CGFloat = 20
+            // 左上
+            context?.move(to: CGPoint(x: inset-3, y: -1.5+inset))
+            context?.addLine(to: CGPoint(x: boldLineLength+inset, y: -1.5+inset))
 
-        // 右上
-        context?.move(to: CGPoint(x: rect.width-boldLineLength, y: 1.5))
-        context?.addLine(to: CGPoint(x: rect.width, y: 1.5))
+            context?.move(to: CGPoint(x: -1.5+inset, y: inset))
+            context?.addLine(to: CGPoint(x: -1.5+inset, y: boldLineLength+inset))
 
-        context?.move(to: CGPoint(x: rect.width-1.5, y: 0))
-        context?.addLine(to: CGPoint(x: rect.width-1.5, y: boldLineLength))
+            // 右上
+            context?.move(to: CGPoint(x: insetRect.width-boldLineLength+inset+3, y: -1.5+inset))
+            context?.addLine(to: CGPoint(x: insetRect.width+inset+3, y: -1.5+inset))
 
-        // 左下
-        context?.move(to: CGPoint(x: 1.5, y: rect.height-boldLineLength))
-        context?.addLine(to: CGPoint(x: 1.5, y: rect.height))
+            context?.move(to: CGPoint(x: insetRect.width+inset+1.5, y: inset))
+            context?.addLine(to: CGPoint(x: insetRect.width+inset+1.5, y: boldLineLength+inset))
 
-        context?.move(to: CGPoint(x: 0, y: rect.height-1.5))
-        context?.addLine(to: CGPoint(x: boldLineLength, y: rect.height-1.5))
+            // 左下
+            context?.move(to: CGPoint(x: inset-1.5, y: insetRect.height-boldLineLength+inset-1.5))
+            context?.addLine(to: CGPoint(x: inset-1.5, y: insetRect.height+inset))
 
-        // 右下
-        context?.move(to: CGPoint(x: rect.width-boldLineLength, y: rect.height-1.5))
-        context?.addLine(to: CGPoint(x: rect.width, y: rect.height-1.5))
+            context?.move(to: CGPoint(x: inset-3, y: insetRect.height+1.5+inset))
+            context?.addLine(to: CGPoint(x: boldLineLength+inset, y: insetRect.height+1.5+inset))
 
-        context?.move(to: CGPoint(x: rect.width-1.5, y: rect.height-boldLineLength))
-        context?.addLine(to: CGPoint(x: rect.width-1.5, y: rect.height))
+            // 右下
+            context?.move(to: CGPoint(x: insetRect.width-boldLineLength+inset, y: insetRect.height+1.5+inset))
+            context?.addLine(to: CGPoint(x: insetRect.width+inset+3, y: insetRect.height+1.5+inset))
 
-        context?.strokePath()
+            context?.move(to: CGPoint(x: insetRect.width+1.5+inset, y: insetRect.height-boldLineLength+inset))
+            context?.addLine(to: CGPoint(x: insetRect.width+1.5+inset, y: insetRect.height+inset))
 
-        context?.setShadow(offset: CGSize(width: 1, height: 1), blur: 0)
+            context?.strokePath()
+        }
     }
     
 }
