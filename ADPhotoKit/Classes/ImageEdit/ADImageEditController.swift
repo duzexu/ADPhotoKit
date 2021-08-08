@@ -23,6 +23,13 @@ public struct ADImageEditTools: OptionSet {
     }
 }
 
+public struct ADEditInfo {
+    let image: UIImage
+    let editImage: UIImage
+    let clipRect: UIImage
+    let rotation: CGFloat
+}
+
 class ADImageEditController: UIViewController {
     
     let image: UIImage

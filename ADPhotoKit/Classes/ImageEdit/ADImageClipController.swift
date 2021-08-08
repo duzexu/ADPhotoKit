@@ -9,7 +9,7 @@ import UIKit
 
 class ADImageClipController: UIViewController {
     
-    let image: UIImage
+    let editInfo: ADEditInfo
     
     private var scrollView: UIScrollView!
     private var contentView: UIView!
@@ -20,8 +20,8 @@ class ADImageClipController: UIViewController {
     
     private let clipAreaInsets: UIEdgeInsets = isPhoneX ? UIEdgeInsets(top: 70, left: 20, bottom: 160, right: 20) : UIEdgeInsets(top: 20, left: 20, bottom: 126, right: 20)
     
-    init(image: UIImage) {
-        self.image = image
+    init(editInfo: ADEditInfo, editFromRect: CGRect) {
+        self.editInfo = editInfo
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,7 +62,7 @@ private extension ADImageClipController {
         scrollView.addSubview(contentView)
         
         imageView = UIImageView()
-        imageView.image = image
+        imageView.image = editInfo.image
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in
@@ -75,7 +75,7 @@ private extension ADImageClipController {
             make.edges.equalToSuperview()
         }
         
-        toolBarView = ADClipToolBarView(ctx: self)
+        toolBarView = ADClipToolBarView(ctx: self, bottomInset: clipAreaInsets.bottom)
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { make in
             make.right.left.bottom.equalToSuperview()
@@ -87,7 +87,7 @@ private extension ADImageClipController {
         view.addGestureRecognizer(panGes)
         scrollView.panGestureRecognizer.require(toFail: panGes)
         
-        resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
+        resizeView(pixelWidth: editInfo.image.size.width, pixelHeight: editInfo.image.size.height)
     }
     
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
@@ -193,7 +193,7 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        
+        grideView.dragingStarted()
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -201,8 +201,13 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
+        grideView.gestureEnded()
     }
     
 }
 
+extension ADImageClipController: UIViewControllerTransitioningDelegate {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return ADImageClipDismissAnimatedTransition()
+    }
+}

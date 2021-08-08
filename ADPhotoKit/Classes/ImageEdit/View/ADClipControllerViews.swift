@@ -13,13 +13,14 @@ class ADClipToolBarView: UIView {
     
     var bottomLayer: CAGradientLayer!
 
-    init(ctx: UIViewController) {
+    init(ctx: UIViewController, bottomInset: CGFloat) {
         self.ctx = ctx
         super.init(frame: .zero)
         clipsToBounds = false
         
         bottomLayer = CAGradientLayer()
-        bottomLayer.colors = [UIColor(white: 0, alpha: 0.15).cgColor, UIColor(white: 0, alpha: 0.35).cgColor]
+        bottomLayer.frame = CGRect(x: 0, y: 0, width: 0, height: bottomInset)
+        bottomLayer.colors = [UIColor(white: 0, alpha: 0).cgColor, UIColor(white: 0, alpha: 0.35).cgColor]
         bottomLayer.locations = [0, 1]
         layer.addSublayer(bottomLayer)
         
@@ -42,6 +43,7 @@ class ADClipToolBarView: UIView {
         }
         
         let revertBtn = UIButton(type: .custom)
+        revertBtn.isEnabled = false
         revertBtn.setTitleColor(.white, for: .normal)
         revertBtn.setTitleColor(UIColor(white: 1, alpha: 0.4), for: .disabled)
         revertBtn.setTitle(ADLocale.LocaleKey.revert.localeTextValue, for: .normal)
@@ -77,7 +79,7 @@ class ADClipToolBarView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        bottomLayer.frame = bounds
+        bottomLayer.frame = CGRect(x: 0, y: bounds.size.height-bottomLayer.frame.size.height, width: bounds.size.width, height: bottomLayer.frame.size.height)
     }
     
     required init?(coder: NSCoder) {
@@ -121,7 +123,7 @@ class ADClipDarkView: UIView {
     }
     
     override func draw(_ rect: CGRect) {
-        UIColor(white: 0, alpha: 0.7).setFill()
+        UIColor(white: 0, alpha: 0.8).setFill()
         UIRectFill(rect)
         let cr = clearRect.intersection(rect)
         UIColor.clear.setFill()
@@ -152,6 +154,8 @@ class ADClipGrideView: UIView {
     private var contentV: UIView!
     private var panEdge: GrideEdge = []
     private var lastPoint: CGPoint?
+    private var isDiming: Bool = false
+    private var isRecting: Bool = false
     
     init(safeInsets: UIEdgeInsets) {
         safeRect = UIScreen.main.bounds.inset(by: safeInsets)
@@ -192,6 +196,7 @@ class ADClipGrideView: UIView {
         if state == .began {
             lastPoint = point
             panEdge = panEdge(with: point)
+            gestureStarted()
         }else if state == .changed {
             let diff = CGPoint(x: point.x - lastPoint!.x, y: point.y - lastPoint!.y)
             var new: CGRect = contentV.frame
@@ -241,13 +246,56 @@ class ADClipGrideView: UIView {
             clipRect = new
             lastPoint = point
         }else{
-            panEdge = []
+            gestureEnded()
         }
     }
     
-    private func update() {
-        UIView.animate(withDuration: 0.25) {
-            self.contentV.frame = self.clipRect
+    func dragingStarted() {
+        isDiming = true
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        UIView.animate(withDuration: 0.2) {
+            self.dimView.alpha = 0
+        }
+    }
+    
+    func gestureEnded() {
+        perform(#selector(_gestureEnded), with: nil, afterDelay: 1)
+    }
+    
+    private func gestureStarted() {
+        guard !panEdge.isEmpty else {
+            return
+        }
+        isRecting = true
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        UIView.animate(withDuration: 0.2) {
+            self.dimView.alpha = 0
+        }
+    }
+    
+    @objc private func _gestureEnded() {
+        if isDiming && !isRecting {
+            UIApplication.shared.beginIgnoringInteractionEvents()
+            UIView.animate(withDuration: 0.2) {
+                self.dimView.alpha = 1
+            } completion: { _ in
+                UIApplication.shared.endIgnoringInteractionEvents()
+            }
+        }else if isRecting {
+            UIApplication.shared.beginIgnoringInteractionEvents()
+            clipRect = resizeClipRect()
+            dimView.clearRect = clipRect
+            UIView.animate(withDuration: 0.3) {
+                self.contentV.frame = self.clipRect
+                self.layoutIfNeeded()
+            } completion: { finish in
+                UIView.animate(withDuration: 0.2) {
+                    self.dimView.alpha = 1
+                } completion: { _ in
+                    UIApplication.shared.endIgnoringInteractionEvents()
+                }
+            }
+            panEdge = []
         }
     }
     
@@ -284,6 +332,22 @@ class ADClipGrideView: UIView {
         return []
     }
     
+    private func resizeClipRect() -> CGRect {
+        var rect: CGRect = .zero
+        let imageHWRatio = clipRect.size.height / clipRect.size.width
+        let viewHWRatio = safeRect.size.height / safeRect.size.width
+        if imageHWRatio > viewHWRatio {
+            rect.size.height = safeRect.size.height
+            rect.size.width = safeRect.size.height / imageHWRatio
+            rect.origin = CGPoint(x: (safeRect.size.width - rect.size.width)/2 + safeRect.origin.x, y: safeRect.origin.y)
+        } else {
+            rect.size.width = safeRect.size.width
+            rect.size.height = safeRect.size.width * imageHWRatio
+            rect.origin = CGPoint(x: safeRect.origin.x, y: (safeRect.size.height - rect.size.height)/2 + safeRect.origin.y)
+        }
+        return rect
+    }
+    
     class ContentView: UIView {
         
         let inset: CGFloat
@@ -312,7 +376,7 @@ class ADClipGrideView: UIView {
             context?.setStrokeColor(UIColor.white.cgColor)
             context?.setLineWidth(1)
             
-            context?.setShadow(offset: .zero, blur: 6, color: UIColor.black.cgColor)
+            context?.setShadow(offset: .zero, blur: 4, color: UIColor(white: 0, alpha: 0.9).cgColor)
             let path = UIBezierPath(rect: insetRect)
             context?.addPath(path.cgPath)
             context?.strokePath()
@@ -346,7 +410,7 @@ class ADClipGrideView: UIView {
             context?.addLine(to: CGPoint(x: -1.5+inset, y: boldLineLength+inset))
 
             // 右上
-            context?.move(to: CGPoint(x: insetRect.width-boldLineLength+inset+3, y: -1.5+inset))
+            context?.move(to: CGPoint(x: insetRect.width-boldLineLength+inset, y: -1.5+inset))
             context?.addLine(to: CGPoint(x: insetRect.width+inset+3, y: -1.5+inset))
 
             context?.move(to: CGPoint(x: insetRect.width+inset+1.5, y: inset))
