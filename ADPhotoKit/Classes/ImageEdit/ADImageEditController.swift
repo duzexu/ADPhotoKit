@@ -26,7 +26,7 @@ public struct ADImageEditTools: OptionSet {
 public struct ADEditInfo {
     let image: UIImage
     let editImage: UIImage
-    let clipRect: UIImage
+    let clipRect: CGRect
     let rotation: CGFloat
 }
 
@@ -68,6 +68,7 @@ class ADImageEditController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        definesPresentationContext = true
         ADStickerInteractView.share.clear()
         setupUI()
         view.backgroundColor = UIColor.black
@@ -212,6 +213,16 @@ extension ADImageEditController {
 extension ADImageEditController: ImageProcessor {
     func process() -> UIImage? {
         return image
+    }
+}
+
+extension ADImageEditController: ADImageClipDismissTransitionContextTo {
+    func transitionRect(convertTo: UIView) -> CGRect? {
+        return contentView.contentView.convert(contentView.imageView.frame, to: convertTo)
+    }
+    
+    func transitionDidFinish() {
+        //isControlShow = true
     }
 }
 

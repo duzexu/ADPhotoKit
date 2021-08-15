@@ -22,7 +22,7 @@ class ADImageClip: ADImageEditTool {
     
     func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
         if let image = ctx?.process() {
-            let clip = ADImageClipController(editInfo: ADEditInfo(image: image, editImage: image, clipRect: image, rotation: 0), editFromRect: .zero)
+            let clip = ADImageClipController(editInfo: ADEditInfo(image: image, editImage: image, clipRect: .zero, rotation: 0), editFromRect: .zero)
             clip.modalPresentationStyle = .overCurrentContext
             ctx?.present(clip, animated: true, completion: nil)
         }

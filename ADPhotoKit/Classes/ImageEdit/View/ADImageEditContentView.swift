@@ -11,6 +11,7 @@ class ADImageEditContentView: UIView {
 
     var scrollView: UIScrollView!
     var contentView: UIView!
+    var imageView: UIImageView!
     var interactContainer: UIView!
     
     private var interactTools: [ADImageEditTool] = []
@@ -123,7 +124,7 @@ private extension ADImageEditContentView {
         scrollView.addSubview(contentView)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
         
-        let imageView = UIImageView()
+        imageView = UIImageView()
         imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true

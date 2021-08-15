@@ -32,6 +32,7 @@ class ADImageClipController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        transitioningDelegate = self
         
         setupUI()
     }
@@ -208,6 +209,12 @@ extension ADImageClipController: UIScrollViewDelegate {
 
 extension ADImageClipController: UIViewControllerTransitioningDelegate {
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return ADImageClipDismissAnimatedTransition()
+        return ADImageClipDismissTransition(transable: self)
+    }
+}
+
+extension ADImageClipController: ADImageClipDismissTransitionContextFrom {
+    func transitionInfo(convertTo: UIView) -> (UIImage, CGRect) {
+        return (editInfo.image, grideView.convert(grideView.clipRect, to: convertTo))
     }
 }
