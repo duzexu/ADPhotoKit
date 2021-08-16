@@ -134,7 +134,7 @@ class ADClipDarkView: UIView {
 
 class ADClipGrideView: UIView {
     
-    struct GrideEdge: OptionSet {
+    private struct GrideEdge: OptionSet {
         let rawValue: Int
         
         static let top = GrideEdge(rawValue: 1 << 0)
@@ -147,6 +147,12 @@ class ADClipGrideView: UIView {
     
     var clipRect: CGRect!
     
+    var clipRectChanged: ((CGRect,Bool)->Void)? {
+        didSet {
+            clipRectChanged?(clipRect,true)
+        }
+    }
+    
     private let interactWidth: CGFloat = 60
     private let minSize: CGFloat = 60
     
@@ -154,10 +160,11 @@ class ADClipGrideView: UIView {
     private var contentV: UIView!
     private var panEdge: GrideEdge = []
     private var lastPoint: CGPoint?
+    private var lastClipRect: CGRect?
     private var isDiming: Bool = false
     private var isRecting: Bool = false
     
-    init(safeInsets: UIEdgeInsets) {
+    init(safeInsets: UIEdgeInsets, clipSize: CGSize) {
         safeRect = UIScreen.main.bounds.inset(by: safeInsets)
         super.init(frame: .zero)
         isUserInteractionEnabled = false
@@ -172,10 +179,10 @@ class ADClipGrideView: UIView {
         c.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(-10)
         }
-        contentV.frame = safeRect
         addSubview(contentV)
-        clipRect = safeRect
+        clipRect = resizeClipRect(with: clipSize)
         dimView.clearRect = clipRect
+        contentV.frame = clipRect
     }
     
     required init?(coder: NSCoder) {
@@ -195,6 +202,7 @@ class ADClipGrideView: UIView {
     func interact(with point: CGPoint, state: UIGestureRecognizer.State) {
         if state == .began {
             lastPoint = point
+            lastClipRect = clipRect
             panEdge = panEdge(with: point)
             gestureStarted()
         }else if state == .changed {
@@ -211,6 +219,12 @@ class ADClipGrideView: UIView {
                         new.origin.y = contentV.frame.maxY - minSize
                     }
                 }
+                if let last = lastClipRect {
+                    if last.minY > new.minY {
+                        lastClipRect?.origin.y = new.origin.y
+                        lastClipRect?.size.height = new.size.height
+                    }
+                }
             }
             if panEdge.contains(.bottom) {
                 new.size.height += diff.y
@@ -219,6 +233,11 @@ class ADClipGrideView: UIView {
                 }
                 if new.size.height < minSize {
                     new.size.height = minSize
+                }
+                if let last = lastClipRect {
+                    if last.maxY < new.maxY {
+                        lastClipRect?.size.height = new.size.height
+                    }
                 }
             }
             if panEdge.contains(.left) {
@@ -232,6 +251,12 @@ class ADClipGrideView: UIView {
                         new.origin.x = contentV.frame.maxX - minSize
                     }
                 }
+                if let last = lastClipRect {
+                    if last.minX > new.minX {
+                        lastClipRect?.origin.x = new.origin.x
+                        lastClipRect?.size.width = new.size.width
+                    }
+                }
             }
             if panEdge.contains(.right) {
                 new.size.width += diff.x
@@ -241,11 +266,18 @@ class ADClipGrideView: UIView {
                 if new.size.width < minSize {
                     new.size.width = minSize
                 }
+                if let last = lastClipRect {
+                    if last.maxX < new.maxX {
+                        lastClipRect?.size.width = new.size.width
+                    }
+                }
             }
             contentV.frame = new
             clipRect = new
             lastPoint = point
+            clipRectChanged?(lastClipRect!,true)
         }else{
+            lastClipRect = nil
             gestureEnded()
         }
     }
@@ -275,6 +307,7 @@ class ADClipGrideView: UIView {
     
     @objc private func _gestureEnded() {
         if isDiming && !isRecting {
+            isDiming = false
             UIApplication.shared.beginIgnoringInteractionEvents()
             UIView.animate(withDuration: 0.2) {
                 self.dimView.alpha = 1
@@ -283,8 +316,10 @@ class ADClipGrideView: UIView {
             }
         }else if isRecting {
             UIApplication.shared.beginIgnoringInteractionEvents()
-            clipRect = resizeClipRect()
+            isRecting = false
+            clipRect = resizeClipRect(with: clipRect.size)
             dimView.clearRect = clipRect
+            clipRectChanged?(clipRect,false)
             UIView.animate(withDuration: 0.3) {
                 self.contentV.frame = self.clipRect
                 self.layoutIfNeeded()
@@ -332,9 +367,9 @@ class ADClipGrideView: UIView {
         return []
     }
     
-    private func resizeClipRect() -> CGRect {
+    private func resizeClipRect(with size: CGSize) -> CGRect {
         var rect: CGRect = .zero
-        let imageHWRatio = clipRect.size.height / clipRect.size.width
+        let imageHWRatio = size.height / size.width
         let viewHWRatio = safeRect.size.height / safeRect.size.width
         if imageHWRatio > viewHWRatio {
             rect.size.height = safeRect.size.height
@@ -382,6 +417,7 @@ class ADClipGrideView: UIView {
             context?.strokePath()
             context?.setShadow(offset: .zero, blur: 0)
             
+            context?.setLineWidth(0.5)
             context?.beginPath()
             var dw: CGFloat = 0
             for _ in 0..<4 {

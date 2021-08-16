@@ -414,7 +414,7 @@ class ViewController: UIViewController {
         
         let maxCount = ConfigModel(title: "MaxCount", mode: .stepper(0)) { [weak self] (value) in
             if let count = value as? Int {
-                self?.params.insert(.maxCount(max: count))
+                self?.params.update(with: .maxCount(max: count))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -422,7 +422,7 @@ class ViewController: UIViewController {
         
         let imageCount = ConfigModel(title: "ImageCount", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.insert(.imageCount(min: trup.0, max: trup.1))
+                self?.params.update(with: .imageCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -430,7 +430,7 @@ class ViewController: UIViewController {
         
         let videoCount = ConfigModel(title: "VideoCount", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.insert(.videoCount(min: trup.0, max: trup.1))
+                self?.params.update(with: .videoCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -438,7 +438,7 @@ class ViewController: UIViewController {
         
         let videoTime = ConfigModel(title: "VideoTime", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.insert(.videoTime(min: trup.0, max: trup.1))
+                self?.params.update(with: .videoTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -446,7 +446,7 @@ class ViewController: UIViewController {
         
         let recordTime = ConfigModel(title: "RecordTime", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.insert(.recordTime(min: trup.0, max: trup.1))
+                self?.params.update(with: .recordTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }

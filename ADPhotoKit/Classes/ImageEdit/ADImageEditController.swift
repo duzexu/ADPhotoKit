@@ -26,7 +26,7 @@ public struct ADImageEditTools: OptionSet {
 public struct ADEditInfo {
     let image: UIImage
     let editImage: UIImage
-    let clipRect: CGRect
+    let clipRect: CGRect?
     let rotation: CGFloat
 }
 
@@ -222,7 +222,7 @@ extension ADImageEditController: ADImageClipDismissTransitionContextTo {
     }
     
     func transitionDidFinish() {
-        //isControlShow = true
+        isControlShow = true
     }
 }
 

@@ -20,6 +20,8 @@ class ADImageClipController: UIViewController {
     
     private let clipAreaInsets: UIEdgeInsets = isPhoneX ? UIEdgeInsets(top: 70, left: 20, bottom: 160, right: 20) : UIEdgeInsets(top: 20, left: 20, bottom: 126, right: 20)
     
+    private var oldClipRect: CGRect?
+    
     init(editInfo: ADEditInfo, editFromRect: CGRect) {
         self.editInfo = editInfo
         super.init(nibName: nil, bundle: nil)
@@ -34,6 +36,7 @@ class ADImageClipController: UIViewController {
         view.backgroundColor = .black
         transitioningDelegate = self
         
+        oldClipRect = editInfo.clipRect
         setupUI()
     }
     
@@ -52,7 +55,7 @@ private extension ADImageClipController {
         scrollView.showsVerticalScrollIndicator = false
         self.scrollView.showsHorizontalScrollIndicator = false
         if #available(iOS 11.0, *) {
-            self.scrollView.contentInsetAdjustmentBehavior = .never
+            scrollView.contentInsetAdjustmentBehavior = .never
         }
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
@@ -60,6 +63,7 @@ private extension ADImageClipController {
         }
         
         contentView = UIView()
+        contentView.frame = CGRect(origin: .zero, size: editInfo.image.size)
         scrollView.addSubview(contentView)
         
         imageView = UIImageView()
@@ -70,10 +74,13 @@ private extension ADImageClipController {
             make.edges.equalToSuperview()
         }
         
-        grideView = ADClipGrideView(safeInsets: clipAreaInsets)
+        grideView = ADClipGrideView(safeInsets: clipAreaInsets, clipSize: editInfo.clipRect?.size ?? editInfo.image.size)
         view.addSubview(grideView)
         grideView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        grideView.clipRectChanged = { [weak self] rect,initial in
+            self?.clipRectDidChanged(rect, initial: initial)
         }
         
         toolBarView = ADClipToolBarView(ctx: self, bottomInset: clipAreaInsets.bottom)
@@ -87,8 +94,6 @@ private extension ADImageClipController {
         panGes.delegate = self
         view.addGestureRecognizer(panGes)
         scrollView.panGestureRecognizer.require(toFail: panGes)
-        
-        resizeView(pixelWidth: editInfo.image.size.width, pixelHeight: editInfo.image.size.height)
     }
     
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
@@ -96,82 +101,18 @@ private extension ADImageClipController {
         grideView.interact(with: point, state: pan.state)
     }
     
-    func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {
-        let imageSize = CGSize(width: pixelWidth, height: pixelHeight)
-        
-        var frame: CGRect = .zero
-        var contentSize: CGSize = .zero
-        
-        let viewW = screenWidth
-        let viewH = screenHeight
-        
-        var width = viewW
-        
-        if UIApplication.shared.statusBarOrientation.isLandscape {
-            let height = viewH
-            frame.size.height = height
-            
-            let imageWHRatio = imageSize.width / imageSize.height
-            let viewWHRatio = viewW / viewH
-            
-            if imageWHRatio > viewWHRatio {
-                frame.size.width = floor(height * imageWHRatio)
-                if frame.size.width > viewW {
-                    // 宽图
-                    frame.size.width = viewW
-                    frame.size.height = viewW / imageWHRatio
-                }
-            } else {
-                width = floor(height * imageWHRatio)
-                if width < 1 || width.isNaN {
-                    width = viewW
-                }
-                frame.size.width = width
-            }
-        } else {
-            frame.size.width = width
-            
-            let imageHWRatio = imageSize.height / imageSize.width
-            let viewHWRatio = viewH / viewW
-            
-            if imageHWRatio > viewHWRatio {
-                // 长图
-                frame.size.width = min(imageSize.width, viewW)
-                frame.size.height = floor(frame.size.width * imageHWRatio)
-            } else {
-                var height = floor(frame.size.width * imageHWRatio)
-                if height < 1 || height.isNaN {
-                    height = viewH
-                }
-                frame.size.height = height
-            }
+    func clipRectDidChanged(_ clip: CGRect, initial: Bool) {
+        scrollView.contentInset = UIEdgeInsets(top: clip.minY, left: clip.minX, bottom: scrollView.frame.maxY-clip.maxY, right: scrollView.frame.maxX-clip.maxX)
+        scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
+        scrollView.maximumZoomScale = 10
+        if initial {
+            scrollView.zoomScale = scrollView.minimumZoomScale
+        }else{
+            let newClip = grideView.convert(clip, to: contentView)
+            print("new \(newClip)")
+    //        scrollView.zoomScale = scrollView.minimumZoomScale
+            //scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
         }
-        
-        // 优化 scroll view zoom scale
-        if frame.width < frame.height {
-            scrollView.maximumZoomScale = max(3, viewW / frame.width)
-        } else {
-            scrollView.maximumZoomScale = max(3, viewH / frame.height)
-        }
-        
-        contentView.frame = frame
-        
-        if UIApplication.shared.statusBarOrientation.isLandscape {
-            contentSize = CGSize(width: width, height: max(viewH, frame.height))
-            if frame.height < viewH {
-                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
-            } else {
-                contentView.frame = CGRect(origin: CGPoint(x: (viewW-frame.width)/2, y: 0), size: frame.size)
-            }
-        } else {
-            contentSize = frame.size
-            if frame.width < viewW || frame.height < viewH {
-                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
-            }
-        }
-        
-        scrollView.contentSize = contentSize
-        scrollView.contentOffset = .zero
     }
     
 }
