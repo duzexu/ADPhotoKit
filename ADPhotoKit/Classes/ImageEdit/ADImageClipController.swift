@@ -53,7 +53,8 @@ private extension ADImageClipController {
         scrollView.alwaysBounceVertical = true
         scrollView.alwaysBounceHorizontal = true
         scrollView.showsVerticalScrollIndicator = false
-        self.scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.maximumZoomScale = 10
         if #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
         }
@@ -102,17 +103,26 @@ private extension ADImageClipController {
     }
     
     func clipRectDidChanged(_ clip: CGRect, initial: Bool) {
-        scrollView.contentInset = UIEdgeInsets(top: clip.minY, left: clip.minX, bottom: scrollView.frame.maxY-clip.maxY, right: scrollView.frame.maxX-clip.maxX)
-        scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
-        scrollView.maximumZoomScale = 10
+        let contentInset = UIEdgeInsets(top: clip.minY, left: clip.minX, bottom: scrollView.frame.maxY-clip.maxY, right: scrollView.frame.maxX-clip.maxX)
         if initial {
-            scrollView.zoomScale = scrollView.minimumZoomScale
+            if scrollView.zoomScale == scrollView.minimumZoomScale {
+                scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
+                scrollView.zoomScale = scrollView.minimumZoomScale
+            }
         }else{
+            scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
             let newClip = grideView.convert(clip, to: contentView)
-            print("new \(newClip)")
-    //        scrollView.zoomScale = scrollView.minimumZoomScale
-            //scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+            let scale = max(editInfo.image.size.height/(newClip.size.height/scrollView.zoomScale), editInfo.image.size.width/(newClip.size.width/scrollView.zoomScale))
+            //scrollView.setZoomScale(scale, animated: true)
+            scrollView.zoomScale = scale
+            if scale < scrollView.maximumZoomScale {
+                print("newClip \(newClip) clip \(clip)")
+                let scal = min(scale, scrollView.maximumZoomScale)
+                let offset = CGPoint(x: newClip.midX-clip.width/2, y: newClip.midY-clip.height/2)
+                scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x*scal, y: -contentInset.top+offset.y*scal)
+            }
         }
+        scrollView.contentInset = contentInset
     }
     
 }
@@ -139,7 +149,7 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        
+        print("offset \(scrollView.contentOffset)")
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
