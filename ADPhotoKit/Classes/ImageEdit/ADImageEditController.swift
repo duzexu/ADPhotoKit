@@ -25,7 +25,6 @@ public struct ADImageEditTools: OptionSet {
 
 public struct ADEditInfo {
     let image: UIImage
-    let editImage: UIImage
     let clipRect: CGRect?
     let rotation: CGFloat
 }
@@ -101,7 +100,7 @@ extension ADImageEditController {
             tools.append(ADImageSticker(style: .text([])))
         }
         if tool.contains(.clip) {
-            tools.append(ADImageClip())
+            tools.append(ADImageClip(source: self))
         }
         if tool.contains(.mosaicDraw) {
             tools.append(ADImageDraw(style: .mosaic(image)))
@@ -212,7 +211,21 @@ extension ADImageEditController {
 
 extension ADImageEditController: ImageProcessor {
     func process() -> UIImage? {
-        return image
+        UIGraphicsBeginImageContextWithOptions(contentView.contentView.bounds.size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            contentView.contentView.layer.render(in: ctx)
+        }
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
+    }
+}
+
+extension ADImageEditController: ADImageClipSource {
+    func clipInfo() -> ADClipInfo {
+        let img = process() ?? image
+        let rect = contentView.scrollView.convert(contentView.contentView.frame, to: view)
+        return ADClipInfo(image: img, clipRect: nil, rotation: nil, clipImage: img, clipFrom: rect)
     }
 }
 

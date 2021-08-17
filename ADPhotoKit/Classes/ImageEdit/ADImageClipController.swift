@@ -9,7 +9,7 @@ import UIKit
 
 class ADImageClipController: UIViewController {
     
-    let editInfo: ADEditInfo
+    let clipInfo: ADClipInfo
     
     private var scrollView: UIScrollView!
     private var contentView: UIView!
@@ -22,8 +22,8 @@ class ADImageClipController: UIViewController {
     
     private var oldClipRect: CGRect?
     
-    init(editInfo: ADEditInfo, editFromRect: CGRect) {
-        self.editInfo = editInfo
+    init(cilpInfo: ADClipInfo) {
+        self.clipInfo = cilpInfo
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -36,8 +36,20 @@ class ADImageClipController: UIViewController {
         view.backgroundColor = .black
         transitioningDelegate = self
         
-        oldClipRect = editInfo.clipRect
+        oldClipRect = clipInfo.clipRect
+        
         setupUI()
+        
+        scrollView.alpha = 0
+        grideView.alpha = 0
+        toolBarView.alpha = 0
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        grideView.clipRectChanged = { [weak self] pan,final,initial in
+            self?.rectDidChanged(panRect: pan, finalRect: final, isInit: initial)
+        }
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -64,25 +76,23 @@ private extension ADImageClipController {
         }
         
         contentView = UIView()
-        contentView.frame = CGRect(origin: .zero, size: editInfo.image.size)
+        contentView.frame = CGRect(origin: .zero, size: clipInfo.image.size)
         scrollView.addSubview(contentView)
         
         imageView = UIImageView()
-        imageView.image = editInfo.image
+        imageView.image = clipInfo.image
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
-        grideView = ADClipGrideView(safeInsets: clipAreaInsets, clipSize: editInfo.clipRect?.size ?? editInfo.image.size)
+        grideView = ADClipGrideView(safeInsets: clipAreaInsets, clipSize: clipInfo.clipRect?.size ?? clipInfo.image.size)
         view.addSubview(grideView)
         grideView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        grideView.clipRectChanged = { [weak self] pan,final in
-            self?.rectDidChanged(panRect: pan, finalRect: final)
-        }
+        
         
         toolBarView = ADClipToolBarView(ctx: self, bottomInset: clipAreaInsets.bottom)
         view.addSubview(toolBarView)
@@ -102,25 +112,47 @@ private extension ADImageClipController {
         grideView.interact(with: point, state: pan.state)
     }
     
-    func rectDidChanged(panRect: CGRect?, finalRect: CGRect) {
+    func rectDidChanged(panRect: CGRect?, finalRect: CGRect, isInit: Bool) {
         let contentInset = UIEdgeInsets(top: finalRect.minY, left: finalRect.minX, bottom: scrollView.frame.maxY-finalRect.maxY, right: scrollView.frame.maxX-finalRect.maxX)
-        scrollView.minimumZoomScale = max(finalRect.size.height/editInfo.image.size.height, finalRect.size.width/editInfo.image.size.width)
+        scrollView.minimumZoomScale = max(finalRect.size.height/clipInfo.image.size.height, finalRect.size.width/clipInfo.image.size.width)
         if let pan = panRect {
             let panClip = grideView.convert(pan, to: contentView)
-            let finalClip = grideView.convert(finalRect, to: contentView)
-            let scale = finalRect.width/pan.width
-            //scrollView.setZoomScale(scale, animated: true)
-            scrollView.zoomScale *= scale
+            let scale = scrollView.zoomScale*finalRect.width/pan.width
+            scrollView.setZoomScale(scale, animated: true)
             if scale < scrollView.maximumZoomScale - CGFloat.ulpOfOne {
-                print("newClip \(panClip) clip \(finalClip)")
-                let scal = min(scale, scrollView.maximumZoomScale)
-                let offset = CGPoint(x: panClip.midX-finalRect.width/2, y: panClip.midY-finalRect.height/2)
-                scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x*scal, y: -contentInset.top+offset.y*scal)
+                let adapt = min(scale, scrollView.maximumZoomScale)
+                let offset = CGPoint(x: panClip.midX*adapt-finalRect.width/2.0, y: panClip.midY*adapt-finalRect.height/2.0)
+                scrollView.setContentOffset(CGPoint(x: -contentInset.left+offset.x, y: -contentInset.top+offset.y), animated: true)
             }
         }else{
-            scrollView.zoomScale = scrollView.minimumZoomScale
+            let finalClip = grideView.convert(finalRect, to: scrollView)
+            if isInit {
+                initialAnimation(to: finalRect)
+                scrollView.zoomScale = scrollView.minimumZoomScale
+            }else if !contentView.frame.contains(finalClip) {
+                scrollView.zoomScale = scrollView.minimumZoomScale
+            }
         }
         scrollView.contentInset = contentInset
+    }
+    
+    func initialAnimation(to rect: CGRect) {
+        let imageView = UIImageView(image: clipInfo.clipImage)
+        imageView.frame = clipInfo.clipFrom
+        view.insertSubview(imageView, belowSubview: grideView)
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        UIView.animate(withDuration: 0.5) {
+            imageView.frame = rect
+        } completion: { _ in
+            UIView.animate(withDuration: 0.3) {
+                self.scrollView.alpha = 1
+                self.grideView.alpha = 1
+                self.toolBarView.alpha = 1
+            } completion: { _ in
+                imageView.removeFromSuperview()
+                UIApplication.shared.endIgnoringInteractionEvents()
+            }
+        }
     }
     
 }
@@ -147,7 +179,7 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print("offset \(scrollView.contentOffset)")
+        
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -164,6 +196,6 @@ extension ADImageClipController: UIViewControllerTransitioningDelegate {
 
 extension ADImageClipController: ADImageClipDismissTransitionContextFrom {
     func transitionInfo(convertTo: UIView) -> (UIImage, CGRect) {
-        return (editInfo.image, grideView.convert(grideView.clipRect, to: convertTo))
+        return (clipInfo.image, grideView.convert(grideView.clipRect, to: convertTo))
     }
 }

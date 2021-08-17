@@ -54,7 +54,16 @@ class ADImageSticker: ADImageEditTool {
     }
     
     func process() -> UIImage? {
-        return nil
+        guard let interactView = toolInteractView else {
+            return nil
+        }
+        UIGraphicsBeginImageContextWithOptions(interactView.bounds.size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            interactView.layer.render(in: ctx)
+        }
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
     }
     
     let style: Style

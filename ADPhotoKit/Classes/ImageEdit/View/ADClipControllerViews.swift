@@ -148,9 +148,9 @@ class ADClipGrideView: UIView {
     var clipRect: CGRect!
     
     // panRect finalRect
-    var clipRectChanged: ((CGRect?,CGRect)->Void)? {
+    var clipRectChanged: ((CGRect?,CGRect,Bool)->Void)? {
         didSet {
-            clipRectChanged?(nil,clipRect)
+            clipRectChanged?(nil,clipRect,true)
         }
     }
     
@@ -276,7 +276,7 @@ class ADClipGrideView: UIView {
             contentV.frame = new
             clipRect = new
             lastPoint = point
-            clipRectChanged?(nil,lastClipRect!)
+            clipRectChanged?(nil,lastClipRect!,false)
         }else{
             lastClipRect = nil
             gestureEnded()
@@ -321,7 +321,7 @@ class ADClipGrideView: UIView {
             let panRect = clipRect
             clipRect = resizeClipRect(with: clipRect.size)
             dimView.clearRect = clipRect
-            clipRectChanged?(panRect,clipRect)
+            clipRectChanged?(panRect,clipRect,false)
             UIView.animate(withDuration: 0.3) {
                 self.contentV.frame = self.clipRect
                 self.layoutIfNeeded()

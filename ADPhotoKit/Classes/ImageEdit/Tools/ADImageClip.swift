@@ -7,6 +7,19 @@
 
 import Foundation
 
+struct ADClipInfo {
+    let image: UIImage
+    let clipRect: CGRect?
+    let rotation: CGFloat?
+    
+    let clipImage: UIImage
+    let clipFrom: CGRect
+}
+
+protocol ADImageClipSource {
+    func clipInfo() -> ADClipInfo
+}
+
 class ADImageClip: ADImageEditTool {
     
     var image: UIImage {
@@ -21,16 +34,20 @@ class ADImageClip: ADImageEditTool {
     var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
-        if let image = ctx?.process() {
-            let clip = ADImageClipController(editInfo: ADEditInfo(image: image, editImage: image, clipRect: nil, rotation: 0), editFromRect: .zero)
-            clip.modalPresentationStyle = .overCurrentContext
-            ctx?.present(clip, animated: false, completion: nil)
-        }
+        let clip = ADImageClipController(cilpInfo: source.clipInfo())
+        clip.modalPresentationStyle = .overCurrentContext
+        ctx?.present(clip, animated: false, completion: nil)
         return false
     }
     
     func process() -> UIImage? {
         return nil
+    }
+    
+    let source: ADImageClipSource
+    
+    init(source: ADImageClipSource) {
+        self.source = source
     }
     
 }
