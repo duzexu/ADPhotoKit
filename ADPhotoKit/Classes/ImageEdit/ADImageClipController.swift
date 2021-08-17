@@ -80,8 +80,8 @@ private extension ADImageClipController {
         grideView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        grideView.clipRectChanged = { [weak self] rect,initial in
-            self?.clipRectDidChanged(rect, initial: initial)
+        grideView.clipRectChanged = { [weak self] pan,final in
+            self?.rectDidChanged(panRect: pan, finalRect: final)
         }
         
         toolBarView = ADClipToolBarView(ctx: self, bottomInset: clipAreaInsets.bottom)
@@ -102,25 +102,23 @@ private extension ADImageClipController {
         grideView.interact(with: point, state: pan.state)
     }
     
-    func clipRectDidChanged(_ clip: CGRect, initial: Bool) {
-        let contentInset = UIEdgeInsets(top: clip.minY, left: clip.minX, bottom: scrollView.frame.maxY-clip.maxY, right: scrollView.frame.maxX-clip.maxX)
-        if initial {
-            if scrollView.zoomScale == scrollView.minimumZoomScale {
-                scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
-                scrollView.zoomScale = scrollView.minimumZoomScale
-            }
-        }else{
-            scrollView.minimumZoomScale = max(clip.size.height/editInfo.image.size.height, clip.size.width/editInfo.image.size.width)
-            let newClip = grideView.convert(clip, to: contentView)
-            let scale = max(editInfo.image.size.height/(newClip.size.height/scrollView.zoomScale), editInfo.image.size.width/(newClip.size.width/scrollView.zoomScale))
+    func rectDidChanged(panRect: CGRect?, finalRect: CGRect) {
+        let contentInset = UIEdgeInsets(top: finalRect.minY, left: finalRect.minX, bottom: scrollView.frame.maxY-finalRect.maxY, right: scrollView.frame.maxX-finalRect.maxX)
+        scrollView.minimumZoomScale = max(finalRect.size.height/editInfo.image.size.height, finalRect.size.width/editInfo.image.size.width)
+        if let pan = panRect {
+            let panClip = grideView.convert(pan, to: contentView)
+            let finalClip = grideView.convert(finalRect, to: contentView)
+            let scale = finalRect.width/pan.width
             //scrollView.setZoomScale(scale, animated: true)
-            scrollView.zoomScale = scale
-            if scale < scrollView.maximumZoomScale {
-                print("newClip \(newClip) clip \(clip)")
+            scrollView.zoomScale *= scale
+            if scale < scrollView.maximumZoomScale - CGFloat.ulpOfOne {
+                print("newClip \(panClip) clip \(finalClip)")
                 let scal = min(scale, scrollView.maximumZoomScale)
-                let offset = CGPoint(x: newClip.midX-clip.width/2, y: newClip.midY-clip.height/2)
+                let offset = CGPoint(x: panClip.midX-finalRect.width/2, y: panClip.midY-finalRect.height/2)
                 scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x*scal, y: -contentInset.top+offset.y*scal)
             }
+        }else{
+            scrollView.zoomScale = scrollView.minimumZoomScale
         }
         scrollView.contentInset = contentInset
     }
