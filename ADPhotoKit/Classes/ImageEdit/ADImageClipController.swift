@@ -117,6 +117,7 @@ private extension ADImageClipController {
         if let pan = panRect {
             let panClip = grideView.convert(pan, to: contentView)
             let scale = scrollView.zoomScale*finalRect.width/pan.width
+            oldClipRect = CGRect(x: panClip.minX/contentView.frame.width, y: panClip.minY/contentView.frame.height, width: panClip.width/contentView.frame.width, height: panClip.height/contentView.frame.height)
             UIView.animate(withDuration: 0.3) {
                 self.scrollView.zoomScale = scale
                 if scale < self.scrollView.maximumZoomScale - CGFloat.ulpOfOne {
@@ -125,13 +126,12 @@ private extension ADImageClipController {
                     self.scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x, y: -contentInset.top+offset.y)
                 }
             }
-            oldClipRect = panClip
         }else{
             let finalClip = grideView.convert(finalRect, to: scrollView)
             if isInit {
                 scrollView.zoomScale = scrollView.minimumZoomScale
                 if let clip = oldClipRect {
-                    scrollView.contentOffset = CGPoint(x: -contentInset.left+clip.origin.x*scrollView.zoomScale, y: -contentInset.top+clip.origin.y*scrollView.zoomScale)
+                    scrollView.contentOffset = CGPoint(x: -contentInset.left+clip.origin.x*clipInfo.image.size.width*scrollView.zoomScale, y: -contentInset.top+clip.origin.y*clipInfo.image.size.height*scrollView.zoomScale)
                 }
                 initialAnimation(to: finalRect)
             }else if !contentView.frame.contains(finalClip) {

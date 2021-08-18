@@ -13,7 +13,8 @@ class ADEditContainerView: UIView {
     
     private var imageView: UIImageView!
     
-    private let imageSize: CGSize
+    let imageSize: CGSize
+    var viewSize: CGSize!
     
     init(image: UIImage) {
         imageSize = image.size
@@ -58,17 +59,20 @@ class ADEditContainerView: UIView {
     
     func setClipRect(_ rect: CGRect?) {
         if let clip = rect {
+            let ratioW = viewSize.width/(clip.width*imageSize.width)
+            let ratioH = viewSize.height/(clip.height*imageSize.height)
+            let inset = UIEdgeInsets(top: -clip.minY*imageSize.height*ratioH, left: -clip.minX*imageSize.width*ratioW, bottom: -(1-clip.maxY)*imageSize.height*ratioH, right: -(1-clip.maxX)*imageSize.width*ratioW)
             imageView.snp.remakeConstraints { (make) in
-                make.edges.equalToSuperview().inset(UIEdgeInsets(top: -clip.minY, left: -clip.minX, bottom: -(imageSize.height-clip.maxY), right: -(imageSize.width-clip.maxX)))
+                make.edges.equalToSuperview().inset(inset)
             }
-            interactContainer.snp.makeConstraints { make in
-                make.edges.equalToSuperview().inset(UIEdgeInsets(top: -clip.minY, left: -clip.minX, bottom: -(imageSize.height-clip.maxY), right: -(imageSize.width-clip.maxX)))
+            interactContainer.snp.remakeConstraints { make in
+                make.edges.equalToSuperview().inset(inset)
             }
         }else{
             imageView.snp.remakeConstraints { (make) in
                 make.edges.equalToSuperview()
             }
-            interactContainer.snp.makeConstraints { make in
+            interactContainer.snp.remakeConstraints { make in
                 make.edges.equalToSuperview()
             }
         }
@@ -112,6 +116,9 @@ class ADImageEditContentView: UIView {
     }
     
     func updateClipRect(_ rect: CGRect?) {
+        let size = rect == nil ? container.imageSize : rect!.size
+        resizeView(pixelWidth: size.width, pixelHeight: size.height)
+        container.viewSize = container.frame.size
         container.setClipRect(rect)
     }
     
@@ -207,6 +214,7 @@ private extension ADImageEditContentView {
         container = ADEditContainerView(image: image)
         scrollView.addSubview(container)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
+        container.viewSize = container.bounds.size
     }
     
     func updateState() {
