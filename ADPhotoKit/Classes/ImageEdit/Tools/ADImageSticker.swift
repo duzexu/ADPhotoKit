@@ -25,7 +25,7 @@ class ADImageSticker: ADImageEditTool {
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
     
-    func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
+    func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text(_):
             let sticker = ADImageEditConfigurable.textStickerEditVC()

@@ -24,14 +24,16 @@ public struct ADImageEditTools: OptionSet {
 }
 
 public struct ADEditInfo {
-    let image: UIImage
-    let clipRect: CGRect?
-    let rotation: CGFloat
+    var editImg: UIImage?
+    var clipRect: CGRect?
+    var rotation: CGFloat?
 }
 
 class ADImageEditController: UIViewController {
     
     let image: UIImage
+    
+    var editInfo: ADEditInfo!
     
     var contentView: ADImageEditContentView!
     var controlsView: ADImageEditControlsView!
@@ -54,6 +56,7 @@ class ADImageEditController: UIViewController {
     
     init(image: UIImage) {
         self.image = image
+        self.editInfo = ADEditInfo()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -67,10 +70,11 @@ class ADImageEditController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor.black
         definesPresentationContext = true
+        
         ADStickerInteractView.share.clear()
         setupUI()
-        view.backgroundColor = UIColor.black
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -163,7 +167,7 @@ extension ADImageEditController {
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
         let trans = pan.translation(in: view)
-        contentView.interactContainer.clipsToBounds = contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
+        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
         pan.setTranslation(.zero, in: view)
         switch pan.state {
         case .began:
@@ -178,7 +182,7 @@ extension ADImageEditController {
     }
     
     @objc func pinchAction(_ pinch: UIPinchGestureRecognizer) {
-        contentView.interactContainer.clipsToBounds = contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
+        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
         pinch.scale = 1
         switch pinch.state {
         case .began:
@@ -193,7 +197,7 @@ extension ADImageEditController {
     }
     
     @objc func rotateAction(_ rotate: UIRotationGestureRecognizer) {
-        contentView.interactContainer.clipsToBounds = contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
+        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
         rotate.rotation = 0
         switch rotate.state {
         case .began:
@@ -211,9 +215,9 @@ extension ADImageEditController {
 
 extension ADImageEditController: ImageProcessor {
     func process() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(contentView.contentView.bounds.size, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(contentView.container.bounds.size, false, UIScreen.main.scale)
         if let ctx = UIGraphicsGetCurrentContext() {
-            contentView.contentView.layer.render(in: ctx)
+            contentView.container.layer.render(in: ctx)
         }
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -223,15 +227,21 @@ extension ADImageEditController: ImageProcessor {
 
 extension ADImageEditController: ADImageClipSource {
     func clipInfo() -> ADClipInfo {
-        let img = process() ?? image
-        let rect = contentView.scrollView.convert(contentView.contentView.frame, to: view)
-        return ADClipInfo(image: img, clipRect: nil, rotation: nil, clipImage: img, clipFrom: rect)
+        let img = contentView.container.processImage() ?? image
+        let clipImage = contentView.clipImage() ?? image
+        let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
+        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: nil, clipImage: clipImage, clipFrom: rect)
+    }
+    
+    func clipRectDidConfirmed(_ rect: CGRect?) {
+        editInfo.clipRect = rect
+        contentView.updateClipRect(rect)
     }
 }
 
 extension ADImageEditController: ADImageClipDismissTransitionContextTo {
     func transitionRect(convertTo: UIView) -> CGRect? {
-        return contentView.contentView.convert(contentView.imageView.frame, to: convertTo)
+        return contentView.scrollView.convert(contentView.container.frame, to: convertTo)
     }
     
     func transitionDidFinish() {

@@ -11,6 +11,8 @@ class ADImageClipController: UIViewController {
     
     let clipInfo: ADClipInfo
     
+    var clipRectConfirmBlock: ((CGRect?) -> Void)?
+    
     private var scrollView: UIScrollView!
     private var contentView: UIView!
     private var imageView: UIImageView!
@@ -93,8 +95,10 @@ private extension ADImageClipController {
             make.edges.equalToSuperview()
         }
         
-        
-        toolBarView = ADClipToolBarView(ctx: self, bottomInset: clipAreaInsets.bottom)
+        toolBarView = ADClipToolBarView(bottomInset: clipAreaInsets.bottom)
+        toolBarView.actionBlock = { [weak self] action in
+            self?.toolAction(action)
+        }
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { make in
             make.right.left.bottom.equalToSuperview()
@@ -107,28 +111,29 @@ private extension ADImageClipController {
         scrollView.panGestureRecognizer.require(toFail: panGes)
     }
     
-    @objc func panAction(_ pan: UIPanGestureRecognizer) {
-        let point = pan.location(in: view)
-        grideView.interact(with: point, state: pan.state)
-    }
-    
     func rectDidChanged(panRect: CGRect?, finalRect: CGRect, isInit: Bool) {
         let contentInset = UIEdgeInsets(top: finalRect.minY, left: finalRect.minX, bottom: scrollView.frame.maxY-finalRect.maxY, right: scrollView.frame.maxX-finalRect.maxX)
         scrollView.minimumZoomScale = max(finalRect.size.height/clipInfo.image.size.height, finalRect.size.width/clipInfo.image.size.width)
         if let pan = panRect {
             let panClip = grideView.convert(pan, to: contentView)
             let scale = scrollView.zoomScale*finalRect.width/pan.width
-            scrollView.setZoomScale(scale, animated: true)
-            if scale < scrollView.maximumZoomScale - CGFloat.ulpOfOne {
-                let adapt = min(scale, scrollView.maximumZoomScale)
-                let offset = CGPoint(x: panClip.midX*adapt-finalRect.width/2.0, y: panClip.midY*adapt-finalRect.height/2.0)
-                scrollView.setContentOffset(CGPoint(x: -contentInset.left+offset.x, y: -contentInset.top+offset.y), animated: true)
+            UIView.animate(withDuration: 0.3) {
+                self.scrollView.zoomScale = scale
+                if scale < self.scrollView.maximumZoomScale - CGFloat.ulpOfOne {
+                    let adapt = min(scale, self.scrollView.maximumZoomScale)
+                    let offset = CGPoint(x: panClip.midX*adapt-finalRect.width/2.0, y: panClip.midY*adapt-finalRect.height/2.0)
+                    self.scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x, y: -contentInset.top+offset.y)
+                }
             }
+            oldClipRect = panClip
         }else{
             let finalClip = grideView.convert(finalRect, to: scrollView)
             if isInit {
-                initialAnimation(to: finalRect)
                 scrollView.zoomScale = scrollView.minimumZoomScale
+                if let clip = oldClipRect {
+                    scrollView.contentOffset = CGPoint(x: -contentInset.left+clip.origin.x*scrollView.zoomScale, y: -contentInset.top+clip.origin.y*scrollView.zoomScale)
+                }
+                initialAnimation(to: finalRect)
             }else if !contentView.frame.contains(finalClip) {
                 scrollView.zoomScale = scrollView.minimumZoomScale
             }
@@ -138,6 +143,8 @@ private extension ADImageClipController {
     
     func initialAnimation(to rect: CGRect) {
         let imageView = UIImageView(image: clipInfo.clipImage)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         imageView.frame = clipInfo.clipFrom
         view.insertSubview(imageView, belowSubview: grideView)
         UIApplication.shared.beginIgnoringInteractionEvents()
@@ -157,6 +164,30 @@ private extension ADImageClipController {
     
 }
 
+private extension ADImageClipController {
+    @objc func panAction(_ pan: UIPanGestureRecognizer) {
+        let point = pan.location(in: view)
+        grideView.interact(with: point, state: pan.state)
+    }
+    
+    func toolAction(_ action: ADClipToolBarView.Action) {
+        switch action {
+        case .cancel:
+            dismiss(animated: true, completion: nil)
+        case .confirm:
+            scrollView.alpha = 0
+            grideView.alpha = 0
+            toolBarView.alpha = 0
+            clipRectConfirmBlock?(oldClipRect)
+            dismiss(animated: true, completion: nil)
+        case .revert:
+            break
+        case .rotate:
+            break
+        }
+    }
+}
+
 extension ADImageClipController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let point = gestureRecognizer.location(in: view)
@@ -171,15 +202,11 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        
+        grideView.dragingStarted()
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         grideView.dragingStarted()
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -196,6 +223,7 @@ extension ADImageClipController: UIViewControllerTransitioningDelegate {
 
 extension ADImageClipController: ADImageClipDismissTransitionContextFrom {
     func transitionInfo(convertTo: UIView) -> (UIImage, CGRect) {
-        return (clipInfo.image, grideView.convert(grideView.clipRect, to: convertTo))
+        let image = oldClipRect == nil ? clipInfo.image : clipInfo.image.image(of: oldClipRect!)
+        return (image, grideView.convert(grideView.clipRect, to: convertTo))
     }
 }

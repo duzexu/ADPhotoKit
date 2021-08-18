@@ -9,7 +9,7 @@ import UIKit
 
 class ADImageEditControlsView: UIView {
     
-    weak var vc: ADImageProcessorable?
+    weak var vc: UIViewController?
     
     var contentStatus: ((Bool) -> Void)?
     
@@ -47,7 +47,7 @@ class ADImageEditControlsView: UIView {
     private var toolsCollectionView: UICollectionView!
     private var userInteractionBtns: [UIButton] = []
 
-    init(vc: ADImageProcessorable, tools: [ADImageEditTool]) {
+    init(vc: UIViewController, tools: [ADImageEditTool]) {
         self.vc = vc
         self.tools = tools
         super.init(frame: .zero)

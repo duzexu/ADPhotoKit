@@ -9,12 +9,18 @@ import UIKit
 
 class ADClipToolBarView: UIView {
     
-    weak var ctx: UIViewController?
+    enum Action {
+        case cancel
+        case confirm
+        case revert
+        case rotate
+    }
+        
+    var actionBlock: ((Action) -> Void)?
     
-    var bottomLayer: CAGradientLayer!
+    private var bottomLayer: CAGradientLayer!
 
-    init(ctx: UIViewController, bottomInset: CGFloat) {
-        self.ctx = ctx
+    init(bottomInset: CGFloat) {
         super.init(frame: .zero)
         clipsToBounds = false
         
@@ -87,19 +93,19 @@ class ADClipToolBarView: UIView {
     }
     
     @objc func cancelBtnAction() {
-        ctx?.dismiss(animated: true, completion: nil)
+        actionBlock?(.cancel)
     }
     
     @objc func revertBtnAction() {
-        
+        actionBlock?(.revert)
     }
     
     @objc func confirmBtnAction() {
-        ctx?.dismiss(animated: true, completion: nil)
+        actionBlock?(.confirm)
     }
     
     @objc func rotateBtnAction() {
-        
+        actionBlock?(.rotate)
     }
     
 }

@@ -22,4 +22,12 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    
+    func image(of clip: CGRect) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(clip.size, false, UIScreen.main.scale)
+        self.draw(at: CGPoint(x: -clip.origin.x, y: -clip.origin.y))
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result ?? self
+    }
 }

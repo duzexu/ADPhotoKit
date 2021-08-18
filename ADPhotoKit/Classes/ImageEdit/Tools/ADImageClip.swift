@@ -18,6 +18,8 @@ struct ADClipInfo {
 
 protocol ADImageClipSource {
     func clipInfo() -> ADClipInfo
+    
+    func clipRectDidConfirmed(_ rect: CGRect?)
 }
 
 class ADImageClip: ADImageEditTool {
@@ -33,8 +35,11 @@ class ADImageClip: ADImageEditTool {
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
     
-    func toolDidSelect(ctx: ADImageProcessorable?) -> Bool {
+    func toolDidSelect(ctx: UIViewController?) -> Bool {
         let clip = ADImageClipController(cilpInfo: source.clipInfo())
+        clip.clipRectConfirmBlock = { [weak self] rect in
+            self?.source.clipRectDidConfirmed(rect)
+        }
         clip.modalPresentationStyle = .overCurrentContext
         ctx?.present(clip, animated: false, completion: nil)
         return false
