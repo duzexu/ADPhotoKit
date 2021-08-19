@@ -8,9 +8,9 @@
 import Foundation
 
 struct ADClipInfo {
-    let image: UIImage
-    let clipRect: CGRect?
-    let rotation: CGFloat?
+    var image: UIImage
+    var clipRect: CGRect?
+    var rotation: ADRotation
     
     let clipImage: UIImage
     let clipFrom: CGRect

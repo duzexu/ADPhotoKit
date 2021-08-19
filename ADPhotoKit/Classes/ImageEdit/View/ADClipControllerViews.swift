@@ -19,6 +19,7 @@ class ADClipToolBarView: UIView {
     var actionBlock: ((Action) -> Void)?
     
     private var bottomLayer: CAGradientLayer!
+    private var rotateBtn: UIButton!
 
     init(bottomInset: CGFloat) {
         super.init(frame: .zero)
@@ -72,7 +73,7 @@ class ADClipToolBarView: UIView {
             make.centerY.equalToSuperview()
         }
         
-        let rotateBtn = UIButton(type: .custom)
+        rotateBtn = UIButton(type: .custom)
         rotateBtn.setImage(Bundle.image(name: "rotateimage", module: .imageEdit), for: .normal)
         rotateBtn.addTarget(self, action: #selector(rotateBtnAction), for: .touchUpInside)
         addSubview(rotateBtn)
@@ -86,6 +87,10 @@ class ADClipToolBarView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         bottomLayer.frame = CGRect(x: 0, y: bounds.size.height-bottomLayer.frame.size.height, width: bounds.size.width, height: bottomLayer.frame.size.height)
+    }
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return rotateBtn.frame.contains(point) || bounds.contains(point)
     }
     
     required init?(coder: NSCoder) {
@@ -303,6 +308,13 @@ class ADClipGrideView: UIView {
     
     func gestureEnded() {
         perform(#selector(_gestureEnded), with: nil, afterDelay: 1)
+    }
+    
+    func resetClipSize(_ size: CGSize) {
+        clipRect = resizeClipRect(with: size)
+        dimView.clearRect = clipRect
+        contentV.frame = clipRect
+        clipRectChanged?(nil,clipRect,true)
     }
     
     private func gestureStarted() {

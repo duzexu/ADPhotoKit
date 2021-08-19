@@ -31,4 +31,26 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return result ?? self
     }
+    
+    func image(with degree: CGFloat) -> UIImage {
+        guard let cgImg = cgImage else {
+            return self
+        }
+        
+        let box = UIView(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        box.transform = CGAffineTransform(rotationAngle: degree)
+        
+        let boxSize = box.frame.size
+        
+        UIGraphicsBeginImageContext(boxSize)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx?.translateBy(x: boxSize.width / 2, y: boxSize.height / 2)
+        ctx?.rotate(by: degree)
+        ctx?.scaleBy(x: 1.0, y: -1.0)
+        ctx?.draw(cgImg, in: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height))
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return result ?? self
+    }
 }

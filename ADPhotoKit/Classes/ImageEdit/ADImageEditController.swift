@@ -29,6 +29,26 @@ public struct ADEditInfo {
     var rotation: CGFloat?
 }
 
+public enum ADRotation: CGFloat {
+    case idle = 0
+    case left = -90
+    case right = 90
+    case down = 180
+    
+    func rotateLeft() -> ADRotation {
+        switch self {
+        case .idle:
+            return .left
+        case .left:
+            return .down
+        case .right:
+            return .idle
+        case .down:
+            return .right
+        }
+    }
+}
+
 class ADImageEditController: UIViewController {
     
     let image: UIImage
@@ -218,7 +238,7 @@ extension ADImageEditController: ADImageClipSource {
         let img = contentView.container.processImage() ?? image
         let clipImage = contentView.clipImage() ?? image
         let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
-        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: nil, clipImage: clipImage, clipFrom: rect)
+        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: .idle, clipImage: clipImage, clipFrom: rect)
     }
     
     func clipRectDidConfirmed(_ rect: CGRect?) {

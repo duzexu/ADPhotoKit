@@ -9,7 +9,7 @@ import UIKit
 
 class ADImageClipController: UIViewController {
     
-    let clipInfo: ADClipInfo
+    var clipInfo: ADClipInfo
     
     var clipRectConfirmBlock: ((CGRect?) -> Void)?
     
@@ -165,6 +165,15 @@ private extension ADImageClipController {
         return CGRect(x: panClip.minX/clipInfo.image.size.width, y: panClip.minY/clipInfo.image.size.height, width: panClip.width/clipInfo.image.size.width, height: panClip.height/clipInfo.image.size.height)
     }
     
+    func rotateLeft() {
+        clipInfo.clipRect = newClipRect()?.rotateLeft()
+        clipInfo.image = clipInfo.image.image(with: ADRotation.left.rawValue/180.0*CGFloat.pi)
+        imageView.image = clipInfo.image
+        contentView.frame = CGRect(origin: .zero, size: clipInfo.image.size)
+        let clipSize = clipInfo.clipRect != nil ? clipInfo.clipRect!.size*clipInfo.image.size : imageView.image!.size
+        grideView.resetClipSize(clipSize)
+    }
+    
 }
 
 private extension ADImageClipController {
@@ -183,7 +192,7 @@ private extension ADImageClipController {
         case .revert:
             break
         case .rotate:
-            break
+            rotateLeft()
         }
     }
 }
