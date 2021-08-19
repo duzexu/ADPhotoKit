@@ -23,9 +23,10 @@ extension UIImage {
         return image
     }
     
-    func image(of clip: CGRect) -> UIImage {
-        UIGraphicsBeginImageContextWithOptions(clip.size, false, UIScreen.main.scale)
-        self.draw(at: CGPoint(x: -clip.origin.x, y: -clip.origin.y))
+    func image(clip normalize: CGRect) -> UIImage {
+        let clipTo = CGRect(x: normalize.minX*size.width, y: normalize.minY*size.height, width: normalize.width*size.width, height: normalize.height*size.height)
+        UIGraphicsBeginImageContextWithOptions(clipTo.size, false, UIScreen.main.scale)
+        self.draw(at: CGPoint(x: -clipTo.origin.x, y: -clipTo.origin.y))
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return result ?? self

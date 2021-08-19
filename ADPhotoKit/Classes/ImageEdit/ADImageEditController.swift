@@ -213,18 +213,6 @@ extension ADImageEditController {
     
 }
 
-extension ADImageEditController: ImageProcessor {
-    func process() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(contentView.container.bounds.size, false, UIScreen.main.scale)
-        if let ctx = UIGraphicsGetCurrentContext() {
-            contentView.container.layer.render(in: ctx)
-        }
-        let result = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return result
-    }
-}
-
 extension ADImageEditController: ADImageClipSource {
     func clipInfo() -> ADClipInfo {
         let img = contentView.container.processImage() ?? image

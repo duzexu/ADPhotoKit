@@ -31,6 +31,10 @@ class ADEditContainerView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         clipView.addSubview(imageView)
+        imageView.snp.makeConstraints { (make) in
+            make.size.equalTo(image.size)
+            make.center.equalToSuperview()
+        }
         
         let noClipView = UIView()
         addSubview(noClipView)
@@ -42,8 +46,10 @@ class ADEditContainerView: UIView {
         interactContainer.clipsToBounds = true
         interactContainer.isUserInteractionEnabled = false
         noClipView.addSubview(interactContainer)
-        
-        setClipRect(nil)
+        interactContainer.snp.makeConstraints { make in
+            make.size.equalTo(image.size)
+            make.center.equalToSuperview()
+        }
     }
     
     func processImage() -> UIImage? {
@@ -59,22 +65,15 @@ class ADEditContainerView: UIView {
     
     func setClipRect(_ rect: CGRect?) {
         if let clip = rect {
-            let ratioW = viewSize.width/(clip.width*imageSize.width)
-            let ratioH = viewSize.height/(clip.height*imageSize.height)
-            let inset = UIEdgeInsets(top: -clip.minY*imageSize.height*ratioH, left: -clip.minX*imageSize.width*ratioW, bottom: -(1-clip.maxY)*imageSize.height*ratioH, right: -(1-clip.maxX)*imageSize.width*ratioW)
-            imageView.snp.remakeConstraints { (make) in
-                make.edges.equalToSuperview().inset(inset)
-            }
-            interactContainer.snp.remakeConstraints { make in
-                make.edges.equalToSuperview().inset(inset)
-            }
+            let ratio = viewSize.height/(clip.height*imageSize.height)
+            let scale = CGAffineTransform(scaleX: ratio, y: ratio)
+            let trans = CGAffineTransform(translationX: (0.5-clip.midX)*imageSize.width*ratio, y: (0.5-clip.midY)*imageSize.height*ratio)
+            imageView.transform = scale.concatenating(trans)
+            interactContainer.transform = scale.concatenating(trans)
         }else{
-            imageView.snp.remakeConstraints { (make) in
-                make.edges.equalToSuperview()
-            }
-            interactContainer.snp.remakeConstraints { make in
-                make.edges.equalToSuperview()
-            }
+            let ratio = viewSize.width/imageSize.width
+            imageView.transform = CGAffineTransform(scaleX: ratio, y: ratio)
+            interactContainer.transform = CGAffineTransform(scaleX: ratio, y: ratio)
         }
     }
     
@@ -116,7 +115,7 @@ class ADImageEditContentView: UIView {
     }
     
     func updateClipRect(_ rect: CGRect?) {
-        let size = rect == nil ? container.imageSize : rect!.size
+        let size = rect == nil ? container.imageSize : container.imageSize*rect!.size
         resizeView(pixelWidth: size.width, pixelHeight: size.height)
         container.viewSize = container.frame.size
         container.setClipRect(rect)
@@ -215,6 +214,7 @@ private extension ADImageEditContentView {
         scrollView.addSubview(container)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
         container.viewSize = container.bounds.size
+        container.setClipRect(nil)
     }
     
     func updateState() {

@@ -153,6 +153,10 @@ class ADClipGrideView: UIView {
     
     var clipRect: CGRect!
     
+    var dynamicClipRect: CGRect {
+        return contentV.frame
+    }
+    
     // panRect finalRect
     var clipRectChanged: ((CGRect?,CGRect,Bool)->Void)? {
         didSet {
