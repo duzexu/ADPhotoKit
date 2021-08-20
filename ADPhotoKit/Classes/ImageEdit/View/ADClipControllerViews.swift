@@ -18,8 +18,10 @@ class ADClipToolBarView: UIView {
         
     var actionBlock: ((Action) -> Void)?
     
+    var revertBtn: UIButton!
+    var rotateBtn: UIButton!
+    
     private var bottomLayer: CAGradientLayer!
-    private var rotateBtn: UIButton!
 
     init(bottomInset: CGFloat) {
         super.init(frame: .zero)
@@ -49,7 +51,7 @@ class ADClipToolBarView: UIView {
             make.centerY.equalToSuperview()
         }
         
-        let revertBtn = UIButton(type: .custom)
+        revertBtn = UIButton(type: .custom)
         revertBtn.isEnabled = false
         revertBtn.setTitleColor(.white, for: .normal)
         revertBtn.setTitleColor(UIColor(white: 1, alpha: 0.4), for: .disabled)
@@ -145,6 +147,13 @@ class ADClipDarkView: UIView {
 
 class ADClipGrideView: UIView {
     
+    enum ClipRectChangeMode {
+        case initial(CGRect)
+        case changed(CGRect)
+        case ended(CGRect,CGRect)
+        case reset(CGRect,Bool)
+    }
+    
     private struct GrideEdge: OptionSet {
         let rawValue: Int
         
@@ -158,14 +167,16 @@ class ADClipGrideView: UIView {
     
     var clipRect: CGRect!
     
+    weak var rotateBtn: UIButton?
+    
     var dynamicClipRect: CGRect {
         return contentV.frame
     }
     
     // panRect finalRect
-    var clipRectChanged: ((CGRect?,CGRect,Bool)->Void)? {
+    var clipRectChanged: ((ClipRectChangeMode)->Void)? {
         didSet {
-            clipRectChanged?(nil,clipRect,true)
+            clipRectChanged?(.initial(clipRect))
         }
     }
     
@@ -291,7 +302,7 @@ class ADClipGrideView: UIView {
             contentV.frame = new
             clipRect = new
             lastPoint = point
-            clipRectChanged?(nil,lastClipRect!,false)
+            clipRectChanged?(.changed(lastClipRect!))
         }else{
             lastClipRect = nil
             gestureEnded()
@@ -303,6 +314,7 @@ class ADClipGrideView: UIView {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         UIView.animate(withDuration: 0.2) {
             self.dimView.alpha = 0
+            self.rotateBtn?.alpha = 0
         }
     }
     
@@ -310,11 +322,13 @@ class ADClipGrideView: UIView {
         perform(#selector(_gestureEnded), with: nil, afterDelay: 1)
     }
     
-    func resetClipSize(_ size: CGSize) {
+    @discardableResult
+    func resetClipSize(_ size: CGSize, animate: Bool = false) -> CGRect {
         clipRect = resizeClipRect(with: size)
         dimView.clearRect = clipRect
         contentV.frame = clipRect
-        clipRectChanged?(nil,clipRect,true)
+        clipRectChanged?(.reset(clipRect,animate))
+        return clipRect
     }
     
     private func gestureStarted() {
@@ -325,6 +339,7 @@ class ADClipGrideView: UIView {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         UIView.animate(withDuration: 0.2) {
             self.dimView.alpha = 0
+            self.rotateBtn?.alpha = 0
         }
     }
     
@@ -334,6 +349,7 @@ class ADClipGrideView: UIView {
             UIApplication.shared.beginIgnoringInteractionEvents()
             UIView.animate(withDuration: 0.2) {
                 self.dimView.alpha = 1
+                self.rotateBtn?.alpha = 1
             } completion: { _ in
                 UIApplication.shared.endIgnoringInteractionEvents()
             }
@@ -343,13 +359,14 @@ class ADClipGrideView: UIView {
             let panRect = clipRect
             clipRect = resizeClipRect(with: clipRect.size)
             dimView.clearRect = clipRect
-            clipRectChanged?(panRect,clipRect,false)
+            clipRectChanged?(.ended(panRect!, clipRect))
             UIView.animate(withDuration: 0.3) {
                 self.contentV.frame = self.clipRect
                 self.layoutIfNeeded()
             } completion: { finish in
                 UIView.animate(withDuration: 0.2) {
                     self.dimView.alpha = 1
+                    self.rotateBtn?.alpha = 1
                 } completion: { _ in
                     UIApplication.shared.endIgnoringInteractionEvents()
                 }

@@ -33,6 +33,10 @@ extension UIImage {
     }
     
     func image(with degree: CGFloat) -> UIImage {
+        guard degree != 0 else {
+            return self
+        }
+        
         guard let cgImg = cgImage else {
             return self
         }

@@ -8,12 +8,16 @@
 import Foundation
 
 struct ADClipInfo {
-    var image: UIImage
+    let image: UIImage
     var clipRect: CGRect?
     var rotation: ADRotation
     
     let clipImage: UIImage
     let clipFrom: CGRect
+    
+    var isOrigin: Bool {
+        return clipRect == nil && rotation == .idle
+    }
 }
 
 protocol ADImageClipSource {
@@ -36,7 +40,7 @@ class ADImageClip: ADImageEditTool {
     var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
-        let clip = ADImageClipController(cilpInfo: source.clipInfo())
+        let clip = ADImageClipController(clipInfo: source.clipInfo())
         clip.clipRectConfirmBlock = { [weak self] rect in
             self?.source.clipRectDidConfirmed(rect)
         }
