@@ -152,6 +152,7 @@ class ADClipGrideView: UIView {
         case changed(CGRect)
         case ended(CGRect,CGRect)
         case reset(CGRect,Bool)
+        case moved
     }
     
     private struct GrideEdge: OptionSet {
@@ -173,7 +174,12 @@ class ADClipGrideView: UIView {
         return contentV.frame
     }
     
-    // panRect finalRect
+    var diming: Bool = true {
+        didSet {
+            dimView.alpha = (diming ? 1 : 0)
+        }
+    }
+    
     var clipRectChanged: ((ClipRectChangeMode)->Void)? {
         didSet {
             clipRectChanged?(.initial(clipRect))
@@ -322,13 +328,27 @@ class ADClipGrideView: UIView {
         perform(#selector(_gestureEnded), with: nil, afterDelay: 1)
     }
     
-    @discardableResult
-    func resetClipSize(_ size: CGSize, animate: Bool = false) -> CGRect {
+    func resetClipSize(_ size: CGSize, animated: Bool = false) {
         clipRect = resizeClipRect(with: size)
         dimView.clearRect = clipRect
         contentV.frame = clipRect
-        clipRectChanged?(.reset(clipRect,animate))
-        return clipRect
+        clipRectChanged?(.reset(clipRect,animated))
+    }
+    
+    func resizeClipRect(with size: CGSize) -> CGRect {
+        var rect: CGRect = .zero
+        let imageHWRatio = size.height / size.width
+        let viewHWRatio = safeRect.size.height / safeRect.size.width
+        if imageHWRatio > viewHWRatio {
+            rect.size.height = safeRect.size.height
+            rect.size.width = safeRect.size.height / imageHWRatio
+            rect.origin = CGPoint(x: (safeRect.size.width - rect.size.width)/2 + safeRect.origin.x, y: safeRect.origin.y)
+        } else {
+            rect.size.width = safeRect.size.width
+            rect.size.height = safeRect.size.width * imageHWRatio
+            rect.origin = CGPoint(x: safeRect.origin.x, y: (safeRect.size.height - rect.size.height)/2 + safeRect.origin.y)
+        }
+        return rect
     }
     
     private func gestureStarted() {
@@ -346,6 +366,7 @@ class ADClipGrideView: UIView {
     @objc private func _gestureEnded() {
         if isDiming && !isRecting {
             isDiming = false
+            clipRectChanged?(.moved)
             UIApplication.shared.beginIgnoringInteractionEvents()
             UIView.animate(withDuration: 0.2) {
                 self.dimView.alpha = 1
@@ -406,22 +427,6 @@ class ADClipGrideView: UIView {
             }
         }
         return []
-    }
-    
-    private func resizeClipRect(with size: CGSize) -> CGRect {
-        var rect: CGRect = .zero
-        let imageHWRatio = size.height / size.width
-        let viewHWRatio = safeRect.size.height / safeRect.size.width
-        if imageHWRatio > viewHWRatio {
-            rect.size.height = safeRect.size.height
-            rect.size.width = safeRect.size.height / imageHWRatio
-            rect.origin = CGPoint(x: (safeRect.size.width - rect.size.width)/2 + safeRect.origin.x, y: safeRect.origin.y)
-        } else {
-            rect.size.width = safeRect.size.width
-            rect.size.height = safeRect.size.width * imageHWRatio
-            rect.origin = CGPoint(x: safeRect.origin.x, y: (safeRect.size.height - rect.size.height)/2 + safeRect.origin.y)
-        }
-        return rect
     }
     
     class ContentView: UIView {

@@ -28,6 +28,8 @@ class ADImageClipController: UIViewController {
             toolBarView.revertBtn.isEnabled = !isOrigin
         }
     }
+    
+    private var rotationInfo: (UIView,CGFloat)?
         
     init(clipInfo: ADClipInfo) {
         self.clipInfo = clipInfo
@@ -121,9 +123,11 @@ private extension ADImageClipController {
     }
     
     func clipRectChanged(with mode: ADClipGrideView.ClipRectChangeMode) {
-        var contentInset: UIEdgeInsets!
+        var contentInset: UIEdgeInsets?
         defer {
-            scrollView.contentInset = contentInset
+            if let inset = contentInset {
+                scrollView.contentInset = inset
+            }
         }
         switch mode {
         case let .initial(finalRect):
@@ -131,14 +135,13 @@ private extension ADImageClipController {
             configZoomScale()
             initialAnimation(with: finalRect)
         case let .changed(finalRect):
-            isOrigin = false
             contentInset = config(with: finalRect)
             let finalClip = grideView.convert(finalRect, to: scrollView)
             if !contentView.frame.contains(finalClip) {
                 scrollView.zoomScale = scrollView.minimumZoomScale
             }
         case let .ended(panRect, finalRect):
-            isOrigin = false
+            updateOrigin(finalRect)
             contentInset = config(with: finalRect)
             let panClip = grideView.convert(panRect, to: contentView)
             let scale = scrollView.zoomScale*finalRect.width/panRect.width
@@ -147,12 +150,14 @@ private extension ADImageClipController {
                 if scale < self.scrollView.maximumZoomScale - CGFloat.ulpOfOne {
                     let adapt = min(scale, self.scrollView.maximumZoomScale)
                     let offset = CGPoint(x: panClip.midX*adapt-finalRect.width/2.0, y: panClip.midY*adapt-finalRect.height/2.0)
-                    self.scrollView.contentOffset = CGPoint(x: -contentInset.left+offset.x, y: -contentInset.top+offset.y)
+                    self.scrollView.contentOffset = CGPoint(x: -contentInset!.left+offset.x, y: -contentInset!.top+offset.y)
                 }
             }
         case let .reset(finalRect,ani):
             contentInset = config(with: finalRect)
             configZoomScale(ani)
+        case .moved:
+            updateOrigin(nil)
         }
         
         func initialAnimation(with finalRect: CGRect) {
@@ -186,11 +191,11 @@ private extension ADImageClipController {
                 if ani {
                     UIView.animate(withDuration: 0.3) {
                         self.scrollView.zoomScale = self.scrollView.minimumZoomScale*min(1/clip.width, 1/clip.height)
-                        self.scrollView.contentOffset = CGPoint(x: -contentInset.left+clip.minX*self.editedImage.size.width*self.scrollView.zoomScale, y: -contentInset.top+clip.minY*self.editedImage.size.height*self.scrollView.zoomScale)
+                        self.scrollView.contentOffset = CGPoint(x: -contentInset!.left+clip.minX*self.editedImage.size.width*self.scrollView.zoomScale, y: -contentInset!.top+clip.minY*self.editedImage.size.height*self.scrollView.zoomScale)
                     }
                 }else{
                     scrollView.zoomScale = scrollView.minimumZoomScale*min(1/clip.width, 1/clip.height)
-                    scrollView.contentOffset = CGPoint(x: -contentInset.left+clip.minX*editedImage.size.width*scrollView.zoomScale, y: -contentInset.top+clip.minY*editedImage.size.height*scrollView.zoomScale)
+                    scrollView.contentOffset = CGPoint(x: -contentInset!.left+clip.minX*editedImage.size.width*scrollView.zoomScale, y: -contentInset!.top+clip.minY*editedImage.size.height*scrollView.zoomScale)
                 }
             }else{
                 if ani {
@@ -205,79 +210,127 @@ private extension ADImageClipController {
     }
     
     enum Animation {
-        case rotation(CGRect?)
+        case rotation(CGRect?,CGFloat)
         case zooming
     }
     
     func beginAnimation(_ animation: Animation?) {
+        let originImage = imageView.image ?? editedImage
+        var animated: Bool = false
+
         editedImage = clipInfo.image.image(with: clipInfo.rotation.rawValue/180.0*CGFloat.pi)
         imageView.image = editedImage
-        scrollView.zoomScale = 1
-        contentView.frame = CGRect(origin: .zero, size: editedImage.size)
         let clipSize = clipInfo.clipRect != nil ? clipInfo.clipRect!.size*editedImage.size : imageView.image!.size
+
+        defer {
+            scrollView.zoomScale = 1
+            contentView.frame = CGRect(origin: .zero, size: editedImage.size)
+            grideView.resetClipSize(clipSize, animated: animated)
+        }
         
         if let ani = animation {
             switch ani {
-            case let .rotation(clip):
-                scrollView.alpha = 0
-                grideView.alpha = 0
-                toolBarView.alpha = 0
+            case let .rotation(clip,angle):
+                NSObject.cancelPreviousPerformRequests(withTarget: self)
                 
                 let clipRect = grideView.convert(grideView.dynamicClipRect, to: view)
-                let rotateView = UIView(frame: clipRect)
-                rotateView.frame = clipRect
-                view.insertSubview(rotateView, belowSubview: grideView)
-                let imgView = UIImageView(image: rotateImage(clip: clip))
-                let frame = view.convert(scrollView.convert(contentView.frame, to: view), to: rotateView)
-                imgView.frame = frame
-                imgView.backgroundColor = .red
-                rotateView.addSubview(imgView)
-                
-                let final = grideView.resetClipSize(clipSize)
-                let scaleW = final.width/clipRect.width
-                let scaleH = final.height/clipRect.height
-                let scale = CGAffineTransform(scaleX: scaleW, y: scaleW)
-                let roate = CGAffineTransform(rotationAngle: -CGFloat.pi/2)
-                
+
+                var rotatingView: UIView!
+                var rotatingAngle: CGFloat!
+                if let info = rotationInfo {
+                    rotatingView = info.0
+                    rotatingAngle = info.1 + angle
+                }else{
+                    scrollView.alpha = 0
+                    grideView.alpha = 0
+                    grideView.diming = false
+                    
+                    let rotateView = UIView(frame: clipRect)
+                    rotateView.frame = clipRect
+                    view.insertSubview(rotateView, belowSubview: grideView)
+                    
+                    let imgView = UIImageView(image: rotate(image: originImage, clip: clip))
+                    let contentRect = scrollView.convert(contentView.frame, to: view)
+                    let imgViewRect = view.convert(contentRect, to: rotateView)
+                    imgView.frame = imgViewRect
+                    rotateView.addSubview(imgView)
+                    
+                    rotatingView = rotateView
+                    rotatingAngle = angle
+                }
+
+                let final = grideView.resizeClipRect(with: clipSize)
+                let ratio = final.width/clipRect.height
+                let roate = CGAffineTransform(rotationAngle: rotatingAngle)
+                let scale = (rotatingAngle/CGFloat.pi).truncatingRemainder(dividingBy: 1) == 0 ? CGAffineTransform(scaleX: 1, y: 1) : CGAffineTransform(scaleX: ratio, y: ratio)
+
                 UIApplication.shared.beginIgnoringInteractionEvents()
-                UIView.animate(withDuration: 2) {
-                    rotateView.transform = roate.concatenating(scale)
+                UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut]) {
+                    rotatingView.transform = roate.concatenating(scale)
                 } completion: { _ in
-                    UIView.animate(withDuration: 0.3) {
-                        self.scrollView.alpha = 1
-                        self.grideView.alpha = 1
-                        self.toolBarView.alpha = 1
-                    } completion: { _ in
-                        rotateView.removeFromSuperview()
-                        UIApplication.shared.endIgnoringInteractionEvents()
-                    }
+                    UIApplication.shared.endIgnoringInteractionEvents()
+                    self.rotationInfo = (rotatingView,rotatingAngle)
+                    self.perform(#selector(self.rotationEnded), with: nil, afterDelay: 0.5)
                 }
             case .zooming:
-                grideView.resetClipSize(clipSize, animate: true)
+                animated = true
             }
-        }else{
-            grideView.resetClipSize(clipSize)
+        }
+        
+        func rotate(image: UIImage, clip: CGRect?) -> UIImage {
+            if let clip = clip {
+                let dark = ADClipDarkView(frame: CGRect(origin: .zero, size: image.size))
+                dark.clearRect = image.size&clip
+                UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
+                image.draw(at: .zero)
+                if let ctx = UIGraphicsGetCurrentContext() {
+                    dark.layer.render(in: ctx)
+                }
+                let result = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                return result ?? image
+            }else{
+                return image
+            }
         }
     }
     
-    func newClipRect() -> CGRect? {
-        if isOrigin { return nil }
-        let panClip = grideView.convert(grideView.dynamicClipRect, to: contentView)
-        return CGRect(x: panClip.minX/editedImage.size.width, y: panClip.minY/editedImage.size.height, width: panClip.width/editedImage.size.width, height: panClip.height/editedImage.size.height)
+    @objc
+    func rotationEnded() {
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        UIView.animate(withDuration: 0.2) {
+            self.scrollView.alpha = 1
+            self.grideView.alpha = 1
+        } completion: { _ in
+            self.grideView.diming = true
+            self.rotationInfo?.0.removeFromSuperview()
+            self.rotationInfo = nil
+            UIApplication.shared.endIgnoringInteractionEvents()
+        }
+    }
+    
+    func newClipRect(_ final: CGRect? = nil) -> CGRect? {
+        let panClip = grideView.convert(final ?? grideView.dynamicClipRect, to: contentView)
+        let clip = CGRect(x: panClip.minX/editedImage.size.width, y: panClip.minY/editedImage.size.height, width: panClip.width/editedImage.size.width, height: panClip.height/editedImage.size.height).approximate.normalizedVerfy
+        if clip.isApproaching(to: CGRect.normalize) {
+            return nil
+        }else{
+            return clip
+        }
     }
     
     func revertOrigin() {
         let rotated = clipInfo.rotation != .idle
-        //TODO
-        let zoomed = clipInfo.clipRect != nil
-        let old = clipInfo.clipRect ?? newClipRect()!
+        let angle = -clipInfo.rotation.rawValue/180.0*CGFloat.pi
+        let clipRect = newClipRect()
+        let zoomed = clipRect != nil
         clipInfo.clipRect = nil
         clipInfo.rotation = .idle
         isOrigin = true
         if rotated && zoomed {
             beginAnimation(nil)
         }else if rotated {
-            beginAnimation(.rotation(old))
+            beginAnimation(.rotation(clipRect,angle))
         }else if zoomed {
             beginAnimation(.zooming)
         }
@@ -287,27 +340,16 @@ private extension ADImageClipController {
         let old = newClipRect()
         clipInfo.clipRect = old?.rotateLeft()
         clipInfo.rotation = clipInfo.rotation.rotateLeft()
-        beginAnimation(.rotation(old))
-        isOrigin = false
+        beginAnimation(.rotation(old,-CGFloat.pi/2))
+        updateOrigin()
     }
     
-    func rotateImage(clip: CGRect?) -> UIImage {
-        if let clip = clip {
-            let dark = ADClipDarkView(frame: CGRect(origin: .zero, size: editedImage.size))
-            dark.clearRect = editedImage.size&clip
-            UIGraphicsBeginImageContextWithOptions(editedImage.size, false, UIScreen.main.scale)
-            editedImage.draw(at: .zero)
-            if let ctx = UIGraphicsGetCurrentContext() {
-                dark.layer.render(in: ctx)
-            }
-            let result = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            return result ?? editedImage
-        }else{
-            return editedImage
-        }
+    func updateOrigin(_ final: CGRect? = nil) {
+        let rotated = clipInfo.rotation != .idle
+        let zoomed = newClipRect(final) != nil
+        isOrigin = !rotated && !zoomed
     }
-    
+        
 }
 
 private extension ADImageClipController {
@@ -353,12 +395,10 @@ extension ADImageClipController: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        isOrigin = false
         grideView.gestureEnded()
     }
     
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        isOrigin = false
         grideView.gestureEnded()
     }
     

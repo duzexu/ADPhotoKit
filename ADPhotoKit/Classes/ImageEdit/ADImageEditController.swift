@@ -24,9 +24,11 @@ public struct ADImageEditTools: OptionSet {
 }
 
 public struct ADEditInfo {
+    
+    public var clipRect: CGRect?
+    public var rotation: ADRotation?
+    
     var editImg: UIImage?
-    var clipRect: CGRect?
-    var rotation: CGFloat?
 }
 
 public enum ADRotation: CGFloat {
@@ -52,8 +54,7 @@ public enum ADRotation: CGFloat {
 class ADImageEditController: UIViewController {
     
     let image: UIImage
-    
-    var editInfo: ADEditInfo!
+    var editInfo: ADEditInfo
     
     var contentView: ADImageEditContentView!
     var controlsView: ADImageEditControlsView!
@@ -74,9 +75,9 @@ class ADImageEditController: UIViewController {
         }
     }
     
-    init(image: UIImage) {
+    init(image: UIImage, editInfo: ADEditInfo? = nil) {
         self.image = image
-        self.editInfo = ADEditInfo()
+        self.editInfo = editInfo ?? ADEditInfo()
         super.init(nibName: nil, bundle: nil)
     }
     
