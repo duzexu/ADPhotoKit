@@ -139,6 +139,7 @@ extension ADImageEditController {
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        contentView.updateClipRect(editInfo.clipRect)
         
         controlsView = ADImageEditControlsView(vc: self, tools: tools)
         controlsView.contentStatus = { [weak self] lock in
@@ -188,7 +189,7 @@ extension ADImageEditController {
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
         let trans = pan.translation(in: view)
-        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
+        contentView.container.interactClipView.clipsToBounds = contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
         pan.setTranslation(.zero, in: view)
         switch pan.state {
         case .began:
@@ -203,7 +204,7 @@ extension ADImageEditController {
     }
     
     @objc func pinchAction(_ pinch: UIPinchGestureRecognizer) {
-        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
+        contentView.container.interactClipView.clipsToBounds = contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
         pinch.scale = 1
         switch pinch.state {
         case .began:
@@ -218,7 +219,7 @@ extension ADImageEditController {
     }
     
     @objc func rotateAction(_ rotate: UIRotationGestureRecognizer) {
-        contentView.container.interactContainer.clipsToBounds = contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
+        contentView.container.interactClipView.clipsToBounds = contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
         rotate.rotation = 0
         switch rotate.state {
         case .began:
@@ -236,7 +237,7 @@ extension ADImageEditController {
 
 extension ADImageEditController: ADImageClipSource {
     func clipInfo() -> ADClipInfo {
-        let img = contentView.container.processImage() ?? image
+        let img = contentView.editImage() ?? image
         let clipImage = contentView.clipImage() ?? image
         let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
         return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: .idle, clipImage: clipImage, clipFrom: rect)

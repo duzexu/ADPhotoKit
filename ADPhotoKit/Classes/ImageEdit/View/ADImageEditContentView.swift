@@ -9,20 +9,17 @@ import UIKit
 
 class ADEditContainerView: UIView {
     
-    var interactContainer: UIView!
-    
+    private let imgClipView = UIView()
+    let interactClipView = UIView()
+        
     private var imageView: UIImageView!
-    
-    let imageSize: CGSize
-    var viewSize: CGSize!
-    
+    fileprivate var interactContainer: UIView!
+        
     init(image: UIImage) {
-        imageSize = image.size
         super.init(frame: .zero)
-        let clipView = UIView()
-        clipView.clipsToBounds = true
-        addSubview(clipView)
-        clipView.snp.makeConstraints { make in
+        imgClipView.clipsToBounds = true
+        addSubview(imgClipView)
+        imgClipView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
@@ -30,51 +27,66 @@ class ADEditContainerView: UIView {
         imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        clipView.addSubview(imageView)
+        imgClipView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
             make.size.equalTo(image.size)
             make.center.equalToSuperview()
         }
         
-        let noClipView = UIView()
-        addSubview(noClipView)
-        noClipView.snp.makeConstraints { make in
+        interactClipView.clipsToBounds = true
+        addSubview(interactClipView)
+        interactClipView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
         interactContainer = UIView()
         interactContainer.clipsToBounds = true
         interactContainer.isUserInteractionEnabled = false
-        noClipView.addSubview(interactContainer)
-        interactContainer.snp.makeConstraints { make in
-            make.size.equalTo(image.size)
-            make.center.equalToSuperview()
+        interactClipView.addSubview(interactContainer)
+    }
+    
+    func addInteractView(_ interact: (UIView & ADToolInteractable)) {
+        interactContainer.addSubview(interact)
+        interact.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
-    func processImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, false, UIScreen.main.scale)
-        if let ctx = UIGraphicsGetCurrentContext() {
-            imageView.layer.render(in: ctx)
-            interactContainer.layer.render(in: ctx)
+    func orderInteractViews() {
+        let order = interactContainer.subviews.sorted { v1, v2 in
+            return (v1 as! ADToolInteractable).zIndex < (v2 as! ADToolInteractable).zIndex
         }
-        let result = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return result
+        for item in order {
+            interactContainer.bringSubviewToFront(item)
+        }
     }
     
-    func setClipRect(_ rect: CGRect?) {
+    func setClipRect(_ viewSize: CGSize, rect: CGRect?) {
+        let imageSize = imageView.image!.size
         if let clip = rect {
             let ratio = viewSize.height/(clip.height*imageSize.height)
             let scale = CGAffineTransform(scaleX: ratio, y: ratio)
             let trans = CGAffineTransform(translationX: (0.5-clip.midX)*imageSize.width*ratio, y: (0.5-clip.midY)*imageSize.height*ratio)
             imageView.transform = scale.concatenating(trans)
-            interactContainer.transform = scale.concatenating(trans)
+            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
+            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
         }else{
             let ratio = viewSize.width/imageSize.width
             imageView.transform = CGAffineTransform(scaleX: ratio, y: ratio)
-            interactContainer.transform = CGAffineTransform(scaleX: ratio, y: ratio)
+            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
+            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
         }
+        layoutIfNeeded()
+    }
+    
+    fileprivate func interactContainerImage() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            interactContainer.layer.render(in: ctx)
+        }
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
     }
     
     required init?(coder: NSCoder) {
@@ -83,6 +95,8 @@ class ADEditContainerView: UIView {
 }
 
 class ADImageEditContentView: UIView {
+    
+    let image: UIImage
 
     var scrollView: UIScrollView!
     var container: ADEditContainerView!
@@ -91,34 +105,35 @@ class ADImageEditContentView: UIView {
     private var target: ADImageEditTool?
 
     init(image: UIImage, tools: [ADImageEditTool]) {
+        self.image = image
         super.init(frame: .zero)
         setupUI(image: image)
         
         for tool in tools {
             if let interact = tool.toolInteractView {
-                container.interactContainer.addSubview(interact)
-                interact.snp.makeConstraints { make in
-                    make.edges.equalToSuperview()
-                }
+                container.addInteractView(interact)
                 interactTools.append(tool)
             }
         }
-        let order = container.interactContainer.subviews.sorted { v1, v2 in
-            return (v1 as! ADToolInteractable).zIndex < (v2 as! ADToolInteractable).zIndex
-        }
-        for item in order {
-            container.interactContainer.bringSubviewToFront(item)
-        }
+        container.orderInteractViews()
         interactTools = interactTools.sorted(by: { t1, t2 in
             return t1.toolInteractView!.zIndex > t2.toolInteractView!.zIndex
         })
     }
     
     func updateClipRect(_ rect: CGRect?) {
-        let size = rect == nil ? container.imageSize : container.imageSize*rect!.size
+        let size = rect == nil ? image.size : image.size*rect!.size
         resizeView(pixelWidth: size.width, pixelHeight: size.height)
-        container.viewSize = container.frame.size
-        container.setClipRect(rect)
+        container.setClipRect(container.frame.size, rect: rect)
+    }
+    
+    func editImage() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
+        image.draw(in: CGRect(origin: .zero, size: image.size))
+        container.interactContainerImage()?.draw(in: CGRect(origin: .zero, size: image.size))
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
     }
     
     func clipImage() -> UIImage? {
@@ -213,8 +228,7 @@ private extension ADImageEditContentView {
         container = ADEditContainerView(image: image)
         scrollView.addSubview(container)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
-        container.viewSize = container.bounds.size
-        container.setClipRect(nil)
+        container.setClipRect(container.bounds.size, rect: nil)
     }
     
     func updateState() {
@@ -299,7 +313,6 @@ private extension ADImageEditContentView {
         scrollView.contentSize = contentSize
         scrollView.contentOffset = .zero
     }
-    
 }
 
 extension ADImageEditContentView: UIScrollViewDelegate {
