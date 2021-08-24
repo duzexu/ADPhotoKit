@@ -16,6 +16,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     public var policy: ADInteractPolicy {
         return .simult
     }
+    
+    public var interactClipBounds: Bool {
+        return false
+    }
         
     public func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool {
         for item in container.subviews.reversed() {
@@ -40,7 +44,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
         switch type {
         case let .pan(loc, trans):
             target?.translation(by: CGPoint(x: trans.x/scale, y: trans.y/scale))
@@ -65,18 +69,15 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         case let .rotate(angle):
             target?.rotate(by: angle)
         }
-        var clip: Bool = false
         switch state {
         case .began:
             target?.beginActive(resignable: false)
         case .ended, .cancelled, .failed:
             target?.beginActive()
             target = nil
-            clip = true
         default:
             break
         }
-        return clip
     }
     
     public static var share = ADStickerInteractView()

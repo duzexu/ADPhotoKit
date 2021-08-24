@@ -21,6 +21,10 @@ class ADDrawInteractView: UIView, ADToolInteractable {
     var policy: ADInteractPolicy {
         return .single
     }
+    
+    var interactClipBounds: Bool {
+        return true
+    }
         
     enum Style {
         case line((() -> UIColor))
@@ -70,7 +74,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
         switch type {
         case let .pan(point, _):
             switch style {
@@ -108,7 +112,6 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         default:
             break
         }
-        return true
     }
     
     func revoke() {

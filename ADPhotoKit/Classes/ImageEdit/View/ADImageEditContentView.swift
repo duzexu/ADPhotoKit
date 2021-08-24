@@ -9,17 +9,18 @@ import UIKit
 
 class ADEditContainerView: UIView {
     
-    private let imgClipView = UIView()
-    let interactClipView = UIView()
-        
-    private var imageView: UIImageView!
+    var scaleRatio: CGFloat = 1
+    
+    private let clipBoundsView = UIView()
     fileprivate var interactContainer: UIView!
+    
+    private var imageView: UIImageView!
         
     init(image: UIImage) {
         super.init(frame: .zero)
-        imgClipView.clipsToBounds = true
-        addSubview(imgClipView)
-        imgClipView.snp.makeConstraints { make in
+        clipBoundsView.clipsToBounds = true
+        addSubview(clipBoundsView)
+        clipBoundsView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
@@ -27,22 +28,19 @@ class ADEditContainerView: UIView {
         imageView.image = image
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imgClipView.addSubview(imageView)
+        clipBoundsView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
             make.size.equalTo(image.size)
             make.center.equalToSuperview()
         }
         
-        interactClipView.clipsToBounds = true
-        addSubview(interactClipView)
-        interactClipView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
         interactContainer = UIView()
-        interactContainer.clipsToBounds = true
         interactContainer.isUserInteractionEnabled = false
-        interactClipView.addSubview(interactContainer)
+        addSubview(interactContainer)
+        interactContainer.snp.remakeConstraints { make in
+            make.size.equalTo(image.size)
+            make.center.equalToSuperview()
+        }
     }
     
     func addInteractView(_ interact: (UIView & ADToolInteractable)) {
@@ -68,15 +66,18 @@ class ADEditContainerView: UIView {
             let scale = CGAffineTransform(scaleX: ratio, y: ratio)
             let trans = CGAffineTransform(translationX: (0.5-clip.midX)*imageSize.width*ratio, y: (0.5-clip.midY)*imageSize.height*ratio)
             imageView.transform = scale.concatenating(trans)
-            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
-            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
+            interactContainer.transform = scale.concatenating(trans)
+//            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
+//            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
+            scaleRatio = ratio
         }else{
             let ratio = viewSize.width/imageSize.width
             imageView.transform = CGAffineTransform(scaleX: ratio, y: ratio)
-            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
-            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
+            interactContainer.transform = CGAffineTransform(scaleX: ratio, y: ratio)
+//            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
+//            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
+            scaleRatio = ratio
         }
-        layoutIfNeeded()
     }
     
     fileprivate func interactContainerImage() -> UIImage? {
@@ -177,7 +178,7 @@ class ADImageEditContentView: UIView {
         return false
     }
     
-    func interact(with type: ADInteractType, state: UIGestureRecognizer.State) -> Bool {
+    func interact(with type: ADInteractType, state: UIGestureRecognizer.State) {
         if let tool = target {
             defer {
                 switch state {
@@ -190,12 +191,11 @@ class ADImageEditContentView: UIView {
             switch type {
             case let .pan(point,trans):
                 let convert = convert(point, to: tool.toolInteractView!)
-                return tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale, state: state)
+                tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale*container.scaleRatio, state: state)
             default:
-                return tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale, state: state)
+                tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale*container.scaleRatio, state: state)
             }
         }
-        return true
     }
     
     required init?(coder: NSCoder) {

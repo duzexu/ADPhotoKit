@@ -65,10 +65,12 @@ public protocol ADToolInteractable {
     var zIndex: Int { get }
     
     var policy: ADInteractPolicy { get }
+    
+    var interactClipBounds: Bool { get }
         
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
     
-    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool
+    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State)
 }
 
 extension ADToolInteractable {
