@@ -44,15 +44,16 @@ class ADEditContainerView: UIView {
     }
     
     func addInteractView(_ interact: (UIView & ADToolInteractable)) {
-        interactContainer.addSubview(interact)
-        interact.snp.makeConstraints { make in
+        let package = InteractPackage(view: interact)
+        interactContainer.addSubview(package)
+        package.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
     
     func orderInteractViews() {
         let order = interactContainer.subviews.sorted { v1, v2 in
-            return (v1 as! ADToolInteractable).zIndex < (v2 as! ADToolInteractable).zIndex
+            return (v1 as! InteractPackage).interactView.zIndex < (v2 as! InteractPackage).interactView.zIndex
         }
         for item in order {
             interactContainer.bringSubviewToFront(item)
@@ -70,6 +71,9 @@ class ADEditContainerView: UIView {
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
             scaleRatio = ratio
+            for sub in interactContainer.subviews {
+                (sub as? InteractPackage)?.clipRect = imageSize|->clip
+            }
         }else{
             let ratio = viewSize.width/imageSize.width
             imageView.transform = CGAffineTransform(scaleX: ratio, y: ratio)
@@ -77,6 +81,9 @@ class ADEditContainerView: UIView {
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
             scaleRatio = ratio
+            for sub in interactContainer.subviews {
+                (sub as? InteractPackage)?.clipRect = CGRect(origin: .zero, size: imageSize)
+            }
         }
     }
     
@@ -93,6 +100,34 @@ class ADEditContainerView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    class InteractPackage: UIView {
+        
+        let interactView: (UIView & ADToolInteractable)
+        
+        var clipRect: CGRect = .zero {
+            didSet {
+                mask?.frame = clipRect
+            }
+        }
+        
+        init(view: (UIView & ADToolInteractable)) {
+            self.interactView = view
+            super.init(frame: .zero)
+            addSubview(interactView)
+            interactView.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+            let maskV = UIView()
+            maskV.backgroundColor = UIColor.black
+            self.mask = maskV
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+    
 }
 
 class ADImageEditContentView: UIView {

@@ -280,7 +280,7 @@ private extension ADImageClipController {
         func rotate(image: UIImage, clip: CGRect?) -> UIImage {
             if let clip = clip {
                 let dark = ADClipDarkView(frame: CGRect(origin: .zero, size: image.size))
-                dark.clearRect = image.size&clip
+                dark.clearRect = image.size|->clip
                 UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
                 image.draw(at: .zero)
                 if let ctx = UIGraphicsGetCurrentContext() {
