@@ -25,6 +25,8 @@ class ADDrawInteractView: UIView, ADToolInteractable {
     var interactClipBounds: Bool {
         return true
     }
+    
+    var clipingInfo: (CGRect?, CGFloat)? = nil
         
     enum Style {
         case line((() -> UIColor))

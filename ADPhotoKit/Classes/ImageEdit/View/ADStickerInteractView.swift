@@ -20,7 +20,17 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     public var interactClipBounds: Bool {
         return false
     }
-        
+    
+    public var clipingInfo: (CGRect?, CGFloat)? = nil {
+        didSet {
+            if let info = clipingInfo {
+                let y = (info.0?.maxY ?? frame.height) - 40 - 15
+                trashView.center = CGPoint(x: info.0?.midX ?? frame.width/2, y: y/info.1)
+                trashIdentifyTrans = CGAffineTransform(scaleX: 1/info.1, y: 1/info.1)
+            }
+        }
+    }
+     
     public func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool {
         for item in container.subviews.reversed() {
             if item.frame.contains(point) {
@@ -94,17 +104,14 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     private lazy var trashView: TrashView = {
         let view = TrashView()
         addSubview(view)
-        let y = UIApplication.shared.keyWindow?.convert(CGPoint(x: 0, y: screenHeight-15), to: self).y
-        let offset = y == nil ? -15 : y! - frame.size.height
-        view.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(offset)
-            make.centerX.equalToSuperview()
+        view.snp.remakeConstraints { make in
             make.width.greaterThanOrEqualTo(160)
             make.height.equalTo(80)
         }
-        view.transform = CGAffineTransform(translationX: 0, y: 130)
         return view
     }()
+    
+    private var trashIdentifyTrans: CGAffineTransform = .identity
         
     private weak var target: ADStickerContentView?
     
@@ -113,10 +120,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     public func addContent(_ view: ADStickerContentView) {
-        if let scale = ADImageEditConfigurable.contentViewState?.scale {
+        if let scale = ADImageEditConfigurable.interactViewState?.scale {
             view.pinch(by: 1/scale)
         }
-        let center = ADImageEditConfigurable.contentViewState?.center ?? CGPoint(x: bounds.width/2, y: bounds.height/2)
+        let center = ADImageEditConfigurable.interactViewState?.center ?? CGPoint(x: bounds.width/2, y: bounds.height/2)
         view.center = center
         container.addSubview(view)
         view.beginActive()
@@ -125,14 +132,15 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     func presentTrashView() {
         trashView.isHidden = false
         trashView.isConfirmed = false
+        trashView.transform = trashIdentifyTrans.translatedBy(x: 0, y: 130)
         UIView.animate(withDuration: 0.2) {
-            self.trashView.transform = .identity
+            self.trashView.transform = self.trashIdentifyTrans
         }
     }
     
     func dismissTrashView() {
         UIView.animate(withDuration: 0.2) {
-            self.trashView.transform = CGAffineTransform(translationX: 0, y: 130)
+            self.trashView.transform = self.trashIdentifyTrans.translatedBy(x: 0, y: 130)
         }
     }
     

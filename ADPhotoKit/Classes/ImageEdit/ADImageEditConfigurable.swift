@@ -67,6 +67,8 @@ public protocol ADToolInteractable {
     var policy: ADInteractPolicy { get }
     
     var interactClipBounds: Bool { get }
+    
+    var clipingInfo: (CGRect?,CGFloat)? { set get }
         
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
     
@@ -97,7 +99,7 @@ public class ADImageEditConfigurable {
     
     public typealias ViewState = (center: CGPoint, scale: CGFloat)
     
-    public static var contentViewState: ViewState?
+    public static var interactViewState: ViewState?
     
     static func imageStickerSelectVC() -> ADImageStickerSelectable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)

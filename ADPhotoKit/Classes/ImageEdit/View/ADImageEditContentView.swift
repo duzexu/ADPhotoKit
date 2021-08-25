@@ -87,10 +87,18 @@ class ADEditContainerView: UIView {
         }
     }
     
+    func setClipInfo(_ info: (CGRect?,CGFloat)) {
+        for sub in interactContainer.subviews {
+            (sub as? InteractPackage)?.interactView.clipingInfo = info
+        }
+    }
+    
     fileprivate func interactContainerImage() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, UIScreen.main.scale)
         if let ctx = UIGraphicsGetCurrentContext() {
+            interactContainer.subviews.forEach { ($0 as? InteractPackage)?.clipBounds = false }
             interactContainer.layer.render(in: ctx)
+            interactContainer.subviews.forEach { ($0 as? InteractPackage)?.clipBounds = true }
         }
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -103,13 +111,21 @@ class ADEditContainerView: UIView {
     
     class InteractPackage: UIView {
         
-        let interactView: (UIView & ADToolInteractable)
+        var interactView: (UIView & ADToolInteractable)
         
         var clipRect: CGRect = .zero {
             didSet {
                 mask?.frame = clipRect
             }
         }
+        
+        var clipBounds: Bool = true {
+            didSet {
+                self.mask = clipBounds ? maskV : nil
+            }
+        }
+        
+        private let maskV = UIView()
         
         init(view: (UIView & ADToolInteractable)) {
             self.interactView = view
@@ -118,7 +134,6 @@ class ADEditContainerView: UIView {
             interactView.snp.makeConstraints { make in
                 make.edges.equalToSuperview()
             }
-            let maskV = UIView()
             maskV.backgroundColor = UIColor.black
             self.mask = maskV
         }
@@ -161,6 +176,7 @@ class ADImageEditContentView: UIView {
         let size = rect == nil ? image.size : image.size*rect!.size
         resizeView(pixelWidth: size.width, pixelHeight: size.height)
         container.setClipRect(container.frame.size, rect: rect)
+        updateInteractState()
     }
     
     func editImage() -> UIImage? {
@@ -218,7 +234,18 @@ class ADImageEditContentView: UIView {
             defer {
                 switch state {
                 case .ended,.failed,.cancelled:
+                    if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
+                        if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
+                            package.clipBounds = true
+                        }
+                    }
                     target = nil
+                case .began:
+                    if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
+                        if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
+                            package.clipBounds = false
+                        }
+                    }
                 default:
                     break
                 }
@@ -239,7 +266,7 @@ class ADImageEditContentView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        updateState()
+        updateInteractState()
     }
 }
 
@@ -266,9 +293,11 @@ private extension ADImageEditContentView {
         container.setClipRect(container.bounds.size, rect: nil)
     }
     
-    func updateState() {
+    func updateInteractState() {
         let center = convert(CGPoint(x: bounds.width/2, y: bounds.height/2), to: container.interactContainer)
-        ADImageEditConfigurable.contentViewState = (center,scrollView.zoomScale)
+        ADImageEditConfigurable.interactViewState = (center,scrollView.zoomScale*container.scaleRatio)
+        let rect = UIApplication.shared.keyWindow?.convert(UIScreen.main.bounds, to: container.interactContainer)
+        container.setClipInfo((rect,scrollView.zoomScale*container.scaleRatio))
     }
     
     func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {
@@ -359,10 +388,10 @@ extension ADImageEditContentView: UIScrollViewDelegate {
         let offsetX = (scrollView.frame.width > scrollView.contentSize.width) ? (scrollView.frame.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.frame.height > scrollView.contentSize.height) ? (scrollView.frame.height - scrollView.contentSize.height) * 0.5 : 0
         container.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY)
-        updateState()
+        updateInteractState()
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        updateState()
+        updateInteractState()
     }
 }
