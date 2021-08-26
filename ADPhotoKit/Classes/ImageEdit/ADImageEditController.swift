@@ -220,7 +220,8 @@ extension ADImageEditController {
     }
     
     @objc func rotateAction(_ rotate: UIRotationGestureRecognizer) {
-        contentView.interact(with: .rotate(rotate.rotation), state: rotate.state)
+        let point = rotate.location(in: view)
+        contentView.interact(with: .rotate(angle: rotate.rotation, point: point), state: rotate.state)
         rotate.rotation = 0
         switch rotate.state {
         case .began:

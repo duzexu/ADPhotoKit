@@ -72,11 +72,19 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             }
         case let .pinch(scale,point):
             if let tg = target {
-                let center = convert(point, to: tg)
-                tg.layer.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
-                target?.pinch(by: scale)
+                if state == .began {
+                    let center = convert(point, to: tg)
+                    tg.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
+                }
             }
-        case let .rotate(angle):
+            target?.pinch(by: scale)
+        case let .rotate(angle,point):
+            if let tg = target {
+                if state == .began {
+                    let center = convert(point, to: tg)
+                    tg.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
+                }
+            }
             target?.rotate(by: angle)
         }
         switch state {

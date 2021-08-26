@@ -57,7 +57,7 @@ public enum ADInteractPolicy {
 public enum ADInteractType {
     case pan(loc: CGPoint, trans: CGPoint)
     case pinch(scale: CGFloat, point: CGPoint)
-    case rotate(CGFloat)
+    case rotate(angle: CGFloat, point: CGPoint)
 }
 
 public typealias ADClipingInfo = (screen: CGRect, clip: CGRect, scale: CGFloat)
