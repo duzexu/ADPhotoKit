@@ -204,7 +204,8 @@ extension ADImageEditController {
     }
     
     @objc func pinchAction(_ pinch: UIPinchGestureRecognizer) {
-        contentView.interact(with: .pinch(pinch.scale), state: pinch.state)
+        let point = pinch.location(in: view)
+        contentView.interact(with: .pinch(scale: pinch.scale, point: point), state: pinch.state)
         pinch.scale = 1
         switch pinch.state {
         case .began:

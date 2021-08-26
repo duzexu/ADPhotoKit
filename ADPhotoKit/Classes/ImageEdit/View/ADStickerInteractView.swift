@@ -21,16 +21,12 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public var clipingInfo: (CGRect?, CGFloat)? = nil {
+    public var clipingScreenInfo: ADClipingInfo? = nil {
         didSet {
-            if let info = clipingInfo {
-                let y = (info.0?.maxY ?? frame.height) - 40 - 15
-                trashView.center = CGPoint(x: info.0?.midX ?? frame.width/2, y: y/info.1)
-                trashIdentifyTrans = CGAffineTransform(scaleX: 1/info.1, y: 1/info.1)
-            }
+            updateClipingScreenInfo()
         }
     }
-     
+    
     public func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool {
         for item in container.subviews.reversed() {
             if item.frame.contains(point) {
@@ -74,8 +70,12 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 }
                 dismissTrashView()
             }
-        case let .pinch(scale):
-            target?.pinch(by: scale)
+        case let .pinch(scale,point):
+            if let tg = target {
+                let center = convert(point, to: tg)
+                tg.layer.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
+                target?.pinch(by: scale)
+            }
         case let .rotate(angle):
             target?.rotate(by: angle)
         }
@@ -88,6 +88,14 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         default:
             break
         }
+    }
+    
+    public func willBeginRenderImage() {
+        container.subviews.forEach { $0.isHidden = false }
+    }
+    
+    public func didEndRenderImage() {
+        updateClipingScreenInfo()
     }
     
     public static var share = ADStickerInteractView()
@@ -103,11 +111,13 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     
     private lazy var trashView: TrashView = {
         let view = TrashView()
+        view.isHidden = true
         addSubview(view)
-        view.snp.remakeConstraints { make in
+        view.snp.makeConstraints { make in
             make.width.greaterThanOrEqualTo(160)
             make.height.equalTo(80)
         }
+        layoutIfNeeded()
         return view
     }()
     
@@ -120,11 +130,12 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     public func addContent(_ view: ADStickerContentView) {
-        if let scale = ADImageEditConfigurable.interactViewState?.scale {
-            view.pinch(by: 1/scale)
+        if let info = clipingScreenInfo {
+            view.pinch(by: 1/info.scale)
+            view.center = CGPoint(x: info.screen.midX, y: info.screen.midY)
+        }else{
+            view.center = CGPoint(x: bounds.width/2, y: bounds.height/2)
         }
-        let center = ADImageEditConfigurable.interactViewState?.center ?? CGPoint(x: bounds.width/2, y: bounds.height/2)
-        view.center = center
         container.addSubview(view)
         view.beginActive()
     }
@@ -141,6 +152,32 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     func dismissTrashView() {
         UIView.animate(withDuration: 0.2) {
             self.trashView.transform = self.trashIdentifyTrans.translatedBy(x: 0, y: 130)
+        } completion: { _ in
+            self.trashView.isHidden = true
+        }
+    }
+    
+    func updateClipingScreenInfo() {
+        if let info = clipingScreenInfo {
+            let y = info.screen.maxY - (40 + 15)/info.scale
+            trashView.center = CGPoint(x: info.screen.midX, y: y)
+            trashIdentifyTrans = CGAffineTransform(scaleX: 1/info.scale, y: 1/info.scale)
+            for view in container.subviews {
+                let content = view as! ADStickerContentView
+                content.outerScale = info.scale
+                if info.clip.intersects(content.frame) || info.clip.contains(content.frame) {
+                    content.isHidden = false
+                }else{
+                    content.isHidden = true
+                }
+            }
+        }else{
+            trashView.center = CGPoint(x: bounds.width/2, y: bounds.height - 56)
+            trashIdentifyTrans = .identity
+            for content in container.subviews {
+                (content as! ADStickerContentView).outerScale = 1
+                (content as! ADStickerContentView).isHidden = false
+            }
         }
     }
     
@@ -203,9 +240,19 @@ public class ADStickerContentView: UIView {
     
     var isActive: Bool = false
     
+    let maxScale: CGFloat = 10
+    
+    fileprivate var outerScale: CGFloat = 1 {
+        didSet {
+            layer.borderWidth = 0.5 / outerScale
+        }
+    }
+    
+    fileprivate var internalScale: CGFloat = 1
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layer.borderWidth = 1 / UIScreen.main.scale
+        layer.borderWidth = 0.5
     }
     
     required init?(coder: NSCoder) {
@@ -214,7 +261,7 @@ public class ADStickerContentView: UIView {
     
     func beginActive(resignable: Bool = true) {
         isActive = true
-        layer.borderColor = UIColor.white.cgColor
+        layer.borderColor = UIColor(white: 1, alpha: 0.8).cgColor
         superview?.bringSubviewToFront(self)
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         if resignable {
@@ -233,7 +280,11 @@ public class ADStickerContentView: UIView {
     
     func pinch(by scale: CGFloat) {
         if scale != 0 {
-            transform = transform.scaledBy(x: scale, y: scale)
+            let scal = internalScale * scale
+            if scal <= maxScale {
+                internalScale = scal
+                transform = transform.scaledBy(x: scale, y: scale)
+            }
         }
     }
     

@@ -56,9 +56,11 @@ public enum ADInteractPolicy {
 
 public enum ADInteractType {
     case pan(loc: CGPoint, trans: CGPoint)
-    case pinch(CGFloat)
+    case pinch(scale: CGFloat, point: CGPoint)
     case rotate(CGFloat)
 }
+
+public typealias ADClipingInfo = (screen: CGRect, clip: CGRect, scale: CGFloat)
 
 public protocol ADToolInteractable {
     
@@ -68,15 +70,23 @@ public protocol ADToolInteractable {
     
     var interactClipBounds: Bool { get }
     
-    var clipingInfo: (CGRect?,CGFloat)? { set get }
+    var clipingScreenInfo: ADClipingInfo? { set get }
         
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
     
     func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State)
+    
+    func willBeginRenderImage()
+    
+    func didEndRenderImage()
 }
 
 extension ADToolInteractable {
     public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> Bool { return true }
+    
+    public func willBeginRenderImage() { }
+    
+    public func didEndRenderImage() { }
 }
 
 public typealias ADImageStickerSelectable = (UIViewController & ADImageStickerSelectConfigurable)
@@ -96,10 +106,6 @@ public protocol ADTextStickerEditConfigurable: AnyObject {
 }
 
 public class ADImageEditConfigurable {
-    
-    public typealias ViewState = (center: CGPoint, scale: CGFloat)
-    
-    public static var interactViewState: ViewState?
     
     static func imageStickerSelectVC() -> ADImageStickerSelectable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
