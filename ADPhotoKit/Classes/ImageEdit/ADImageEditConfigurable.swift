@@ -74,7 +74,7 @@ public protocol ADToolInteractable {
         
     func shouldInteract(_ gesture: UIGestureRecognizer, point: CGPoint) -> Bool
     
-    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State)
+    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval?
     
     func willBeginRenderImage()
     

@@ -76,7 +76,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+    func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval? {
         switch type {
         case let .pan(point, _):
             switch style {
@@ -114,6 +114,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         default:
             break
         }
+        return nil
     }
     
     func revoke() {

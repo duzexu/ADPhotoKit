@@ -50,7 +50,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) {
+    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval? {
         switch type {
         case let .pan(loc, trans):
             target?.translation(by: CGPoint(x: trans.x/scale, y: trans.y/scale))
@@ -70,52 +70,63 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 }
                 dismissTrashView()
             }
-        case let .pinch(scale,point):
-            if let tg = target {
-                if state == .began {
-                    let center = convert(point, to: tg)
-                    tg.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
-                }
-            }
+        case let .pinch(scale,_):
             target?.pinch(by: scale)
-        case let .rotate(angle,point):
-            if let tg = target {
-                if state == .began {
-                    let center = convert(point, to: tg)
-                    tg.anchorPoint = CGPoint(x: center.x/tg.frame.width, y: (tg.frame.height-center.y)/tg.frame.height)
-                }
-            }
+        case let .rotate(angle,_):
             target?.rotate(by: angle)
         }
         switch state {
         case .began:
             target?.beginActive(resignable: false)
+            if let tg = target {
+                tg.center = container.convert(tg.center, to: self)
+                addSubview(tg)
+            }
         case .ended, .cancelled, .failed:
+            var animated: Bool = false
+            if let tg = target {
+                let clipCenter = clipView.center
+                let height = clipingScreenInfo?.clip.height ?? bounds.height
+                let width = clipingScreenInfo?.clip.width ?? bounds.width
+                if abs(Float(clipCenter.y - tg.center.y)) - Float(height/2+tg.frame.height/2) >= -10 || abs(Float(clipCenter.x - tg.center.x)) - Float(width/2+tg.frame.width/2) >= -10 {
+                    animated = true
+                }else{
+                    tg.center = convert(tg.center, to: container)
+                }
+                
+                if animated {
+                    UIView.animate(withDuration: 0.3) {
+                        tg.center = clipCenter
+                    } completion: { _ in
+                        self.container.addSubview(tg)
+                    }
+                }else{
+                    container.addSubview(tg)
+                }
+            }
             target?.beginActive()
             target = nil
+            if animated {
+                return 0.3
+            }
         default:
             break
         }
+        return nil
     }
     
     public func willBeginRenderImage() {
-        container.subviews.forEach { $0.isHidden = false }
+        clipView.clipsToBounds = false
     }
     
     public func didEndRenderImage() {
-        updateClipingScreenInfo()
+        clipView.clipsToBounds = true
     }
     
     public static var share = ADStickerInteractView()
     
-    private lazy var container: UIView = {
-        let view = UIView()
-        addSubview(view)
-        view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        return view
-    }()
+    private var clipView: UIView!
+    private var container: UIView!
     
     private lazy var trashView: TrashView = {
         let view = TrashView()
@@ -132,6 +143,20 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     private var trashIdentifyTrans: CGAffineTransform = .identity
         
     private weak var target: ADStickerContentView?
+    
+    init() {
+        super.init(frame: .zero)
+        clipView = UIView()
+        clipView.clipsToBounds = true
+        addSubview(clipView)
+        container = UIView()
+        container.clipsToBounds = false
+        clipView.addSubview(container)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     public func clear() {
         container.subviews.forEach { $0.removeFromSuperview() }
@@ -173,20 +198,19 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             for view in container.subviews {
                 let content = view as! ADStickerContentView
                 content.outerScale = info.scale
-                if info.clip.intersects(content.frame) || info.clip.contains(content.frame) {
-                    content.isHidden = false
-                }else{
-                    content.isHidden = true
-                }
             }
+            clipView.frame = info.clip
+            container.frame = convert(bounds, to: clipView)
         }else{
             trashView.center = CGPoint(x: bounds.width/2, y: bounds.height - 56)
             trashIdentifyTrans = .identity
             for content in container.subviews {
                 (content as! ADStickerContentView).outerScale = 1
-                (content as! ADStickerContentView).isHidden = false
             }
+            clipView.frame = bounds
+            container.frame = bounds
         }
+        layoutIfNeeded()
     }
     
     class TrashView: UIView {
@@ -270,7 +294,6 @@ public class ADStickerContentView: UIView {
     func beginActive(resignable: Bool = true) {
         isActive = true
         layer.borderColor = UIColor(white: 1, alpha: 0.8).cgColor
-        superview?.bringSubviewToFront(self)
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         if resignable {
             perform(#selector(resignActive), with: nil, afterDelay: 2)

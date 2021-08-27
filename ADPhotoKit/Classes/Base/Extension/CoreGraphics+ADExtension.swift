@@ -55,19 +55,3 @@ extension CGFloat {
         return (self * divisor).rounded() / divisor
     }
 }
-
-extension UIView {
-    var anchorPoint: CGPoint {
-        set {
-            let origin = layer.anchorPoint
-            let offetPoint = CGPoint(x: newValue.x - origin.x, y: newValue.y - origin.y)
-            let offetX = offetPoint.x*frame.size.width
-            let offetY = offetPoint.y*frame.size.height
-            layer.anchorPoint = newValue
-            layer.position = CGPoint(x: layer.position.x + offetX, y: layer.position.y + offetY)
-        }
-        get {
-            return layer.anchorPoint
-        }
-    }
-}

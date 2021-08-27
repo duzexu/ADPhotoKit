@@ -241,12 +241,19 @@ class ADImageEditContentView: UIView {
     
     func interact(with type: ADInteractType, state: UIGestureRecognizer.State) {
         if let tool = target {
+            var delay: TimeInterval?
             defer {
                 switch state {
                 case .ended,.failed,.cancelled:
                     if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
                         if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
-                            package.clipBounds = true
+                            if let ti = delay {
+                                DispatchQueue.main.asyncAfter(deadline: .now()+ti) {
+                                    package.clipBounds = true
+                                }
+                            }else{
+                                package.clipBounds = true
+                            }
                         }
                     }
                     target = nil
@@ -263,12 +270,12 @@ class ADImageEditContentView: UIView {
             switch type {
             case let .pan(point,trans):
                 let convert = convert(point, to: tool.toolInteractView!)
-                tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale*container.scaleRatio, state: state)
+                delay = tool.toolInteractView!.interact(with: .pan(loc: convert, trans: trans), scale: scrollView.zoomScale*container.scaleRatio, state: state)
             case let .pinch(scale, point):
                 let convert = convert(point, to: tool.toolInteractView!)
-                tool.toolInteractView!.interact(with: .pinch(scale: scale, point: convert), scale: scrollView.zoomScale*container.scaleRatio, state: state)
+                delay = tool.toolInteractView!.interact(with: .pinch(scale: scale, point: convert), scale: scrollView.zoomScale*container.scaleRatio, state: state)
             default:
-                tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale*container.scaleRatio, state: state)
+                delay = tool.toolInteractView!.interact(with: type, scale: scrollView.zoomScale*container.scaleRatio, state: state)
             }
         }
     }
