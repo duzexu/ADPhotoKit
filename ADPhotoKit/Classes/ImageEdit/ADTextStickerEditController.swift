@@ -110,6 +110,14 @@ private extension ADTextStickerEditController {
             stackView.addArrangedSubview(cell)
         }
         
+        let string = NSAttributedString(string: "hhahhsahdahd阿萨德卡的好看见那，阿萨德你去问那看来你这些处女座\n那倒是\n奥斯卡大道mdasd", attributes: [.font:UIFont.systemFont(ofSize: 29),.foregroundColor:UIColor.white])
+        let label = ADStickerLabel(attributeString: string, width: screenWidth-40, edgeInsets: UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16))
+        view.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            //make.edges.equalToSuperview().inset(UIEdgeInsets(top: 100, left: 20, bottom: 100, right: 20))
+        }
+        
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
         stackView.addGestureRecognizer(singleTap)
     }

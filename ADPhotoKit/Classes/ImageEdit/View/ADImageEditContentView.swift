@@ -247,7 +247,7 @@ class ADImageEditContentView: UIView {
                 case .ended,.failed,.cancelled:
                     if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
                         if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
-                            if let ti = delay {
+                            if let ti = delay, ti > 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now()+ti) {
                                     package.clipBounds = true
                                 }

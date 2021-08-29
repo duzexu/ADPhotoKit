@@ -54,9 +54,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         switch type {
         case let .pan(loc, trans):
             target?.translation(by: CGPoint(x: trans.x/scale, y: trans.y/scale))
-            if state == .began {
-                presentTrashView()
-            }else if state == .changed {
+            if state == .changed {
                 if trashView.frame.contains(loc) {
                     trashView.isConfirmed = true
                 }else{
@@ -64,11 +62,6 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                         trashView.isHidden = true
                     }
                 }
-            }else{
-                if trashView.isConfirmed && !trashView.isHidden {
-                    target?.removeFromSuperview()
-                }
-                dismissTrashView()
             }
         case let .pinch(scale,_):
             target?.pinch(by: scale)
@@ -77,12 +70,18 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         }
         switch state {
         case .began:
+            presentTrashView()
             target?.beginActive(resignable: false)
             if let tg = target {
                 tg.center = container.convert(tg.center, to: self)
-                addSubview(tg)
+                insertSubview(tg, belowSubview: trashView)
             }
         case .ended, .cancelled, .failed:
+            if trashView.isConfirmed && !trashView.isHidden {
+                target?.removeFromSuperview()
+                target = nil
+            }
+            dismissTrashView()
             var animated: Bool = false
             if let tg = target {
                 let clipCenter = clipView.center
@@ -129,14 +128,9 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     private var container: UIView!
     
     private lazy var trashView: TrashView = {
-        let view = TrashView()
+        let view = TrashView(frame: CGRect(x: 0, y: 0, width: 160, height: 80))
         view.isHidden = true
         addSubview(view)
-        view.snp.makeConstraints { make in
-            make.width.greaterThanOrEqualTo(160)
-            make.height.equalTo(80)
-        }
-        layoutIfNeeded()
         return view
     }()
     
@@ -174,8 +168,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
         
     func presentTrashView() {
+        guard trashView.isHidden else {
+            return
+        }
         trashView.isHidden = false
-        trashView.isConfirmed = false
         trashView.transform = trashIdentifyTrans.translatedBy(x: 0, y: 130)
         UIView.animate(withDuration: 0.2) {
             self.trashView.transform = self.trashIdentifyTrans
@@ -183,6 +179,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     func dismissTrashView() {
+        trashView.isConfirmed = false
         UIView.animate(withDuration: 0.2) {
             self.trashView.transform = self.trashIdentifyTrans.translatedBy(x: 0, y: 130)
         } completion: { _ in
@@ -210,7 +207,6 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             clipView.frame = bounds
             container.frame = bounds
         }
-        layoutIfNeeded()
     }
     
     class TrashView: UIView {
