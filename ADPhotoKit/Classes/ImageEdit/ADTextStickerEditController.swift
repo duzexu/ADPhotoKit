@@ -111,7 +111,7 @@ private extension ADTextStickerEditController {
         }
         
         let string = NSAttributedString(string: "hhahhsahdahd阿萨德卡的好看见那，阿萨德你去问那看来你这些处女座\n那倒是\n奥斯卡大道mdasd", attributes: [.font:UIFont.systemFont(ofSize: 29),.foregroundColor:UIColor.white])
-        let label = ADStickerLabel(attributeString: string, width: screenWidth-40, edgeInsets: UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16))
+        let label = ADTextStickerInputView(attributeString: string, width: screenWidth-50, border: Border(width: 12, margin: 4))
         view.addSubview(label)
         label.snp.makeConstraints { make in
             make.center.equalToSuperview()
