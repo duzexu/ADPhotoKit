@@ -26,6 +26,8 @@ class ADTextStickerEditController: UIViewController, ADTextStickerEditConfigurab
     let text: String?
     var color: ADTextStickerColor
     
+    private var textInputView: ADTextStickerInputView!
+    
     private var colorsView: UIView!
     private var stackView: UIStackView!
     
@@ -97,6 +99,7 @@ private extension ADTextStickerEditController {
         let switchBtn = UIButton(type: .custom)
         switchBtn.setImage(Bundle.image(name: "icons_outlined_text", module: .imageEdit), for: .normal)
         switchBtn.setImage(Bundle.image(name: "icons_filled_text", module: .imageEdit), for: .selected)
+        switchBtn.addTarget(self, action: #selector(modeSwitchAction(_:)), for: .touchUpInside)
         colorsView.addSubview(switchBtn)
         switchBtn.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
@@ -122,9 +125,9 @@ private extension ADTextStickerEditController {
             stackView.addArrangedSubview(cell)
         }
         
-        let label = ADTextStickerInputView(width: screenWidth-50, border: Border(width: 12, margin: 4), sticker: ADTextSticker(color: color, text: "hhahhsahdahd阿萨德卡的好看见那，阿萨德你去问那看来你这些处女座\n那倒是\n奥斯卡大道mdasd"))
-        view.addSubview(label)
-        label.snp.makeConstraints { make in
+        textInputView = ADTextStickerInputView(width: screenWidth-50, border: Border(width: 12, margin: 4), sticker: ADTextSticker(color: color, text: "公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了\n公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了\n公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了"))
+        view.addSubview(textInputView)
+        textInputView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
         
@@ -140,12 +143,18 @@ private extension ADTextStickerEditController {
         dismiss(animated: true, completion: nil)
     }
     
+    @objc func modeSwitchAction(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        textInputView.mode = sender.isSelected ? .border : .normal
+    }
+    
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
         let point = tap.location(in: stackView)
         for (i,cell) in stackView.arrangedSubviews.enumerated() {
             if cell.frame.contains(point) {
                 (cell as! ADColorCell).isSelect = true
                 color = ADPhotoKitConfiguration.default.textStickerColors[i]
+                textInputView.color = color
             }else{
                 (cell as! ADColorCell).isSelect = false
             }

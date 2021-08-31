@@ -118,9 +118,11 @@ class ADTextStickerInputView: UIView {
         }
     }
     
-    private var framesetter: CTFramesetter?
+    private let font = UIFont.systemFont(ofSize: 32, weight: .bold)
+    
     private var contentSize: CGSize = .zero
     
+    private var textView: UITextView!
     private var textLabel: ADTextStickerLabel!
     private var borderView: ADTextStickerLabelBorder!
 
@@ -146,9 +148,22 @@ class ADTextStickerInputView: UIView {
         textLabel.backgroundColor = .clear
         addSubview(textLabel)
         textLabel.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.left.equalToSuperview().offset(border.margin)
-            make.right.equalToSuperview().offset(-border.margin)
+            make.edges.equalToSuperview()
+        }
+        
+        textView = UITextView()
+        textView.textContainer.lineFragmentPadding = 0;
+        textView.textContainerInset = .zero
+        textView.showsHorizontalScrollIndicator = false
+        textView.showsVerticalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            textView.contentInsetAdjustmentBehavior = .never
+        }
+        textView.backgroundColor = .clear
+        addSubview(textView)
+        textView.snp.makeConstraints { make in
+            make.top.left.right.equalToSuperview()
+            make.bottom.equalToSuperview().offset(10)
         }
         
         update()
@@ -173,15 +188,18 @@ class ADTextStickerInputView: UIView {
             foregroundColor = color.bgColor
             borderColor = color.textColor
         }
-        let attributeString = NSAttributedString(string: text ?? "", attributes: [.font:UIFont.systemFont(ofSize: 29),.foregroundColor:foregroundColor])
-        framesetter = CTFramesetterCreateWithAttributedString(attributeString)
-        let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter!, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = -0.32;
+        textView.attributedText = NSAttributedString(string: text ?? "", attributes: [.font:font,.paragraphStyle:style,.foregroundColor:UIColor.clear])
+        let attributeString = NSAttributedString(string: text ?? "", attributes: [.font:font,.foregroundColor:foregroundColor])
+        let framesetter = CTFramesetterCreateWithAttributedString(attributeString)
+        let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
         contentSize = CGSize(width: width, height: frameSize.height)
         UIGraphicsBeginImageContext(contentSize)
         guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
-        let ctframe = CTFramesetterCreateFrame(framesetter!, CFRange(), CGPath(rect: CGRect(origin: .zero, size: frameSize), transform: nil), nil)
+        let ctframe = CTFramesetterCreateFrame(framesetter, CFRange(), CGPath(rect: CGRect(origin: .zero, size: frameSize), transform: nil), nil)
         textLabel.ctframe = ctframe
         let lines = CTFrameGetLines(ctframe) as? [CTLine]
         var rects: [CGRect] = []
@@ -310,7 +328,7 @@ class ADTextStickerLabelBorder: UIView {
                                 let radius = (nn.point.y-last.point.y-border.width*2)/2
                                 if nn.point.x > next.point.x && nn.point.x-next.point.x > radius+border.width {
                                     let point = CGPoint(x: item.point.x+radius+border.width, y: last.point.y+(nn.point.y-last.point.y)/2)
-                                    points.append(.round(radius: border.width, style: .leftSemicircle(point)))
+                                    points.append(.round(radius: radius, style: .leftSemicircle(point)))
                                     jump = true
                                     continue
                                 }
@@ -329,6 +347,7 @@ class ADTextStickerLabelBorder: UIView {
                 }
             }
         }
+        /* use for test
         for item in points {
             switch item {
             case let .round(radius, style):
@@ -349,6 +368,7 @@ class ADTextStickerLabelBorder: UIView {
                 v.center = center
             }
         }
+        */
         setNeedsDisplay()
     }
     
