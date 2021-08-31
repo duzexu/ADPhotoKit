@@ -13,32 +13,6 @@ enum Quadrant {
     case rightTop
     case rightBottom
     case leftBottom
-    
-    var startAngle: CGFloat {
-        switch self {
-        case .leftTop:
-            return CGFloat.pi
-        case .rightTop:
-            return -CGFloat.pi/2
-        case .rightBottom:
-            return 0
-        case .leftBottom:
-            return CGFloat.pi/2
-        }
-    }
-    
-    var endAngle: CGFloat {
-        switch self {
-        case .leftTop:
-            return -CGFloat.pi/2
-        case .rightTop:
-            return 0
-        case .rightBottom:
-            return CGFloat.pi/2
-        case .leftBottom:
-            return CGFloat.pi
-        }
-    }
 }
 
 struct Corner {
@@ -46,44 +20,73 @@ struct Corner {
     let quadrant: Quadrant
 }
 
-struct RoundCorner {
-    let corner: Corner
-    let start: CGPoint
-    let end: CGPoint
-    let radius: CGFloat
-}
-
 enum RoundStyle {
     ///╭ ┃
     ///━━╋━━
     ///  ┃
-    case leftTop(s: CGPoint, e: CGPoint)
+    case leftTop(CGPoint)
     ///  ┃ ╮
     ///━━╋━━
     ///  ┃
-    case rightTop(s: CGPoint, e: CGPoint)
+    case rightTop(CGPoint)
     ///  ┃
     ///━━╋━━
     ///  ┃ ╯
-    case rightBottom(s: CGPoint, e: CGPoint)
+    case rightBottom(CGPoint)
     ///  ┃
     ///━━╋━━
     ///╰ ┃
-    case leftBottom(s: CGPoint, e: CGPoint)
+    case leftBottom(CGPoint)
     ///  ┃
     ///━━╋━━
     ///  ┃ ╭
-    case inverseLeftTop(s: CGPoint, e: CGPoint)
+    case inverseLeftTop(CGPoint)
     ///  ┃ ╰
     ///━━╋━━
     ///  ┃
-    case inverseLeftBottom(s: CGPoint, e: CGPoint)
+    case inverseLeftBottom(CGPoint)
     ///
-    case leftSemicircle(s: CGPoint, e: CGPoint)
+    case leftSemicircle(CGPoint)
+    
+    typealias RoundStyleInfo = (cPos: CGPoint, sPos: CGPoint, ePos: CGPoint, sAngle: CGFloat, eAngle: CGFloat, clockwise: Bool)
+    
+    func infoWith(radius: CGFloat) -> RoundStyleInfo {
+        switch self {
+        case let .leftTop(center):
+            let start = CGPoint(x: center.x - radius, y: center.y)
+            let end = CGPoint(x: center.x, y: center.y - radius)
+            return (center,start,end,CGFloat.pi,1.5*CGFloat.pi,false)
+        case let .rightTop(center):
+            let start = CGPoint(x: center.x, y: center.y - radius)
+            let end = CGPoint(x: center.x + radius, y: center.y)
+            return (center,start,end,CGFloat.pi*1.5,0,false)
+        case let .rightBottom(center):
+            let start = CGPoint(x: center.x + radius, y: center.y)
+            let end = CGPoint(x: center.x, y: center.y + radius)
+            return (center,start,end,0,0.5*CGFloat.pi,false)
+        case let .leftBottom(center):
+            let start = CGPoint(x: center.x, y: center.y + radius)
+            let end = CGPoint(x: center.x - radius, y: center.y)
+            return (center,start,end,CGFloat.pi*0.5,CGFloat.pi,false)
+        case let .inverseLeftTop(center):
+            let start = CGPoint(x: center.x, y: center.y - radius)
+            let end = CGPoint(x: center.x - radius, y: center.y)
+            return (center,start,end,CGFloat.pi*1.5,CGFloat.pi,true)
+        case let .inverseLeftBottom(center):
+            let start = CGPoint(x: center.x - radius, y: center.y)
+            let end = CGPoint(x: center.x, y: center.y + radius)
+            return (center,start,end,CGFloat.pi,0.5*CGFloat.pi,true)
+        case let .leftSemicircle(center):
+            let start = CGPoint(x: center.x, y: center.y - radius)
+            let end = CGPoint(x: center.x, y: center.y + radius)
+            return (center,start,end,CGFloat.pi*1.5,0.5*CGFloat.pi,true)
+        }
+    }
+    
 }
 
 enum Point {
-    case round(center: CGPoint, radius: CGFloat, style: RoundStyle)
+    case round(radius: CGFloat, style: RoundStyle)
     case straight(CGPoint)
 }
 
@@ -94,9 +97,26 @@ struct Border {
 
 class ADTextStickerInputView: UIView {
     
-    let attributeString: NSAttributedString
+    var color: ADTextStickerColor {
+        didSet {
+            update()
+        }
+    }
+    
+    var mode: ADTextSticker.Mode {
+        didSet {
+            update()
+        }
+    }
+    
     let width: CGFloat
     let margin: CGFloat
+    
+    private var text: String? {
+        didSet {
+            update()
+        }
+    }
     
     private var framesetter: CTFramesetter?
     private var contentSize: CGSize = .zero
@@ -104,10 +124,12 @@ class ADTextStickerInputView: UIView {
     private var textLabel: ADTextStickerLabel!
     private var borderView: ADTextStickerLabelBorder!
 
-    init(attributeString: NSAttributedString, width: CGFloat, border: Border) {
-        self.attributeString = attributeString
+    init(width: CGFloat, border: Border, sticker: ADTextSticker) {
         self.width = width
         self.margin = border.margin
+        self.color = sticker.color
+        self.mode = sticker.mode
+        self.text = sticker.text
         super.init(frame: .zero)
         backgroundColor = UIColor.clear
         
@@ -129,7 +151,7 @@ class ADTextStickerInputView: UIView {
             make.right.equalToSuperview().offset(-border.margin)
         }
         
-        update(string: attributeString)
+        update()
     }
     
     required init?(coder: NSCoder) {
@@ -140,7 +162,18 @@ class ADTextStickerInputView: UIView {
         return contentSize
     }
     
-    func update(string: NSAttributedString) {
+    func update() {
+        var foregroundColor: UIColor
+        var borderColor: UIColor
+        switch mode {
+        case .normal:
+            foregroundColor = color.textColor
+            borderColor = color.bgColor
+        case .border:
+            foregroundColor = color.bgColor
+            borderColor = color.textColor
+        }
+        let attributeString = NSAttributedString(string: text ?? "", attributes: [.font:UIFont.systemFont(ofSize: 29),.foregroundColor:foregroundColor])
         framesetter = CTFramesetterCreateWithAttributedString(attributeString)
         let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter!, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
         contentSize = CGSize(width: width, height: frameSize.height)
@@ -165,7 +198,8 @@ class ADTextStickerInputView: UIView {
                 rects.append(lineBounds)
             }
         }
-        borderView.lineRects = rects
+        borderView.isHidden = mode == .normal
+        borderView.borderInfo = (rects,borderColor)
         UIGraphicsEndImageContext()
         invalidateIntrinsicContentSize()
     }
@@ -193,7 +227,7 @@ class ADTextStickerLabel: UIView {
 
 class ADTextStickerLabelBorder: UIView {
     
-    var lineRects: [CGRect] = [] {
+    var borderInfo: (lineRects:[CGRect],color:UIColor) = ([],UIColor.clear) {
         didSet {
             reloadBorder()
         }
@@ -201,7 +235,6 @@ class ADTextStickerLabelBorder: UIView {
     
     let border: Border
     
-    var roundCorners: [RoundCorner] = []
     var points: [Point] = []
     
     init(border: Border) {
@@ -215,60 +248,106 @@ class ADTextStickerLabelBorder: UIView {
     
     func reloadBorder() {
         var corners: [Corner] = []
-        for i in 0..<lineRects.count {
-            let rect = lineRects[i]
+        for i in 0..<borderInfo.lineRects.count {
+            let rect = borderInfo.lineRects[i]
             if i == 0 {
-                corners.append(Corner(point: CGPoint(x: border.width, y: border.width), quadrant: .leftTop))
-                corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width), quadrant: .rightTop))
+                corners.append(Corner(point: CGPoint(x: border.width, y: border.width), quadrant: .rightBottom))
+                corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width), quadrant: .leftBottom))
             }else{
-                let last = lineRects[i-1]
+                let last = borderInfo.lineRects[i-1]
                 let diff = rect.maxX-last.maxX
                 if diff > border.width {
-                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+last.width, y: border.width+last.maxY), quadrant: .leftBottom))
-                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.minY), quadrant: .rightTop))
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+last.width, y: border.width+last.maxY), quadrant: .leftTop))
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.minY), quadrant: .leftBottom))
                 }else if diff < -border.width {
-                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+last.width, y: border.width+last.maxY), quadrant: .rightBottom))
-                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.minY), quadrant: .leftTop))
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+last.width, y: border.width+last.maxY), quadrant: .leftTop))
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.minY), quadrant: .leftBottom))
                 }
-                if i == lineRects.count-1 {
-                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.maxY), quadrant: .rightBottom))
-                    corners.append(Corner(point: CGPoint(x: border.width, y: border.width+rect.maxY), quadrant: .leftBottom))
+                if i == borderInfo.lineRects.count-1 {
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.maxY), quadrant: .leftTop))
+                    corners.append(Corner(point: CGPoint(x: border.width, y: border.width+rect.maxY), quadrant: .rightTop))
                 }
             }
-        }
-        roundCorners.removeAll()
-        for item in corners {
-            var start: CGPoint!
-            var end: CGPoint!
-            switch item.quadrant {
-            case .leftTop:
-                start = CGPoint(x: item.point.x - border.width, y: item.point.y)
-                end = CGPoint(x: item.point.x, y: item.point.y - border.width)
-            case .rightTop:
-                start = CGPoint(x: item.point.x, y: item.point.y - border.width)
-                end = CGPoint(x: item.point.x + border.width, y: item.point.y)
-            case .rightBottom:
-                start = CGPoint(x: item.point.x + border.width, y: item.point.y)
-                end = CGPoint(x: item.point.x, y: item.point.y + border.width)
-            case .leftBottom:
-                start = CGPoint(x: item.point.x, y: item.point.y + border.width)
-                end = CGPoint(x: item.point.x - border.width, y: item.point.y)
-            }
-            let roundCorner = RoundCorner(corner: item, start: start, end: end, radius: border.width)
-            roundCorners.append(roundCorner)
         }
         points.removeAll()
-        
-        for item in roundCorners {
-            let v = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 2, height: 2)))
-            v.backgroundColor = .red
-            addSubview(v)
-            v.center = item.start
-            
-            let e = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 2, height: 2)))
-            e.backgroundColor = .blue
-            addSubview(e)
-            e.center = item.end
+        var jump: Bool = false
+        for (i,item) in corners.enumerated() {
+            if i == 0 {
+                points.append(.round(radius: border.width, style: .leftTop(item.point)))
+            }else if i == 1 {
+                points.append(.round(radius: border.width, style: .rightTop(item.point)))
+            }else if i == corners.count-1 {
+                points.append(.round(radius: border.width, style: .leftBottom(item.point)))
+            }else if i == corners.count-2 {
+                points.append(.round(radius: border.width, style: .rightBottom(item.point)))
+            }else{
+                if jump {
+                    jump = false
+                    continue
+                }
+                let last = corners[i-1]
+                let next = corners[i+1]
+                switch item.quadrant {
+                case .leftTop:
+                    let offX = item.point.x - next.point.x
+                    if offX < 0 {
+                        if -offX >= border.width*2 {
+                            let point = CGPoint(x: item.point.x+border.width*2, y: next.point.y-border.width*2)
+                            points.append(.round(radius: border.width, style: .inverseLeftBottom(point)))
+                        }else{
+                            let point = CGPoint(x: item.point.x+border.width, y: next.point.y-border.width)
+                            points.append(.straight(point))
+                        }
+                    }else{
+                        points.append(.round(radius: border.width, style: .rightBottom(item.point)))
+                    }
+                case .leftBottom:
+                    let offX = item.point.x - last.point.x
+                    if offX < 0 {
+                        if -offX >= border.width*2 {
+                            if i+2 < corners.count-2 {
+                                let nn = corners[i+2]
+                                let radius = (nn.point.y-last.point.y-border.width*2)/2
+                                if nn.point.x > next.point.x && nn.point.x-next.point.x > radius+border.width {
+                                    let point = CGPoint(x: item.point.x+radius+border.width, y: last.point.y+(nn.point.y-last.point.y)/2)
+                                    points.append(.round(radius: border.width, style: .leftSemicircle(point)))
+                                    jump = true
+                                    continue
+                                }
+                            }
+                            let point = CGPoint(x: item.point.x+border.width*2, y: last.point.y+border.width*2)
+                            points.append(.round(radius: border.width, style: .inverseLeftTop(point)))
+                        }else{
+                            let point = CGPoint(x: item.point.x+border.width, y: last.point.y+border.width)
+                            points.append(.straight(point))
+                        }
+                    }else{
+                        points.append(.round(radius: border.width, style: .rightTop(item.point)))
+                    }
+                default:
+                    break
+                }
+            }
+        }
+        for item in points {
+            switch item {
+            case let .round(radius, style):
+                let info = style.infoWith(radius: radius)
+                let s = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 2, height: 2)))
+                s.backgroundColor = .red
+                addSubview(s)
+                s.center = info.sPos
+                
+                let e = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 2, height: 2)))
+                e.backgroundColor = .blue
+                addSubview(e)
+                e.center = info.ePos
+            case let .straight(center):
+                let v = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 4, height: 4)))
+                v.backgroundColor = .green
+                addSubview(v)
+                v.center = center
+            }
         }
         setNeedsDisplay()
     }
@@ -277,20 +356,27 @@ class ADTextStickerLabelBorder: UIView {
         guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
-        context.setFillColor(UIColor(white: 1, alpha: 0.5).cgColor)
-        for (i,item) in roundCorners.enumerated() {
-            if i == 0 {
-                context.move(to: item.start)
-                context.addArc(center: item.corner.point, radius: item.radius, startAngle: item.corner.quadrant.startAngle, endAngle: item.corner.quadrant.endAngle, clockwise: false)
-            }else if i == roundCorners.count-1 {
-                context.addLine(to: item.start)
-                context.addArc(center: item.corner.point, radius: item.radius, startAngle: item.corner.quadrant.startAngle, endAngle: item.corner.quadrant.endAngle, clockwise: false)
-                context.closePath()
-            }else{
-                context.addLine(to: item.start)
-                context.addArc(center: item.corner.point, radius: item.radius, startAngle: item.corner.quadrant.startAngle, endAngle: item.corner.quadrant.endAngle, clockwise: false)
+        context.setFillColor(borderInfo.color.cgColor)
+        for (i,item) in points.enumerated() {
+            switch item {
+            case let .round(radius, style):
+                let info = style.infoWith(radius: radius)
+                if i == 0 {
+                    context.move(to: info.sPos)
+                    context.addArc(center: info.cPos, radius: radius, startAngle: info.sAngle, endAngle: info.eAngle, clockwise: info.clockwise)
+                }else{
+                    context.addLine(to: info.sPos)
+                    context.addArc(center: info.cPos, radius: radius, startAngle: info.sAngle, endAngle: info.eAngle, clockwise: info.clockwise)
+                }
+            case let .straight(pos):
+                if i == 0 {
+                    context.move(to: pos)
+                }else{
+                    context.addLine(to: pos)
+                }
             }
         }
+        context.closePath()
         context.fillPath()
     }
 }

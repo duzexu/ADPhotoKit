@@ -7,12 +7,24 @@
 
 import UIKit
 
+struct ADTextSticker {
+    enum Mode {
+        case normal
+        case border
+    }
+    
+    let color: ADTextStickerColor
+    let mode: Mode = .normal
+    let text: String?
+}
+
+
 class ADTextStickerEditController: UIViewController, ADTextStickerEditConfigurable {
     
     var textDidEdit: ((String, ADTextStickerColor) -> Void)?
     
     let text: String?
-    var color: ADTextStickerColor!
+    var color: ADTextStickerColor
     
     private var colorsView: UIView!
     private var stackView: UIStackView!
@@ -110,12 +122,10 @@ private extension ADTextStickerEditController {
             stackView.addArrangedSubview(cell)
         }
         
-        let string = NSAttributedString(string: "hhahhsahdahd阿萨德卡的好看见那，阿萨德你去问那看来你这些处女座\n那倒是\n奥斯卡大道mdasd", attributes: [.font:UIFont.systemFont(ofSize: 29),.foregroundColor:UIColor.white])
-        let label = ADTextStickerInputView(attributeString: string, width: screenWidth-50, border: Border(width: 12, margin: 4))
+        let label = ADTextStickerInputView(width: screenWidth-50, border: Border(width: 12, margin: 4), sticker: ADTextSticker(color: color, text: "hhahhsahdahd阿萨德卡的好看见那，阿萨德你去问那看来你这些处女座\n那倒是\n奥斯卡大道mdasd"))
         view.addSubview(label)
         label.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            //make.edges.equalToSuperview().inset(UIEdgeInsets(top: 100, left: 20, bottom: 100, right: 20))
         }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
