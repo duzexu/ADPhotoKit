@@ -95,6 +95,7 @@ class ADImageEditController: UIViewController {
         definesPresentationContext = true
         
         ADStickerInteractView.share.clear()
+        ADStickerInteractView.share.ctx = self
         setupUI()
     }
     
@@ -152,6 +153,11 @@ extension ADImageEditController {
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
         view.addGestureRecognizer(singleTap)
+        
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleTap)
+        singleTap.require(toFail: doubleTap)
 
         let panGes = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
         panGes.delegate = self
@@ -184,6 +190,11 @@ extension ADImageEditController {
             return
         }
         isControlShow = !isControlShow
+    }
+    
+    @objc func doubleTapAction(_ tap: UITapGestureRecognizer) {
+        let point = tap.location(in: view)
+        _ = contentView.gestureShouldBegin(tap, point: point)
     }
     
     @objc func panAction(_ pan: UIPanGestureRecognizer) {

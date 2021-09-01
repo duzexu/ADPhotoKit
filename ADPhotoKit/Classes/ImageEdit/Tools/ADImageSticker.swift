@@ -28,9 +28,10 @@ class ADImageSticker: ADImageEditTool {
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text(_):
-            let sticker = ADImageEditConfigurable.textStickerEditVC()
-            sticker.textDidEdit = { text, color in
-                
+            let sticker = ADImageEditConfigurable.textStickerEditVC(sticker: nil)
+            sticker.textDidEdit = { image, sticker in
+                let content = ADTextStickerContentView(image: image, sticker: sticker)
+                ADStickerInteractView.share.addContent(content)
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate

@@ -209,9 +209,9 @@ class ADImageEditContentView: UIView {
     }
     
     func gestureShouldBegin(_ gestureRecognizer: UIGestureRecognizer, point: CGPoint) -> Bool {
-        let isSingleTap = gestureRecognizer.isKind(of: UITapGestureRecognizer.self)
+        let isTap = gestureRecognizer.isKind(of: UITapGestureRecognizer.self)
         for tool in interactTools {
-            if !isSingleTap && target != nil {
+            if !isTap && target != nil {
                 return true
             }
             
@@ -219,7 +219,7 @@ class ADImageEditContentView: UIView {
             switch tool.toolInteractView!.policy {
             case .simult: // Allow interact with simult tool view
                 if tool.toolInteractView!.shouldInteract(gestureRecognizer, point: convert) {
-                    if !isSingleTap {
+                    if !isTap {
                         target = tool
                     }
                     return true
@@ -227,7 +227,7 @@ class ADImageEditContentView: UIView {
             case .single:
                 // Only allow interact with select tool view
                 if tool.isSelected && tool.toolInteractView!.shouldInteract(gestureRecognizer, point: convert) {
-                    if !isSingleTap {
+                    if !isTap {
                         target = tool
                     }
                     return true

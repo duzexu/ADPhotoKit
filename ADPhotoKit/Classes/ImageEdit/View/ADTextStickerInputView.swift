@@ -103,24 +103,30 @@ class ADTextStickerInputView: UIView {
         }
     }
     
-    var mode: ADTextSticker.Mode {
+    var style: ADTextSticker.Style {
         didSet {
             update()
         }
     }
     
+    var textDidChangeBlock: ((String?) -> Void)?
+    
     let width: CGFloat
-    let margin: CGFloat
     
     private var text: String? {
         didSet {
+            textDidChangeBlock?(text)
             update()
         }
     }
+    
+    private var selectRange: NSRange?
     
     private let font = UIFont.systemFont(ofSize: 32, weight: .bold)
     
     private var contentSize: CGSize = .zero
+    private var topBottom: CGFloat!
+    private var leftRight: CGFloat!
     
     private var textView: UITextView!
     private var textLabel: ADTextStickerLabel!
@@ -128,15 +134,14 @@ class ADTextStickerInputView: UIView {
 
     init(width: CGFloat, border: Border, sticker: ADTextSticker) {
         self.width = width
-        self.margin = border.margin
         self.color = sticker.color
-        self.mode = sticker.mode
+        self.style = sticker.style
         self.text = sticker.text
         super.init(frame: .zero)
         backgroundColor = UIColor.clear
         
-        let topBottom = border.width
-        let leftRight = border.margin+border.width
+        self.topBottom = border.width
+        self.leftRight = border.margin+border.width
         borderView = ADTextStickerLabelBorder(border: border)
         borderView.backgroundColor = .clear
         addSubview(borderView)
@@ -152,10 +157,14 @@ class ADTextStickerInputView: UIView {
         }
         
         textView = UITextView()
+        textView.tintColor = UIColor(hex: 0x10C060)
+        textView.delegate = self
         textView.textContainer.lineFragmentPadding = 0;
         textView.textContainerInset = .zero
+        textView.layoutManager.usesFontLeading = false
         textView.showsHorizontalScrollIndicator = false
         textView.showsVerticalScrollIndicator = false
+        textView.font = font
         if #available(iOS 11.0, *) {
             textView.contentInsetAdjustmentBehavior = .never
         }
@@ -169,6 +178,34 @@ class ADTextStickerInputView: UIView {
         update()
     }
     
+    func beginInput() {
+        textView.becomeFirstResponder()
+    }
+    
+    func stickerImage() -> UIImage? {
+        guard text != nil && text!.count > 0 else {
+            return nil
+        }
+        let size = CGSize(width: borderView.imageWidth, height: borderView.frame.height)
+        UIGraphicsBeginImageContextWithOptions(textLabel.frame.size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            textLabel.layer.render(in: ctx)
+        }
+        let textImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        guard textImage != nil else {
+            return nil
+        }
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            borderView.layer.render(in: ctx)
+        }
+        textImage?.draw(at: CGPoint(x: leftRight, y: topBottom))
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -177,10 +214,10 @@ class ADTextStickerInputView: UIView {
         return contentSize
     }
     
-    func update() {
+    private func update() {
         var foregroundColor: UIColor
         var borderColor: UIColor
-        switch mode {
+        switch style {
         case .normal:
             foregroundColor = color.textColor
             borderColor = color.bgColor
@@ -188,15 +225,18 @@ class ADTextStickerInputView: UIView {
             foregroundColor = color.bgColor
             borderColor = color.textColor
         }
-        let style = NSMutableParagraphStyle()
-        style.lineSpacing = -0.32;
-        textView.attributedText = NSAttributedString(string: text ?? "", attributes: [.font:font,.paragraphStyle:style,.foregroundColor:UIColor.clear])
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = -0.32;
+        textView.attributedText = NSAttributedString(string: text ?? "", attributes: [.font:font,.paragraphStyle:paragraphStyle,.foregroundColor:UIColor.clear])
+        textView.selectedRange = selectRange ?? NSRange(location: textView.attributedText.length, length: 0)
         let attributeString = NSAttributedString(string: text ?? "", attributes: [.font:font,.foregroundColor:foregroundColor])
         let framesetter = CTFramesetterCreateWithAttributedString(attributeString)
         let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
-        contentSize = CGSize(width: width, height: frameSize.height)
-        UIGraphicsBeginImageContext(contentSize)
+        contentSize = CGSize(width: width, height: max(35, frameSize.height))
+        UIGraphicsBeginImageContext(frameSize)
         guard let context = UIGraphicsGetCurrentContext() else {
+            borderView.isHidden = true
+            textLabel.isHidden = true
             return
         }
         let ctframe = CTFramesetterCreateFrame(framesetter, CFRange(), CGPath(rect: CGRect(origin: .zero, size: frameSize), transform: nil), nil)
@@ -216,7 +256,8 @@ class ADTextStickerInputView: UIView {
                 rects.append(lineBounds)
             }
         }
-        borderView.isHidden = mode == .normal
+        borderView.isHidden = style == .normal
+        textLabel.isHidden = false
         borderView.borderInfo = (rects,borderColor)
         UIGraphicsEndImageContext()
         invalidateIntrinsicContentSize()
@@ -224,7 +265,23 @@ class ADTextStickerInputView: UIView {
     
 }
 
-class ADTextStickerLabel: UIView {
+extension ADTextStickerInputView: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        let range = textView.selectedRange
+        var string = textView.text ?? ""
+        if string.count > 100 {
+            string = String(string.prefix(100))
+            if range.location > 100 {
+                selectRange = NSRange(location: 100, length: 0)
+            }else{
+                selectRange = range
+            }
+        }
+        text = string
+    }
+}
+
+private class ADTextStickerLabel: UIView {
     
     var ctframe: CTFrame? = nil {
         didSet {
@@ -243,7 +300,7 @@ class ADTextStickerLabel: UIView {
     
 }
 
-class ADTextStickerLabelBorder: UIView {
+private class ADTextStickerLabelBorder: UIView {
     
     var borderInfo: (lineRects:[CGRect],color:UIColor) = ([],UIColor.clear) {
         didSet {
@@ -251,9 +308,11 @@ class ADTextStickerLabelBorder: UIView {
         }
     }
     
+    var imageWidth: CGFloat = 0
+    
     let border: Border
     
-    var points: [Point] = []
+    private var points: [Point] = []
     
     init(border: Border) {
         self.border = border
@@ -271,6 +330,10 @@ class ADTextStickerLabelBorder: UIView {
             if i == 0 {
                 corners.append(Corner(point: CGPoint(x: border.width, y: border.width), quadrant: .rightBottom))
                 corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width), quadrant: .leftBottom))
+                if i == borderInfo.lineRects.count-1 {
+                    corners.append(Corner(point: CGPoint(x: border.margin*2+border.width+rect.width, y: border.width+rect.maxY), quadrant: .leftTop))
+                    corners.append(Corner(point: CGPoint(x: border.width, y: border.width+rect.maxY), quadrant: .rightTop))
+                }
             }else{
                 let last = borderInfo.lineRects[i-1]
                 let diff = rect.maxX-last.maxX
@@ -286,6 +349,9 @@ class ADTextStickerLabelBorder: UIView {
                     corners.append(Corner(point: CGPoint(x: border.width, y: border.width+rect.maxY), quadrant: .rightTop))
                 }
             }
+        }
+        if borderInfo.lineRects.count >= 1 {
+            imageWidth = corners[1].point.x - corners[0].point.x + border.width*2
         }
         points.removeAll()
         var jump: Bool = false

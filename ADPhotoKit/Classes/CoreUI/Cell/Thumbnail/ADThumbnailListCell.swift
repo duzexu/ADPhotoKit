@@ -82,7 +82,7 @@ public class ADThumbnailListCell: UICollectionViewCell {
         }
         
         indexLabel = UILabel()
-        indexLabel.backgroundColor = UIColor(hex: 0x50A938)
+        indexLabel.backgroundColor = UIColor(hex: 0x10C060)
         indexLabel.layer.cornerRadius = 12
         indexLabel.layer.masksToBounds = true
         indexLabel.textColor = .white
@@ -262,7 +262,7 @@ extension ADThumbnailListCell {
                     indexLabel.textColor = (v as? UIColor) ?? .white
                 }
                 if k == .indexBgColor {
-                    indexLabel.backgroundColor = (v as? UIColor) ?? UIColor(hex: 0x50A938)
+                    indexLabel.backgroundColor = (v as? UIColor) ?? UIColor(hex: 0x10C060)
                 }
                 if k == .indexFont {
                     indexLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 14)
@@ -329,7 +329,7 @@ extension ADThumbnailListCell.Key {
     public static let cornerRadius = ADThumbnailListCell.Key(rawValue: "cornerRadius")
     /// UIColor, default .white
     public static let indexColor = ADThumbnailListCell.Key(rawValue: "indexColor")
-    /// UIColor, default UIColor(hex: 0x50A938)
+    /// UIColor, default UIColor(hex: 0x10C060)
     public static let indexBgColor = ADThumbnailListCell.Key(rawValue: "indexBgColor")
     /// UIFont, default UIFont.systemFont(ofSize: 14)
     public static let indexFont = ADThumbnailListCell.Key(rawValue: "indexFont")

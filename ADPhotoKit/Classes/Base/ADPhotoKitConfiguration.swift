@@ -133,7 +133,7 @@ public class ADPhotoKitConfiguration {
     
     /* =============== draw =============== */
     
-    public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0x50A938)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x8B69EA)!]
+    public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0x10C060)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x8B69EA)!]
     
     public var lineDrawDefaultColorIndex: Int = 2
     
@@ -149,9 +149,9 @@ public class ADPhotoKitConfiguration {
     
     /* =============== text sticker =============== */
     
-    public var customTextStickerEditVC: ADTextStickerEditable?
+    public var customTextStickerEditVCBlock: ((ADTextSticker?) -> ADTextStickerEditable)?
     
-    public var textStickerColors: [ADTextStickerColor] = [(.white,.black),(.black,.white),(UIColor(hex: 0xF14F4F)!,.white),(UIColor(hex: 0xF3AA4E)!,.white),(UIColor(hex: 0x50A938)!,.white),(UIColor(hex: 0x1EB7F3)!,.white),(UIColor(hex: 0x8B69EA)!,.white)]
+    public var textStickerColors: [ADTextStickerColor] = [(.white,.black),(.black,.white),(UIColor(hex: 0xF14F4F)!,.white),(UIColor(hex: 0xF3AA4E)!,.white),(UIColor(hex: 0x10C060)!,.white),(UIColor(hex: 0x1EB7F3)!,.white),(UIColor(hex: 0x8B69EA)!,.white)]
     
     public var textStickerDefaultColorIndex: Int = 0
     

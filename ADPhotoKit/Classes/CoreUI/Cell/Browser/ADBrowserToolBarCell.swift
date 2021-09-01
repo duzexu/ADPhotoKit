@@ -18,7 +18,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layer.borderColor = UIColor(hex: 0x50A938)?.cgColor
+        layer.borderColor = UIColor(hex: 0x10C060)?.cgColor
         
         imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -118,7 +118,7 @@ extension ADBrowserToolBarCell {
                     tagLabel.font = (v as? UIFont) ?? UIFont.systemFont(ofSize: 17)
                 }
                 if k == .borderColor {
-                    layer.borderColor = (v as? UIColor)?.cgColor ?? UIColor(hex: 0x50A938)?.cgColor
+                    layer.borderColor = (v as? UIColor)?.cgColor ?? UIColor(hex: 0x10C060)?.cgColor
                 }
             }
         }
@@ -133,6 +133,6 @@ extension ADBrowserToolBarCell.Key {
     public static let tagColor = ADBrowserToolBarCell.Key(rawValue: "tagColor")
     /// UIFont, default UIFont.systemFont(ofSize: 13)
     public static let tagFont = ADBrowserToolBarCell.Key(rawValue: "tagFont")
-    /// UIColor, default UIColor(hex: 0x50A938)
+    /// UIColor, default UIColor(hex: 0x10C060)
     public static let borderColor = ADBrowserToolBarCell.Key(rawValue: "borderColor")
 }

@@ -55,7 +55,7 @@ private extension ADBrowserNavBarView {
         let selectIndex = dataSource?.options.contains(.selectIndex) ?? true
         if selectIndex {
             let indexLabel = UILabel()
-            indexLabel.backgroundColor = UIColor(hex: 0x50A938)
+            indexLabel.backgroundColor = UIColor(hex: 0x10C060)
             indexLabel.layer.cornerRadius = 13
             indexLabel.layer.masksToBounds = true
             indexLabel.textColor = .white

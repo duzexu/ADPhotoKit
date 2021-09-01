@@ -7,36 +7,26 @@
 
 import UIKit
 
-struct ADTextSticker {
-    enum Mode {
-        case normal
-        case border
-    }
-    
-    let color: ADTextStickerColor
-    let mode: Mode = .normal
-    let text: String?
-}
-
-
 class ADTextStickerEditController: UIViewController, ADTextStickerEditConfigurable {
     
-    var textDidEdit: ((String, ADTextStickerColor) -> Void)?
+    var textDidEdit: ((UIImage, ADTextSticker) -> Void)?
     
-    let text: String?
-    var color: ADTextStickerColor
+    var sticker: ADTextSticker
     
     private var textInputView: ADTextStickerInputView!
+    
+    private var cancelBtn: UIButton!
+    private var confirmBtn: UIButton!
     
     private var colorsView: UIView!
     private var stackView: UIStackView!
     
-    init(text: String? = nil, color: ADTextStickerColor? = nil) {
-        self.text = text
+    init(sticker: ADTextSticker? = nil) {
         if ADPhotoKitConfiguration.default.textStickerDefaultColorIndex > ADPhotoKitConfiguration.default.textStickerColors.count {
             fatalError("`textStickerDefaultColorIndex` must less then `textStickerColors`'s count")
         }
-        self.color = color ?? ADPhotoKitConfiguration.default.textStickerColors[ADPhotoKitConfiguration.default.textStickerDefaultColorIndex]
+        let color = ADPhotoKitConfiguration.default.textStickerColors[ADPhotoKitConfiguration.default.textStickerDefaultColorIndex]
+        self.sticker = sticker ?? ADTextSticker(color: color, style: .normal, text: nil)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -48,6 +38,11 @@ class ADTextStickerEditController: UIViewController, ADTextStickerEditConfigurab
         super.viewDidLoad()
         
         setupUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        textInputView.beginInput()
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -62,7 +57,7 @@ private extension ADTextStickerEditController {
         
         let top = isPhoneX ? 7 + statusBarHeight : 7
         
-        let cancelBtn = UIButton(type: .custom)
+        cancelBtn = UIButton(type: .custom)
         cancelBtn.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)
         cancelBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         cancelBtn.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
@@ -74,9 +69,9 @@ private extension ADTextStickerEditController {
             make.height.equalTo(34)
         }
         
-        let confirmBtn = UIButton(type: .custom)
+        confirmBtn = UIButton(type: .custom)
         confirmBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
-        confirmBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x50A938)!), for: .normal)
+        confirmBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x10C060)!), for: .normal)
         confirmBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         confirmBtn.layer.cornerRadius = 5
         confirmBtn.layer.masksToBounds = true
@@ -89,10 +84,24 @@ private extension ADTextStickerEditController {
             make.height.equalTo(34)
         }
         
+        let offsetY = (screenHeight-(top+34)-(tabBarOffset+60))/2-screenHeight/2
+        
+        textInputView = ADTextStickerInputView(width: screenWidth-50, border: Border(width: 12, margin: 4), sticker: sticker)
+        view.addSubview(textInputView)
+        textInputView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(offsetY)
+        }
+        
+        textInputView.textDidChangeBlock = { [weak self] text in
+            self?.sticker.text = text
+        }
+        
         colorsView = UIView()
         view.addSubview(colorsView)
         colorsView.snp.makeConstraints { make in
-            make.left.bottom.right.equalToSuperview()
+            make.left.right.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-tabBarOffset)
             make.height.equalTo(60)
         }
         
@@ -119,49 +128,89 @@ private extension ADTextStickerEditController {
         }
         
         let colors = ADPhotoKitConfiguration.default.textStickerColors
-        for (i,color) in colors.enumerated() {
+        for color in colors {
             let cell = ADColorCell(color: color.textColor)
-            cell.isSelect = ADPhotoKitConfiguration.default.textStickerDefaultColorIndex == i
+            cell.isSelect = color == sticker.color
             stackView.addArrangedSubview(cell)
         }
         
-        textInputView = ADTextStickerInputView(width: screenWidth-50, border: Border(width: 12, margin: 4), sticker: ADTextSticker(color: color, text: "公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了\n公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了\n公积金看了就看了看吧粑粑了看见了fgbghhhhbhbbbbbbbbnbbbbb看看图看见了"))
-        view.addSubview(textInputView)
-        textInputView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
-        
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
-        stackView.addGestureRecognizer(singleTap)
+        singleTap.delegate = self
+        view.addGestureRecognizer(singleTap)
+        
+        NotificationCenter.default
+            .addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIApplication.keyboardWillShowNotification, object: nil)
+        
+        NotificationCenter.default
+            .addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIApplication.keyboardWillHideNotification, object: nil)
     }
-    
+}
+
+extension ADTextStickerEditController {
     @objc func cancelBtnAction(_ sender: UIButton) {
         dismiss(animated: true, completion: nil)
     }
     
     @objc func confirmBtnAction(_ sender: UIButton) {
+        if let image = textInputView.stickerImage() {
+            textDidEdit?(image,sticker)
+        }
         dismiss(animated: true, completion: nil)
     }
     
     @objc func modeSwitchAction(_ sender: UIButton) {
         sender.isSelected = !sender.isSelected
-        textInputView.mode = sender.isSelected ? .border : .normal
+        textInputView.style = sender.isSelected ? .border : .normal
+        sticker.style = textInputView.style
     }
     
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
-        let point = tap.location(in: stackView)
-        for (i,cell) in stackView.arrangedSubviews.enumerated() {
-            if cell.frame.contains(point) {
-                (cell as! ADColorCell).isSelect = true
-                color = ADPhotoKitConfiguration.default.textStickerColors[i]
-                textInputView.color = color
-            }else{
-                (cell as! ADColorCell).isSelect = false
+        let point = tap.location(in: view)
+        if colorsView.frame.contains(point) {
+            let pos = view.convert(point, to: stackView)
+            for (i,cell) in stackView.arrangedSubviews.enumerated() {
+                if cell.frame.contains(pos) {
+                    (cell as! ADColorCell).isSelect = true
+                    let color = ADPhotoKitConfiguration.default.textStickerColors[i]
+                    textInputView.color = color
+                    sticker.color = color
+                }else{
+                    (cell as! ADColorCell).isSelect = false
+                }
             }
+        }else{
+            textInputView.beginInput()
         }
     }
 }
 
+extension ADTextStickerEditController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let point = gestureRecognizer.location(in: view)
+        if cancelBtn.frame.contains(point) || confirmBtn.frame.contains(point) {
+            return false
+        }
+        return true
+    }
+}
+
 extension ADTextStickerEditController {
-    
+    @objc func keyboardWillShow(_ noti: Notification) {
+        guard let userInfo = noti.userInfo else { return }
+        let duration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
+        let frame = (userInfo[UIApplication.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+        UIView.animate(withDuration: duration) {
+            self.colorsView.transform = CGAffineTransform(translationX: 0, y: tabBarOffset-frame.height)
+            self.textInputView.transform = CGAffineTransform(translationX: 0, y: (tabBarOffset-frame.height)/4)
+        }
+    }
+
+    @objc func keyboardWillHide(_ noti: Notification) {
+        guard let userInfo = noti.userInfo else { return }
+        let duration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
+        UIView.animate(withDuration: duration) {
+            self.colorsView.transform = .identity
+            self.textInputView.transform = .identity
+        }
+    }
 }

@@ -117,7 +117,7 @@ private extension ADBrowserToolBarView {
         }
         
         doneBtn = createBtn(ADLocale.LocaleKey.done.localeTextValue, #selector(doneAction))
-        doneBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x50A938)!), for: .normal)
+        doneBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x10C060)!), for: .normal)
         doneBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x323232)!), for: .disabled)
         doneBtn.layer.cornerRadius = 5
         doneBtn.layer.masksToBounds = true

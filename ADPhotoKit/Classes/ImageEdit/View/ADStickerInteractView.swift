@@ -36,10 +36,14 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         }
         if gesture.isKind(of: UITapGestureRecognizer.self) {
             if let t = target {
-                if t.isActive {
-                    t.resignActive()
+                if (gesture as! UITapGestureRecognizer).numberOfTapsRequired == 1 {
+                    if t.isActive {
+                        t.resignActive()
+                    }else{
+                        t.beginActive()
+                    }
                 }else{
-                    t.beginActive()
+                    t.doubleTapAction(ctx: ctx)
                 }
                 target = nil
                 return true
@@ -123,6 +127,8 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     public static var share = ADStickerInteractView()
+    
+    weak var ctx: UIViewController?
     
     private var clipView: UIView!
     private var container: UIView!
@@ -278,9 +284,22 @@ public class ADStickerContentView: UIView {
     
     fileprivate var internalScale: CGFloat = 1
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         layer.borderWidth = 0.5
+    }
+    
+    open func doubleTapAction(ctx: UIViewController?) {
+        
+    }
+    
+    public func sizeDidChange(_ size: CGSize) {
+        let oldCenter = center
+        let oldTrans = transform
+        transform = .identity
+        frame.size = size
+        transform = oldTrans
+        center = oldCenter
     }
     
     required init?(coder: NSCoder) {
@@ -323,14 +342,21 @@ public class ADStickerContentView: UIView {
 
 public class ADImageStickerContentView: ADStickerContentView {
     
+    var imageView: UIImageView!
+    
     public init(image: UIImage) {
         super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -10, dy: -10))
         
-        let imageView = UIImageView(image: image)
+        imageView = UIImageView(image: image)
         addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+    }
+    
+    public func updateImage(_ img: UIImage) {
+        sizeDidChange(CGSize(width: img.size.width+20, height: img.size.height+20) )
+        imageView.image = img
     }
     
     required init?(coder: NSCoder) {
@@ -338,22 +364,27 @@ public class ADImageStickerContentView: ADStickerContentView {
     }
 }
 
-class ADTextStickerContentView: ADStickerContentView {
+class ADTextStickerContentView: ADImageStickerContentView {
     
-    init(text: String) {
-        super.init(frame: .zero)
-        let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 30)
-        label.textColor = .white
-        label.numberOfLines = 0
-        label.lineBreakMode = .byCharWrapping
-        addSubview(label)
-        label.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20))
-        }
+    var sticker: ADTextSticker
+    
+    init(image: UIImage, sticker: ADTextSticker) {
+        self.sticker = sticker
+        super.init(image: image)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func doubleTapAction(ctx: UIViewController?) {
+        let sticker = ADImageEditConfigurable.textStickerEditVC(sticker: sticker)
+        sticker.textDidEdit = { [weak self] image, sticker in
+            self?.updateImage(image)
+            self?.sticker = sticker
+        }
+        sticker.modalPresentationStyle = .custom
+        sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
+        ctx?.present(sticker, animated: true, completion: nil)
     }
 }

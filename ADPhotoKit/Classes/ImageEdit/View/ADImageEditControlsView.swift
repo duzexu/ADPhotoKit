@@ -140,7 +140,7 @@ private extension ADImageEditControlsView {
         
         let confirmBtn = UIButton(type: .custom)
         confirmBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
-        confirmBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x50A938)!), for: .normal)
+        confirmBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x10C060)!), for: .normal)
         confirmBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         confirmBtn.layer.cornerRadius = 5
         confirmBtn.layer.masksToBounds = true
