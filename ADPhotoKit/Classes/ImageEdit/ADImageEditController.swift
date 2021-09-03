@@ -23,7 +23,7 @@ public struct ADImageEditTools: OptionSet {
     }
 }
 
-public struct ADEditInfo {
+public struct ADImageEditInfo {
     
     public var clipRect: CGRect?
     public var rotation: ADRotation?
@@ -53,8 +53,10 @@ public enum ADRotation: CGFloat {
 
 class ADImageEditController: UIViewController {
     
+    var imageDidEdit: ((ADImageEditInfo) -> Void)?
+    
     let image: UIImage
-    var editInfo: ADEditInfo
+    var editInfo: ADImageEditInfo
     
     var contentView: ADImageEditContentView!
     var controlsView: ADImageEditControlsView!
@@ -75,9 +77,9 @@ class ADImageEditController: UIViewController {
         }
     }
     
-    init(image: UIImage, editInfo: ADEditInfo? = nil) {
+    init(image: UIImage, editInfo: ADImageEditInfo? = nil) {
         self.image = image
-        self.editInfo = editInfo ?? ADEditInfo()
+        self.editInfo = editInfo ?? ADImageEditInfo()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -140,11 +142,14 @@ extension ADImageEditController {
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        contentView.updateClipRect(editInfo.clipRect)
+        contentView.update(clipRect: editInfo.clipRect, rotation: editInfo.rotation ?? .idle)
         
         controlsView = ADImageEditControlsView(vc: self, tools: tools)
         controlsView.contentStatus = { [weak self] lock in
             self?.contentView.scrollView.isScrollEnabled = !lock
+        }
+        controlsView.confirmActionBlock = { [weak self] in
+            self?.confirmAction()
         }
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { make in
@@ -246,19 +251,27 @@ extension ADImageEditController {
         }
     }
     
+    func confirmAction() {
+        editInfo.editImg = contentView.clipImage()
+        imageDidEdit?(editInfo)
+    }
+    
 }
 
 extension ADImageEditController: ADImageClipSource {
     func clipInfo() -> ADClipInfo {
+        defer {
+            contentView.resetZoomLevel()
+        }
         let img = contentView.editImage() ?? image
         let clipImage = contentView.clipImage() ?? image
         let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
         return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: .idle, clipImage: clipImage, clipFrom: rect)
     }
     
-    func clipRectDidConfirmed(_ rect: CGRect?) {
-        editInfo.clipRect = rect
-        contentView.updateClipRect(rect)
+    func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation) {
+        editInfo.clipRect = clipRect
+        contentView.update(clipRect: clipRect, rotation: rotation)
     }
 }
 

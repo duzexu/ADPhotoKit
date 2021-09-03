@@ -239,6 +239,11 @@ public class ADAssetModel: Equatable {
     /// Asset associte with model.
     public let asset: PHAsset
     
+    #if Module_ImageEdit
+    /// The image edit info. If not 'nil', indicate asset have been edited.
+    public var imageEditInfo: ADImageEditInfo?
+    #endif
+    
     /// Media type of asset.
     public var type: MediaType = .unknown
     

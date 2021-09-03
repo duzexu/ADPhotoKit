@@ -93,7 +93,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     func configure(with source: ADImageSource) {
         imageBrowserView.isHidden = source.isLivePhoto
         livePhotoBrowserView.isHidden = !source.isLivePhoto
-        if source.isLivePhoto {
+        if source.isLivePhoto && ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
             livePhotoBrowserView.asset = source.livePhotoAsset!
         }else{
             imageBrowserView.source = source

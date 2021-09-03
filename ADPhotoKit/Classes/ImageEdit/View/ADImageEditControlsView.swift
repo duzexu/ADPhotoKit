@@ -11,6 +11,8 @@ class ADImageEditControlsView: UIView {
     
     weak var vc: UIViewController?
     
+    var confirmActionBlock: (() -> Void)?
+    
     var contentStatus: ((Bool) -> Void)?
     
     private let tools: [ADImageEditTool]
@@ -126,7 +128,7 @@ private extension ADImageEditControlsView {
         let leftBtnItem = UIButton(type: .custom)
         leftBtnItem.contentHorizontalAlignment = .left
         leftBtnItem.setImage(Bundle.image(name: "retake", module: .imageEdit), for: .normal)
-        leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
+        leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(_:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
             let top = isPhoneX ? 2 + statusBarHeight : 2
@@ -145,7 +147,7 @@ private extension ADImageEditControlsView {
         confirmBtn.layer.cornerRadius = 5
         confirmBtn.layer.masksToBounds = true
         confirmBtn.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        confirmBtn.addTarget(self, action: #selector(confirmBtnAction(sender:)), for: .touchUpInside)
+        confirmBtn.addTarget(self, action: #selector(confirmBtnAction(_:)), for: .touchUpInside)
         confirmBtn.setContentHuggingPriority(.required, for: .horizontal)
         confirmBtn.setContentCompressionResistancePriority(.required, for: .horizontal)
         addSubview(confirmBtn)
@@ -181,13 +183,13 @@ private extension ADImageEditControlsView {
 
 extension ADImageEditControlsView {
     @objc
-    func leftBtnItemAction(sender: UIButton) {
+    func leftBtnItemAction(_ sender: UIButton) {
         vc?.navigationController?.popViewController(animated: true)
     }
     
     @objc
-    func confirmBtnAction(sender: UIButton) {
-        
+    func confirmBtnAction(_ sender: UIButton) {
+        confirmActionBlock?()
     }
 }
 

@@ -224,6 +224,13 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
             descLabel.text = format
         }
         
+        #if Module_ImageEdit
+        if let imageEdit = model.imageEditInfo?.editImg {
+            imageView.image = imageEdit
+            return
+        }
+        #endif
+        
         imageView.setAsset(model.asset, size: CGSize(width: ADAssetModel.thumbnailSize.width*UIScreen.main.scale, height: ADAssetModel.thumbnailSize.height*UIScreen.main.scale), placeholder: Bundle.image(name: "defaultphoto"))
     }
     

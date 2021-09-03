@@ -203,8 +203,11 @@ private extension ADAssetBrowserController {
                     switch edit {
                     case let .image(img):
                         #if Module_ImageEdit
-                        if let image = img {
+                        if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
                             let vc = ADImageEditController(image: image)
+                            vc.imageDidEdit = { [weak self] editInfo in
+                                
+                            }
                             navigationController?.pushViewController(vc, animated: false)
                         }
                         #endif

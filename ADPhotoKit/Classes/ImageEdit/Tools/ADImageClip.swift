@@ -23,7 +23,7 @@ struct ADClipInfo {
 protocol ADImageClipSource {
     func clipInfo() -> ADClipInfo
     
-    func clipRectDidConfirmed(_ rect: CGRect?)
+    func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation)
 }
 
 class ADImageClip: ADImageEditTool {
@@ -41,16 +41,12 @@ class ADImageClip: ADImageEditTool {
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         let clip = ADImageClipController(clipInfo: source.clipInfo())
-        clip.clipRectConfirmBlock = { [weak self] rect in
-            self?.source.clipRectDidConfirmed(rect)
+        clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
+            self?.source.clipInfoDidConfirmed(clipRect, rotation: rotation)
         }
         clip.modalPresentationStyle = .overCurrentContext
         ctx?.present(clip, animated: false, completion: nil)
         return false
-    }
-    
-    func process() -> UIImage? {
-        return nil
     }
     
     let source: ADImageClipSource

@@ -38,19 +38,6 @@ class ADImageDraw: ADImageEditTool {
         case mosaic(UIImage)
     }
     
-    func process() -> UIImage? {
-        guard let interactView = toolInteractView else {
-            return nil
-        }
-        UIGraphicsBeginImageContextWithOptions(interactView.bounds.size, false, UIScreen.main.scale)
-        if let ctx = UIGraphicsGetCurrentContext() {
-            interactView.layer.render(in: ctx)
-        }
-        let result = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return result
-    }
-    
     let style: Style
     
     init(style: Style) {

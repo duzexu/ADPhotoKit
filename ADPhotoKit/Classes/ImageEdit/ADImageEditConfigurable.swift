@@ -13,7 +13,7 @@ public protocol ImageProcessor: AnyObject {
     
 }
 
-public protocol ADImageEditTool: ImageProcessor {
+public protocol ADImageEditTool: AnyObject {
     
     var image: UIImage { get }
     var selectImage: UIImage? { get }

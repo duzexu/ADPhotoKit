@@ -11,7 +11,7 @@ class ADImageClipController: UIViewController {
     
     var clipInfo: ADClipInfo
     
-    var clipRectConfirmBlock: ((CGRect?) -> Void)?
+    var clipInfoConfirmBlock: ((CGRect?,ADRotation) -> Void)?
     
     private var scrollView: UIScrollView!
     private var contentView: UIView!
@@ -363,7 +363,7 @@ private extension ADImageClipController {
         case .cancel:
             dismiss(animated: true, completion: nil)
         case .confirm:
-            clipRectConfirmBlock?(newClipRect())
+            clipInfoConfirmBlock?(newClipRect(),clipInfo.rotation)
             dismiss(animated: true, completion: nil)
         case .revert:
             revertOrigin()

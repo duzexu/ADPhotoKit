@@ -120,11 +120,15 @@ class ADDrawInteractView: UIView, ADToolInteractable {
     func revoke() {
         switch style {
         case .line(_):
-            paths.removeLast()
+            if paths.count > 0 {
+                paths.removeLast()
+            }
             setNeedsDisplay()
         case .mosaic:
-            paths.removeLast()
-            pathMaskView?.paths = paths
+            if paths.count > 0 {
+                paths.removeLast()
+                pathMaskView?.paths = paths
+            }
         }
         lineCountChange?(paths.count)
     }
