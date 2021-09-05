@@ -17,16 +17,24 @@ public enum ADPickerStyle {
     case embed
 }
 
+/// Asset fetch result.
+public struct ADAssetResult {
+    /// Image fetch with asset. It's `nil` if `browserOpts` not contain `.fetchImage` or error occur when fetching.
+    public var image: UIImage?
+    /// Image edited by user. It can be `nil` if image is not edit.
+    public var editImg: UIImage?
+}
+
 /// Main class of ADPhotoKit UI. It provide methods to show asset picker or asset browser.
 public class ADPhotoKitUI {
     
     /// Warp of select asset.
     /// - Parameters:
     ///     - asset: Asset select from system.
-    ///     - image: Image fetch with asset. It's `nil` if `browserOpts` not contain `.fetchImage` or error occur when fetching.
+    ///     - result: Result fetch with asset.
     ///     - error: Error info when fetch error. It's not `nil` when error occur when fetching.
-    /// - Note: If `browserOpts` not contain `.fetchImage`, fetch will not perform and asset will return immediately, `image` and `error` will be `nil`.
-    public typealias Asset = (asset: PHAsset, image: UIImage?, error: Error?)
+    /// - Note: If `browserOpts` not contain `.fetchImage`, fetch will not perform and asset will return immediately, `result.image` and `error` will be `nil`.
+    public typealias Asset = (asset: PHAsset, result: ADAssetResult, error: Error?)
     /// Return select assets and if original or not.
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
     /// Return browsable asset array.
@@ -211,7 +219,7 @@ extension ADAssetListDataSource {
         var result: [ADPhotoKitUI.Asset?] = Array(repeating: nil, count: selects.count)
         var operations: [Operation] = []
         for (i,item) in selects.enumerated() {
-            let op = ADAssetOperation(model: item.asset, isOriginal: original, selectAsGif: asGif, progress: nil) { (asset) in
+            let op = ADAssetOperation(model: item, isOriginal: original, selectAsGif: asGif, progress: nil) { (asset) in
                 result[i] = asset
             }
             operations.append(op)

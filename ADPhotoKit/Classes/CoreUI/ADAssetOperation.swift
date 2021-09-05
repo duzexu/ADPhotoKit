@@ -11,7 +11,7 @@ import Kingfisher
 
 class ADAssetOperation: Operation {
     
-    let model: PHAsset
+    let model: ADSelectAssetModel
     let isOriginal: Bool
     let selectAsGif: Bool
     
@@ -30,7 +30,7 @@ class ADAssetOperation: Operation {
         didSet { didChangeValue(forKey: "isExecuting") }
     }
     
-    init(model: PHAsset,
+    init(model: ADSelectAssetModel,
          isOriginal: Bool = false,
          selectAsGif: Bool = true,
          progress: ADPhotoManager.ADAssetProgressHandler? = nil,
@@ -51,23 +51,23 @@ class ADAssetOperation: Operation {
         
         _isExecuting = true
         
-        if model.isGif && selectAsGif {
-            requestID = ADPhotoManager.fetch(for: model, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
+        if model.asset.isGif && selectAsGif {
+            requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
                 guard let strong = self else { return }
                 if let d = data as? Data {
-                    self?.completion((strong.model,KingfisherWrapper.image(data: d, options: .init()),nil))
+                    self?.completion((strong.model.asset,                    ADAssetResult(image: KingfisherWrapper.image(data: d, options: .init()), editImg: strong.model.editImage),nil))
                 }else{
                     let error = info?[PHImageErrorKey] as? NSError
-                    self?.completion((strong.model,nil,error))
+                    self?.completion((strong.model.asset,ADAssetResult(editImg: strong.model.editImage),error))
                 }
                 self?.done()
             })
         }else{
-            let size: CGSize? = isOriginal ? nil : model.browserSize
-            requestID = ADPhotoManager.fetch(for: model, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
+            let size: CGSize? = isOriginal ? nil : model.asset.browserSize
+            requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
                 guard let strong = self else { return }
                 let error = info?[PHImageErrorKey] as? NSError
-                self?.completion((strong.model,image as? UIImage,error))
+                self?.completion((strong.model.asset,ADAssetResult(image: image as? UIImage, editImg: strong.model.editImage),error))
                 self?.done()
             })
         }

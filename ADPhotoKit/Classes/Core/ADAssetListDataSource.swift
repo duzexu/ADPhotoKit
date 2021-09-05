@@ -148,6 +148,9 @@ public class ADAssetListDataSource: NSObject {
             }) == nil {
                 let selected = ADSelectAssetModel(asset: item.asset)
                 selected.index = index
+                #if Module_ImageEdit
+                selected.editImage = item.imageEditInfo?.editImg
+                #endif
                 selects.append(selected)
                 item.selectStatus = .select(index: selects.count)
             }
@@ -199,6 +202,9 @@ public class ADAssetListDataSource: NSObject {
                 let model = ADSelectAssetModel(asset: item.asset)
                 item.selectStatus = .select(index: index+1)
                 model.index = idx
+                #if Module_ImageEdit
+                model.editImage = item.imageEditInfo?.editImg
+                #endif
                 selects.append(model)
             }else{
                 item.selectStatus = .select(index: nil)
@@ -219,6 +225,19 @@ public class ADAssetListDataSource: NSObject {
             view.reloadItems(at: view.indexPathsForVisibleItems)
         }
     }
+    
+    #if Module_ImageEdit
+    /// Reload asset `imageEditInfo` when edit ended.
+    /// - Parameters:
+    ///   - info: Info contains image edit data.
+    ///   - index: Index whitch asset is update.
+    func reloadImageEditInfo(_ info: ADImageEditInfo, at index: Int) {
+        if index < list.count {
+            let item = list[index]
+            item.imageEditInfo = info
+        }
+    }
+    #endif
     
     private func scrollToBottom() {
         guard albumOpts.contains(.ascending), list.count > 0 else {

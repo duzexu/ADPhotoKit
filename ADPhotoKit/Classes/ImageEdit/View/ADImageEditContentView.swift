@@ -60,29 +60,32 @@ class ADEditContainerView: UIView {
         }
     }
     
-    func setClipRect(_ viewSize: CGSize, rect: CGRect?) {
-        let imageSize = imageView.image!.size
-        if let clip = rect {
+    func setClipRect(_ clipRect: CGRect?, rotation: ADRotation, viewSize: CGSize) {
+        let imageSize = rotation.imageSize(imageView.image!.size)
+        if let clip = clipRect {
             let ratio = viewSize.height/(clip.height*imageSize.height)
+            let rotate = CGAffineTransform(rotationAngle: rotation.rawValue/180.0*CGFloat.pi)
             let scale = CGAffineTransform(scaleX: ratio, y: ratio)
             let trans = CGAffineTransform(translationX: (0.5-clip.midX)*imageSize.width*ratio, y: (0.5-clip.midY)*imageSize.height*ratio)
-            imageView.transform = scale.concatenating(trans)
-            interactContainer.transform = scale.concatenating(trans)
+            imageView.transform = rotate.concatenating(scale.concatenating(trans))
+            interactContainer.transform = rotate.concatenating(scale.concatenating(trans))
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
             scaleRatio = ratio
             for sub in interactContainer.subviews {
-                (sub as? InteractPackage)?.clipRect = imageSize|->clip
+                (sub as? InteractPackage)?.clipRect = imageView.image!.size|->rotation.clipRect(clip)
             }
         }else{
             let ratio = viewSize.width/imageSize.width
-            imageView.transform = CGAffineTransform(scaleX: ratio, y: ratio)
-            interactContainer.transform = CGAffineTransform(scaleX: ratio, y: ratio)
+            let scale = CGAffineTransform(scaleX: ratio, y: ratio)
+            let rotate = CGAffineTransform(rotationAngle: rotation.rawValue/180.0*CGFloat.pi)
+            imageView.transform = scale.concatenating(rotate)
+            interactContainer.transform = scale.concatenating(rotate)
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
             scaleRatio = ratio
             for sub in interactContainer.subviews {
-                (sub as? InteractPackage)?.clipRect = CGRect(origin: .zero, size: imageSize)
+                (sub as? InteractPackage)?.clipRect = CGRect(origin: .zero, size: imageView.image!.size)
             }
         }
     }
@@ -156,13 +159,13 @@ class ADImageEditContentView: UIView {
     let image: UIImage
 
     var scrollView: UIScrollView!
-    var contentView: UIView!
     var container: ADEditContainerView!
     
     private var interactTools: [ADImageEditTool] = []
     private var target: ADImageEditTool?
     
     private var clipRect: CGRect?
+    private var rotation: ADRotation?
 
     init(image: UIImage, tools: [ADImageEditTool]) {
         self.image = image
@@ -183,9 +186,11 @@ class ADImageEditContentView: UIView {
     
     func update(clipRect: CGRect?, rotation: ADRotation) {
         self.clipRect = clipRect
-        let size = clipRect == nil ? image.size : image.size*clipRect!.size
+        self.rotation = rotation
+        let imageSize = rotation.imageSize(image.size)
+        let size = clipRect == nil ? imageSize : imageSize*clipRect!.size
         resizeView(pixelWidth: size.width, pixelHeight: size.height)
-        container.setClipRect(container.frame.size, rect: clipRect)
+        container.setClipRect(clipRect, rotation: rotation, viewSize: container.frame.size)
         layoutIfNeeded()
         updateClipingScreenInfo()
     }
@@ -312,23 +317,16 @@ private extension ADImageEditContentView {
             make.edges.equalToSuperview()
         }
         
-        contentView = UIView()
-        scrollView.addSubview(contentView)
-        
         container = ADEditContainerView(image: image)
-        contentView.addSubview(container)
-        container.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        scrollView.addSubview(container)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
-        layoutIfNeeded()
-        container.setClipRect(container.bounds.size, rect: nil)
+        container.setClipRect(nil, rotation: .idle, viewSize: container.bounds.size)
     }
     
     func updateClipingScreenInfo() {
         let screen = convert(bounds, to: container.interactContainer)
         let clip = container.convert(container.clipBoundsView.frame, to: container.imageView)
-        container.setClipInfo((screen,clip,scrollView.zoomScale*container.scaleRatio))
+        container.setClipInfo((screen,clip,(rotation ?? .idle),scrollView.zoomScale*container.scaleRatio))
     }
     
     func resizeView(pixelWidth: CGFloat, pixelHeight: CGFloat) {
@@ -389,19 +387,19 @@ private extension ADImageEditContentView {
             scrollView.maximumZoomScale = max(3, viewH / frame.height)
         }
         
-        contentView.frame = frame
+        container.frame = frame
         
         if UIApplication.shared.statusBarOrientation.isLandscape {
             contentSize = CGSize(width: width, height: max(viewH, frame.height))
             if frame.height < viewH {
-                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
+                container.center = CGPoint(x: viewW / 2, y: viewH / 2)
             } else {
-                contentView.frame = CGRect(origin: CGPoint(x: (viewW-frame.width)/2, y: 0), size: frame.size)
+                container.frame = CGRect(origin: CGPoint(x: (viewW-frame.width)/2, y: 0), size: frame.size)
             }
         } else {
             contentSize = frame.size
             if frame.width < viewW || frame.height < viewH {
-                contentView.center = CGPoint(x: viewW / 2, y: viewH / 2)
+                container.center = CGPoint(x: viewW / 2, y: viewH / 2)
             }
         }
         
@@ -412,17 +410,21 @@ private extension ADImageEditContentView {
 
 extension ADImageEditContentView: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return contentView
+        return container
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         let offsetX = (scrollView.frame.width > scrollView.contentSize.width) ? (scrollView.frame.width - scrollView.contentSize.width) * 0.5 : 0
         let offsetY = (scrollView.frame.height > scrollView.contentSize.height) ? (scrollView.frame.height - scrollView.contentSize.height) * 0.5 : 0
-        contentView.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY)
-        updateClipingScreenInfo()
+        container.center = CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX, y: scrollView.contentSize.height * 0.5 + offsetY)
+        if scrollView.zoomScale >= 1 {
+            updateClipingScreenInfo()
+        }
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        updateClipingScreenInfo()
+        if scrollView.zoomScale >= 1 {
+            updateClipingScreenInfo()
+        }
     }
 }

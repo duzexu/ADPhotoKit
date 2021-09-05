@@ -12,9 +12,12 @@ import Photos
 import ProgressHUD
 
 struct NetImage: ADAssetBrowsable {
+    
     var browseAsset: ADAsset {
         return .image(.network(URL(string: url)!))
     }
+    
+    var imageEditInfo: ADImageEditInfo?
     
     let url: String
 }
@@ -23,6 +26,8 @@ struct NetVideo: ADAssetBrowsable {
     var browseAsset: ADAsset {
         return .video(.network(URL(string: url)!))
     }
+    
+    var imageEditInfo: ADImageEditInfo?
     
     let url: String
 }

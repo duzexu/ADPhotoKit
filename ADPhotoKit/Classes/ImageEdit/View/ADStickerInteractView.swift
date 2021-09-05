@@ -165,6 +165,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     public func addContent(_ view: ADStickerContentView) {
         if let info = clipingScreenInfo {
             view.pinch(by: 1/info.scale)
+            view.rotate(by: -info.rotate.rawValue/180.0*CGFloat.pi)
             view.center = CGPoint(x: info.screen.midX, y: info.screen.midY)
         }else{
             view.center = CGPoint(x: bounds.width/2, y: bounds.height/2)
@@ -195,9 +196,19 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     
     func updateClipingScreenInfo() {
         if let info = clipingScreenInfo {
-            let y = info.screen.maxY - (40 + 15)/info.scale
-            trashView.center = CGPoint(x: info.screen.midX, y: y)
-            trashIdentifyTrans = CGAffineTransform(scaleX: 1/info.scale, y: 1/info.scale)
+            let scale = CGAffineTransform(scaleX: 1/info.scale, y: 1/info.scale)
+            let rotate = CGAffineTransform(rotationAngle: -info.rotate.rawValue/180*CGFloat.pi)
+            trashIdentifyTrans = rotate.concatenating(scale)
+            switch info.rotate {
+            case .idle:
+                trashView.center = CGPoint(x: info.screen.midX, y: info.screen.maxY - (40 + 15)/info.scale)
+            case .left:
+                trashView.center = CGPoint(x: info.screen.minX + (40 + 15)/info.scale, y: info.screen.midY)
+            case .right:
+                trashView.center = CGPoint(x: info.screen.maxX - (40 + 15)/info.scale, y: info.screen.midY)
+            case .down:
+                trashView.center = CGPoint(x: info.screen.midX, y: info.screen.minY + (40 + 15)/info.scale)
+            }
             for view in container.subviews {
                 let content = view as! ADStickerContentView
                 content.outerScale = info.scale

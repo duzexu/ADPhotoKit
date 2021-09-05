@@ -184,7 +184,7 @@ extension ADThumbnailViewController {
                     self?.navigationController?.dismiss(animated: true, completion: nil)
                 }
             }else{
-                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,nil,nil) }
+                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,ADAssetResult(editImg: $0.editImage),nil) }
                 ADPhotoKitUI.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
                 strong.navigationController?.dismiss(animated: true, completion: nil)
             }

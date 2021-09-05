@@ -19,7 +19,7 @@ public class ADAssetBrowserDataSource: NSObject {
     public let options: ADAssetBrowserOptions
     
     /// Assets to browser.
-    public let list: [ADAssetBrowsable]
+    public var list: [ADAssetBrowsable]
     /// Select assets.
     public var selects: [ADAssetBrowsable] = []
     /// Select asset's index.

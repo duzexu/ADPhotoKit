@@ -12,6 +12,10 @@ import Photos
 /// Represents an asset source for browser.
 public protocol ADAssetBrowsable {
     var browseAsset: ADAsset { get }
+    
+    #if Module_ImageEdit
+    var imageEditInfo: ADImageEditInfo? { set get }
+    #endif
 }
 
 /// Image asset support browser.
@@ -104,6 +108,11 @@ extension ADAssetModel: ADAssetBrowsable {
     }
 }
 
+struct ADAssetBrowsableRuntimeKey {
+    static let ImageEditInfo : UnsafeRawPointer! = UnsafeRawPointer.init(bitPattern: "ImageEditInfo:".hashValue)
+}
+
+
 extension PHAsset: ADAssetBrowsable {
     
     /// PHAsset conforms to `ADAssetBrowsable` in ADPhotoKit.
@@ -117,6 +126,18 @@ extension PHAsset: ADAssetBrowsable {
             return .image(.album(self))
         }
     }
+    
+    #if Module_ImageEdit
+    public var imageEditInfo: ADImageEditInfo? {
+        set {
+            objc_setAssociatedObject(self, ADAssetBrowsableRuntimeKey.ImageEditInfo, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+        get {
+            return objc_getAssociatedObject(self, ADAssetBrowsableRuntimeKey.ImageEditInfo) as? ADImageEditInfo
+        }
+    }
+    #endif
+    
 }
 
 extension UIImage: ADAssetBrowsable {
@@ -125,4 +146,15 @@ extension UIImage: ADAssetBrowsable {
     public var browseAsset: ADAsset {
         return .image(.local(self, UUID().uuidString))
     }
+    
+    #if Module_ImageEdit
+    public var imageEditInfo: ADImageEditInfo? {
+        set {
+            objc_setAssociatedObject(self, ADAssetBrowsableRuntimeKey.ImageEditInfo, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+        get {
+            return objc_getAssociatedObject(self, ADAssetBrowsableRuntimeKey.ImageEditInfo) as? ADImageEditInfo
+        }
+    }
+    #endif
 }

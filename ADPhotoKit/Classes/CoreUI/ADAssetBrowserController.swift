@@ -87,6 +87,14 @@ public class ADAssetBrowserController: UIViewController {
         navigationController?.dismiss(animated: true, completion: nil)
     }
     
+    #if Module_ImageEdit
+    /// Called when image edit finished.
+    open func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
+        dataSource.list[dataSource.index].imageEditInfo = info
+        collectionView.reloadData()
+    }
+    #endif
+    
     /// Indicated current asset can select or not. Subclass can override to do something.
     /// - Returns: If `true`, means you can select. Otherwise can't.
     open func canSelectWithCurrentIndex() -> Bool {
@@ -206,7 +214,7 @@ private extension ADAssetBrowserController {
                         if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
                             let vc = ADImageEditController(image: image)
                             vc.imageDidEdit = { [weak self] editInfo in
-                                
+                                self?.didImageEditInfoUpdate(editInfo)
                             }
                             navigationController?.pushViewController(vc, animated: false)
                         }
@@ -283,7 +291,15 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
         switch model.browseAsset {
         case let .image(source):
             if let imageCell = cell as? ADImageBrowserCellable {
+                #if Module_ImageEdit
+                if let editImg = model.imageEditInfo?.editImg {
+                    imageCell.configure(with: .local(editImg, UUID().uuidString))
+                }else{
+                    imageCell.configure(with: source)
+                }
+                #else
                 imageCell.configure(with: source)
+                #endif
             }
         case let .video(source):
             if let videoCell = cell as? ADVideoBrowserCellable {

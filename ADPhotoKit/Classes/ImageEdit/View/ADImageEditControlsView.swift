@@ -184,7 +184,7 @@ private extension ADImageEditControlsView {
 extension ADImageEditControlsView {
     @objc
     func leftBtnItemAction(_ sender: UIButton) {
-        vc?.navigationController?.popViewController(animated: true)
+        vc?.navigationController?.popViewController(animated: false)
     }
     
     @objc

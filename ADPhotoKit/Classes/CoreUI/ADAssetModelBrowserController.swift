@@ -28,16 +28,27 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     }
     
     override func finishSelection() {
+        didSelectsUpdate()
         if config.browserOpts.contains(.fetchImage) {
             listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: config.assetOpts.contains(.selectAsGif)) { [weak self] in
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }else{
-            let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,nil,nil) }
+            let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,ADAssetResult(editImg: $0.editImage),nil) }
             ADPhotoKitUI.config.pickerSelect?(selected, toolBarView.isOriginal)
             navigationController?.dismiss(animated: true, completion: nil)
         }
     }
+    
+    #if Module_ImageEdit
+    override func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
+        super.didImageEditInfoUpdate(info)
+        listData.reloadImageEditInfo(info, at: dataSource.index)
+        if canSelectWithCurrentIndex() {
+            dataSource.appendSelect(dataSource.index)
+        }
+    }
+    #endif
     
     override func canSelectWithCurrentIndex() -> Bool {
         let item = listData.list[dataSource.index]

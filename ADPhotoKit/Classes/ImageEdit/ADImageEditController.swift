@@ -49,6 +49,28 @@ public enum ADRotation: CGFloat {
             return .right
         }
     }
+    
+    func imageSize(_ size: CGSize) -> CGSize {
+        switch self {
+        case .idle,.down:
+            return size
+        case .left,.right:
+            return CGSize(width: size.height, height: size.width)
+        }
+    }
+    
+    func clipRect(_ rect: CGRect) -> CGRect {
+        switch self {
+        case .idle:
+            return rect
+        case .left:
+            return rect.rotateRight()
+        case .right:
+            return rect.rotateRight().rotateRight().rotateRight()
+        case .down:
+            return rect.rotateRight().rotateRight()
+        }
+    }
 }
 
 class ADImageEditController: UIViewController {
@@ -204,7 +226,18 @@ extension ADImageEditController {
     
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
-        let trans = pan.translation(in: view)
+        var trans = pan.translation(in: view)
+        let rotation = editInfo.rotation ?? .idle
+        switch rotation {
+        case .idle:
+            break
+        case .left:
+            trans = CGPoint(x: -trans.y, y: trans.x)
+        case .right:
+            trans = CGPoint(x: trans.y, y: -trans.x)
+        case .down:
+            trans = CGPoint(x: -trans.x, y: -trans.y)
+        }
         contentView.interact(with: .pan(loc: point, trans: trans), state: pan.state)
         pan.setTranslation(.zero, in: view)
         switch pan.state {
@@ -254,6 +287,7 @@ extension ADImageEditController {
     func confirmAction() {
         editInfo.editImg = contentView.clipImage()
         imageDidEdit?(editInfo)
+        navigationController?.popViewController(animated: false)
     }
     
 }
@@ -266,11 +300,12 @@ extension ADImageEditController: ADImageClipSource {
         let img = contentView.editImage() ?? image
         let clipImage = contentView.clipImage() ?? image
         let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
-        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: .idle, clipImage: clipImage, clipFrom: rect)
+        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: editInfo.rotation ?? .idle, clipImage: clipImage, clipFrom: rect)
     }
     
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation) {
         editInfo.clipRect = clipRect
+        editInfo.rotation = rotation
         contentView.update(clipRect: clipRect, rotation: rotation)
     }
 }

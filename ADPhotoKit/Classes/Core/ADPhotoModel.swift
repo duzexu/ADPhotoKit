@@ -315,6 +315,9 @@ public class ADSelectAssetModel: Equatable {
     /// Index of asset in select array.
     public var index: Int?
     
+    /// Image edited by user.
+    public var editImage: UIImage?
+    
     /// Create warp model with asset.
     /// - Parameter asset: Asset to warp.
     public init(asset: PHAsset) {

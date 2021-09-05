@@ -39,6 +39,10 @@ extension CGRect {
         return CGRect(x: minY, y: 1-maxX, width: height, height: width)
     }
     
+    func rotateRight() -> CGRect {
+        return CGRect(x: 1-maxY, y: minX, width: height, height: width)
+    }
+    
     func isApproaching(to other: CGRect) -> Bool {
         let minX = fabsf(Float(minX-other.minX)) < Float.ulpOfOne
         let minY = fabsf(Float(minY-other.minY)) < Float.ulpOfOne

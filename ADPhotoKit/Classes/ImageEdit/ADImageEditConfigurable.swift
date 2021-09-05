@@ -60,7 +60,7 @@ public enum ADInteractType {
     case rotate(angle: CGFloat, point: CGPoint)
 }
 
-public typealias ADClipingInfo = (screen: CGRect, clip: CGRect, scale: CGFloat)
+public typealias ADClipingInfo = (screen: CGRect, clip: CGRect, rotate: ADRotation, scale: CGFloat)
 
 public protocol ADToolInteractable {
     

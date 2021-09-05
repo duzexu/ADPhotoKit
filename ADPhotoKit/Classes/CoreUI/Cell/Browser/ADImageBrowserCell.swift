@@ -96,6 +96,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
         if source.isLivePhoto && ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
             livePhotoBrowserView.asset = source.livePhotoAsset!
         }else{
+            imageBrowserView.isHidden = false
             imageBrowserView.source = source
         }
     }
