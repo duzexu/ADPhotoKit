@@ -72,6 +72,19 @@ public enum ADRotation: CGFloat {
             return rect.rotateRight().rotateRight()
         }
     }
+    
+    var imageOrientation: UIImage.Orientation {
+        switch self {
+        case .idle:
+            return .up
+        case .left:
+            return .left
+        case .right:
+            return .right
+        case .down:
+            return .down
+        }
+    }
 }
 
 class ADImageEditController: UIViewController {
@@ -303,9 +316,13 @@ extension ADImageEditController {
             if editInfo.clipRect == nil {
                 editInfo.editImg = editImage
             }else{
-                let clipRect = editImage.size|->editInfo.clipRect!
+                let rotation = editInfo.rotation ?? .idle
+                let imageSize = rotation.imageSize(editImage.size)
+                let clipRect = imageSize|->editInfo.clipRect!
                 UIGraphicsBeginImageContextWithOptions(clipRect.size, true, UIScreen.main.scale)
-                editImage.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
+                let ori = editInfo.rotation?.imageOrientation ?? .up
+                let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
+                edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
                 let result = UIGraphicsGetImageFromCurrentImageContext()
                 UIGraphicsEndImageContext()
                 editInfo.editImg = result

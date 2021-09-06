@@ -10,6 +10,7 @@ import Foundation
 struct ADStickerInfo {
     let image: UIImage
     let transform: CGAffineTransform
+    let outerScale: CGFloat
     let center: CGPoint
     let sticker: ADTextSticker?
 }
@@ -87,13 +88,13 @@ class ADImageSticker: ADImageEditTool {
         case .text:
             let stkrs: [ADStickerInfo] = textStkrs.compactMap { $0.target }.map { obj in
                 let content = (obj as! ADTextStickerContentView)
-                return ADStickerInfo(image: content.image, transform: content.transform, center: content.center, sticker: content.sticker)
+                return ADStickerInfo(image: content.image, transform: content.transform, outerScale: content.outerScale, center: content.center, sticker: content.sticker)
             }
             return ["stkrs":stkrs]
         case .image:
             let stkrs: [ADStickerInfo] = imageStkrs.compactMap { $0.target }.map { obj in
                 let content = obj as! ADImageStickerContentView
-                return ADStickerInfo(image: content.image, transform: content.transform, center: content.center, sticker: nil)
+                return ADStickerInfo(image: content.image, transform: content.transform, outerScale: content.outerScale, center: content.center, sticker: nil)
             }
             return ["stkrs":stkrs]
         }
@@ -104,9 +105,23 @@ class ADImageSticker: ADImageEditTool {
             if let stkrs = json["stkrs"] as? [ADStickerInfo] {
                 switch style {
                 case .text:
-                    break
+                    for item in stkrs {
+                        let content = ADTextStickerContentView(image: item.image, sticker: item.sticker!)
+                        content.transform = item.transform
+                        content.center = item.center
+                        content.outerScale = item.outerScale
+                        textStkrs.append(ADWeakProxy(target: content))
+                        ADStickerInteractView.share.appendContent(content)
+                    }
                 case .image:
-                    break
+                    for item in stkrs {
+                        let content = ADImageStickerContentView(image: item.image)
+                        content.transform = item.transform
+                        content.center = item.center
+                        content.outerScale = item.outerScale
+                        imageStkrs.append(ADWeakProxy(target: content))
+                        ADStickerInteractView.share.appendContent(content)
+                    }
                 }
             }
         }

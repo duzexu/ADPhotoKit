@@ -90,11 +90,12 @@ public class ADAssetBrowserController: UIViewController {
     #if Module_ImageEdit
     /// Called when image edit finished.
     open func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
+        dataSource.list[dataSource.index].imageEditInfo = info
+        collectionView.reloadData()
         if !dataSource.isSelected && canSelectWithCurrentIndex() {
             dataSource.appendSelect(dataSource.index)
         }
-        dataSource.list[dataSource.index].imageEditInfo = info
-        collectionView.reloadData()
+        dataSource.selectView?.reloadData()
     }
     #endif
     

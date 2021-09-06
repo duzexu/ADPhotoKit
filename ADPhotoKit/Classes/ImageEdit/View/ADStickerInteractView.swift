@@ -291,7 +291,7 @@ public class ADStickerContentView: UIView {
     
     let maxScale: CGFloat = 10
     
-    fileprivate var outerScale: CGFloat = 1 {
+    public var outerScale: CGFloat = 1 {
         didSet {
             layer.borderWidth = 0.5 / outerScale
         }
@@ -302,6 +302,7 @@ public class ADStickerContentView: UIView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         layer.borderWidth = 0.5
+        layer.borderColor = UIColor.clear.cgColor
     }
     
     open func doubleTapAction(ctx: UIViewController?) {
