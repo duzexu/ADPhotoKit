@@ -7,13 +7,16 @@
 
 import Foundation
 
-public protocol ImageProcessor: AnyObject {
+public protocol ADImageEditToolCodable: AnyObject {
     
-    func process() -> UIImage?
+    var identifier: String { get }
     
+    func encode() -> Any?
+    
+    func decode(from: Any)
 }
 
-public protocol ADImageEditTool: AnyObject {
+public protocol ADImageEditTool: ADImageEditToolCodable {
     
     var image: UIImage { get }
     var selectImage: UIImage? { get }

@@ -66,4 +66,30 @@ class ADImageDraw: ADImageEditTool {
         toolInteractView?.isOpaque = false
     }
     
+    var identifier: String {
+        switch style {
+        case .line:
+            return "ADImageDraw-Line"
+        case .mosaic:
+            return "ADImageDraw-Mosaic"
+        }
+    }
+    
+    func encode() -> Any? {
+        if let interact = toolInteractView as? ADDrawInteractView {
+            if interact.paths.count > 0 {
+                return ["paths":interact.paths]
+            }
+        }
+        return nil
+    }
+    
+    func decode(from: Any) {
+        if let json = from as? Dictionary<String,Any> {
+            if let paths = json["paths"] as? [DrawPath] {
+                (toolInteractView as? ADDrawInteractView)?.paths = paths
+            }
+        }
+    }
+    
 }

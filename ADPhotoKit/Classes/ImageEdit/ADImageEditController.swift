@@ -27,6 +27,7 @@ public struct ADImageEditInfo {
     
     public var clipRect: CGRect?
     public var rotation: ADRotation?
+    public var toolsJson: Dictionary<String,Any>?
     
     var editImg: UIImage?
 }
@@ -144,10 +145,10 @@ extension ADImageEditController {
             if ADPhotoKitConfiguration.default.customImageStickerSelectVC == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
                 fatalError("`imageStickerDataSource` must not be `nil`")
             }
-            tools.append(ADImageSticker(style: .image([])))
+            tools.append(ADImageSticker(style: .image))
         }
         if tool.contains(.textStkr) {
-            tools.append(ADImageSticker(style: .text([])))
+            tools.append(ADImageSticker(style: .text))
         }
         if tool.contains(.clip) {
             tools.append(ADImageClip(source: self))
@@ -164,7 +165,7 @@ extension ADImageEditController {
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        contentView.update(clipRect: editInfo.clipRect, rotation: editInfo.rotation ?? .idle)
+        contentView.update(clipRect: nil, rotation: .idle)
         
         controlsView = ADImageEditControlsView(vc: self, tools: tools)
         controlsView.contentStatus = { [weak self] lock in
@@ -176,6 +177,14 @@ extension ADImageEditController {
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        if let json = editInfo.toolsJson {
+            for tool in controlsView.tools {
+                if let data = json[tool.identifier] {
+                    tool.decode(from: data)
+                }
+            }
         }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
@@ -285,7 +294,23 @@ extension ADImageEditController {
     }
     
     func confirmAction() {
-        editInfo.editImg = contentView.clipImage()
+        var json = Dictionary<String,Any>()
+        for tool in controlsView.tools {
+            json[tool.identifier] = tool.encode()
+        }
+        editInfo.toolsJson = json
+        if let editImage = contentView.editImage() {
+            if editInfo.clipRect == nil {
+                editInfo.editImg = editImage
+            }else{
+                let clipRect = editImage.size|->editInfo.clipRect!
+                UIGraphicsBeginImageContextWithOptions(clipRect.size, true, UIScreen.main.scale)
+                editImage.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
+                let result = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                editInfo.editImg = result
+            }
+        }
         imageDidEdit?(editInfo)
         navigationController?.popViewController(animated: false)
     }
@@ -293,14 +318,14 @@ extension ADImageEditController {
 }
 
 extension ADImageEditController: ADImageClipSource {
-    func clipInfo() -> ADClipInfo {
+    func clipSource() -> ADClipSource {
         defer {
             contentView.resetZoomLevel()
         }
         let img = contentView.editImage() ?? image
         let clipImage = contentView.clipImage() ?? image
         let rect = contentView.scrollView.convert(contentView.container.frame, to: view)
-        return ADClipInfo(image: img, clipRect: editInfo.clipRect, rotation: editInfo.rotation ?? .idle, clipImage: clipImage, clipFrom: rect)
+        return ADClipSource(image: img, clipImage: clipImage, clipFrom: rect)
     }
     
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation) {

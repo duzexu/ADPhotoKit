@@ -9,7 +9,7 @@ import UIKit
 
 class ADWeakProxy: NSObject {
     
-    private weak var target: NSObjectProtocol?
+    weak var target: NSObjectProtocol?
     
     init(target: NSObjectProtocol) {
         self.target = target

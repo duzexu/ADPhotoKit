@@ -11,10 +11,6 @@ import ADPhotoKit
 
 class ImageBrowserCell: UICollectionViewCell, ADImageBrowserCellConfigurable {
     
-    var editData: ADAssetEditData? {
-        return nil
-    }
-    
     func configure(with source: ADImageSource) {
         switch source {
         case let .network(url):

@@ -44,9 +44,6 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     override func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
         super.didImageEditInfoUpdate(info)
         listData.reloadImageEditInfo(info, at: dataSource.index)
-        if canSelectWithCurrentIndex() {
-            dataSource.appendSelect(dataSource.index)
-        }
     }
     #endif
     

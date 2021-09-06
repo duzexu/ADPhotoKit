@@ -173,6 +173,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         container.addSubview(view)
         view.beginActive()
     }
+    
+    public func appendContent(_ view: ADStickerContentView) {
+        container.addSubview(view)
+    }
         
     func presentTrashView() {
         guard trashView.isHidden else {
@@ -353,9 +357,12 @@ public class ADStickerContentView: UIView {
 
 public class ADImageStickerContentView: ADStickerContentView {
     
+    let image: UIImage
+    
     var imageView: UIImageView!
     
     public init(image: UIImage) {
+        self.image = image
         super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -10, dy: -10))
         
         imageView = UIImageView(image: image)

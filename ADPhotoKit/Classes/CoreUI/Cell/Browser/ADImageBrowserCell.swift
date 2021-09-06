@@ -54,14 +54,6 @@ extension ADImageSource {
 /// Cell for browse image asset in browser controller.
 class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     
-    override var editData: ADAssetEditData? {
-        if !imageBrowserView.isHidden {
-            return .image(imageBrowserView.imageView.image)
-        }else{
-            return .image(livePhotoBrowserView.imageView.image)
-        }
-    }
-    
     var imageBrowserView: ADImageBrowserView!
     
     var livePhotoBrowserView: ADLivePhotoBrowserView!

@@ -7,21 +7,14 @@
 
 import Foundation
 
-struct ADClipInfo {
+struct ADClipSource {
     let image: UIImage
-    var clipRect: CGRect?
-    var rotation: ADRotation
-    
     let clipImage: UIImage
     let clipFrom: CGRect
-    
-    var isOrigin: Bool {
-        return clipRect == nil && rotation == .idle
-    }
 }
 
 protocol ADImageClipSource {
-    func clipInfo() -> ADClipInfo
+    func clipSource() -> ADClipSource
     
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation)
 }
@@ -40,8 +33,12 @@ class ADImageClip: ADImageEditTool {
     var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
-        let clip = ADImageClipController(clipInfo: source.clipInfo())
+        let dourceInfo = source.clipSource()
+        let info = ADClipInfo(image: dourceInfo.image, clipRect: clipRect, rotation: rotation, clipImage: dourceInfo.clipImage, clipFrom: dourceInfo.clipFrom)
+        let clip = ADImageClipController(clipInfo: info)
         clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
+            self?.clipRect = clipRect
+            self?.rotation = rotation
             self?.source.clipInfoDidConfirmed(clipRect, rotation: rotation)
         }
         clip.modalPresentationStyle = .overCurrentContext
@@ -51,8 +48,38 @@ class ADImageClip: ADImageEditTool {
     
     let source: ADImageClipSource
     
+    var clipRect: CGRect? = nil
+    var rotation: ADRotation = .idle
+    
+    var isOrigin: Bool {
+        return clipRect == nil && rotation == .idle
+    }
+    
     init(source: ADImageClipSource) {
         self.source = source
+    }
+    
+    var identifier: String {
+        return "ADImageClip"
+    }
+    
+    func encode() -> Any? {
+        if !isOrigin {
+            if clipRect == nil {
+                return ["rotation":rotation]
+            }else{
+                return ["clipRect":clipRect!,"rotation":rotation]
+            }
+        }
+        return nil
+    }
+    
+    func decode(from: Any) {
+        if let json = from as? Dictionary<String,Any> {
+            clipRect = json["clipRect"] as? CGRect
+            rotation = json["rotation"] as? ADRotation ?? .idle
+        }
+        source.clipInfoDidConfirmed(clipRect, rotation: rotation)
     }
     
 }

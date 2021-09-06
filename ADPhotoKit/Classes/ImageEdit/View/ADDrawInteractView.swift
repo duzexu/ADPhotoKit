@@ -37,7 +37,12 @@ class ADDrawInteractView: UIView, ADToolInteractable {
     
     let style: Style
         
-    var paths: [DrawPath] = []
+    var paths: [DrawPath] = [] {
+        didSet {
+            setNeedsDisplay()
+            pathMaskView?.paths = paths
+        }
+    }
     
     var pathMaskView: MaskView?
     

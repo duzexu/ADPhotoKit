@@ -90,6 +90,9 @@ public class ADAssetBrowserController: UIViewController {
     #if Module_ImageEdit
     /// Called when image edit finished.
     open func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
+        if !dataSource.isSelected && canSelectWithCurrentIndex() {
+            dataSource.appendSelect(dataSource.index)
+        }
         dataSource.list[dataSource.index].imageEditInfo = info
         collectionView.reloadData()
     }
@@ -206,25 +209,37 @@ private extension ADAssetBrowserController {
         }
         
         func editAssetAction() {
-            if let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as? ADBrowserBaseCell {
-                if let edit = cell.editData {
-                    switch edit {
-                    case let .image(img):
-                        #if Module_ImageEdit
-                        if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
-                            let vc = ADImageEditController(image: image)
-                            vc.imageDidEdit = { [weak self] editInfo in
-                                self?.didImageEditInfoUpdate(editInfo)
-                            }
-                            navigationController?.pushViewController(vc, animated: false)
-                        }
-                        #endif
-                        break
-                    case .video(_):
-                        break
+            switch dataSource.current.browseAsset {
+            case let .image(imageSource):
+                switch imageSource {
+                case let .network(url):
+                    KingfisherManager.shared.retrieveImage(with: url) { result in
+                        let img = try? result.get().image
+                        editImage(img)
                     }
+                case let .album(asset):
+                    ADPhotoManager.fetchImage(for: asset, synchronous: true) { img, _, _ in
+                        editImage(img)
+                    }
+                case let .local(img, _):
+                    editImage(img)
                 }
+                break
+            case .video(_):
+                break
             }
+        }
+        
+        func editImage(_ img: UIImage?) {
+            #if Module_ImageEdit
+            if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
+                let vc = ADImageEditController(image: image, editInfo: dataSource.current.imageEditInfo)
+                vc.imageDidEdit = { [weak self] editInfo in
+                    self?.didImageEditInfoUpdate(editInfo)
+                }
+                navigationController?.pushViewController(vc, animated: false)
+            }
+            #endif
         }
         
         toolBarView.editActionBlock = {

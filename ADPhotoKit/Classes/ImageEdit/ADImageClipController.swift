@@ -7,6 +7,19 @@
 
 import UIKit
 
+struct ADClipInfo {
+    let image: UIImage
+    var clipRect: CGRect?
+    var rotation: ADRotation
+    
+    let clipImage: UIImage
+    let clipFrom: CGRect
+    
+    var isOrigin: Bool {
+        return clipRect == nil && rotation == .idle
+    }
+}
+
 class ADImageClipController: UIViewController {
     
     var clipInfo: ADClipInfo

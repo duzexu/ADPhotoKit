@@ -9,13 +9,13 @@ import UIKit
 
 class ADImageEditControlsView: UIView {
     
+    let tools: [ADImageEditTool]
     weak var vc: UIViewController?
     
     var confirmActionBlock: (() -> Void)?
     
     var contentStatus: ((Bool) -> Void)?
     
-    private let tools: [ADImageEditTool]
     private var selectToolIndex: Int? {
         didSet {
             if let new = selectToolIndex {

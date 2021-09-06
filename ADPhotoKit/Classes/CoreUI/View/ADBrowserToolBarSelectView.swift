@@ -94,7 +94,15 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
         
         if let selects = dataSource?.selects {
             let asset = selects[indexPath.row]
+            #if Module_ImageEdit
+            if let editImg = asset.imageEditInfo?.editImg {
+                cell.configure(with: editImg)
+            }else{
+                cell.configure(with: asset)
+            }
+            #else
             cell.configure(with: asset)
+            #endif
             if asset.browseAsset == dataSource?.current.browseAsset {
                 cell.layer.borderWidth = 4
             }else{

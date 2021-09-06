@@ -7,13 +7,20 @@
 
 import Foundation
 
+struct ADStickerInfo {
+    let image: UIImage
+    let transform: CGAffineTransform
+    let center: CGPoint
+    let sticker: ADTextSticker?
+}
+
 class ADImageSticker: ADImageEditTool {
     
     var image: UIImage {
         switch style {
-        case .text(_):
+        case .text:
             return Bundle.image(name: "textSticker", module: .imageEdit) ?? UIImage()
-        case .image(_):
+        case .image:
             return Bundle.image(name: "imageSticker", module: .imageEdit) ?? UIImage()
         }
     }
@@ -25,21 +32,26 @@ class ADImageSticker: ADImageEditTool {
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
     
+    private var textStkrs: [ADWeakProxy] = []
+    private var imageStkrs: [ADWeakProxy] = []
+    
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
-        case .text(_):
+        case .text:
             let sticker = ADImageEditConfigurable.textStickerEditVC(sticker: nil)
-            sticker.textDidEdit = { image, sticker in
+            sticker.textDidEdit = { [weak self] image, sticker in
                 let content = ADTextStickerContentView(image: image, sticker: sticker)
+                self?.textStkrs.append(ADWeakProxy(target: content))
                 ADStickerInteractView.share.addContent(content)
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
             ctx?.present(sticker, animated: true, completion: nil)
-        case .image(_):
+        case .image:
             let sticker = ADImageEditConfigurable.imageStickerSelectVC()
-            sticker.imageDidSelect = { image in
+            sticker.imageDidSelect = { [weak self] image in
                 let content = ADImageStickerContentView(image: image)
+                self?.imageStkrs.append(ADWeakProxy(target: content))
                 ADStickerInteractView.share.addContent(content)
             }
             sticker.modalPresentationStyle = .custom
@@ -50,8 +62,8 @@ class ADImageSticker: ADImageEditTool {
     }
     
     enum Style {
-        case text([UIColor])
-        case image([UIImage])
+        case text
+        case image
     }
     
     let style: Style
@@ -59,6 +71,45 @@ class ADImageSticker: ADImageEditTool {
     init(style: Style) {
         self.style = style
         toolInteractView = ADStickerInteractView.share
+    }
+    
+    var identifier: String {
+        switch style {
+        case .text:
+            return "ADImageSticker-Text"
+        case .image:
+            return "ADImageSticker-Image"
+        }
+    }
+    
+    func encode() -> Any? {
+        switch style {
+        case .text:
+            let stkrs: [ADStickerInfo] = textStkrs.compactMap { $0.target }.map { obj in
+                let content = (obj as! ADTextStickerContentView)
+                return ADStickerInfo(image: content.image, transform: content.transform, center: content.center, sticker: content.sticker)
+            }
+            return ["stkrs":stkrs]
+        case .image:
+            let stkrs: [ADStickerInfo] = imageStkrs.compactMap { $0.target }.map { obj in
+                let content = obj as! ADImageStickerContentView
+                return ADStickerInfo(image: content.image, transform: content.transform, center: content.center, sticker: nil)
+            }
+            return ["stkrs":stkrs]
+        }
+    }
+    
+    func decode(from: Any) {
+        if let json = from as? Dictionary<String,Any> {
+            if let stkrs = json["stkrs"] as? [ADStickerInfo] {
+                switch style {
+                case .text:
+                    break
+                case .image:
+                    break
+                }
+            }
+        }
     }
     
 }

@@ -11,11 +11,7 @@ import AVFoundation
 
 /// Cell for browse video asset in browser controller.
 class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
-    
-    override var editData: ADAssetEditData? {
-        return nil
-    }
-        
+      
     var player: AVPlayer?
     var playerLayer: AVPlayerLayer!
     
