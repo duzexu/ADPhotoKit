@@ -227,6 +227,8 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
         #if Module_ImageEdit
         if let imageEdit = model.imageEditInfo?.editImg {
             imageView.image = imageEdit
+            bottomMaskView.isHidden = false
+            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
             return
         }
         #endif

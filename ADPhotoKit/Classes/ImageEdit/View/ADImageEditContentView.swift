@@ -196,7 +196,7 @@ class ADImageEditContentView: UIView {
     }
     
     func editImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(image.size, false, 1)
         image.draw(in: CGRect(origin: .zero, size: image.size))
         container.interactContainerImage()?.draw(in: CGRect(origin: .zero, size: image.size))
         let result = UIGraphicsGetImageFromCurrentImageContext()

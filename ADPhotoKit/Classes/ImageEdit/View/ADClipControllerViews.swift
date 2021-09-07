@@ -42,7 +42,7 @@ class ADClipToolBarView: UIView {
         }
         
         let cancelBtn = UIButton(type: .custom)
-        cancelBtn.setImage(Bundle.image(name: "close", module: .imageEdit), for: .normal)
+        cancelBtn.setImage(Bundle.image(name: "icons_filled_close", module: .imageEdit), for: .normal)
         cancelBtn.addTarget(self, action: #selector(cancelBtnAction), for: .touchUpInside)
         addSubview(cancelBtn)
         cancelBtn.snp.makeConstraints { make in
@@ -66,7 +66,7 @@ class ADClipToolBarView: UIView {
         }
         
         let doneBtn = UIButton(type: .custom)
-        doneBtn.setImage(Bundle.image(name: "confirm", module: .imageEdit), for: .normal)
+        doneBtn.setImage(Bundle.image(name: "icons_filled_done", module: .imageEdit), for: .normal)
         doneBtn.addTarget(self, action: #selector(confirmBtnAction), for: .touchUpInside)
         addSubview(doneBtn)
         doneBtn.snp.makeConstraints { make in
@@ -76,7 +76,7 @@ class ADClipToolBarView: UIView {
         }
         
         rotateBtn = UIButton(type: .custom)
-        rotateBtn.setImage(Bundle.image(name: "rotateimage", module: .imageEdit), for: .normal)
+        rotateBtn.setImage(Bundle.image(name: "icons_outlined_rotate", module: .imageEdit), for: .normal)
         rotateBtn.addTarget(self, action: #selector(rotateBtnAction), for: .touchUpInside)
         addSubview(rotateBtn)
         rotateBtn.snp.makeConstraints { make in

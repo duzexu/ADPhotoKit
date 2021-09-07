@@ -57,4 +57,17 @@ extension UIImage {
 
         return result ?? self
     }
+    
+    func resize(to size: CGSize, mode: UIView.ContentMode) -> UIImage? {
+        if self.size.width < size.width  && self.size.height < size.height {
+            return self
+        }
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
+        let fitRect = CGRect(x: 0, y: 0, width: size.width, height: size.height).rectFit(with: self.size, mode: mode)
+        self.draw(in: fitRect)
+        let ret = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return ret
+    }
+    
 }

@@ -22,7 +22,7 @@ protocol ADImageClipSource {
 class ADImageClip: ADImageEditTool {
     
     var image: UIImage {
-        return Bundle.image(name: "clip", module: .imageEdit) ?? UIImage()
+        return Bundle.image(name: "icons_filled_clip", module: .imageEdit) ?? UIImage()
     }
     
     var isSelected: Bool = false

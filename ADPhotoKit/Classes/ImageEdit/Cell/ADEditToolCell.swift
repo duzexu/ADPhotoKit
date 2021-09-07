@@ -14,6 +14,7 @@ class ADEditToolCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         iconImageView = UIImageView(frame: .zero)
+        iconImageView.contentMode = .center
         contentView.addSubview(iconImageView)
         iconImageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

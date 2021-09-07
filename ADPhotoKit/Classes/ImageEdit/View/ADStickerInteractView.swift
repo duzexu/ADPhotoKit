@@ -256,12 +256,11 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 make.edges.equalToSuperview()
             }
             
-            imageView = UIImageView(image: Bundle.image(name: "ashbin", module: .imageEdit), highlightedImage: Bundle.image(name: "ashbin_open", module: .imageEdit))
+            imageView = UIImageView(image: Bundle.image(name: "icons_filled_delete", module: .imageEdit), highlightedImage: Bundle.image(name: "icons_filled_delete_on", module: .imageEdit))
             addSubview(imageView)
             imageView.snp.makeConstraints { make in
-                make.top.equalToSuperview().offset(15)
+                make.top.equalToSuperview().offset(18)
                 make.centerX.equalToSuperview()
-                make.size.equalTo(CGSize(width: 25, height: 25))
             }
             tipsLabel = UILabel()
             tipsLabel.textAlignment = .center

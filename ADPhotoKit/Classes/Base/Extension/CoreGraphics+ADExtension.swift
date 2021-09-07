@@ -51,6 +51,51 @@ extension CGRect {
         return (minX && minY && width && height)
     }
     
+    func rectFit(with size: CGSize, mode: UIView.ContentMode) -> CGRect {
+        let stdRect = self.standardized
+        let center = CGPoint(x: stdRect.midX, y: stdRect.midY)
+        var ret: CGRect = .zero
+        switch mode {
+        case .scaleAspectFit,.scaleAspectFill:
+            var scale: CGFloat = 0
+            if mode == .scaleAspectFit {
+                if (size.width / size.height < stdRect.size.width / stdRect.size.height) {
+                    scale = stdRect.size.height / size.height;
+                } else {
+                    scale = stdRect.size.width / size.width;
+                }
+            }else{
+                if (size.width / size.height < stdRect.size.width / stdRect.size.height) {
+                    scale = stdRect.size.width / size.width;
+                } else {
+                    scale = stdRect.size.height / size.height;
+                }
+                ret.size = CGSize(width: size.width * scale, height: size.height * scale)
+                ret.origin = CGPoint(x: center.x - ret.size.width * 0.5, y: center.y - ret.size.height * 0.5)
+            }
+        case .center:
+            ret.size = size
+            ret.origin = CGPoint(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5)
+        case .top:
+            ret.size = size
+            ret.origin.x = center.x - size.width * 0.5
+        case .bottom:
+            ret.size = size
+            ret.origin = CGPoint(x: center.x - size.width * 0.5, y: self.size.height - size.height)
+        case .left:
+            ret.size = size
+            ret.origin.y = center.y - size.height * 0.5
+        case .right:
+            ret.size = size
+            ret.origin = CGPoint(x: self.size.width - size.width, y: center.y - size.height * 0.5)
+        case .scaleToFill,.redraw:
+            ret = stdRect
+        default:
+            ret = stdRect
+        }
+        return ret
+    }
+    
 }
 
 extension CGFloat {

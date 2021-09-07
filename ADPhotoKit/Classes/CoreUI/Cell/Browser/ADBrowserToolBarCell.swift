@@ -53,6 +53,13 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
     func configure(with model: ADAssetBrowsable) {
         tagImageView.isHidden = true
         tagLabel.isHidden = true
+        #if Module_ImageEdit
+        if model.imageEditInfo != nil {
+            imageView.image = model.imageEditInfo?.editImg
+            tagImageView.isHidden = false
+            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+        }
+        #endif
         switch model.browseAsset {
         case let .image(source):
             switch source {
@@ -82,7 +89,6 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
                 imageView.setVideoUrlAsset(url)
             }
         }
-        
     }
     
 }

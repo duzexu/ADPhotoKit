@@ -319,7 +319,7 @@ extension ADImageEditController {
                 let rotation = editInfo.rotation ?? .idle
                 let imageSize = rotation.imageSize(editImage.size)
                 let clipRect = imageSize|->editInfo.clipRect!
-                UIGraphicsBeginImageContextWithOptions(clipRect.size, true, UIScreen.main.scale)
+                UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
                 let ori = editInfo.rotation?.imageOrientation ?? .up
                 let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
                 edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))

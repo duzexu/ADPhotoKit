@@ -52,7 +52,7 @@ class ADDrawColorsView: UIView, ADToolConfigable {
         
         revokeBtn = UIButton(type: .custom)
         revokeBtn.isEnabled = false
-        revokeBtn.setImage(Bundle.image(name: "revoke", module: .imageEdit), for: .normal)
+        revokeBtn.setImage(Bundle.image(name: "icons_filled_previous", module: .imageEdit), for: .normal)
         
         for (i,color) in colors.enumerated() {
             let cell = ADColorCell(color: color)

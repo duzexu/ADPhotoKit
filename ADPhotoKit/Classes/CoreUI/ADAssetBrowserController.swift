@@ -210,20 +210,21 @@ private extension ADAssetBrowserController {
         }
         
         func editAssetAction() {
+            let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
             switch dataSource.current.browseAsset {
             case let .image(imageSource):
                 switch imageSource {
                 case let .network(url):
                     KingfisherManager.shared.retrieveImage(with: url) { result in
                         let img = try? result.get().image
-                        editImage(img)
+                        editImage(img?.resize(to: maxSize, mode: .scaleAspectFit))
                     }
                 case let .album(asset):
-                    ADPhotoManager.fetchImage(for: asset, synchronous: true) { img, _, _ in
+                    ADPhotoManager.fetchImage(for: asset, size: maxSize, synchronous: true) { img, _, _ in
                         editImage(img)
                     }
                 case let .local(img, _):
-                    editImage(img)
+                    editImage(img.resize(to: maxSize, mode: .scaleAspectFit))
                 }
                 break
             case .video(_):

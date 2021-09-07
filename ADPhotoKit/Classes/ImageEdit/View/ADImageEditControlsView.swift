@@ -127,7 +127,7 @@ private extension ADImageEditControlsView {
         
         let leftBtnItem = UIButton(type: .custom)
         leftBtnItem.contentHorizontalAlignment = .left
-        leftBtnItem.setImage(Bundle.image(name: "retake", module: .imageEdit), for: .normal)
+        leftBtnItem.setImage(Bundle.image(name: "icons_filled_previous2", module: .imageEdit), for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(_:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in

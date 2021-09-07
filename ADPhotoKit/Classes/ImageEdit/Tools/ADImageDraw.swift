@@ -56,12 +56,12 @@ class ADImageDraw: ADImageEditTool {
             }
             toolInteractView = interact
             toolConfigView = colorSelect
-            image = Bundle.image(name: "drawLine", module: .imageEdit) ?? UIImage()
-            selectImage = Bundle.image(name: "drawLine_selected", module: .imageEdit)
+            image = Bundle.image(name: "icons_filled_pencil3", module: .imageEdit) ?? UIImage()
+            selectImage = Bundle.image(name: "icons_filled_pencil3_on", module: .imageEdit)
         case let .mosaic(img):
             toolInteractView = ADDrawInteractView(style: .mosaic(img))
-            image = Bundle.image(name: "mosaic", module: .imageEdit) ?? UIImage()
-            selectImage = Bundle.image(name: "mosaic_selected", module: .imageEdit)
+            image = Bundle.image(name: "icons_filled_mosaic", module: .imageEdit) ?? UIImage()
+            selectImage = Bundle.image(name: "icons_filled_mosaic_on", module: .imageEdit)
         }
         toolInteractView?.isOpaque = false
     }
@@ -89,6 +89,12 @@ class ADImageDraw: ADImageEditTool {
             if let paths = json["paths"] as? [DrawPath] {
                 (toolInteractView as? ADDrawInteractView)?.paths = paths
             }
+        }
+        switch style {
+        case .line:
+            (toolConfigView as? ADDrawColorsView)?.lineCount = 0
+        case .mosaic:
+            break
         }
     }
     

@@ -20,9 +20,9 @@ class ADImageSticker: ADImageEditTool {
     var image: UIImage {
         switch style {
         case .text:
-            return Bundle.image(name: "textSticker", module: .imageEdit) ?? UIImage()
+            return Bundle.image(name: "icons_filled_text2", module: .imageEdit) ?? UIImage()
         case .image:
-            return Bundle.image(name: "imageSticker", module: .imageEdit) ?? UIImage()
+            return Bundle.image(name: "icons_filled_sticker", module: .imageEdit) ?? UIImage()
         }
     }
     
