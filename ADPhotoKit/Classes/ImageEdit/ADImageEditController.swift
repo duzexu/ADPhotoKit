@@ -25,11 +25,13 @@ public struct ADImageEditTools: OptionSet {
 
 public struct ADImageEditInfo {
     
-    public var clipRect: CGRect?
-    public var rotation: ADRotation?
     public var toolsJson: Dictionary<String,Any>?
     
-    var editImg: UIImage?
+    public var editImg: UIImage?
+    
+    var clipRect: CGRect?
+    var rotation: ADRotation?
+    
 }
 
 public enum ADRotation: CGFloat {
@@ -119,10 +121,6 @@ class ADImageEditController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    deinit {
-        print("[deinit]ADImageEditController")
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -201,12 +199,13 @@ extension ADImageEditController {
         }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
+        singleTap.delegate = self
         view.addGestureRecognizer(singleTap)
         
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(_:)))
         doubleTap.numberOfTapsRequired = 2
+        doubleTap.delegate = self
         view.addGestureRecognizer(doubleTap)
-        singleTap.require(toFail: doubleTap)
 
         let panGes = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
         panGes.delegate = self
@@ -313,15 +312,15 @@ extension ADImageEditController {
         }
         editInfo.toolsJson = json
         if let editImage = contentView.editImage() {
+            let ori = editInfo.rotation?.imageOrientation ?? .up
+            let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
             if editInfo.clipRect == nil {
-                editInfo.editImg = editImage
+                editInfo.editImg = edit
             }else{
                 let rotation = editInfo.rotation ?? .idle
                 let imageSize = rotation.imageSize(editImage.size)
                 let clipRect = imageSize|->editInfo.clipRect!
                 UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
-                let ori = editInfo.rotation?.imageOrientation ?? .up
-                let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
                 edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
                 let result = UIGraphicsGetImageFromCurrentImageContext()
                 UIGraphicsEndImageContext()
@@ -366,6 +365,9 @@ extension ADImageEditController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if contentView.scrollView.isZooming {
             return false
+        }
+        if gestureRecognizer.isKind(of: UITapGestureRecognizer.self) {
+            return true
         }
         let point = gestureRecognizer.location(in: view)
         return contentView.gestureShouldBegin(gestureRecognizer, point: point)

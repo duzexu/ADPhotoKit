@@ -124,13 +124,13 @@ public class ADThumbnailViewController: UIViewController {
     
     func reloadAlbum(_ album: ADAlbumModel, initial: Bool) {
         if initial {
-            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
             dataSource.selectAssetChanged = { [weak self] count in
                 self?.toolBarView.selectCount = count
             }
         }else{
             let selected = dataSource.selects.map { $0.asset }
-            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, select: selected, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selected, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
             dataSource.selectAssetChanged = { [weak self] count in
                 self?.toolBarView.selectCount = count
             }
@@ -184,7 +184,7 @@ extension ADThumbnailViewController {
                     self?.navigationController?.dismiss(animated: true, completion: nil)
                 }
             }else{
-                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,ADAssetResult(editImg: $0.editImage),nil) }
+                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
                 ADPhotoKitUI.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
                 strong.navigationController?.dismiss(animated: true, completion: nil)
             }

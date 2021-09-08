@@ -119,6 +119,9 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     public func willBeginRenderImage() {
+        for item in container.subviews {
+            (item as! ADStickerContentView).resignActive()
+        }
         clipView.clipsToBounds = false
     }
     

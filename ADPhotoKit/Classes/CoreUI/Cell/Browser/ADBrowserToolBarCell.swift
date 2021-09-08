@@ -58,6 +58,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
             imageView.image = model.imageEditInfo?.editImg
             tagImageView.isHidden = false
             tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+            return
         }
         #endif
         switch model.browseAsset {

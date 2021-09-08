@@ -315,8 +315,10 @@ public class ADSelectAssetModel: Equatable {
     /// Index of asset in select array.
     public var index: Int?
     
-    /// Image edited by user.
-    public var editImage: UIImage?
+    #if Module_ImageEdit
+    /// Image edited info.
+    public var imageEditInfo: ADImageEditInfo?
+    #endif
     
     /// Create warp model with asset.
     /// - Parameter asset: Asset to warp.
@@ -327,6 +329,18 @@ public class ADSelectAssetModel: Equatable {
     
     public static func == (lhs: ADSelectAssetModel, rhs: ADSelectAssetModel) -> Bool {
         return lhs.identifier == rhs.identifier
+    }
+    
+    func result(with image: UIImage?) -> ADAssetResult? {
+        #if Module_ImageEdit
+        return ADAssetResult(image: image, imageEditInfo: imageEditInfo)
+        #else
+        if let img = image {
+            return ADAssetResult(image: img)
+        }else{
+            return nil
+        }
+        #endif
     }
     
 }

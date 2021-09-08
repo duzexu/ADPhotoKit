@@ -34,7 +34,7 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }else{
-            let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,ADAssetResult(editImg: $0.editImage),nil) }
+            let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
             ADPhotoKitUI.config.pickerSelect?(selected, toolBarView.isOriginal)
             navigationController?.dismiss(animated: true, completion: nil)
         }

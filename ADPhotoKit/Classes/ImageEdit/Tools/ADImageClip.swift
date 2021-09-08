@@ -13,7 +13,7 @@ struct ADClipSource {
     let clipFrom: CGRect
 }
 
-protocol ADImageClipSource {
+protocol ADImageClipSource: AnyObject {
     func clipSource() -> ADClipSource
     
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation)
@@ -33,20 +33,21 @@ class ADImageClip: ADImageEditTool {
     var toolInteractView: (UIView & ADToolInteractable)?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
-        let dourceInfo = source.clipSource()
-        let info = ADClipInfo(image: dourceInfo.image, clipRect: clipRect, rotation: rotation, clipImage: dourceInfo.clipImage, clipFrom: dourceInfo.clipFrom)
-        let clip = ADImageClipController(clipInfo: info)
-        clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
-            self?.clipRect = clipRect
-            self?.rotation = rotation
-            self?.source.clipInfoDidConfirmed(clipRect, rotation: rotation)
+        if let sourceInfo = source?.clipSource() {
+            let info = ADClipInfo(image: sourceInfo.image, clipRect: clipRect, rotation: rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
+            let clip = ADImageClipController(clipInfo: info)
+            clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
+                self?.clipRect = clipRect
+                self?.rotation = rotation
+                self?.source?.clipInfoDidConfirmed(clipRect, rotation: rotation)
+            }
+            clip.modalPresentationStyle = .overCurrentContext
+            ctx?.present(clip, animated: false, completion: nil)
         }
-        clip.modalPresentationStyle = .overCurrentContext
-        ctx?.present(clip, animated: false, completion: nil)
         return false
     }
     
-    let source: ADImageClipSource
+    weak var source: ADImageClipSource?
     
     var clipRect: CGRect? = nil
     var rotation: ADRotation = .idle
@@ -79,7 +80,7 @@ class ADImageClip: ADImageEditTool {
             clipRect = json["clipRect"] as? CGRect
             rotation = json["rotation"] as? ADRotation ?? .idle
         }
-        source.clipInfoDidConfirmed(clipRect, rotation: rotation)
+        source?.clipInfoDidConfirmed(clipRect, rotation: rotation)
     }
     
 }

@@ -209,43 +209,8 @@ private extension ADAssetBrowserController {
             make.edges.equalToSuperview()
         }
         
-        func editAssetAction() {
-            let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
-            switch dataSource.current.browseAsset {
-            case let .image(imageSource):
-                switch imageSource {
-                case let .network(url):
-                    KingfisherManager.shared.retrieveImage(with: url) { result in
-                        let img = try? result.get().image
-                        editImage(img?.resize(to: maxSize, mode: .scaleAspectFit))
-                    }
-                case let .album(asset):
-                    ADPhotoManager.fetchImage(for: asset, size: maxSize, synchronous: true) { img, _, _ in
-                        editImage(img)
-                    }
-                case let .local(img, _):
-                    editImage(img.resize(to: maxSize, mode: .scaleAspectFit))
-                }
-                break
-            case .video(_):
-                break
-            }
-        }
-        
-        func editImage(_ img: UIImage?) {
-            #if Module_ImageEdit
-            if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
-                let vc = ADImageEditController(image: image, editInfo: dataSource.current.imageEditInfo)
-                vc.imageDidEdit = { [weak self] editInfo in
-                    self?.didImageEditInfoUpdate(editInfo)
-                }
-                navigationController?.pushViewController(vc, animated: false)
-            }
-            #endif
-        }
-        
-        toolBarView.editActionBlock = {
-            editAssetAction()
+        toolBarView.editActionBlock = { [weak self] in
+            self?.editAssetAction()
         }
         toolBarView.doneActionBlock = { [weak self] in
             self?.finishSelection()
@@ -269,6 +234,41 @@ private extension ADAssetBrowserController {
     
     func hideOrShowControlsView() {
         controlsView.isHidden = !controlsView.isHidden
+    }
+    
+    func editAssetAction() {
+        let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
+        switch dataSource.current.browseAsset {
+        case let .image(imageSource):
+            switch imageSource {
+            case let .network(url):
+                KingfisherManager.shared.retrieveImage(with: url) { [weak self] result in
+                    let img = try? result.get().image
+                    self?.editImage(img?.resize(to: maxSize, mode: .scaleAspectFit))
+                }
+            case let .album(asset):
+                ADPhotoManager.fetchImage(for: asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
+                    self?.editImage(img)
+                }
+            case let .local(img, _):
+                editImage(img.resize(to: maxSize, mode: .scaleAspectFit))
+            }
+            break
+        case .video(_):
+            break
+        }
+    }
+    
+    func editImage(_ img: UIImage?) {
+        #if Module_ImageEdit
+        if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
+            let vc = ADImageEditController(image: image, editInfo: dataSource.current.imageEditInfo)
+            vc.imageDidEdit = { [weak self] editInfo in
+                self?.didImageEditInfoUpdate(editInfo)
+            }
+            navigationController?.pushViewController(vc, animated: false)
+        }
+        #endif
     }
 }
 

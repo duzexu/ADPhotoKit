@@ -55,10 +55,10 @@ class ADAssetOperation: Operation {
             requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
                 guard let strong = self else { return }
                 if let d = data as? Data {
-                    self?.completion((strong.model.asset,                    ADAssetResult(image: KingfisherWrapper.image(data: d, options: .init()), editImg: strong.model.editImage),nil))
+                    self?.completion((strong.model.asset,strong.model.result(with: KingfisherWrapper.image(data: d, options: .init())),nil))
                 }else{
                     let error = info?[PHImageErrorKey] as? NSError
-                    self?.completion((strong.model.asset,ADAssetResult(editImg: strong.model.editImage),error))
+                    self?.completion((strong.model.asset,strong.model.result(with: nil),error))
                 }
                 self?.done()
             })
@@ -67,7 +67,7 @@ class ADAssetOperation: Operation {
             requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
                 guard let strong = self else { return }
                 let error = info?[PHImageErrorKey] as? NSError
-                self?.completion((strong.model.asset,ADAssetResult(image: image as? UIImage, editImg: strong.model.editImage),error))
+                self?.completion((strong.model.asset,strong.model.result(with: image as? UIImage),error))
                 self?.done()
             })
         }

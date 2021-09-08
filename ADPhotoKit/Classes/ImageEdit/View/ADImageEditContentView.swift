@@ -97,7 +97,7 @@ class ADEditContainerView: UIView {
     }
     
     fileprivate func interactContainerImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, UIScreen.main.scale)
+        UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, 1)
         if let ctx = UIGraphicsGetCurrentContext() {
             interactContainer.subviews.forEach {
                 ($0 as! InteractPackage).clipBounds = false
@@ -196,9 +196,10 @@ class ADImageEditContentView: UIView {
     }
     
     func editImage() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(image.size, false, 1)
-        image.draw(in: CGRect(origin: .zero, size: image.size))
-        container.interactContainerImage()?.draw(in: CGRect(origin: .zero, size: image.size))
+        let size = image.size
+        UIGraphicsBeginImageContextWithOptions(size, false, 1)
+        image.draw(in: CGRect(origin: .zero, size: size))
+        container.interactContainerImage()?.draw(in: CGRect(origin: .zero, size: size))
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return result

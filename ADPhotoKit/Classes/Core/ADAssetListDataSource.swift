@@ -84,19 +84,42 @@ public class ADAssetListDataSource: NSObject {
     /// - Parameters:
     ///   - reloadable: Associate reloadable view.
     ///   - album: Album to get assets.
-    ///   - select: Selected assets.
+    ///   - selects: Selected assets.
     ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
     ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
     public init(reloadable: ADDataSourceReloadable,
                 album: ADAlbumModel,
-                select: [PHAsset],
+                selects: [PHAsset],
                 albumOpts: ADAlbumSelectOptions,
                 assetOpts: ADAssetSelectOptions) {
         self.reloadable = reloadable
         self.album = album
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts
-        self.selects = select.map { ADSelectAssetModel(asset: $0) }
+        self.selects = selects.map { ADSelectAssetModel(asset: $0) }
+        super.init()
+        if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
+            PHPhotoLibrary.shared().register(self)
+        }
+    }
+    
+    /// Create data source with associate reloadable view, album model, select assets and options.
+    /// - Parameters:
+    ///   - reloadable: Associate reloadable view.
+    ///   - album: Album to get assets.
+    ///   - selects: Selected asset models.
+    ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
+    public init(reloadable: ADDataSourceReloadable,
+                album: ADAlbumModel,
+                selects: [ADSelectAssetModel],
+                albumOpts: ADAlbumSelectOptions,
+                assetOpts: ADAssetSelectOptions) {
+        self.reloadable = reloadable
+        self.album = album
+        self.albumOpts = albumOpts
+        self.assetOpts = assetOpts
+        self.selects = selects
         super.init()
         if #available(iOS 14.0, *), PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
             PHPhotoLibrary.shared().register(self)
@@ -149,7 +172,7 @@ public class ADAssetListDataSource: NSObject {
                 let selected = ADSelectAssetModel(asset: item.asset)
                 selected.index = index
                 #if Module_ImageEdit
-                selected.editImage = item.imageEditInfo?.editImg
+                selected.imageEditInfo = item.imageEditInfo
                 #endif
                 selects.append(selected)
                 item.selectStatus = .select(index: selects.count)
@@ -203,7 +226,7 @@ public class ADAssetListDataSource: NSObject {
                 item.selectStatus = .select(index: index+1)
                 model.index = idx
                 #if Module_ImageEdit
-                model.editImage = item.imageEditInfo?.editImg
+                model.imageEditInfo = item.imageEditInfo
                 #endif
                 selects.append(model)
             }else{
