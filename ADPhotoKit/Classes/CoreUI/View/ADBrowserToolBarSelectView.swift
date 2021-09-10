@@ -95,7 +95,7 @@ extension ADBrowserToolBarSelectView: UICollectionViewDataSource, UICollectionVi
         if let selects = dataSource?.selects {
             let asset = selects[indexPath.row]
             cell.configure(with: asset)
-            if asset.browseAsset == dataSource?.current.browseAsset {
+            if asset.browseAsset == dataSource?.current?.browseAsset {
                 cell.layer.borderWidth = 4
             }else{
                 cell.layer.borderWidth = 0

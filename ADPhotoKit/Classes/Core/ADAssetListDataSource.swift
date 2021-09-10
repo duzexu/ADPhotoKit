@@ -144,6 +144,11 @@ public class ADAssetListDataSource: NSObject {
                 }) {
                     item.index = index
                     strong.list[index].selectStatus = .select(index: idx+1)
+                    #if Module_ImageEdit
+                    strong.list[index].imageEditInfo = item.imageEditInfo
+                    #endif
+                }else{
+                    item.index = nil
                 }
             }
             DispatchQueue.main.async {
@@ -219,18 +224,31 @@ public class ADAssetListDataSource: NSObject {
     ///   - indexs: Select asset indexs.
     ///   - current: Current browser index.
     public func reloadSelectAssetIndexs(_ indexs: [Int], current: Int) {
-        selects.removeAll()
-        for (idx,item) in list.enumerated() {
-            if let index = indexs.firstIndex(of: idx) {
+        var new: [ADSelectAssetModel?] = []
+        for item in selects {
+            if item.index != nil {
+                new.append(nil)
+            }else{
+                new.append(item)
+            }
+        }
+        for idx in indexs {
+            let item = list[idx]
+            if let index = new.firstIndex(of: nil) {
                 let model = ADSelectAssetModel(asset: item.asset)
-                item.selectStatus = .select(index: index+1)
                 model.index = idx
                 #if Module_ImageEdit
                 model.imageEditInfo = item.imageEditInfo
                 #endif
-                selects.append(model)
-            }else{
-                item.selectStatus = .select(index: nil)
+                new.replaceSubrange(index..<index+1, with: [model])
+            }
+        }
+        selects = new.compactMap { $0 }
+        for (idx,item) in selects.enumerated() {
+            if let index = list.firstIndex(where: { (model) -> Bool in
+                return model.identifier == item.identifier
+            }) {
+                list[index].selectStatus = .select(index: idx+1)
             }
         }
         #if Module_UI

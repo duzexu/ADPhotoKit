@@ -72,11 +72,53 @@ public class ADPhotoKitUI {
         config = configuration
         if style == .normal {
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let album = ADAlbumListController(config: configuration)
+                let album = ADAlbumListController(config: configuration, selects: assets.map { ADSelectAssetModel(asset: $0) })
                 let nav = ADPhotoNavController(rootViewController: album)
-                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: assets)
+                album.pushThumbnail(with: model, style: style, animated: false)
                 nav.modalPresentationStyle = .fullScreen
-                nav.pushViewController(thumbnail, animated: false)
+                on.present(nav, animated: true, completion: nil)
+            }
+        }else{
+            ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
+                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: assets.map { ADSelectAssetModel(asset: $0) })
+                let nav = ADPhotoNavController(rootViewController: thumbnail)
+                nav.modalPresentationStyle = .fullScreen
+                on.present(nav, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    /// Show picker to select assets.
+    /// - Parameters:
+    ///   - on: The controller to show picker.
+    ///   - style: Style to display picker.
+    ///   - assets: Asset models have been selected.
+    ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
+    ///   - browserOpts: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - params: Params to control the asset select condition.
+    ///   - selected: Called after selection finish.
+    ///   - canceled: Called when cancel select.
+    public class func imagePicker(present on: UIViewController,
+                                    style: ADPickerStyle = .normal,
+                                    assets: [ADSelectAssetModel] = [],
+                                    albumOpts: ADAlbumSelectOptions = .default,
+                                    assetOpts: ADAssetSelectOptions = .default,
+                                    browserOpts: ADAssetBrowserOptions = .default,
+                                    params: Set<ADPhotoSelectParams> = [],
+                                    selected: @escaping AssetSelectHandler,
+                                    canceled: AssetCancelHandler? = nil) {
+        let configuration = ADPhotoKitConfig(albumOpts: albumOpts, assetOpts: assetOpts, browserOpts: browserOpts, params: params, pickerSelect: selected, browserSelect: nil, canceled: canceled)
+        if let asset = assets.randomElement() {
+            configuration.selectMediaImage = ADAssetModel(asset: asset.asset).type.isImage
+        }
+        config = configuration
+        if style == .normal {
+            ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
+                let album = ADAlbumListController(config: configuration, selects: assets)
+                let nav = ADPhotoNavController(rootViewController: album)
+                album.pushThumbnail(with: model, style: style, animated: false)
+                nav.modalPresentationStyle = .fullScreen
                 on.present(nav, animated: true, completion: nil)
             }
         }else{
@@ -93,15 +135,15 @@ public class ADPhotoKitUI {
     /// - Parameters:
     ///   - on: The controller to show browser.
     ///   - assets: Assets to browser.
+    ///   - selects: Assets heave been selected.
     ///   - index: Current browser asset index.
-    ///   - selects: Indexs of assets have been selected.
     ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
     ///   - selected: Called after selection finish.
     ///   - canceled: Called when cancel select.
     public class func assetBrowser(present on: UIViewController,
                                     assets:  [ADAssetBrowsable],
+                                    selects: [ADAssetBrowsable] = [],
                                     index: Int? = nil,
-                                    selects: [Int] = [],
                                     options: ADAssetBrowserOptions = .default,
                                     selected: @escaping AssetableSelectHandler,
                                     canceled: AssetCancelHandler? = nil) {
@@ -110,7 +152,7 @@ public class ADPhotoKitUI {
         }
         let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
         config = configuration
-        let browser = ADAssetBrowserController(config: configuration, assets: assets, index: index, selects: selects)
+        let browser = ADAssetBrowserController(config: configuration, assets: assets, selects: selects, index: index)
         let nav = ADPhotoNavController(rootViewController: browser)
         nav.modalPresentationStyle = .fullScreen
         on.present(nav, animated: true, completion: nil)

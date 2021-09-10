@@ -14,8 +14,7 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     
     init(config: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
-        let selects = dataSource.selects.compactMap { $0.index }
-        super.init(config: config, assets: dataSource.list, index: index, selects: selects)
+        super.init(config: config, assets: dataSource.list, selects: dataSource.selects.map { $0.asset }, index: index)
     }
     
     required init?(coder: NSCoder) {
@@ -24,7 +23,7 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     
     override func didSelectsUpdate() {
         super.didSelectsUpdate()
-        listData.reloadSelectAssetIndexs(dataSource.selectIndexs, current: dataSource.index)
+        listData.reloadSelectAssetIndexs(dataSource.selectIndexs.compactMap { $0 }, current: dataSource.index)
     }
     
     override func finishSelection() {
@@ -48,6 +47,9 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     #endif
     
     override func canSelectWithCurrentIndex() -> Bool {
+        guard dataSource.index >= 0 else {
+            return false
+        }
         let item = listData.list[dataSource.index]
         switch item.type {
         case let .video(duration, _):

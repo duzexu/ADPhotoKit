@@ -142,6 +142,9 @@ private extension ADBrowserToolBarView {
         token = dataSource?.observe(\.index, options: .new) { [weak self] (dataSource, change) in
             if let ass = self?.dataSource?.current {
                 self?.reload(asset: ass)
+            }else{
+                self?.editBtn?.isHidden = true
+                self?.originalBtn.alpha = 0
             }
         }
     }

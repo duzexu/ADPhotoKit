@@ -23,10 +23,13 @@ public class ADAssetBrowserDataSource: NSObject {
     /// Select assets.
     public var selects: [ADAssetBrowsable] = []
     /// Select asset's index.
-    public var selectIndexs: [Int] = []
+    public var selectIndexs: [Int?] = []
     
     /// Current browser asset.
-    public var current: ADAssetBrowsable {
+    public var current: ADAssetBrowsable? {
+        if index < 0 {
+            return nil
+        }
         return list[index]
     }
 
@@ -45,24 +48,36 @@ public class ADAssetBrowserDataSource: NSObject {
     /// Called when selet or deselect asset.
     public var selectAssetChanged: ((Int)->Void)?
     
+    /// Called whether selet asset is in `list` or not.
+    public var selectAssetExistOrNot: ((Bool) -> Void)?
+    
     /// Create data source with browser data, options and select info.
     /// - Parameters:
     ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
     ///   - list: Asset array to browser.
+    ///   - selects: Assets have been selected.
     ///   - index: Current asset index in `list`.
-    ///   - selects: Assets selected.
     public init(options: ADAssetBrowserOptions,
                 list: [ADAssetBrowsable],
-                index: Int = 0,
-                selects: [Int] = []) {
+                selects: [ADAssetBrowsable],
+                index: Int = 0) {
         self.options = options
         self.list = list
         self.index = index
-        self.selectIndexs = selects
-        self.selects = selectIndexs.map { list[$0] }
-        self.isSelected = selects.contains(index)
+        self.selectIndexs = []
+        self.selects = selects
+        for item in selects {
+            if let index = list.firstIndex(where: { (model) -> Bool in
+                return model.browseAsset.identifier == item.browseAsset.identifier
+            }) {
+                selectIndexs.append(index)
+            }else{
+                selectIndexs.append(nil)
+            }
+        }
+        self.isSelected = selectIndexs.contains(index)
         if isSelected {
-            self.selectIndex = selects.firstIndex(of: index)!
+            self.selectIndex = selectIndexs.firstIndex(of: index)!
         }
         selectAssetChanged?(selects.count)
         super.init()
@@ -70,18 +85,25 @@ public class ADAssetBrowserDataSource: NSObject {
     
     /// Change current browser index.
     /// - Parameter idx: Asset index in `list` to browser.
-    public func didIndexChange(_ idx: Int) {
-        index = idx
-        isSelected = selectIndexs.contains(index)
-        if let index = selects.firstIndex(where: { $0.browseAsset == current.browseAsset }) {
-            selectIndex = index
-            selectView?.performBatchUpdates { [weak self] in
-                self?.selectView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
-            } completion: { [weak self] (_) in
-                guard let strong = self?.selectView else { return }
-                strong.reloadItems(at: strong.indexPathsForVisibleItems)
+    public func didIndexChange(_ idx: Int?) {
+        if idx != nil {
+            index = idx!
+            isSelected = selectIndexs.contains(index)
+            if let index = selects.firstIndex(where: { $0.browseAsset == current!.browseAsset }) {
+                selectIndex = index
+                selectView?.performBatchUpdates { [weak self] in
+                    self?.selectView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: true)
+                } completion: { [weak self] (_) in
+                    guard let strong = self?.selectView else { return }
+                    strong.reloadItems(at: strong.indexPathsForVisibleItems)
+                }
+            }else{
+                selectIndex = -1
+                selectView?.reloadItems(at: selectView!.indexPathsForVisibleItems)
             }
         }else{
+            index = -1
+            isSelected = false
             selectIndex = -1
             selectView?.reloadItems(at: selectView!.indexPathsForVisibleItems)
         }
@@ -90,8 +112,19 @@ public class ADAssetBrowserDataSource: NSObject {
     /// Change select browser index.
     /// - Parameter idx: Asset index in `selects` to browser.
     public func didSelectIndexChange(_ idx: Int) {
-        didIndexChange(selectIndexs[idx])
-        listView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
+        if idx < selectIndexs.count {
+            if let index = selectIndexs[idx] {
+                selectAssetExistOrNot?(true)
+                didIndexChange(index)
+                listView?.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: false)
+            }else{
+                selectAssetExistOrNot?(false)
+                didIndexChange(nil)
+            }
+        }else{
+            selectAssetExistOrNot?(false)
+            didIndexChange(nil)
+        }
     }
     
     /// Select the asset.

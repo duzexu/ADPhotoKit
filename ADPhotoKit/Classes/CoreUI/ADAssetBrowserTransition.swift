@@ -52,10 +52,18 @@ class ADAssetBrowserInteractiveTransition: UIPercentDrivenInteractiveTransition 
     
     weak var transable: Transable?
     
+    var isEnabled: Bool = false {
+        didSet {
+            dismissPan.isEnabled = isEnabled
+        }
+    }
+    
     var interactive: Bool = false
     
     /// private
     private weak var ctx: UIViewControllerContextTransitioning?
+    
+    private var dismissPan: UIPanGestureRecognizer!
 
     private var beginPoint: CGPoint = .zero
     private var imageViewFrame: CGRect = .zero
@@ -67,7 +75,7 @@ class ADAssetBrowserInteractiveTransition: UIPercentDrivenInteractiveTransition 
     init(transable: Transable) {
         super.init()
         self.transable = transable
-        let dismissPan = UIPanGestureRecognizer(target: self, action: #selector(dismissPanAction(_:)))
+        dismissPan = UIPanGestureRecognizer(target: self, action: #selector(dismissPanAction(_:)))
         transable.view.addGestureRecognizer(dismissPan)
     }
     

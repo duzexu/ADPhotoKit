@@ -41,16 +41,18 @@ public class ADThumbnailViewController: UIViewController {
     let config: ADPhotoKitConfig
     var album: ADAlbumModel
     let style: ADPickerStyle
-    let selects: [PHAsset]
+    let selects: [ADSelectAssetModel]
     
     /// View to display asset.
     public var collectionView: UICollectionView!
     /// The data source of album assets.
     public var dataSource: ADAssetListDataSource!
+    /// Return back to `albumListController` when ADPickerStyle is `normal`
+    public var selectAlbumBlock: (([ADSelectAssetModel]) -> Void)?
     
     var toolBarView: ADThumbnailToolBarable!
     
-    init(config: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [PHAsset] = []) {
+    init(config: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [ADSelectAssetModel] = []) {
         self.config = config
         self.album = album
         self.style = style
@@ -125,17 +127,13 @@ public class ADThumbnailViewController: UIViewController {
     func reloadAlbum(_ album: ADAlbumModel, initial: Bool) {
         if initial {
             dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
-            dataSource.selectAssetChanged = { [weak self] count in
-                self?.toolBarView.selectCount = count
-            }
         }else{
-            let selected = dataSource.selects.map { $0.asset }
-            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selected, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
-            dataSource.selectAssetChanged = { [weak self] count in
-                self?.toolBarView.selectCount = count
-            }
+            dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
         }
-        
+        dataSource.selectAssetChanged = { [weak self] count in
+            self?.toolBarView.selectCount = count
+        }
+
         reloadAssets()
     }
 
@@ -194,6 +192,9 @@ extension ADThumbnailViewController {
         navBarView.title = album.title
         navBarView.leftActionBlock = { [weak self] in
             if let _ = self?.navigationController?.popViewController(animated: true) {
+                if let strong = self {
+                    self?.selectAlbumBlock?(strong.dataSource.selects)
+                }
             }else{
                 ADPhotoKitUI.config.canceled?()
                 self?.navigationController?.dismiss(animated: true, completion: nil)

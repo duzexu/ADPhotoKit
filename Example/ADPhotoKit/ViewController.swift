@@ -770,7 +770,11 @@ class ViewController: UIViewController {
     }
 
     @IBAction func presentImagePicker(_ sender: UIButton) {
-        let s = keepSelect ? selected.map { $0.asset } : []
+        let s: [ADSelectAssetModel] = keepSelect ? selected.map {
+            let model = ADSelectAssetModel(asset: $0.asset)
+            model.imageEditInfo = $0.result?.imageEditInfo
+            return model
+        } : []
         ADPhotoKitUI.imagePicker(present: self,
                                  style: pickerStyle,
                                  assets: s,
@@ -796,7 +800,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func presentSelectAsset(_ sender: UIButton) {
-        ADPhotoKitUI.assetBrowser(present: self, assets: selected.map { $0.asset }, options: browserOptions) { (assets) in
+        let assets: [PHAsset] = selected.map {
+            let asset = $0.asset
+            asset.imageEditInfo = $0.result?.imageEditInfo
+            return asset
+        }
+        ADPhotoKitUI.assetBrowser(present: self, assets: assets, options: browserOptions) { (assets) in
             print(assets)
         }
     }

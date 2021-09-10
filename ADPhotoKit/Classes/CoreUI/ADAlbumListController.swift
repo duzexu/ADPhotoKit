@@ -18,8 +18,11 @@ public class ADAlbumListController: UIViewController {
     /// Data source contain album models.
     public var dataSource: ADAlbumListDataSource!
     
-    init(config: ADPhotoKitConfig) {
+    var selects: [ADSelectAssetModel] = []
+    
+    init(config: ADPhotoKitConfig, selects: [ADSelectAssetModel] = []) {
         self.config = config
+        self.selects = selects
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -47,6 +50,13 @@ public class ADAlbumListController: UIViewController {
         return ADPhotoKitConfiguration.default.statusBarStyle ?? .lightContent
     }
     
+    func pushThumbnail(with album: ADAlbumModel, style: ADPickerStyle, animated: Bool) {
+        let thumbnail = ADThumbnailViewController(config: config, album: album, style: style, selects: selects)
+        thumbnail.selectAlbumBlock = { [weak self] selects in
+            self?.selects = selects
+        }
+        navigationController?.pushViewController(thumbnail, animated: animated)
+    }
 }
 
 extension ADAlbumListController {
@@ -112,8 +122,7 @@ extension ADAlbumListController: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let thumbnail = ADThumbnailViewController(config: config, album: dataSource.list[indexPath.row])
-        navigationController?.pushViewController(thumbnail, animated: true)
+        pushThumbnail(with: dataSource.list[indexPath.row], style: .normal, animated: true)
     }
     
 }

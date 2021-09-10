@@ -38,9 +38,9 @@ public class ADAssetBrowserController: UIViewController {
     /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
     
-    init(config: ADPhotoKitConfig, assets: [ADAssetBrowsable], index: Int? = nil, selects: [Int] = []) {
+    init(config: ADPhotoKitConfig, assets: [ADAssetBrowsable], selects: [ADAssetBrowsable] = [], index: Int? = nil) {
         self.config = config
-        self.dataSource = ADAssetBrowserDataSource(options: config.browserOpts, list: assets, index: (index ?? selects.first) ?? 0, selects: selects)
+        self.dataSource = ADAssetBrowserDataSource(options: config.browserOpts, list: assets, selects: selects, index: index ?? 0)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -104,7 +104,9 @@ public class ADAssetBrowserController: UIViewController {
     open func canSelectWithCurrentIndex() -> Bool {
         let selected = dataSource.selects.count
         let max = config.params.maxCount ?? Int.max
-        let item = dataSource.current
+        guard let item = dataSource.current else {
+            return false
+        }
         if selected < max {
             let itemIsImage = item.browseAsset.isImage
             if config.assetOpts.contains(.mixSelect) {
@@ -179,6 +181,10 @@ private extension ADAssetBrowserController {
         ADPhotoKitConfiguration.default.customBrowserCellRegistor?(collectionView)
         
         dataSource?.listView = collectionView
+        dataSource.selectAssetExistOrNot = { [weak self] exist in
+            self?.collectionView.isHidden = !exist
+            self?.popTransition?.isEnabled = exist
+        }
         
         navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource)
         navBarView.leftActionBlock = { [weak self] in
@@ -237,8 +243,11 @@ private extension ADAssetBrowserController {
     }
     
     func editAssetAction() {
+        guard let current = dataSource.current else {
+            return
+        }
         let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
-        switch dataSource.current.browseAsset {
+        switch current.browseAsset {
         case let .image(imageSource):
             switch imageSource {
             case let .network(url):
@@ -262,7 +271,7 @@ private extension ADAssetBrowserController {
     func editImage(_ img: UIImage?) {
         #if Module_ImageEdit
         if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
-            let vc = ADImageEditController(image: image, editInfo: dataSource.current.imageEditInfo)
+            let vc = ADImageEditController(image: image, editInfo: dataSource.current!.imageEditInfo)
             vc.imageDidEdit = { [weak self] editInfo in
                 self?.didImageEditInfoUpdate(editInfo)
             }
@@ -382,7 +391,7 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
 extension ADAssetBrowserController: ADAssetBrowserTransitionContextFrom {
     
     var contextIdentifier: String {
-        return dataSource.current.browseAsset.identifier
+        return dataSource.current?.browseAsset.identifier ?? ""
     }
     
     func transitionInfo(convertTo: UIView) -> (UIView, CGRect) {
