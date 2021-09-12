@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 
 /// Subclass of `ADAssetBrowserController` to browser `PHAsset` in big mode.
 class ADAssetModelBrowserController: ADAssetBrowserController {
@@ -14,7 +15,17 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     
     init(config: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
-        super.init(config: config, assets: dataSource.list, selects: dataSource.selects.map { $0.asset }, index: index)
+        var selects: [PHAsset] = []
+        #if Module_ImageEdit
+        for item in dataSource.selects {
+            let asset = item.asset
+            asset.imageEditInfo = item.imageEditInfo
+            selects.append(asset)
+        }
+        #else
+        selects = dataSource.selects.map { $0.asset }
+        #endif
+        super.init(config: config, assets: dataSource.list, selects: selects, index: index)
     }
     
     required init?(coder: NSCoder) {

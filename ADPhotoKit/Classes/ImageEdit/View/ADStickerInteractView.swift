@@ -360,7 +360,7 @@ public class ADStickerContentView: UIView {
 
 public class ADImageStickerContentView: ADStickerContentView {
     
-    let image: UIImage
+    var image: UIImage
     
     var imageView: UIImageView!
     
@@ -377,6 +377,7 @@ public class ADImageStickerContentView: ADStickerContentView {
     
     public func updateImage(_ img: UIImage) {
         sizeDidChange(CGSize(width: img.size.width+20, height: img.size.height+20) )
+        image = img
         imageView.image = img
     }
     

@@ -40,7 +40,7 @@ public class ADAssetBrowserController: UIViewController {
     
     init(config: ADPhotoKitConfig, assets: [ADAssetBrowsable], selects: [ADAssetBrowsable] = [], index: Int? = nil) {
         self.config = config
-        self.dataSource = ADAssetBrowserDataSource(options: config.browserOpts, list: assets, selects: selects, index: index ?? 0)
+        self.dataSource = ADAssetBrowserDataSource(options: config.browserOpts, list: assets, selects: selects, index: index)
         super.init(nibName: nil, bundle: nil)
     }
     

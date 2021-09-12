@@ -39,8 +39,12 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         
     var paths: [DrawPath] = [] {
         didSet {
-            setNeedsDisplay()
-            pathMaskView?.paths = paths
+            switch style {
+            case .line:
+                setNeedsDisplay()
+            case .mosaic:
+                pathMaskView?.paths = paths
+            }
         }
     }
     
@@ -61,7 +65,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
                 let ciImage = CIImage(cgImage: cgImg)
                 let filter = CIFilter(name: "CIPixellate")
                 filter?.setValue(ciImage, forKey: kCIInputImageKey)
-                filter?.setValue(10, forKey: kCIInputScaleKey)
+                filter?.setValue(20, forKey: kCIInputScaleKey)
                 if let output = filter?.outputImage {
                     let context = CIContext()
                     layer.contents = context.createCGImage(output, from: CGRect(origin: .zero, size: img.size))

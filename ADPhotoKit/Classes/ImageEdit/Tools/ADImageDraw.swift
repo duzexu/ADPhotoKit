@@ -44,7 +44,7 @@ class ADImageDraw: ADImageEditTool {
         self.style = style
         switch style {
         case let .line(colors,index):
-            let colorSelect = ADDrawColorsView(colors: colors, select: index)
+            let colorSelect = ADLineDrawView(colors: colors, select: index)
             let interact = ADDrawInteractView(style: .line({ [weak colorSelect] in
                 return colorSelect?.selectColor ?? .clear
             }))
@@ -59,7 +59,16 @@ class ADImageDraw: ADImageEditTool {
             image = Bundle.image(name: "icons_filled_pencil3", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "icons_filled_pencil3_on", module: .imageEdit)
         case let .mosaic(img):
-            toolInteractView = ADDrawInteractView(style: .mosaic(img))
+            let config = ADMosaicDrawView()
+            let interact = ADDrawInteractView(style: .mosaic(img))
+            config.revokeAction = { [weak interact] in
+                interact?.revoke()
+            }
+            interact.lineCountChange = { [weak config] count in
+                config?.lineCount = count
+            }
+            toolInteractView = interact
+            toolConfigView = config
             image = Bundle.image(name: "icons_filled_mosaic", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "icons_filled_mosaic_on", module: .imageEdit)
         }
@@ -85,16 +94,18 @@ class ADImageDraw: ADImageEditTool {
     }
     
     func decode(from: Any) {
+        var count: Int = 0
         if let json = from as? Dictionary<String,Any> {
             if let paths = json["paths"] as? [DrawPath] {
+                count = paths.count
                 (toolInteractView as? ADDrawInteractView)?.paths = paths
             }
         }
         switch style {
         case .line:
-            (toolConfigView as? ADDrawColorsView)?.lineCount = 0
+            (toolConfigView as? ADLineDrawView)?.lineCount = count
         case .mosaic:
-            break
+            (toolConfigView as? ADMosaicDrawView)?.lineCount = count
         }
     }
     

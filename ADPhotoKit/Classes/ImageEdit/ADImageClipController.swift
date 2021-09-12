@@ -42,10 +42,13 @@ class ADImageClipController: UIViewController {
         }
     }
     
+    private let originalClipInfo: ADClipInfo
+    
     private var rotationInfo: (UIView,CGFloat)?
         
     init(clipInfo: ADClipInfo) {
         self.clipInfo = clipInfo
+        self.originalClipInfo = clipInfo
         self.editedImage = clipInfo.image.image(with: clipInfo.rotation.rawValue/180.0*CGFloat.pi)
         super.init(nibName: nil, bundle: nil)
     }
@@ -294,7 +297,7 @@ private extension ADImageClipController {
             if let clip = clip {
                 let dark = ADClipDarkView(frame: CGRect(origin: .zero, size: image.size))
                 dark.clearRect = image.size|->clip
-                UIGraphicsBeginImageContextWithOptions(image.size, false, UIScreen.main.scale)
+                UIGraphicsBeginImageContextWithOptions(image.size, false, 1)
                 image.draw(at: .zero)
                 if let ctx = UIGraphicsGetCurrentContext() {
                     dark.layer.render(in: ctx)
@@ -332,7 +335,7 @@ private extension ADImageClipController {
         }
     }
     
-    func revertOrigin() {
+    func originalRevert() {
         let rotated = clipInfo.rotation != .idle
         let angle = -clipInfo.rotation.rawValue/180.0*CGFloat.pi
         let clipRect = newClipRect()
@@ -347,6 +350,12 @@ private extension ADImageClipController {
         }else if zoomed {
             beginAnimation(.zooming)
         }
+    }
+    
+    func cancelRevert() {
+        clipInfo.clipRect = originalClipInfo.clipRect
+        clipInfo.rotation = originalClipInfo.rotation
+        beginAnimation(nil)
     }
     
     func rotateLeft() {
@@ -374,12 +383,13 @@ private extension ADImageClipController {
     func toolAction(_ action: ADClipToolBarView.Action) {
         switch action {
         case .cancel:
+            cancelRevert()
             dismiss(animated: true, completion: nil)
         case .confirm:
             clipInfoConfirmBlock?(newClipRect(),clipInfo.rotation)
             dismiss(animated: true, completion: nil)
         case .revert:
-            revertOrigin()
+            originalRevert()
         case .rotate:
             rotateLeft()
         }
@@ -431,7 +441,7 @@ extension ADImageClipController: ADImageClipDismissTransitionContextFrom {
             toolBarView.alpha = 0
         }
         let clipRect = newClipRect()
-        let image = clipRect == nil ? editedImage : editedImage.image(clip: clipRect!)
+        let image = clipRect == nil ? editedImage : editedImage.image(clip: clipRect!, scale: 1)
         return (image, grideView.convert(grideView.clipRect, to: convertTo))
     }
 }

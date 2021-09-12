@@ -56,28 +56,32 @@ public class ADAssetBrowserDataSource: NSObject {
     ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
     ///   - list: Asset array to browser.
     ///   - selects: Assets have been selected.
-    ///   - index: Current asset index in `list`.
+    ///   - index: Default asset index in `list`. If `nil`, it will be set first select asset index in `list` or set 0 when select count is 0.
     public init(options: ADAssetBrowserOptions,
                 list: [ADAssetBrowsable],
                 selects: [ADAssetBrowsable],
-                index: Int = 0) {
+                index: Int?) {
         self.options = options
         self.list = list
-        self.index = index
         self.selectIndexs = []
         self.selects = selects
+        var _index: Int? = index
         for item in selects {
-            if let index = list.firstIndex(where: { (model) -> Bool in
+            if let idx = list.firstIndex(where: { (model) -> Bool in
                 return model.browseAsset.identifier == item.browseAsset.identifier
             }) {
-                selectIndexs.append(index)
+                if _index == nil {
+                    _index = idx
+                }
+                selectIndexs.append(idx)
             }else{
                 selectIndexs.append(nil)
             }
         }
-        self.isSelected = selectIndexs.contains(index)
+        self.index = _index ?? 0
+        self.isSelected = selectIndexs.contains(self.index)
         if isSelected {
-            self.selectIndex = selectIndexs.firstIndex(of: index)!
+            self.selectIndex = selectIndexs.firstIndex(of: self.index)!
         }
         selectAssetChanged?(selects.count)
         super.init()

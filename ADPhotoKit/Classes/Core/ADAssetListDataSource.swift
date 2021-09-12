@@ -234,13 +234,15 @@ public class ADAssetListDataSource: NSObject {
         }
         for idx in indexs {
             let item = list[idx]
+            let model = ADSelectAssetModel(asset: item.asset)
+            model.index = idx
+            #if Module_ImageEdit
+            model.imageEditInfo = item.imageEditInfo
+            #endif
             if let index = new.firstIndex(of: nil) {
-                let model = ADSelectAssetModel(asset: item.asset)
-                model.index = idx
-                #if Module_ImageEdit
-                model.imageEditInfo = item.imageEditInfo
-                #endif
                 new.replaceSubrange(index..<index+1, with: [model])
+            }else{
+                new.append(model)
             }
         }
         selects = new.compactMap { $0 }
