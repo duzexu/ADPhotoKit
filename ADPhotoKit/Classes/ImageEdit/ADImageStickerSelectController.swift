@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// System image sticker select controller datasource.
 public struct ADImageStickerDataSource {
     
     public struct StickerItem {
@@ -23,7 +24,9 @@ public struct ADImageStickerDataSource {
         public let name: String
         public let icon: UIImage
         public let items: [StickerItem]
+        /// Control item show name or not.
         public let itemNameOn: Bool
+        /// Extra info for later use.
         public let info: Dictionary<String,Any>?
         
         public init(icon: UIImage, name: String, items: [StickerItem], itemNameOn: Bool = true, info: Dictionary<String,Any>? = nil) {

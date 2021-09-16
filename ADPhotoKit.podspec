@@ -56,6 +56,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec "ImageEdit" do |img|
+    img.dependency 'ADPhotoKit/Base'
     img.dependency 'SnapKit'
     img.source_files  = ["ADPhotoKit/Classes/ImageEdit/**/*.swift"]
     img.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_ImageEdit'}

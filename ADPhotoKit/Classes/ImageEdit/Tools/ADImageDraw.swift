@@ -14,11 +14,11 @@ class ADImageDraw: ADImageEditTool {
     
     var isSelected: Bool = false {
         didSet {
-            contentStatus?(isSelected)
+            contentLockStatus?(isSelected)
         }
     }
     
-    var contentStatus: ((Bool) -> Void)?
+    var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?

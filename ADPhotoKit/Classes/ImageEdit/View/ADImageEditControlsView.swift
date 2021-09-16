@@ -56,7 +56,7 @@ class ADImageEditControlsView: UIView {
         isUserInteractionEnabled = false
         
         for item in tools {
-            item.contentStatus = { [weak self] lock in
+            item.contentLockStatus = { [weak self] lock in
                 self?.contentStatus?(lock)
             }
         }

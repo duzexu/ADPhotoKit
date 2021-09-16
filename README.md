@@ -18,8 +18,8 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 * [x] Highly customizable base on protocol(UI/Image/Color/Font).
 * [x] UIAppearance support.
 * [x] Supports batch export PHAsset to image.
+* [x] Image editor.
 * [ ] Custom camera.
-* [ ] Image editor.
 * [ ] Video editor.
 
 ## Usage
@@ -32,7 +32,7 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 }
 ```
 
-For more configuration you can set, you can see [ADPhotoKitConfiguration](./ADPhotoKit/Classes/Core/ADPhotoKitConfiguration.swift) and [ADPhotoKitUI](./ADPhotoKit/Classes/UI/ADPhotoKitUI.swift)
+For more configuration you can set, you can see [ADPhotoKitConfiguration](./ADPhotoKit/Classes/Core/ADPhotoKitConfiguration.swift).
 
 ## Learn More
 
@@ -64,14 +64,16 @@ end
 
 ##### Subspecs
 
-There are 2 subspecs available now:
+There are 4 subspecs available now:
 
 | Subspec | Description |
 |---|---|
+| Base | Required. This subspec provides base configuration and extensions. |
 | Core | Required. This subspec provides raw data. |
-| UI | Optional. The subspec provides ui for photo select. |
+| CoreUI | Optional. The subspec provides ui for photo select. |
+| ImageEdit | Optional. The subspec provides image edit ability. |
 
-You can install only some of the ADPhotoKit modules. By default, you get all subspecs.
+You can install only some of the ADPhotoKit modules. By default, you get `CoreUI` subspecs.
 
 #### Swift Package Manager
 

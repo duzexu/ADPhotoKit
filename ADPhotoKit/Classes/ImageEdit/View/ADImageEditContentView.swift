@@ -227,7 +227,7 @@ class ADImageEditContentView: UIView {
             }
             
             let convert = convert(point, to: tool.toolInteractView!)
-            switch tool.toolInteractView!.policy {
+            switch tool.toolInteractView!.strategy {
             case .simult: // Allow interact with simult tool view
                 if tool.toolInteractView!.shouldInteract(gestureRecognizer, point: convert) {
                     if !isTap {

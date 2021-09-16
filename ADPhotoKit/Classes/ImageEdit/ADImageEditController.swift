@@ -7,13 +7,19 @@
 
 import UIKit
 
+/// System defalut image edit tools.
 public struct ADImageEditTools: OptionSet {
     public let rawValue: Int
     
+    /// Tool used to add color line to image.
     public static let lineDraw = ADImageEditTools(rawValue: 1 << 0)
+    /// Tool used to add image sticker to image.
     public static let imageStkr = ADImageEditTools(rawValue: 1 << 1)
+    /// Tool used to add text sticker to image.
     public static let textStkr = ADImageEditTools(rawValue: 1 << 2)
+    /// Tool used to clip image.
     public static let clip = ADImageEditTools(rawValue: 1 << 3)
+    /// Tool used to add mosaic effect to image.
     public static let mosaicDraw = ADImageEditTools(rawValue: 1 << 4)
     
     public static let all: ADImageEditTools = [.lineDraw, .imageStkr, .textStkr, .clip, .mosaicDraw]
@@ -23,10 +29,13 @@ public struct ADImageEditTools: OptionSet {
     }
 }
 
+/// Image edit info.
 public struct ADImageEditInfo {
     
+    /// Tools saved data. `Key` is tool's `identifier`.
     public var toolsJson: Dictionary<String,Any>?
     
+    /// Edit result image.
     public var editImg: UIImage?
     
     var clipRect: CGRect?
@@ -34,13 +43,20 @@ public struct ADImageEditInfo {
     
 }
 
+/// Image rotation.
 public enum ADRotation: CGFloat {
+    /// No rotation.
     case idle = 0
+    /// Rotate left.
     case left = -90
+    /// Rotate right.
     case right = 90
+    /// Rotate upside down.
     case down = 180
     
-    func rotateLeft() -> ADRotation {
+    /// Rotate left.
+    /// - Returns: Rotation after rotate left.
+    public func rotateLeft() -> ADRotation {
         switch self {
         case .idle:
             return .left
@@ -167,7 +183,7 @@ extension ADImageEditController {
         if tool.contains(.mosaicDraw) {
             tools.append(ADImageDraw(style: .mosaic(image)))
         }
-        if let custom = ADPhotoKitConfiguration.default.customImageEditTools {
+        if let custom = ADPhotoKitConfiguration.default.customImageEditToolsBlock?(image) {
             tools.append(contentsOf: custom)
         }
         

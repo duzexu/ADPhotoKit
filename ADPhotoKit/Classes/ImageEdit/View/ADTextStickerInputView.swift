@@ -219,11 +219,11 @@ class ADTextStickerInputView: UIView {
         var borderColor: UIColor
         switch style {
         case .normal:
-            foregroundColor = color.textColor
-            borderColor = color.bgColor
+            foregroundColor = color.primaryColor
+            borderColor = color.secondaryColor
         case .border:
-            foregroundColor = color.bgColor
-            borderColor = color.textColor
+            foregroundColor = color.secondaryColor
+            borderColor = color.primaryColor
         }
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = -0.32;

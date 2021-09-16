@@ -18,7 +18,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         }
     }
     
-    var policy: ADInteractPolicy {
+    var strategy: ADInteractStrategy {
         return .single
     }
     

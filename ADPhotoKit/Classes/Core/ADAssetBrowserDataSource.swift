@@ -25,7 +25,7 @@ public class ADAssetBrowserDataSource: NSObject {
     /// Select asset's index.
     public var selectIndexs: [Int?] = []
     
-    /// Current browser asset.
+    /// Current browser asset. Will be `nil` if select asset is not in `list`.
     public var current: ADAssetBrowsable? {
         if index < 0 {
             return nil

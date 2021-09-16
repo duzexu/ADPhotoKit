@@ -127,35 +127,51 @@ public class ADPhotoKitConfiguration {
     /// You can custom `image edit` image Bundle by this property or simple replace image in `ADPhotoKitImageEdit.bundle`. Default is `ADPhotoKitImageEdit.bundle`.
     public var customImageEditBundle: Bundle?
     
+    /// System image edit tools. Default is ordered by `ADImageEditTools.all` 's order. You can remove some tools or reorder.
+    /// - Note: If contain `.imageStkr`, you must set `imageStickerDataSource` or `customImageStickerSelectVC`.
     public var systemImageEditTools: ADImageEditTools = .all
     
-    public var customImageEditTools: [ADImageEditTool]?
+    /// User custom image edit tools. Custom tools is default add after system tools.
+    /// - Parameter image: Original image.
+    public var customImageEditToolsBlock: ((UIImage) -> [ADImageEditTool])?
     
     /* =============== draw =============== */
     
+    /// System line draw tool selectable colors.
     public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0x10C060)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x8B69EA)!]
     
+    /// System line draw tool default color index.
     public var lineDrawDefaultColorIndex: Int = 2
     
+    /// System line draw tool default line width.
     public var lineDrawWidth: CGFloat = 5
     
+    /// System mosaic draw tool default line width.
     public var mosaicDrawWidth: CGFloat = 25
     
     /* =============== image sticker =============== */
     
+    /// System image picker data source.
     public var imageStickerDataSource: ADImageStickerDataSource?
     
+    /// Custom image sticker select controller.
     public var customImageStickerSelectVC: ADImageStickerSelectable?
     
     /* =============== text sticker =============== */
     
+    /// Custom text sticker edit controller.
     public var customTextStickerEditVCBlock: ((ADTextSticker?) -> ADTextStickerEditable)?
     
+    /// System text sticker selectable colors. 
     public var textStickerColors: [ADTextStickerColor] = [(.white,.black),(.black,.white),(UIColor(hex: 0xF14F4F)!,.white),(UIColor(hex: 0xF3AA4E)!,.white),(UIColor(hex: 0x10C060)!,.white),(UIColor(hex: 0x1EB7F3)!,.white),(UIColor(hex: 0x8B69EA)!,.white)]
     
+    /// System text sticker tool default color index.
     public var textStickerDefaultColorIndex: Int = 0
     
     /* =============== clip =============== */
+    
+    /// Custom image clip controller.
+    public var customImageClipVCBlock: ((ADClipInfo) -> ADImageClipable)?
     
     #endif
 

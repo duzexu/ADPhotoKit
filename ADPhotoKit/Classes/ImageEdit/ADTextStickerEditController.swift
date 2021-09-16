@@ -129,7 +129,7 @@ private extension ADTextStickerEditController {
         
         let colors = ADPhotoKitConfiguration.default.textStickerColors
         for color in colors {
-            let cell = ADColorCell(color: color.textColor)
+            let cell = ADColorCell(color: color.primaryColor)
             cell.isSelect = color == sticker.color
             stackView.addArrangedSubview(cell)
         }

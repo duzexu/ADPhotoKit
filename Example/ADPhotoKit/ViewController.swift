@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import ADPhotoKit
+@_exported import ADPhotoKit
 import Photos
 import ProgressHUD
 
@@ -84,6 +84,10 @@ class ViewController: UIViewController {
             sections.append(section)
         }
         ADPhotoKitConfiguration.default.imageStickerDataSource = ADImageStickerDataSource(sections: sections)
+        
+        ADPhotoKitConfiguration.default.customImageEditToolsBlock = { image in
+            return [ImageFilterTool(image: image)]
+        }
         
         let stack = UIStackView()
         stack.axis = .horizontal

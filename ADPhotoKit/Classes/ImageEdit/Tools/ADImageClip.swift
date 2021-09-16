@@ -27,7 +27,7 @@ class ADImageClip: ADImageEditTool {
     
     var isSelected: Bool = false
     
-    var contentStatus: ((Bool) -> Void)?
+    var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
@@ -35,7 +35,7 @@ class ADImageClip: ADImageEditTool {
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         if let sourceInfo = source?.clipSource() {
             let info = ADClipInfo(image: sourceInfo.image, clipRect: clipRect, rotation: rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
-            let clip = ADImageClipController(clipInfo: info)
+            let clip = ADImageEditConfigurable.imageClipVC(clipInfo: info)
             clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
                 self?.clipRect = clipRect
                 self?.rotation = rotation

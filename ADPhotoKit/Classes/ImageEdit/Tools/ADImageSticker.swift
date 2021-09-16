@@ -10,7 +10,7 @@ import Foundation
 struct ADStickerInfo {
     let image: UIImage
     let transform: CGAffineTransform
-    let outerScale: CGFloat
+    let scale: CGFloat
     let center: CGPoint
     let sticker: ADTextSticker?
 }
@@ -28,7 +28,7 @@ class ADImageSticker: ADImageEditTool {
     
     var isSelected: Bool = false
     
-    var contentStatus: ((Bool) -> Void)?
+    var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: (UIView & ADToolConfigable)?
     var toolInteractView: (UIView & ADToolInteractable)?
@@ -88,13 +88,13 @@ class ADImageSticker: ADImageEditTool {
         case .text:
             let stkrs: [ADStickerInfo] = textStkrs.compactMap { $0.target }.map { obj in
                 let content = (obj as! ADTextStickerContentView)
-                return ADStickerInfo(image: content.image, transform: content.transform, outerScale: content.outerScale, center: content.center, sticker: content.sticker)
+                return ADStickerInfo(image: content.image, transform: content.transform, scale: content.scale, center: content.center, sticker: content.sticker)
             }
             return ["stkrs":stkrs]
         case .image:
             let stkrs: [ADStickerInfo] = imageStkrs.compactMap { $0.target }.map { obj in
                 let content = obj as! ADImageStickerContentView
-                return ADStickerInfo(image: content.image, transform: content.transform, outerScale: content.outerScale, center: content.center, sticker: nil)
+                return ADStickerInfo(image: content.image, transform: content.transform, scale: content.scale, center: content.center, sticker: nil)
             }
             return ["stkrs":stkrs]
         }
@@ -109,7 +109,7 @@ class ADImageSticker: ADImageEditTool {
                         let content = ADTextStickerContentView(image: item.image, sticker: item.sticker!)
                         content.transform = item.transform
                         content.center = item.center
-                        content.outerScale = item.outerScale
+                        content.scale = item.scale
                         textStkrs.append(ADWeakProxy(target: content))
                         ADStickerInteractView.share.appendContent(content)
                     }
@@ -118,7 +118,7 @@ class ADImageSticker: ADImageEditTool {
                         let content = ADImageStickerContentView(image: item.image)
                         content.transform = item.transform
                         content.center = item.center
-                        content.outerScale = item.outerScale
+                        content.scale = item.scale
                         imageStkrs.append(ADWeakProxy(target: content))
                         ADStickerInteractView.share.appendContent(content)
                     }

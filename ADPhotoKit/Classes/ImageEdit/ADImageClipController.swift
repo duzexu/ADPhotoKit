@@ -7,20 +7,34 @@
 
 import UIKit
 
-struct ADClipInfo {
-    let image: UIImage
-    var clipRect: CGRect?
-    var rotation: ADRotation
+/// Image clip info.
+public struct ADClipInfo {
+    /// Origin image whithout clip but with other edit tool.
+    public let image: UIImage
+    /// Normalized clip rect. If `nil`, means image is not clip.
+    public var clipRect: CGRect?
+    /// Image rotation info.
+    public var rotation: ADRotation
     
-    let clipImage: UIImage
-    let clipFrom: CGRect
+    /// Cliped Image use to animated.
+    public let clipImage: UIImage
+    /// Rect where clip image animated from.
+    public let clipFrom: CGRect
+    
+    public init(image: UIImage, clipRect: CGRect?, rotation: ADRotation, clipImage: UIImage, clipFrom: CGRect) {
+        self.image = image
+        self.clipRect = clipRect
+        self.rotation = rotation
+        self.clipImage = clipImage
+        self.clipFrom = clipFrom
+    }
     
     var isOrigin: Bool {
         return clipRect == nil && rotation == .idle
     }
 }
 
-class ADImageClipController: UIViewController {
+class ADImageClipController: UIViewController, ADImageClipConfigurable {
     
     var clipInfo: ADClipInfo
     
@@ -46,7 +60,7 @@ class ADImageClipController: UIViewController {
     
     private var rotationInfo: (UIView,CGFloat)?
         
-    init(clipInfo: ADClipInfo) {
+    required init(clipInfo: ADClipInfo) {
         self.clipInfo = clipInfo
         self.originalClipInfo = clipInfo
         self.editedImage = clipInfo.image.image(with: clipInfo.rotation.rawValue/180.0*CGFloat.pi)

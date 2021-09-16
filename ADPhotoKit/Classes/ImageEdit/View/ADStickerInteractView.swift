@@ -13,7 +13,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         return ADInteractZIndex.Top.rawValue
     }
     
-    public var policy: ADInteractPolicy {
+    public var strategy: ADInteractStrategy  {
         return .simult
     }
     
@@ -34,8 +34,12 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 break
             }
         }
+        if target != activeTarget {
+            activeTarget?.resignActive()
+        }
         if gesture.isKind(of: UITapGestureRecognizer.self) {
             if let t = target {
+                activeTarget = t
                 if (gesture as! UITapGestureRecognizer).numberOfTapsRequired == 1 {
                     if t.isActive {
                         t.resignActive()
@@ -108,6 +112,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 }
             }
             target?.beginActive()
+            activeTarget = target
             target = nil
             if animated {
                 return 0.3
@@ -146,6 +151,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     private var trashIdentifyTrans: CGAffineTransform = .identity
         
     private weak var target: ADStickerContentView?
+    private weak var activeTarget: ADStickerContentView?
     
     init() {
         super.init(frame: .zero)
@@ -166,7 +172,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     public func addContent(_ view: ADStickerContentView) {
+        activeTarget?.resignActive()
+        activeTarget = view
         if let info = clipingScreenInfo {
+            view.outerScale = info.scale
             view.pinch(by: 1/info.scale)
             view.rotate(by: -info.rotate.rawValue/180.0*CGFloat.pi)
             view.center = CGPoint(x: info.screen.midX, y: info.screen.midY)
@@ -293,13 +302,17 @@ public class ADStickerContentView: UIView {
     
     let maxScale: CGFloat = 10
     
-    public var outerScale: CGFloat = 1 {
+    fileprivate var outerScale: CGFloat = 1 {
         didSet {
-            layer.borderWidth = 0.5 / outerScale
+            updateBorderWidth()
         }
     }
     
-    fileprivate var internalScale: CGFloat = 1
+    public var scale: CGFloat = 1 {
+        didSet {
+            updateBorderWidth()
+        }
+    }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -344,9 +357,9 @@ public class ADStickerContentView: UIView {
     
     func pinch(by scale: CGFloat) {
         if scale != 0 {
-            let scal = internalScale * scale
-            if scal <= maxScale {
-                internalScale = scal
+            let scal = self.scale * scale
+            if scal <= maxScale/outerScale {
+                self.scale = scal
                 transform = transform.scaledBy(x: scale, y: scale)
             }
         }
@@ -354,6 +367,10 @@ public class ADStickerContentView: UIView {
     
     func rotate(by angle: CGFloat) {
         transform = transform.rotated(by: angle)
+    }
+    
+    private func updateBorderWidth() {
+        layer.borderWidth = 0.5 / (outerScale * scale)
     }
     
 }
