@@ -331,16 +331,4 @@ public class ADSelectAssetModel: Equatable {
         return lhs.identifier == rhs.identifier
     }
     
-    func result(with image: UIImage?) -> ADAssetResult? {
-        #if Module_ImageEdit
-        return ADAssetResult(image: image, imageEditInfo: imageEditInfo)
-        #else
-        if let img = image {
-            return ADAssetResult(image: img)
-        }else{
-            return nil
-        }
-        #endif
-    }
-    
 }

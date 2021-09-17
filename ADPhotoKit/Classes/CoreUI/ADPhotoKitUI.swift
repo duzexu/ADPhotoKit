@@ -28,6 +28,20 @@ public struct ADAssetResult {
     #endif
 }
 
+extension ADSelectAssetModel {
+    func result(with image: UIImage?) -> ADAssetResult? {
+        #if Module_ImageEdit
+        return ADAssetResult(image: image, imageEditInfo: imageEditInfo)
+        #else
+        if let img = image {
+            return ADAssetResult(image: img)
+        }else{
+            return nil
+        }
+        #endif
+    }
+}
+
 /// Main class of ADPhotoKit UI. It provide methods to show asset picker or asset browser.
 public class ADPhotoKitUI {
     

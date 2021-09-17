@@ -7,6 +7,19 @@
 
 import UIKit
 
+/// Protocol use to show alert.
+public protocol ADAlertConfigurable {
+    
+    /// Show alert on controller.
+    /// - Parameters:
+    ///   - on: The controller to show alert.
+    ///   - title: Alert title.
+    ///   - message: Alert message.
+    ///   - completion: Called when confirm button click.
+    static func alert(on: UIViewController, title: String?, message: String?, completion: ((Int)->Void)?)
+        
+}
+
 class ADAlert: ADAlertConfigurable {
 
     static func alert(on: UIViewController, title: String? = nil, message: String? = nil, completion: ((Int)->Void)? = nil) {

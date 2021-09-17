@@ -12,20 +12,26 @@ extension Bundle {
     
     static var baseBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitBase", cls: ADPhotoKitConfiguration.self)
     
-    static var coreUIBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitCoreUI", cls: ADPhotoManager.self)
+    #if Module_UI
+    static var coreUIBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitCoreUI", cls: ADPhotoKitUI.self)
+    #endif
     
+    #if Module_ImageEdit
     static var imageEditBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitImageEdit", cls: ADPhotoManager.self)
+    #endif
     
     enum Module {
-        case core
+        case coreUI
         case imageEdit
     }
     
-    static func image(name: String, module: Module = .core) -> UIImage? {
+    static func image(name: String, module: Module = .coreUI) -> UIImage? {
         switch module {
-        case .core:
+        case .coreUI:
+            #if Module_UI
             let bundle = ADPhotoKitConfiguration.default.customCoreUIBundle
             return bundle?.image(name: name) ?? coreUIBundle?.image(name: name)
+            #endif
         case .imageEdit:
             #if Module_ImageEdit
             let bundle = ADPhotoKitConfiguration.default.customImageEditBundle
