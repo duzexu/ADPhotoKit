@@ -35,6 +35,9 @@ public struct ADImageEditInfo {
     /// Tools saved data. `Key` is tool's `identifier`.
     public var toolsJson: Dictionary<String,Any>?
     
+    /// Modifyed origin image.
+    public var modifyImg: UIImage?
+    
     /// Edit result image.
     public var editImg: UIImage?
     
@@ -187,7 +190,15 @@ extension ADImageEditController {
             tools.append(contentsOf: custom)
         }
         
-        contentView = ADImageEditContentView(image: image, tools: tools)
+        for tool in tools {
+            if var editable = tool as? ADSourceImageEditable {
+                editable.modifySourceImage = { [weak self] image in
+                    self?.sourceImageDidChanged(image)
+                }
+            }
+        }
+        
+        contentView = ADImageEditContentView(image: editInfo.modifyImg ?? image, tools: tools)
         view.addSubview(contentView)
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -241,15 +252,21 @@ extension ADImageEditController {
         contentView.scrollView.panGestureRecognizer.require(toFail: panGes)
     }
     
+    func sourceImageDidChanged(_ image: UIImage) {
+        editInfo.modifyImg = image
+        contentView.sourceImageChanged(image)
+        for tool in controlsView.tools {
+            if let modify = tool as? ADSourceImageModify {
+                modify.sourceImageDidModify(image)
+            }
+        }
+    }
 }
 
 extension ADImageEditController {
     
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
         let point = tap.location(in: view)
-        if controlsView.singleTap(with: point) {
-            return
-        }
         if contentView.gestureShouldBegin(tap, point: point) {
             return
         }
@@ -382,11 +399,14 @@ extension ADImageEditController: UIGestureRecognizerDelegate {
         if contentView.scrollView.isZooming {
             return false
         }
+        let point = gestureRecognizer.location(in: view)
         if gestureRecognizer.isKind(of: UITapGestureRecognizer.self) {
+            if controlsView.point(inside: point, with: nil) {
+                return false
+            }
             return true
         }
-        let point = gestureRecognizer.location(in: view)
-        return contentView.gestureShouldBegin(gestureRecognizer, point: point)
+        return contentView.gestureShouldBegin(gestureRecognizer, point: point) && !controlsView.point(inside: point, with: nil)
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {

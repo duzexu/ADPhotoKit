@@ -85,10 +85,6 @@ class ViewController: UIViewController {
         }
         ADPhotoKitConfiguration.default.imageStickerDataSource = ADImageStickerDataSource(sections: sections)
         
-        ADPhotoKitConfiguration.default.customImageEditToolsBlock = { image in
-            return [ImageFilterTool(image: image)]
-        }
-        
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 20
@@ -771,6 +767,25 @@ class ViewController: UIViewController {
         
         let customConfig = ConfigSection(title: "CustomUIConfig", models: customModels)
         dataSource.append(customConfig)
+        
+        var imageEditModels: [ConfigModel] = []
+        
+        let filter = ConfigModel(title: "Image Filter", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customImageEditToolsBlock = { image in
+                        return [ImageFilterTool(image: image)]
+                    }
+                }else{
+                    ADPhotoKitConfiguration.default.customImageEditToolsBlock = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(filter)
+        
+        let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
+        dataSource.append(imageEditConfig)
     }
 
     @IBAction func presentImagePicker(_ sender: UIButton) {

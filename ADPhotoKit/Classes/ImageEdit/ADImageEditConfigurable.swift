@@ -57,17 +57,30 @@ public extension ADImageEditTool {
     var selectImage: UIImage? { return nil }
 }
 
+/// `ImageEditTool` can confirm this protocol to add ability to modify the original image.
+public protocol ADSourceImageEditable {
+    var modifySourceImage: ((UIImage) -> Void)? { get set }
+}
+
+/// `ImageEditTool` can confirm this protocol to add ability to do something when the original image is modify.
+public protocol ADSourceImageModify {
+    func sourceImageDidModify(_ image: UIImage)
+}
+
 /// Use to control tool's setting config view.
 public protocol ADToolConfigable {
     
     /// Whether it can respond when clicked.
-    /// - Parameter point: Point where user click.
+    /// - Parameters:
+    ///   - point:  Point where user click.
+    ///   - event: System event.
     /// - Returns: Return `true` if can response user's click. Otherwise, return `false`.
-    func singleTap(with point: CGPoint) -> Bool
+    func point(inside point: CGPoint, with event: UIEvent?) -> Bool
+    
 }
 
 extension ADToolConfigable {
-    public func singleTap(with point: CGPoint) -> Bool {
+    public func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         return false
     }
 }

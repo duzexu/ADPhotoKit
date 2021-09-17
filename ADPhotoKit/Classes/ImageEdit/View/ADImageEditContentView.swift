@@ -156,7 +156,7 @@ class ADEditContainerView: UIView {
 
 class ADImageEditContentView: UIView {
     
-    let image: UIImage
+    var image: UIImage
 
     var scrollView: UIScrollView!
     var container: ADEditContainerView!
@@ -182,6 +182,11 @@ class ADImageEditContentView: UIView {
         interactTools = interactTools.sorted(by: { t1, t2 in
             return t1.toolInteractView!.zIndex > t2.toolInteractView!.zIndex
         })
+    }
+    
+    func sourceImageChanged(_ image: UIImage) {
+        self.image = image
+        container.imageView.image = image
     }
     
     func update(clipRect: CGRect?, rotation: ADRotation) {
@@ -319,6 +324,7 @@ private extension ADImageEditContentView {
         }
         
         container = ADEditContainerView(image: image)
+        container.isUserInteractionEnabled = false
         scrollView.addSubview(container)
         resizeView(pixelWidth: image.size.width, pixelHeight: image.size.height)
         container.setClipRect(nil, rotation: .idle, viewSize: container.bounds.size)

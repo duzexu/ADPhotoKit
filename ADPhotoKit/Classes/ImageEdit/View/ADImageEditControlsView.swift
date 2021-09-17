@@ -53,7 +53,6 @@ class ADImageEditControlsView: UIView {
         self.vc = vc
         self.tools = tools
         super.init(frame: .zero)
-        isUserInteractionEnabled = false
         
         for item in tools {
             item.contentLockStatus = { [weak self] lock in
@@ -64,33 +63,6 @@ class ADImageEditControlsView: UIView {
         setupUI()
     }
     
-    func singleTap(with point: CGPoint) -> Bool {
-        guard alpha == 1 else {
-            return false
-        }
-        for item in userInteractionBtns {
-            if item.frame.contains(point) {
-                item.sendActions(for: .touchUpInside)
-                return true
-            }
-        }
-        for sub in toolConfigContainer.subviews {
-            if let tool = sub as? ADToolConfigable {
-                if tool.singleTap(with: point) {
-                    return true
-                }
-            }
-        }
-        if toolsCollectionView.frame.contains(point) {
-            let sub = convert(point, to: toolsCollectionView)
-            if let indexPath = toolsCollectionView.indexPathForItem(at: sub) {
-                collectionView(toolsCollectionView, didSelectItemAt: indexPath)
-                return true
-            }
-        }
-        return false
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -99,6 +71,26 @@ class ADImageEditControlsView: UIView {
         super.layoutSubviews()
         topShadow.frame = CGRect(x: 0, y: 0, width: frame.width, height: 150)
         bottomShadow.frame = CGRect(x: 0, y: frame.height-140-tabBarOffset, width: frame.width, height: 140+tabBarOffset)
+    }
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        guard alpha == 1 else {
+            return false
+        }
+        for item in userInteractionBtns {
+            if item.frame.contains(point) {
+                return true
+            }
+        }
+        for sub in toolConfigContainer.subviews {
+            if sub.point(inside: point, with: event) {
+                return true
+            }
+        }
+        if toolsCollectionView.frame.contains(point) {
+            return true
+        }
+        return false
     }
     
 }

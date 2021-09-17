@@ -41,6 +41,10 @@ class ADMosaicDrawView: UIView, ADToolConfigable {
         return false
     }
     
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return revokeBtn.frame.contains(point)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

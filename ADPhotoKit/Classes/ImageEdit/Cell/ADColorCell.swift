@@ -15,6 +15,8 @@ class ADColorCell: UIView {
         }
     }
     
+    var cellSelectBlock: ((Int) -> Void)?
+    
     private var bgView: UIView!
     
     init(color: UIColor) {
@@ -38,10 +40,21 @@ class ADColorCell: UIView {
             make.center.equalToSuperview()
             make.size.equalTo(CGSize(width: 18, height: 18))
         }
+        
+        let btn = UIButton(type: .custom)
+        btn.addTarget(self, action: #selector(colorCellAction), for: .touchUpInside)
+        addSubview(btn)
+        btn.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc func colorCellAction(_ sender: UIButton) {
+        cellSelectBlock?(tag)
     }
 
 }

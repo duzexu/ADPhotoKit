@@ -69,7 +69,9 @@ enum Filter: CaseIterable {
     }
 }
 
-class ImageFilterTool: NSObject, ADImageEditTool {
+class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
+    
+    var modifySourceImage: ((UIImage) -> Void)?
     
     var image: UIImage {
         return UIImage(named: "filter")!
@@ -96,11 +98,14 @@ class ImageFilterTool: NSObject, ADImageEditTool {
     }
     
     func encode() -> Any? {
-        return nil
+        return ["index":selectIndex]
     }
     
     func decode(from: Any) {
-        
+        if let json = from as? Dictionary<String,Any> {
+            selectIndex = json["index"] as? Int ?? 0
+        }
+        indexDidChange()
     }
     
     let originImage: UIImage
@@ -116,8 +121,6 @@ class ImageFilterTool: NSObject, ADImageEditTool {
         
         let selectV = ImageFilterSelectView(dataSource: self)
         toolConfigView = selectV
-        let interactV = ImageFilterInteractView(frame: .zero)
-        toolInteractView = interactV
         
         DispatchQueue.global().async {
             for filter in filters {
@@ -126,8 +129,7 @@ class ImageFilterTool: NSObject, ADImageEditTool {
                 self.filterImages.append(filter.process(img: image))
             }
             DispatchQueue.main.async {
-                interactV.imageView.image = self.filterImages[self.selectIndex]
-                selectV.collectionView.reloadData()
+                self.indexDidChange()
             }
         }
         
@@ -146,6 +148,14 @@ class ImageFilterTool: NSObject, ADImageEditTool {
             UIGraphicsEndImageContext()
             return result
         }
+    }
+    
+    func indexDidChange() {
+        guard selectIndex < filterImages.count else {
+            return
+        }
+        (toolConfigView as? ImageFilterSelectView)?.collectionView.reloadData()
+        modifySourceImage?(filterImages[selectIndex])
     }
     
 }
@@ -173,7 +183,6 @@ extension ImageFilterTool: UICollectionViewDataSource, UICollectionViewDelegate 
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectIndex = indexPath.row
-        (toolInteractView as? ImageFilterInteractView)?.imageView.image = filterImages[indexPath.row]
-        collectionView.reloadData()
+        indexDidChange()
     }
 }

@@ -51,12 +51,17 @@ class ADLineDrawView: UIView, ADToolConfigable {
         }
         
         revokeBtn = UIButton(type: .custom)
+        revokeBtn.addTarget(self, action: #selector(revokeAction(_:)), for: .touchUpInside)
         revokeBtn.isEnabled = false
         revokeBtn.setImage(Bundle.image(name: "icons_filled_previous", module: .imageEdit), for: .normal)
         
         for (i,color) in colors.enumerated() {
             let cell = ADColorCell(color: color)
+            cell.cellSelectBlock = { [weak self] index in
+                self?.select = index
+            }
             cell.isSelect = i == select
+            cell.tag = i
             stackView.addArrangedSubview(cell)
             colorCells.append(cell)
         }
@@ -64,25 +69,16 @@ class ADLineDrawView: UIView, ADToolConfigable {
         stackView.addArrangedSubview(revokeBtn)
     }
     
-    func singleTap(with point: CGPoint) -> Bool {
-        if stackView.frame.contains(point) {
-            let sub = convert(point, to: stackView)
-            if revokeBtn.frame.contains(sub) {
-                revokeAction?()
-                return true
-            }
-            for (i,cell) in colorCells.enumerated() {
-                if cell.frame.contains(sub) {
-                    select = i
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return stackView.frame.contains(point)
+    }
+    
+    @objc func revokeAction(_ sender: UIButton) {
+        revokeAction?()
     }
     
 }

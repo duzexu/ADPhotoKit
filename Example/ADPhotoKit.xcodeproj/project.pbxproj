@@ -91,7 +91,6 @@
 		95792A9126579AA300AE8ED5 /* VideoBrowserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95792A8F26579AA300AE8ED5 /* VideoBrowserCell.xib */; };
 		9582CACC26F338C100C250E7 /* ImageFilterTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582CACB26F338C100C250E7 /* ImageFilterTool.swift */; };
 		9582CACE26F33B1700C250E7 /* ImageFilterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582CACD26F33B1700C250E7 /* ImageFilterSelectView.swift */; };
-		9582CAD026F33B4B00C250E7 /* ImageFilterInteractView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582CACF26F33B4B00C250E7 /* ImageFilterInteractView.swift */; };
 		BFEB069A60BB41EC33CB7F50 /* Pods_ADPhotoKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24853DA6C7C8D2739F567EE4 /* Pods_ADPhotoKit_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -187,7 +186,6 @@
 		95792A8F26579AA300AE8ED5 /* VideoBrowserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VideoBrowserCell.xib; sourceTree = "<group>"; };
 		9582CACB26F338C100C250E7 /* ImageFilterTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterTool.swift; sourceTree = "<group>"; };
 		9582CACD26F33B1700C250E7 /* ImageFilterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterSelectView.swift; sourceTree = "<group>"; };
-		9582CACF26F33B4B00C250E7 /* ImageFilterInteractView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterInteractView.swift; sourceTree = "<group>"; };
 		95CADD19265CD0A100009D1B /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		A1D674AD92CA2F57D0C42C9D /* Pods-ADPhotoKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ADPhotoKit_Tests.release.xcconfig"; path = "Target Support Files/Pods-ADPhotoKit_Tests/Pods-ADPhotoKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		AD6AD32727AAE9474B8F3EE1 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -399,7 +397,6 @@
 			children = (
 				9582CACB26F338C100C250E7 /* ImageFilterTool.swift */,
 				9582CACD26F33B1700C250E7 /* ImageFilterSelectView.swift */,
-				9582CACF26F33B4B00C250E7 /* ImageFilterInteractView.swift */,
 			);
 			name = Edit;
 			sourceTree = "<group>";
@@ -612,7 +609,6 @@
 				9522FB332655133D00A0D360 /* ProgressHUD.swift in Sources */,
 				9551F0B9263C0AF10089C8DE /* Stepper.swift in Sources */,
 				9551F0B2263BA9130089C8DE /* ConfigModel.swift in Sources */,
-				9582CAD026F33B4B00C250E7 /* ImageFilterInteractView.swift in Sources */,
 				9582CACE26F33B1700C250E7 /* ImageFilterSelectView.swift in Sources */,
 				9551F0B6263BACB70089C8DE /* ConfigCell.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,

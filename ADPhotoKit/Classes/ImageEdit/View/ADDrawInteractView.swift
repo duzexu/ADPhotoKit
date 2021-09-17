@@ -179,6 +179,26 @@ class ADDrawInteractView: UIView, ADToolInteractable {
 
 }
 
+extension ADDrawInteractView: ADSourceImageModify {
+    func sourceImageDidModify(_ image: UIImage) {
+        switch style {
+        case .line(_):
+            break
+        case .mosaic(_):
+            if let cgImg = image.cgImage {
+                let ciImage = CIImage(cgImage: cgImg)
+                let filter = CIFilter(name: "CIPixellate")
+                filter?.setValue(ciImage, forKey: kCIInputImageKey)
+                filter?.setValue(20, forKey: kCIInputScaleKey)
+                if let output = filter?.outputImage {
+                    let context = CIContext()
+                    layer.contents = context.createCGImage(output, from: CGRect(origin: .zero, size: image.size))
+                }
+            }
+        }        
+    }
+}
+
 struct DrawPath {
     
     let width: CGFloat

@@ -29,15 +29,22 @@ class ImageFilterSelectView: UIView, ADToolConfigable {
         self.dataSource = dataSource
         super.init(frame: .zero)
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 60, height: 80)
+        layout.minimumLineSpacing = 15
+        layout.minimumInteritemSpacing = 15
+        layout.scrollDirection = .horizontal
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.dataSource = dataSource
         collectionView.delegate = dataSource
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = .clear
         addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.bottom.equalTo(self.snp.bottomMargin).offset(-64)
             make.left.equalToSuperview().offset(15)
             make.right.equalToSuperview().offset(-15)
-            make.height.equalTo(30)
+            make.height.equalTo(80)
         }
         collectionView.register(FilterCell.self, forCellWithReuseIdentifier: "FilterCell")
     }
@@ -46,6 +53,9 @@ class ImageFilterSelectView: UIView, ADToolConfigable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return collectionView.frame.contains(point)
+    }
 }
 
 class FilterCell: UICollectionViewCell {
@@ -56,6 +66,14 @@ class FilterCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        contentView.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         nameLabel = UILabel()
         nameLabel.font = UIFont.systemFont(ofSize: 12)
         nameLabel.textColor = .white
@@ -63,14 +81,6 @@ class FilterCell: UICollectionViewCell {
         contentView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.bottom.left.right.equalToSuperview()
-        }
-        
-        imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        contentView.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
     

@@ -110,3 +110,14 @@ class ADImageDraw: ADImageEditTool {
     }
     
 }
+
+extension ADImageDraw: ADSourceImageModify {
+    func sourceImageDidModify(_ image: UIImage) {
+        switch style {
+        case .line(_, _):
+            break
+        case .mosaic(_):
+            (toolInteractView as? ADDrawInteractView)?.sourceImageDidModify(image)
+        }
+    }
+}
