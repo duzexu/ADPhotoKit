@@ -115,18 +115,18 @@ public class ADAssetBrowserController: UIViewController {
                 let maxImageCount = config.params.maxImageCount ?? Int.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                    ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                     return false
                 }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                    ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
                     return false
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     if selectMediaImage {
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "不能选择视频", completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: "不能选择视频", completion: nil)
                     }else{
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "不能选择图片", completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: "不能选择图片", completion: nil)
                     }
                     return false
                 }else{
@@ -135,17 +135,17 @@ public class ADAssetBrowserController: UIViewController {
                     let maxImageCount = config.params.maxImageCount ?? Int.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
                         return false
                     }
                 }
             }
         }else{
             let message = String(format: ADLocale.LocaleKey.exceededMaxSelectCount.localeTextValue, max)
-            ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
+            ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
             return false
         }
         return true

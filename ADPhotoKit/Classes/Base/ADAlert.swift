@@ -32,3 +32,11 @@ class ADAlert: ADAlertConfigurable {
     }
 
 }
+
+extension ADAlert {
+    #if Module_Core
+    static func alert() -> ADAlertConfigurable.Type {
+        return ADPhotoKitConfiguration.default.customAlert ?? ADAlert.self
+    }
+    #endif
+}

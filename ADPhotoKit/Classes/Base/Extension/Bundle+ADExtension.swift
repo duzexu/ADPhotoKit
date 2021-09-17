@@ -17,7 +17,7 @@ extension Bundle {
     #endif
     
     #if Module_ImageEdit
-    static var imageEditBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitImageEdit", cls: ADPhotoManager.self)
+    static var imageEditBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitImageEdit", cls: ADImageEditController.self)
     #endif
     
     enum Module {

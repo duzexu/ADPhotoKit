@@ -258,8 +258,6 @@ class ADPhotoUIConfigurable {
         return ADPhotoKitConfiguration.default.customProgressBlock?() ?? ADProgressView()
     }
     
-    static func alert() -> ADAlertConfigurable.Type {
-        return ADPhotoKitConfiguration.default.customAlert ?? ADAlert.self
-    }
+    
     
 }

@@ -68,14 +68,14 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                 if let max = config.params.maxVideoTime {
                     if duration > max {
                         let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }
                 }
                 if let min = config.params.minVideoTime {
                     if duration < min {
                         let message = String(format: ADLocale.LocaleKey.shorterThanMaxVideoDuration.localeTextValue, min)
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }
                 }

@@ -634,7 +634,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 if let min = self.config.params.minRecordTime {
                     let asset = AVAsset(url: url)
                     if Int(asset.duration.seconds) < min {
-                        ADPhotoUIConfigurable.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min), completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min), completion: nil)
                         return
                     }
                 }
