@@ -22,6 +22,9 @@
 "hudLoading" = "기다리는 중...";
 
 "exceededMaxSelectCount" = "최대 선택 수: %ld";
+"exceededMaxImageSelectCount" = "동영상 최대 사진을 수: %ld";
+"imageNotSelectable" = "사진을 선택할 수 없습니다";
+"videoNotSelectable" = "동영상을 선택할 수 없습니다";
 "longerThanMaxVideoDuration" = "길이가 %ld 초 보다 긴 동영상을 선택할 수 없습니다";
 "shorterThanMaxVideoDuration" = "기간이 %ld 초 보다 짧은 비디오를 선택할 수 없습니다";
 "exceededMaxVideoSelectCount" = "동영상 최대 선택 수: %ld";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "모든 사진";
 "unableToAccessAllPhotos" = "앨범 사진에 접근할 수 없습니다.\n\"사진\"에서 \"모든 사진\"에 대한 접근을 허용합니다.";
-"textStickerRemoveTips" = "제거하려면 여기로 드래그하세요";
+"textStickerDeleteTips" = "제거하려면 여기로 드래그하세요";
+"textStickerReleaseToDelete" = "삭제하러 가자";

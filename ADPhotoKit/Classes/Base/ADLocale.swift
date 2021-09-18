@@ -69,8 +69,14 @@ public class ADLocale {
         case saveImageError
         /// Failed to save the video (视频保存失败)
         case saveVideoError
-        /// Max select count: %ld (最多只能选择%ld张图片)
+        /// Max select count: %ld (最多只能选择%ld个)
         case exceededMaxSelectCount
+        /// Cannot select image (不能选择图片)
+        case imageNotSelectable
+        /// Cannot select video (不能选择视频)
+        case videoNotSelectable
+        /// Max count for image selection: %ld (最多只能选择%ld张图片)
+        case exceededMaxImageSelectCount
         /// Max count for video selection: %ld (最多只能选择%ld个视频)
         case exceededMaxVideoSelectCount
         /// Min count for video selection: %ld (最少选择%ld个视频)
@@ -125,8 +131,10 @@ public class ADLocale {
         case noTitleAlbumListPlaceholder
         /// Unable to access all photos, go to settings (无法访问所有照片，前往设置)
         case unableToAccessAllPhotos
+        /// Release to delete (松手即可删除)
+        case textStickerReleaseToDelete
         /// Drag here to remove (拖到此处删除)
-        case textStickerRemoveTips
+        case textStickerDeleteTips
         
         /// Return key's localizable text.
         public var localeTextValue: String {

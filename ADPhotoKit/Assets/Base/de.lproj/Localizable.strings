@@ -22,6 +22,9 @@
 "hudLoading" = "warten...";
 
 "exceededMaxSelectCount" = "Maximale Auswahlanzahl: %ld";
+"exceededMaxImageSelectCount" = "Image max Auswahlanzahl: %ld";
+"imageNotSelectable" = "Image kann nicht ausgewählt werden";
+"videoNotSelectable" = "Video kann nicht ausgewählt werden";
 "longerThanMaxVideoDuration" = "Video mit einer Dauer von mehr als %lds kann nicht ausgewählt werden";
 "shorterThanMaxVideoDuration" = "Video mit einer Dauer von weniger als %lds kann nicht ausgewählt werden";
 "exceededMaxVideoSelectCount" = "Video max Auswahlanzahl: %ld";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "Alle Fotos";
 "unableToAccessAllPhotos" = "Zugriff auf alle Fotos im Album nicht möglich.\nZugriff auf \"Alle Fotos\" unter \"Fotos\" zulassen.";
-"textStickerRemoveTips" = "Zum Entfernen hierher ziehen";
+"textStickerDeleteTips" = "Zum Entfernen hierher ziehen";
+"textStickerReleaseToDelete" = "Release to delete";

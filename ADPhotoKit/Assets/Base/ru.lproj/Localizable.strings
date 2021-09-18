@@ -22,6 +22,9 @@
 "hudLoading" = "ожидание...";
 
 "exceededMaxSelectCount" = "Максимальное количество выбранных: %ld";
+"exceededMaxImageSelectCount" = "Максимальное количество выбранных изображений: %ld";
+"imageNotSelectable" = "Не могу выбрать картинку";
+"videoNotSelectable" = "Невозможно выбрать видео";
 "longerThanMaxVideoDuration" = "Невозможно выбрать видео длительностью более %ld с";
 "shorterThanMaxVideoDuration" = "Невозможно выбрать видео продолжительностью менее 2 с";
 "exceededMaxVideoSelectCount" = "Максимальное количество выбранных видео: %ld";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "Все фотографии";
 "unableToAccessAllPhotos" = "Невозможно получить доступ к фотографиям в альбоме.\nРазрешить доступ ко \"Всем фотографиям\" в \"Фото\".";
-"textStickerRemoveTips" = "Перетащите сюда, чтобы удалить";
+"textStickerDeleteTips" = "Перетащите сюда, чтобы удалить";
+"textStickerReleaseToDelete" = "Отпустить, чтобы удалить";

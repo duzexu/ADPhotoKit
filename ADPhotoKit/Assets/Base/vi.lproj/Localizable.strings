@@ -22,6 +22,9 @@
 "hudLoading" = "đang chờ đợi...";
 
 "exceededMaxSelectCount" = "Số lượng lựa chọn tối đa: %ld";
+"exceededMaxImageSelectCount" = "Số lượng lựa chọn tối đa của image: %ld";
+"imageNotSelectable" = "Không thể chọn ảnh";
+"videoNotSelectable" = "Không thể chọn video";
 "longerThanMaxVideoDuration" = "Không thể chọn video có thời lượng dài hơn %ld giây";
 "shorterThanMaxVideoDuration" = "Không thể chọn video có thời lượng ngắn hơn %ld giây";
 "exceededMaxVideoSelectCount" = "Số lượng lựa chọn tối đa của video: %ld";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "Tất cả ảnh";
 "unableToAccessAllPhotos" = "Không thể truy cập tất cả ảnh trong album.\nCho phép truy cập vào \"Tất cả ảnh\" trong \"Ành\".";
-"textStickerRemoveTips" = "Kéo vào đây để xóa";
+"textStickerDeleteTips" = "Kéo vào đây để xóa";
+"textStickerReleaseToDelete" = "Đi để xóa";

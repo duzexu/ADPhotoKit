@@ -22,6 +22,9 @@
 "hudLoading" = "menunggu...";
 
 "exceededMaxSelectCount" = "Kiraan maksimum untuk pemilihan: %ld";
+"exceededMaxImageSelectCount" = "Jumlah maksimum untuk pemilihan image: %ld";
+"imageNotSelectable" = "Tidak dapat memilih image";
+"videoNotSelectable" = "Tidak dapat memilih video";
 "longerThanMaxVideoDuration" = "Tidak dapat memilih video dengan jangka masa lebih lama daripada %lds";
 "shorterThanMaxVideoDuration" = "Tidak dapat memilih video dengan jangka masa lebih pendek daripada %lds";
 "exceededMaxVideoSelectCount" = "Jumlah maksimum untuk pemilihan video: %ld";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "Semua Foto";
 "unableToAccessAllPhotos" = "Tidak dapat mengakses semua foto dalam album.\nBenarkan akses kepada \"Semua Foto\" dalam \"Foto\".";
-"textStickerRemoveTips" = "Seret ke sini untuk mengalih keluar";
+"textStickerDeleteTips" = "Seret ke sini untuk mengalih keluar";
+"textStickerReleaseToDelete" = "Lepaskan untuk memadam";

@@ -249,7 +249,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 imageView.isHighlighted = isConfirmed
                 bgView.isHidden = isConfirmed
                 backgroundColor = isConfirmed ? UIColor(hex: 0xF14F4F, alpha: 0.98) : .clear
-                tipsLabel.text = isConfirmed ? "松手即可删除" : ADLocale.LocaleKey.textStickerRemoveTips.localeTextValue
+                tipsLabel.text = isConfirmed ? ADLocale.LocaleKey.textStickerReleaseToDelete.localeTextValue : ADLocale.LocaleKey.textStickerDeleteTips.localeTextValue
             }
         }
         
@@ -278,7 +278,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             tipsLabel.textAlignment = .center
             tipsLabel.font = UIFont.systemFont(ofSize: 12)
             tipsLabel.textColor = .white
-            tipsLabel.text = ADLocale.LocaleKey.textStickerRemoveTips.localeTextValue
+            tipsLabel.text = ADLocale.LocaleKey.textStickerDeleteTips.localeTextValue
             addSubview(tipsLabel)
             tipsLabel.snp.makeConstraints { make in
                 make.bottom.equalToSuperview()

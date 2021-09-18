@@ -118,15 +118,16 @@ public class ADAssetBrowserController: UIViewController {
                     ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                     return false
                 }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                    ADAlert.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
+                    let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
+                    ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                     return false
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     if selectMediaImage {
-                        ADAlert.alert().alert(on: self, title: nil, message: "不能选择视频", completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.videoNotSelectable.localeTextValue, completion: nil)
                     }else{
-                        ADAlert.alert().alert(on: self, title: nil, message: "不能选择图片", completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.imageNotSelectable.localeTextValue, completion: nil)
                     }
                     return false
                 }else{
@@ -138,7 +139,8 @@ public class ADAssetBrowserController: UIViewController {
                         ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                        ADAlert.alert().alert(on: self, title: nil, message: "最多选择\(maxImageCount)个图片", completion: nil)
+                        let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
                         return false
                     }
                 }

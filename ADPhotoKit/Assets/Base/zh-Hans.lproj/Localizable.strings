@@ -21,7 +21,10 @@
 "loading" = "加载中，请稍后";
 "hudLoading" = "正在处理...";
 
-"exceededMaxSelectCount" = "最多只能选择%ld张图片";
+"exceededMaxSelectCount" = "最多选择数%ld";
+"exceededMaxImageSelectCount" = "最多只能选择%ld张图片";
+"imageNotSelectable" = "无法选择图片";
+"videoNotSelectable" = "无法选择视频";
 "longerThanMaxVideoDuration" = "不能选择超过%ld秒的视频";
 "shorterThanMaxVideoDuration" = "不能选择低于%ld秒的视频";
 "exceededMaxVideoSelectCount" = "最多只能选择%ld个视频";
@@ -62,4 +65,5 @@
 
 "noTitleAlbumListPlaceholder" = "所有照片";
 "unableToAccessAllPhotos" = "无法访问相册中所有照片，\n请允许访问「照片」中的「所有照片」。";
-"textStickerRemoveTips" = "拖到此处删除";
+"textStickerDeleteTips" = "拖到此处删除";
+"textStickerReleaseToDelete" = "松手即可删除";
