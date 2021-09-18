@@ -10,6 +10,7 @@ import UIKit
 /// System image sticker select controller datasource.
 public struct ADImageStickerDataSource {
     
+    /// Sticker item
     public struct StickerItem {
         public let image: UIImage
         public let name: String?
@@ -20,6 +21,7 @@ public struct ADImageStickerDataSource {
         }
     }
     
+    /// Sticker section
     public struct StickerSection {
         public let name: String
         public let icon: UIImage

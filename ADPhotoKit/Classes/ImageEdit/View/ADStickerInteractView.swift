@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Shared view that you can add sticker to.
 public class ADStickerInteractView: UIView, ADToolInteractable {
     
     public var zIndex: Int {
@@ -134,6 +135,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         clipView.clipsToBounds = true
     }
     
+    /// Get shared sticker interact view.
     public static var share = ADStickerInteractView()
     
     weak var ctx: UIViewController?
@@ -167,10 +169,8 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func clear() {
-        container.subviews.forEach { $0.removeFromSuperview() }
-    }
-    
+    /// Add sticker content to shared view.
+    /// - Parameter view: Sticker content.
     public func addContent(_ view: ADStickerContentView) {
         activeTarget?.resignActive()
         activeTarget = view
@@ -186,8 +186,17 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         view.beginActive()
     }
     
+    /// Add sticker content to shared view.
+    /// - Parameter view: Sticker content
+    /// - Note: Use this method when revert saved data from encode data.
+    /// - Note: The difference from `addContent(_ view: ADStickerContentView)` is you must set `contentView`'s transform, center and scale by yourself.`
     public func appendContent(_ view: ADStickerContentView) {
         container.addSubview(view)
+    }
+    
+    /// Clear all content in shared view.
+    public func clear() {
+        container.subviews.forEach { $0.removeFromSuperview() }
     }
         
     func presentTrashView() {
@@ -296,6 +305,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     
 }
 
+/// Sticker base content view that you can add to `ADStickerInteractView`.
 public class ADStickerContentView: UIView {
     
     var isActive: Bool = false
@@ -308,22 +318,29 @@ public class ADStickerContentView: UIView {
         }
     }
     
+    /// View's scale.
     public var scale: CGFloat = 1 {
         didSet {
             updateBorderWidth()
         }
     }
     
+    /// Initial view whith frame
+    /// - Parameter frame: View rect.
     public override init(frame: CGRect) {
         super.init(frame: frame)
         layer.borderWidth = 0.5
         layer.borderColor = UIColor.clear.cgColor
     }
     
+    /// Called when double tap the content view. Subclass can override and do some operation.
+    /// - Parameter ctx: Image edit controller.
     open func doubleTapAction(ctx: UIViewController?) {
         
     }
     
+    /// Call this method when sticker size changed.
+    /// - Parameter size: New sticker size.
     public func sizeDidChange(_ size: CGSize) {
         let oldCenter = center
         let oldTrans = transform
@@ -375,12 +392,15 @@ public class ADStickerContentView: UIView {
     
 }
 
+/// Subclass of `ADStickerContentView`, Used to display image sticker.
 public class ADImageStickerContentView: ADStickerContentView {
     
     var image: UIImage
     
     var imageView: UIImageView!
     
+    /// Create content view with image.
+    /// - Parameter image: Sticker image.
     public init(image: UIImage) {
         self.image = image
         super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -10, dy: -10))
@@ -392,6 +412,8 @@ public class ADImageStickerContentView: ADStickerContentView {
         }
     }
     
+    /// Call when image changed.
+    /// - Parameter img: New sticker image.
     public func updateImage(_ img: UIImage) {
         sizeDidChange(CGSize(width: img.size.width+20, height: img.size.height+20) )
         image = img

@@ -242,7 +242,7 @@ public protocol ADImageClipConfigurable: AnyObject {
     
 }
 
-public class ADImageEditConfigurable {
+class ADImageEditConfigurable {
     
     static func imageStickerSelectVC() -> ADImageStickerSelectable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
