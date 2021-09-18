@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADPhotoKit - ADClipInfo</title>
+    <link rel="stylesheet" type="text/css" href="https://duzexu.github.io/ADPhotoKit/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="https://duzexu.github.io/ADPhotoKit/">
+            <strong>
+                ADPhotoKit
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#adclipinfo.init(image:cliprect:rotation:clipimage:clipfrom:)">init(image:​clip​Rect:​rotation:​clip​Image:​clip​From:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adclipinfo.image">image</a></li><li class="variable"><a href="#adclipinfo.cliprect">clip​Rect</a></li><li class="variable"><a href="#adclipinfo.rotation">rotation</a></li><li class="variable"><a href="#adclipinfo.clipimage">clip​Image</a></li><li class="variable"><a href="#adclipinfo.clipfrom">clip​From</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Structure</small>
+    <code class="name">ADClip​Info</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">ADClipInfo</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Image clip info.</p>
+
+</div>
+
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="adclipinfo.init(image:cliprect:rotation:clipimage:clipfrom:)">
+    <h3>
+        <code><a href="#adclipinfo.init(image:cliprect:rotation:clipimage:clipfrom:)">init(image:​clip​Rect:​rotation:​clip​Image:​clip​From:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">image</span>: <span class="type">UIImage</span>, <span class="variable">clipRect</span>: <span class="type">CGRect</span>?, <span class="variable">rotation</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADRotation"><span class="type">ADRotation</span></a>, <span class="variable">clipImage</span>: <span class="type">UIImage</span>, <span class="variable">clipFrom</span>: <span class="type">CGRect</span>)  </body></html></code></pre>
+</div>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="adclipinfo.image">
+    <h3>
+        <code><a href="#adclipinfo.image">image</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">image</span>: <span class="type">UIImage</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Origin image whithout clip but with other edit tool.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adclipinfo.cliprect">
+    <h3>
+        <code><a href="#adclipinfo.cliprect">clip​Rect</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">clipRect</span>: <span class="type">CGRect</span>? </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Normalized clip rect. If <code>nil</code>, means image is not clip.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adclipinfo.rotation">
+    <h3>
+        <code><a href="#adclipinfo.rotation">rotation</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">rotation</span>: <a href="https://duzexu.github.io/ADPhotoKit/ADRotation"><span class="type">ADRotation</span></a></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Image rotation info.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adclipinfo.clipimage">
+    <h3>
+        <code><a href="#adclipinfo.clipimage">clip​Image</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">clipImage</span>: <span class="type">UIImage</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Cliped Image use to animated.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="adclipinfo.clipfrom">
+    <h3>
+        <code><a href="#adclipinfo.clipfrom">clip​From</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">clipFrom</span>: <span class="type">CGRect</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Rect where clip image animated from.</p>
+
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-09-18T06:48:55+0000">September 18, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>
