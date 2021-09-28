@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     
     name: "ADPhotoKit",
-    
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v10)
     ],
@@ -16,8 +16,8 @@ let package = Package(
     ],
     
     dependencies: [
-        .package(url: "https://github.com/SnapKit/SnapKit.git", .upToNextMajor(from: "5.0.1")),
-        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "6.0.0")
+        .package(url: "https://gitee.com/zexu007/SnapKit", .upToNextMajor(from: "5.0.1")),
+        .package(url: "https://gitee.com/zexu007/Kingfisher.git", from: "6.0.0")
     ],
     
     targets: [
@@ -28,11 +28,12 @@ let package = Package(
             ],
             path: "ADPhotoKit/Classes",
             resources: [
-                .process("ADPhotoKit/Assets")
+                .process(".")
             ],
             swiftSettings: [
-                .define("Module_UI", .when(configuration: .release)),
-                .define("Module_UI", .when(configuration: .debug))
+                .define("Module_Core"),
+                .define("Module_UI"),
+                .define("Module_ImageEdit")
             ]
         )
     ]

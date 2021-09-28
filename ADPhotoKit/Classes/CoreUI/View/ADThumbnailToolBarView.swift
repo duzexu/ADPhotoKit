@@ -141,7 +141,7 @@ private extension ADThumbnailToolBarView {
         }
         
         originalBtn = createBtn(ADLocale.LocaleKey.originalPhoto.localeTextValue, #selector(originalAction))
-        originalBtn.isHidden = !config.assetOpts.contains(.selectOriginal) && config.albumOpts.contains(.allowImage)
+        originalBtn.isHidden = !config.browserOpts.contains(.selectOriginal) && config.albumOpts.contains(.allowImage)
         originalBtn.isSelected = isOriginal
         originalBtn.setImage(Bundle.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.image(name: "btn_original_selected"), for: .selected)

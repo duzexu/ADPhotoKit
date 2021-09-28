@@ -57,14 +57,12 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let allowBrowser = ADAssetSelectOptions(rawValue: 1 << 10)
     /// Allow toolbar in thumbnail controller
     public static let thumbnailToolBar = ADAssetSelectOptions(rawValue: 1 << 11)
-    /// Allow select full image.
-    public static let selectOriginal = ADAssetSelectOptions(rawValue: 1 << 12)
-        
+       
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.selectOriginal,.slideSelect,.autoScroll,allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.slideSelect,.autoScroll,allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
     
 }
 
@@ -73,15 +71,17 @@ public struct ADAssetBrowserOptions: OptionSet {
     public let rawValue: Int
     
     /// Allow select full image.
+    ///
+    /// Identify whether the user selects the original image. If contains `fetchImage`, will fetch orginal image, otherwise return the screen-fit-size image.
     public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
     /// Display the selected photos at the bottom of the browse large photos interface.
-    public static let selectBrowser = ADAssetBrowserOptions(rawValue: 1 << 1)
+    public static let selectThumbnil = ADAssetBrowserOptions(rawValue: 1 << 1)
     /// Display the index of the selected photos at navbar.
     public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
     /// Allow framework fetch image when callback.
     public static let fetchImage = ADAssetBrowserOptions(rawValue: 1 << 3)
     
-    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectBrowser, .selectIndex, .fetchImage]
+    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue

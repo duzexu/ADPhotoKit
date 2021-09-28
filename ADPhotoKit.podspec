@@ -25,6 +25,7 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'duzexu' => 'zexu007@qq.com' }
   s.source           = { :git => 'https://github.com/duzexu/ADPhotoKit.git', :tag => s.version.to_s }
+  s.documentation_url = 'https://duzexu.github.io/ADPhotoKit/'
 
   s.ios.deployment_target = '10.0'
   s.swift_version = '5.1'
@@ -34,6 +35,7 @@ Pod::Spec.new do |s|
   
   s.subspec "Base" do |b|
     b.source_files  = ["ADPhotoKit/Classes/Base/**/*.swift"]
+    b.preserve_paths = 'ADPhotoKit/ADPhotoKit.docc'
     b.resource_bundles = {
       'ADPhotoKitBase' => ['ADPhotoKit/Assets/Base/**/*']
     }

@@ -347,18 +347,6 @@ class ViewController: UIViewController {
         }
         assetModels.append(thumbnailToolBar)
         
-        let selectOriginal = ConfigModel(title: "SelectOriginal", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.assetOptions.insert(.selectOriginal)
-                }else{
-                    self?.assetOptions.remove(.selectOriginal)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(selectOriginal)
-        
         let assetConfig = ConfigSection(title: "AssetOptions", models: assetModels)
         dataSource.append(assetConfig)
         
@@ -379,9 +367,9 @@ class ViewController: UIViewController {
         let selectBrowser = ConfigModel(title: "SelectBrowser", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.browserOptions.insert(.selectBrowser)
+                    self?.browserOptions.insert(.selectThumbnil)
                 }else{
-                    self?.browserOptions.remove(.selectBrowser)
+                    self?.browserOptions.remove(.selectThumbnil)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -796,7 +784,7 @@ class ViewController: UIViewController {
         } : []
         ADPhotoKitUI.imagePicker(present: self,
                                  style: pickerStyle,
-                                 assets: s,
+                                 models: s,
                                  albumOpts: albumOptions,
                                  assetOpts: assetOptions,
                                  browserOpts: browserOptions,
@@ -808,6 +796,18 @@ class ViewController: UIViewController {
                                  canceled: {
             print("cancel")
         })
+//        ADPhotoKitUI.imagePicker(present: self,
+//                                 models: [],
+//                                 albumOpts: [.allowImage, .allowVideo],
+//                                 assetOpts: .default,
+//                                 browserOpts: .default,
+//                                 params: [.maxCount(max: 9)],
+//                                 selected: { (assets, value) in
+//            print(assets)
+//        },
+//                                 canceled: {
+//            print("cancel")
+//        })
     }
     
     @IBAction func presentAssetBrowser(_ sender: UIButton) {

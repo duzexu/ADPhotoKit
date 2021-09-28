@@ -11,7 +11,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
 
     var height: CGFloat {
         var hi: CGFloat = 55+tabBarOffset
-        if let ds = dataSource, ds.options.contains(.selectBrowser) {
+        if let ds = dataSource, ds.options.contains(.selectThumbnil) {
             hi += 100
         }
         return hi

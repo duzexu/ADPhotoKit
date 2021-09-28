@@ -106,7 +106,7 @@ public class ADPhotoKitUI {
     /// - Parameters:
     ///   - on: The controller to show picker.
     ///   - style: Style to display picker.
-    ///   - assets: Asset models have been selected.
+    ///   - models: Asset models have been selected.
     ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
     ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
     ///   - browserOpts: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
@@ -115,7 +115,7 @@ public class ADPhotoKitUI {
     ///   - canceled: Called when cancel select.
     public class func imagePicker(present on: UIViewController,
                                     style: ADPickerStyle = .normal,
-                                    assets: [ADSelectAssetModel] = [],
+                                    models: [ADSelectAssetModel] = [],
                                     albumOpts: ADAlbumSelectOptions = .default,
                                     assetOpts: ADAssetSelectOptions = .default,
                                     browserOpts: ADAssetBrowserOptions = .default,
@@ -123,13 +123,13 @@ public class ADPhotoKitUI {
                                     selected: @escaping AssetSelectHandler,
                                     canceled: AssetCancelHandler? = nil) {
         let configuration = ADPhotoKitConfig(albumOpts: albumOpts, assetOpts: assetOpts, browserOpts: browserOpts, params: params, pickerSelect: selected, browserSelect: nil, canceled: canceled)
-        if let asset = assets.randomElement() {
+        if let asset = models.randomElement() {
             configuration.selectMediaImage = ADAssetModel(asset: asset.asset).type.isImage
         }
         config = configuration
         if style == .normal {
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let album = ADAlbumListController(config: configuration, selects: assets)
+                let album = ADAlbumListController(config: configuration, selects: models)
                 let nav = ADPhotoNavController(rootViewController: album)
                 album.pushThumbnail(with: model, style: style, animated: false)
                 nav.modalPresentationStyle = .fullScreen
@@ -137,7 +137,7 @@ public class ADPhotoKitUI {
             }
         }else{
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: assets)
+                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: models)
                 let nav = ADPhotoNavController(rootViewController: thumbnail)
                 nav.modalPresentationStyle = .fullScreen
                 on.present(nav, animated: true, completion: nil)

@@ -109,9 +109,11 @@ public enum ADRotation: CGFloat {
     }
 }
 
-class ADImageEditController: UIViewController {
+/// Controller to edit image.
+public class ADImageEditController: UIViewController {
     
-    var imageDidEdit: ((ADImageEditInfo) -> Void)?
+    /// Called when finish image edit.
+    public var imageDidEdit: ((ADImageEditInfo) -> Void)?
     
     let image: UIImage
     var editInfo: ADImageEditInfo
@@ -135,7 +137,11 @@ class ADImageEditController: UIViewController {
         }
     }
     
-    init(image: UIImage, editInfo: ADImageEditInfo? = nil) {
+    /// Create image edit controller.
+    /// - Parameters:
+    ///   - image: Image to edit.
+    ///   - editInfo: Edited info.
+    public init(image: UIImage, editInfo: ADImageEditInfo? = nil) {
         self.image = image
         self.editInfo = editInfo ?? ADImageEditInfo()
         super.init(nibName: nil, bundle: nil)
@@ -145,7 +151,7 @@ class ADImageEditController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         definesPresentationContext = true
@@ -155,7 +161,7 @@ class ADImageEditController: UIViewController {
         setupUI()
     }
     
-    override var prefersStatusBarHidden: Bool {
+    public override var prefersStatusBarHidden: Bool {
         return true
     }
 
@@ -396,7 +402,7 @@ extension ADImageEditController: ADImageClipDismissTransitionContextTo {
 }
 
 extension ADImageEditController: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if contentView.scrollView.isZooming {
             return false
         }
@@ -410,13 +416,13 @@ extension ADImageEditController: UIGestureRecognizerDelegate {
         return contentView.gestureShouldBegin(gestureRecognizer, point: point) && !controlsView.point(inside: point, with: nil)
     }
     
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
 }
 
 extension ADImageEditController: UIViewControllerTransitioningDelegate {
-    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         let controller = ADPresentationController(presentedViewController: presented, presenting: presenting)
         controller.appearance = self
         return controller

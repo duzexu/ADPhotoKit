@@ -114,9 +114,7 @@ extension Bundle {
         
         #if SWIFT_PACKAGE
         // For SWIFT_PACKAGE.
-        if let url = Bundle.module?.bundleURL {
-            candidates.append(url)
-        }
+        candidates.append(Bundle.module.bundleURL)
         #endif
 
         for candidate in candidates {

@@ -5,8 +5,8 @@
 //  Created by MAC on 2021/3/14.
 //
 
-import Foundation
-import UIKit
+@_exported import Foundation
+@_exported import UIKit
 
 /// Class to modify ADPhotoKit's configuration.
 public class ADPhotoKitConfiguration {
