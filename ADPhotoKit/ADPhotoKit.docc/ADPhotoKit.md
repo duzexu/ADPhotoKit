@@ -6,8 +6,11 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 
 ![logo](logo)
 
-
-
+ADPhotoKit contains four moudles:
+* Base: Module provides base configuration and extensions.
+* Core: Module provides method to get system album data.
+* CoreUI: Module provides ui for asset select.
+* ImageEdit: Module provides image edit ability.
 
 ## Features
 
@@ -26,17 +29,18 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 
 ADPhotoKit is available under the MIT license. See the LICENSE file for more info.
 
-> Some code and resource are copy from **ZLPhotoBrowser**
-
 ## Topics
 
-### Getting Started
+### Essentials
 
-- <doc:GettingSrarted>
-- ``ADPhotoKitUI``
-
-### Picker
-
-- ``ADPhotoKitUI``
+- <doc:GettingStarted>
 - ``ADPhotoKitConfiguration``
+- ``ADPhotoManager``
+- ``ADPhotoKitUI``
 
+### Modules
+
+- <doc:BaseModule>
+- <doc:CoreModule>
+- <doc:CoreUIModule>
+- <doc:ImageEditModule>

@@ -19,6 +19,7 @@ public struct ADAlbumSelectOptions: OptionSet {
     /// If contain, results will have video assets. Default is contain.
     public static let allowVideo = ADAlbumSelectOptions(rawValue: 1 << 2)
     
+    /// Default options.
     public static let `default`: ADAlbumSelectOptions = [.allowImage, .allowVideo]
     
     public init(rawValue: Int) {
@@ -55,14 +56,18 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let allowAuthTips = ADAssetSelectOptions(rawValue: 1 << 9)
     /// Allow access to the browse large image interface (That is, whether to allow access to the large image interface after clicking the thumbnail image).
     public static let allowBrowser = ADAssetSelectOptions(rawValue: 1 << 10)
-    /// Allow toolbar in thumbnail controller
+    /// Allow toolbar in thumbnail controller.
     public static let thumbnailToolBar = ADAssetSelectOptions(rawValue: 1 << 11)
        
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.slideSelect,.autoScroll,allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
+    /// Default options.
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.slideSelect,.autoScroll,.allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
+    
+    /// Options do not allow mix select.
+    public static let exclusive: ADAssetSelectOptions = [.slideSelect,.autoScroll,.allowTakePhotoAsset,.thumbnailToolBar,.allowBrowser]
     
 }
 
@@ -81,6 +86,7 @@ public struct ADAssetBrowserOptions: OptionSet {
     /// Allow framework fetch image when callback.
     public static let fetchImage = ADAssetBrowserOptions(rawValue: 1 << 3)
     
+    /// Default options.
     public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage]
     
     public init(rawValue: Int) {

@@ -796,18 +796,6 @@ class ViewController: UIViewController {
                                  canceled: {
             print("cancel")
         })
-//        ADPhotoKitUI.imagePicker(present: self,
-//                                 models: [],
-//                                 albumOpts: [.allowImage, .allowVideo],
-//                                 assetOpts: .default,
-//                                 browserOpts: .default,
-//                                 params: [.maxCount(max: 9)],
-//                                 selected: { (assets, value) in
-//            print(assets)
-//        },
-//                                 canceled: {
-//            print("cancel")
-//        })
     }
     
     @IBAction func presentAssetBrowser(_ sender: UIButton) {

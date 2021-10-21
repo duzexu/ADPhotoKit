@@ -115,8 +115,47 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 
 ### More Advanced Example
 
-TODO
+Select up to 9 images or videos:
 
-For more configuration you can set, you can see ``ADPhotoKitConfiguration``.
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                        params: [.maxCount(max: 9)],
+                        selected: { (assets, origin) in
+    // do something
+})
+```
+
+Select 1 video or 9 images:
+
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                                 assetOpts: .exclusive,
+                                 params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
+                                 selected: { (assets, origin) in
+    // do something
+})
+```
+
+Select max 8 images:
+
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                                 albumOpts: [.allowImage],
+                                 assetOpts: .exclusive,
+                                 params: [.maxCount(max: 8)],
+                                 selected: { (assets, origin) in
+    // do something
+})
+```
+
+Browser network image and video:
+
+```swift
+ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
+    // do something
+}
+```
+
+For more usage configuration, you can see ``ADPhotoKitUI``.
 
 

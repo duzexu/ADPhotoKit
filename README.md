@@ -25,6 +25,8 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 
 ## Usage
 
+### Quick Start
+
 The simplest use-case is present the image picker on your controller:
 
 ```swift
@@ -33,7 +35,50 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 }
 ```
 
-For more configuration you can set, you can see [ADPhotoKitConfiguration](./ADPhotoKit/Classes/Core/ADPhotoKitConfiguration.swift).
+### More Advanced Example
+
+Select up to 9 images or videos:
+
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                        params: [.maxCount(max: 9)],
+                        selected: { (assets, origin) in
+    // do something
+})
+```
+
+Select 1 video or 9 images:
+
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                                 assetOpts: .exclusive,
+                                 params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
+                                 selected: { (assets, origin) in
+    // do something
+})
+```
+
+Select max 8 images:
+
+```swift
+ADPhotoKitUI.imagePicker(present: self,
+                                 albumOpts: [.allowImage],
+                                 assetOpts: .exclusive,
+                                 params: [.maxCount(max: 8)],
+                                 selected: { (assets, origin) in
+    // do something
+})
+```
+
+Browser network image and video:
+
+```swift
+ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
+    // do something
+}
+```
+
+For more usage configuration, you can see [ADPhotoKitUI](./ADPhotoKit/Classes/CoreUI/ADPhotoKitUI.swift).
 
 ## Learn More
 
@@ -62,6 +107,8 @@ target 'MyApp' do
   pod 'ADPhotoKit'
 end
 ```
+
+> DocC support need cocoaPods 1.12.0+
 
 ##### Subspecs
 
