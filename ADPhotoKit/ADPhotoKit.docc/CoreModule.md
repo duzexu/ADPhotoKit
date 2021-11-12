@@ -1,6 +1,6 @@
 #  Core Module
 
-Get system album raw data and warp as list dataSource.
+Get system album raw data and wrap as list dataSource.
 
 ## Topics
 
@@ -9,20 +9,18 @@ Get system album raw data and warp as list dataSource.
 - ``ADPhotoManager``
 - ``ADAssetResult``
 
-### Options
+### Options & Params
 
 - ``ADAlbumSelectOptions``
 - ``ADAssetSelectOptions``
 - ``ADAssetBrowserOptions``
 - ``ADPhotoSelectParams``
-- ``ADPickerStyle``
 
 ### Models
 
 - ``ADAlbumModel``
 - ``ADAlbumType``
 - ``ADAssetModel``
-- ``ADThumbnailSelectStatus``
 - ``ADSelectAssetModel``
 
 ### DataSource

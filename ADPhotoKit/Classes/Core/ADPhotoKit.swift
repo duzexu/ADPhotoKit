@@ -133,35 +133,4 @@ public enum ADPhotoSelectParams: Hashable, Equatable {
     }
 }
 
-/// Represent thumbnail cell's select status.
-public enum ADThumbnailSelectStatus {
-    /// Cell can be selet.
-    /// - Parameter index: If not nil, the cell is seleted and the value is select index.
-    case select(index: Int?)
-    /// Cell can not be selet.
-    case deselect
 
-    /// Return cell is select or not.
-    public var isSelect: Bool {
-        switch self {
-        case let .select(index):
-            if let _ = index {
-                return true
-            }else{
-                return false
-            }
-        case .deselect:
-            return false
-        }
-    }
-    
-    /// Return cell is selectable or not.
-    public var isEnable: Bool {
-        switch self {
-        case .select:
-            return true
-        case .deselect:
-            return false
-        }
-    }
-}

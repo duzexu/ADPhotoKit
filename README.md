@@ -1,6 +1,5 @@
 ![logo](./ADPhotoKit/ADPhotoKit.docc/Resources/logo@3x.png)
 
-[![CI Status](https://img.shields.io/travis/zexu007@qq.com/ADPhotoKit.svg?style=flat)](https://travis-ci.org/zexu007@qq.com/ADPhotoKit)
 [![Version](https://img.shields.io/cocoapods/v/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 [![License](https://img.shields.io/cocoapods/l/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
 [![Platform](https://img.shields.io/cocoapods/p/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)

@@ -121,7 +121,7 @@ public enum ADInteractType {
     case rotate(angle: CGFloat, point: CGPoint)
 }
 
-/// Warp of interaction view clip info.
+/// Wrap of interaction view clip info.
 /// - Parameters:
 ///     - screen: Screen rect convert to tool's interaction view.
 ///     - clip: Clip rect to to tool's interaction view.

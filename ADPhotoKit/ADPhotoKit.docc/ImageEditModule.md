@@ -23,9 +23,9 @@ Provide image editing capabilities.
 ### Clip
 
 - ``ADClipInfo``
+- ``ADRotation``
 - ``ADImageClipConfigurable``
 - ``ADImageClipable``
-- ``ADRotation``
 
 ### Interact View
 
@@ -34,7 +34,7 @@ Provide image editing capabilities.
 - ``ADInteractType``
 - ``ADInteractZIndex``
 
-### Sticker
+### Sticker Interact
 
 - ``ADStickerInteractView``
 - ``ADStickerContentView``

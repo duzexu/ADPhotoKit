@@ -233,6 +233,39 @@ public class ADAssetModel: Equatable {
         }
     }
     
+    /// Represent asset select status.
+    public enum SelectStatus {
+        /// Asset can be selected.
+        /// - Parameter index: If not nil, the asset is seleted and the value is select index.
+        case select(index: Int?)
+        /// Asset can not be selet.
+        case deselect
+
+        /// Return asset is select or not.
+        public var isSelect: Bool {
+            switch self {
+            case let .select(index):
+                if let _ = index {
+                    return true
+                }else{
+                    return false
+                }
+            case .deselect:
+                return false
+            }
+        }
+        
+        /// Return asset is selectable or not.
+        public var isEnable: Bool {
+            switch self {
+            case .select:
+                return true
+            case .deselect:
+                return false
+            }
+        }
+    }
+    
     /// An identifier which persistently identifies the object on a given device.
     public let identifier: String
     
@@ -248,7 +281,7 @@ public class ADAssetModel: Equatable {
     public var type: MediaType = .unknown
     
     /// Asset's select status.
-    public var selectStatus: ADThumbnailSelectStatus = .select(index: nil)
+    public var selectStatus: SelectStatus = .select(index: nil)
     
     /// Create asset info model.
     /// - Parameter asset: Asset to bind.
@@ -303,16 +336,16 @@ public class ADAssetModel: Equatable {
     
 }
 
-/// Warp of select asset.
+/// Wrap of select asset.
 public class ADSelectAssetModel: Equatable {
     
     /// PHAsset's identifier.
     public let identifier: String
     
-    /// Asset warp by model.
+    /// Asset wrap by model.
     public let asset: PHAsset
     
-    /// Index of asset in select array.
+    /// Index of asset in specified album list array. May be `nil` if album don't contain this asset.
     public var index: Int?
     
     #if Module_ImageEdit
@@ -320,8 +353,8 @@ public class ADSelectAssetModel: Equatable {
     public var imageEditInfo: ADImageEditInfo?
     #endif
     
-    /// Create warp model with asset.
-    /// - Parameter asset: Asset to warp.
+    /// Create wrap model with asset.
+    /// - Parameter asset: Asset to wrap.
     public init(asset: PHAsset) {
         self.identifier = asset.localIdentifier
         self.asset = asset

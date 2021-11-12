@@ -21,7 +21,7 @@ extension ADAssetModel {
 public class ADThumbnailListCell: UICollectionViewCell {
     
     /// Thumbnail cell select status.
-    public var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
+    public var selectStatus: ADAssetModel.SelectStatus = .select(index: nil) {
         didSet {
             selectStatusDidChange()
         }

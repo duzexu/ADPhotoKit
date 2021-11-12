@@ -28,6 +28,33 @@ public struct ADAssetResult {
     #endif
 }
 
+/// Parsing the input `Set<ADPhotoSelectParams>` to `ADConstraintParams` and pass through the internal methods.
+public struct ADConstraintParams {
+    
+    /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
+    public var maxCount: Int?
+    
+    /// Limit the min image count you can select. Set `nil` means no limit. Default is no limit.
+    public var minImageCount: Int?
+    /// Limit the max image count you can select. Set `nil` means no limit. Default is no limit.
+    public var maxImageCount: Int?
+    
+    /// Limit the min video count you can select. Set `nil` means no limit. Default is no limit.
+    public var minVideoCount: Int?
+    /// Limit the max video count you can select. Set `nil` means no limit. Default is no limit.
+    public var maxVideoCount: Int?
+    
+    /// Limit the min video time you can select. Set `nil` means no limit. Default is no limit.
+    public var minVideoTime: Int?
+    /// Limit the max video time you can select. Set `nil` means no limit. Default is no limit.
+    public var maxVideoTime: Int?
+    
+    /// Limit the min video time you can record. Set `nil` means no limit. Default is no limit.
+    public var minRecordTime: Int?
+    /// Limit the max video time you can record. Set `nil` means no limit. Default is no limit.
+    public var maxRecordTime: Int?
+}
+
 extension ADSelectAssetModel {
     func result(with image: UIImage?) -> ADAssetResult? {
         #if Module_ImageEdit
@@ -45,7 +72,7 @@ extension ADSelectAssetModel {
 /// Main class of ADPhotoKit UI. It provide methods to show asset picker or asset browser.
 public class ADPhotoKitUI {
     
-    /// Warp of select asset.
+    /// Wrap of select asset.
     /// - Parameters:
     ///     - asset: Asset select from system.
     ///     - result: Result fetch with asset. It's `nil` if not contain `ImageEdit` subspec and `browserOpts` not contain `.fetchImage`.
@@ -156,7 +183,7 @@ public class ADPhotoKitConfig {
     public let albumOpts: ADAlbumSelectOptions
     public let assetOpts: ADAssetSelectOptions
     public let browserOpts: ADAssetBrowserOptions
-    public let params: ADThumbnailParams
+    public let params: ADConstraintParams
     
     let pickerSelect: ADPhotoKitUI.AssetSelectHandler?
     let browserSelect: ADPhotoKitUI.AssetableSelectHandler?
@@ -182,7 +209,7 @@ public class ADPhotoKitConfig {
         self.browserSelect = browserSelect
         self.canceled = canceled
         
-        var value = ADThumbnailParams()
+        var value = ADConstraintParams()
         for item in params {
             switch item {
             case let .maxCount(max):

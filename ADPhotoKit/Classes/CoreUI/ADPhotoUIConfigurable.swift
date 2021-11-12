@@ -82,7 +82,7 @@ public typealias ADThumbnailCellable = (UICollectionViewCell & ADThumbnailCellCo
 public protocol ADThumbnailCellConfigurable {
     
     /// Thumbnail cell select status.
-    var selectStatus: ADThumbnailSelectStatus { set get }
+    var selectStatus: ADAssetModel.SelectStatus { set get }
     /// Asset model to config cell interface.
     var assetModel: ADAssetModel! { set get }
     /// Cell indexPath in collection view.

@@ -11,7 +11,7 @@ import ADPhotoKit
 
 class ThumbnailCell: UICollectionViewCell, ADThumbnailCellConfigurable {
     
-    var selectStatus: ADThumbnailSelectStatus = .select(index: nil) {
+    var selectStatus: ADAssetModel.SelectStatus = .select(index: nil) {
         didSet {
             selectStatusDidChange()
         }
