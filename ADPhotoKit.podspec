@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ADPhotoKit'
-  s.version          = '1.1.0'
+  s.version          = '1.1.1'
   s.summary          = 'A library for select photos from album implemented by pure-Swift.'
 
 # This description is used to generate tags and improve search results.
@@ -43,6 +43,7 @@ Pod::Spec.new do |s|
   
   s.subspec "Core" do |c|
     c.dependency 'ADPhotoKit/Base'
+    c.dependency 'Kingfisher', '<= 5.15.8'
     c.source_files  = ["ADPhotoKit/Classes/Core/**/*.swift"]
     c.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_Core'}
   end
@@ -50,7 +51,6 @@ Pod::Spec.new do |s|
   s.subspec "CoreUI" do |ui|
     ui.dependency 'ADPhotoKit/Core'
     ui.dependency 'SnapKit'
-    ui.dependency 'Kingfisher', '~> 6.0'
     ui.source_files  = ["ADPhotoKit/Classes/CoreUI/**/*.swift"]
     ui.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_UI'}
     ui.resource_bundles = {
