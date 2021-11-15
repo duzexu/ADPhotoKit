@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADPhotoKit - ADThumbnailSelectStatus</title>
+    <title>ADPhotoKit - ADAssetModel.SelectStatus</title>
     <link rel="stylesheet" type="text/css" href="https://duzexu.github.io/ADPhotoKit/all.css" media="all" />
 </head>
 <body>
@@ -25,7 +25,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#enumeration cases">Enumeration Cases</a><ul><li class="case"><a href="#adthumbnailselectstatus.select">select</a></li><li class="case"><a href="#adthumbnailselectstatus.deselect">deselect</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adthumbnailselectstatus.isselect">is​Select</a></li><li class="variable"><a href="#adthumbnailselectstatus.isenable">is​Enable</a></li></ul></li></ol>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Member Of</a></li></ul></li><li><a href="#enumeration cases">Enumeration Cases</a><ul><li class="case"><a href="#adassetmodel.selectstatus.select">select</a></li><li class="case"><a href="#adassetmodel.selectstatus.deselect">deselect</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#adassetmodel.selectstatus.isselect">is​Select</a></li><li class="variable"><a href="#adassetmodel.selectstatus.isenable">is​Enable</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -33,29 +33,38 @@
         <article>
             <h1>
     <small>Enumeration</small>
-    <code class="name">ADThumbnail​Select​Status</code>
+    <code class="name">ADAsset​Model.​Select​Status</code>
 </h1>
 
 <div class="declaration">
-<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">enum</span> <span class="type">ADThumbnailSelectStatus</span>  </body></html></code></pre>
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">enum</span> <span class="type">SelectStatus</span>  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>Represent thumbnail cell's select status.</p>
+    <p>Represent asset select status.</p>
 
 </div>
-
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        
+        <h3>Member Of</h3>
+<dl>
+    <dt class="class"><code><a href="https://duzexu.github.io/ADPhotoKit/ADAssetModel">ADAssetModel</a></code></dt>
+<dd><p>Model contain asset info.</p>
+</dd>
+</dl>
+</section>
     <section id="enumeration cases">
         <h2>Enumeration Cases</h2>
 
-        <div role="article" class="case" id="adthumbnailselectstatus.select">
+        <div role="article" class="case" id="adassetmodel.selectstatus.select">
     <h3>
-        <code><a href="#adthumbnailselectstatus.select">select</a></code>
+        <code><a href="#adassetmodel.selectstatus.select">select</a></code>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">case</span> <span class="variable">select</span>(<span class="variable">index</span>: <span class="type">Int</span>?) </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>Cell can be selet.</p>
+    <p>Asset can be selected.</p>
 
 </div>
 <h4>Parameters</h4>
@@ -72,21 +81,21 @@
     <tr>
     <th>index</th>
     <td></td>
-    <td><p>If not nil, the cell is seleted and the value is select index.</p>
+    <td><p>If not nil, the asset is seleted and the value is select index.</p>
 </td>
 </tr>
   </tbody>
 </table>
 </div>
-<div role="article" class="case" id="adthumbnailselectstatus.deselect">
+<div role="article" class="case" id="adassetmodel.selectstatus.deselect">
     <h3>
-        <code><a href="#adthumbnailselectstatus.deselect">deselect</a></code>
+        <code><a href="#adassetmodel.selectstatus.deselect">deselect</a></code>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">case</span> <span class="variable">deselect</span></body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>Cell can not be selet.</p>
+    <p>Asset can not be selet.</p>
 
 </div>
 </div>
@@ -94,27 +103,27 @@
     <section id="properties">
         <h2>Properties</h2>
 
-        <div role="article" class="variable" id="adthumbnailselectstatus.isselect">
+        <div role="article" class="variable" id="adassetmodel.selectstatus.isselect">
     <h3>
-        <code><a href="#adthumbnailselectstatus.isselect">is​Select</a></code>
+        <code><a href="#adassetmodel.selectstatus.isselect">is​Select</a></code>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">isSelect</span>: <span class="type">Bool</span>  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>Return cell is select or not.</p>
+    <p>Return asset is select or not.</p>
 
 </div>
 </div>
-<div role="article" class="variable" id="adthumbnailselectstatus.isenable">
+<div role="article" class="variable" id="adassetmodel.selectstatus.isenable">
     <h3>
-        <code><a href="#adthumbnailselectstatus.isenable">is​Enable</a></code>
+        <code><a href="#adassetmodel.selectstatus.isenable">is​Enable</a></code>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">isEnable</span>: <span class="type">Bool</span>  </body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
-    <p>Return cell is selectable or not.</p>
+    <p>Return asset is selectable or not.</p>
 
 </div>
 </div>
@@ -127,7 +136,7 @@
 
     <footer>
         <p>
-    Generated on <time datetime="2021-09-18T07:55:56+0000">September 18, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2021-11-15T08:08:55+0000">November 15, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
