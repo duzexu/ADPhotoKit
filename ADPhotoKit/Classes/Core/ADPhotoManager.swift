@@ -328,9 +328,9 @@ public class ADPhotoManager {
     @discardableResult
     public class func fetchAVAsset(forVideo asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
-        option.version = .original
+        option.version = .current
         option.deliveryMode = .automatic
-        option.isNetworkAccessAllowed =  true
+        option.isNetworkAccessAllowed = true
         option.progressHandler = { (pro, error, stop, info) in
             DispatchQueue.main.async {
                 progress?(pro, error, stop, info)
