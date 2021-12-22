@@ -777,25 +777,31 @@ class ViewController: UIViewController {
     }
 
     @IBAction func presentImagePicker(_ sender: UIButton) {
-        let s: [ADSelectAssetModel] = keepSelect ? selected.map {
-            let model = ADSelectAssetModel(asset: $0.asset)
-            model.imageEditInfo = $0.result?.imageEditInfo
-            return model
-        } : []
         ADPhotoKitUI.imagePicker(present: self,
-                                 style: pickerStyle,
-                                 models: s,
-                                 albumOpts: albumOptions,
-                                 assetOpts: assetOptions,
-                                 browserOpts: browserOptions,
-                                 params: params,
-                                 selected: { [weak self] (assets, value) in
-            self?.selected = assets
-            print(assets)
-        },
-                                 canceled: {
-            print("cancel")
+                                 assetOpts: .exclusive,
+                                 params: [.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1),.videoTime(min: 30, max: 300)],
+                                 selected: { (assets, origin) in
+            // do something
         })
+//        let s: [ADSelectAssetModel] = keepSelect ? selected.map {
+//            let model = ADSelectAssetModel(asset: $0.asset)
+//            model.imageEditInfo = $0.result?.imageEditInfo
+//            return model
+//        } : []
+//        ADPhotoKitUI.imagePicker(present: self,
+//                                 style: pickerStyle,
+//                                 models: s,
+//                                 albumOpts: albumOptions,
+//                                 assetOpts: assetOptions,
+//                                 browserOpts: browserOptions,
+//                                 params: params,
+//                                 selected: { [weak self] (assets, value) in
+//            self?.selected = assets
+//            print(assets)
+//        },
+//                                 canceled: {
+//            print("cancel")
+//        })
     }
     
     @IBAction func presentAssetBrowser(_ sender: UIButton) {

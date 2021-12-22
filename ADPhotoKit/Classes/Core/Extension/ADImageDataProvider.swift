@@ -10,13 +10,15 @@ import UIKit
 import Kingfisher
 import Photos
 
+/// PHAsset image loading error.
 enum ADImageDataProviderError: Error {
     case fetchError
 }
 
-class PHAssetImageDataProvider: ImageDataProvider {
+/// Kingfisher's ImageDataProvider to load image from `PHAsset`.
+public class PHAssetImageDataProvider: ImageDataProvider {
     
-    var cacheKey: String {
+    public var cacheKey: String {
         if let s = size {
             return "com.adphotokit.phasset_" + asset.localIdentifier + "_\(s.width)*\(s.height)"
         }
@@ -29,7 +31,12 @@ class PHAssetImageDataProvider: ImageDataProvider {
     
     private var requestID: PHImageRequestID?
     
-    init(asset: PHAsset, size: CGSize? = nil, progress: ((String,Double)->Void)? = nil) {
+    /// Creates an image data provider by supplying the target local file URL.
+    /// - Parameters:
+    ///   - asset: PHAsset from photo library.
+    ///   - size: Image thumbnail size, `nil` if fetch origin image data.
+    ///   - progress: Image loading progress.
+    public init(asset: PHAsset, size: CGSize? = nil, progress: ((String,Double)->Void)? = nil) {
         self.asset = asset
         self.size = size
         self.progress = progress
@@ -41,7 +48,7 @@ class PHAssetImageDataProvider: ImageDataProvider {
         }
     }
     
-    func data(handler: @escaping (Result<Data, Error>) -> Void) {
+    public func data(handler: @escaping (Result<Data, Error>) -> Void) {
         if let id = requestID {
             PHImageManager.default().cancelImageRequest(id)
         }

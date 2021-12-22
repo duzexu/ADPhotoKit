@@ -25,13 +25,19 @@ public class ADPhotoKitConfiguration {
     /// You can custom display text for diffent language on yourself. Default is nil.
     public var customLocaleValue: [Locale:[ADLocale.LocaleKey: String]]?
     
+    /// Custom alert. Default to use alert in framework.
+    public var customAlert: ADAlertConfigurable.Type?
+    
+    /// Bolck to generate `ProgressHUD`. Default to use hud in framework.
+    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
+    
+    /// Bolck to generate `ProgressView`. Default to use view in framework.
+    public var customProgressBlock: (() -> ADProgressableable)?
+    
     #if Module_Core
     
     /// Custom album orders, if type not contain, it will not display. Default is ordered by `ADAlbumType.allCases` 's order.
     public var customAlbumOrders: [ADAlbumType]?
-    
-    /// Custom alert. Default to use alert in framework.
-    public var customAlert: ADAlertConfigurable.Type?
     
     #endif
     
@@ -43,12 +49,6 @@ public class ADPhotoKitConfiguration {
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
     
-    /// Bolck to generate `ProgressHUD`. Default to use hud in framework.
-    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
-    
-    /// Bolck to generate `ProgressView`. Default to use view in framework.
-    public var customProgressBlock: (() -> ADProgressableable)?
-
     /// Timeout for request images from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20
     

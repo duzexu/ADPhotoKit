@@ -11,6 +11,7 @@ Get system album raw data and wrap as list dataSource.
 
 ### Options & Params
 
+- <doc:SelectionRestrict>
 - ``ADAlbumSelectOptions``
 - ``ADAssetSelectOptions``
 - ``ADAssetBrowserOptions``
@@ -29,3 +30,7 @@ Get system album raw data and wrap as list dataSource.
 - ``ADAssetListDataSource``
 - ``ADAssetBrowserDataSource``
 - ``ADDataSourceReloadable``
+
+### Utils
+
+- ``PHAssetImageDataProvider``

@@ -116,7 +116,7 @@ private extension ADVideoBrowserCell {
             make.top.equalToSuperview().offset(60)
         }
         
-        progressView = ADPhotoUIConfigurable.progress()
+        progressView = ADProgress.progress()
         progressView.isHidden = true
         contentView.addSubview(progressView)
         progressView.snp.makeConstraints { (make) in

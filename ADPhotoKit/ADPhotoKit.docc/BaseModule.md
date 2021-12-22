@@ -10,6 +10,7 @@ Modify configuration for ADPhotoKit.
 
 ### Multi-language Configuration
 
+- <doc:CustomLocalization>
 - ``ADLocale``
 
 ### UI Configuration

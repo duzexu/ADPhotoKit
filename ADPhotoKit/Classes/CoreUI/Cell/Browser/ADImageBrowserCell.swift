@@ -168,7 +168,7 @@ private extension ADImageBrowserView {
             make.edges.equalToSuperview()
         }
         
-        progressView = ADPhotoUIConfigurable.progress()
+        progressView = ADProgress.progress()
         progressView.isHidden = true
         addSubview(progressView)
         progressView.snp.makeConstraints { (make) in

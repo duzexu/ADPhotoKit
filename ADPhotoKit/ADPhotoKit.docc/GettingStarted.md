@@ -141,7 +141,6 @@ Select max 8 images:
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
                                  albumOpts: [.allowImage],
-                                 assetOpts: .exclusive,
                                  params: [.maxCount(max: 8)],
                                  selected: { (assets, origin) in
     // do something

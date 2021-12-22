@@ -87,7 +87,7 @@ public class ADThumbnailViewController: UIViewController {
     
     func reloadAssets() {
         if dataSource.list.isEmpty {
-            let hud = ADPhotoUIConfigurable.progressHUD()
+            let hud = ADProgress.progressHUD()
             hud.show(timeout: 0)
             dataSource.reloadData() {
                 hud.hide()
@@ -592,7 +592,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true) {
             if let image = info[.originalImage] as? UIImage {
-                let hud = ADPhotoUIConfigurable.progressHUD()
+                let hud = ADProgress.progressHUD()
                 hud.show(timeout: 0)
                 ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
                     if suc {
@@ -612,7 +612,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                     }
                 }
                 
-                let hud = ADPhotoUIConfigurable.progressHUD()
+                let hud = ADProgress.progressHUD()
                 hud.show(timeout: 0)
                 ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
                     if suc {
