@@ -223,6 +223,8 @@ public class ADPhotoManager {
             let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool ?? false)
             if downloadFinished {
                 completion(image, info, isDegraded)
+            }else{
+                completion(nil, info, false)
             }
         }
     }
@@ -253,6 +255,8 @@ public class ADPhotoManager {
             let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool ?? false)
             if !cancel, let data = data {
                 completion(data, info, isDegraded)
+            }else{
+                completion(nil, info, false)
             }
         }
     }
