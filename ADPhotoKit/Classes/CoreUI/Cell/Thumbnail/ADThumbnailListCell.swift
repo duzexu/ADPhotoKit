@@ -28,7 +28,7 @@ public class ADThumbnailListCell: UICollectionViewCell {
     }
     
     /// Called when cell select or deselect. The parameter `Bool` represent asset is selet or not.
-    public var selectAction: ((ADThumbnailCellable,Bool)->Void)?
+    public var selectAction: ((ADThumbnailCellConfigurable,Bool)->Void)?
     
     /// Asset model to config cell interface.
     public var assetModel: ADAssetModel!

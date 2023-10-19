@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ADPhotoKit'
-  s.version          = '1.1.1'
+  s.version          = '1.2.0'
   s.summary          = 'A library for select photos from album implemented by pure-Swift.'
 
 # This description is used to generate tags and improve search results.
@@ -33,9 +33,13 @@ Pod::Spec.new do |s|
   s.frameworks            = 'UIKit','Photos','PhotosUI','AVFoundation'
   s.default_subspec = 'CoreUI'
   
+  s.subspec "DocC" do |d|
+    d.source_files  = ["ADPhotoKit/ADPhotoKit.docc/**/*.*"]
+  end
+  
   s.subspec "Base" do |b|
+    b.dependency 'ADPhotoKit/DocC'
     b.source_files  = ["ADPhotoKit/Classes/Base/**/*.swift"]
-    b.preserve_paths = 'ADPhotoKit/ADPhotoKit.docc'
     b.resource_bundles = {
       'ADPhotoKitBase' => ['ADPhotoKit/Assets/Base/**/*']
     }

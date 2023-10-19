@@ -13,4 +13,6 @@ ADPhotoKit use Wechat-like image assets, you can replace with your app style ima
 
 ```swift
 ADPhotoKitConfiguration.default.customCoreUIBundle = Bundle(url: ...)
+
+ADPhotoKitConfiguration.default.customImageEditBundle = Bundle(url: ...)
 ```

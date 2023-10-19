@@ -17,7 +17,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
     
     var playBtn: UIButton!
     
-    var progressView: ADProgressableable!
+    var progressView: ADProgressConfigurable!
     
     var imageView: UIImageView!
     var errorLabel: UILabel!

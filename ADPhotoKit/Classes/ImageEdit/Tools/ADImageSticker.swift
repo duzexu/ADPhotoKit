@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct ADStickerInfo {
     let image: UIImage

@@ -22,7 +22,7 @@ public struct ADImageEditTools: OptionSet {
     public static let clip = ADImageEditTools(rawValue: 1 << 3)
     /// Tool used to add mosaic effect to image.
     public static let mosaicDraw = ADImageEditTools(rawValue: 1 << 4)
-    
+    /// Contains all tools.
     public static let all: ADImageEditTools = [.lineDraw, .imageStkr, .textStkr, .clip, .mosaicDraw]
     
     public init(rawValue: Int) {

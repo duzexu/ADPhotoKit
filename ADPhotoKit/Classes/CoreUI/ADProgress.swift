@@ -6,21 +6,18 @@
 //
 
 import Foundation
+import UIKit
 
-/// View use to show download or loading progress.
-public typealias ADProgressableable = (UIView & ADProgressConfigurable)
 /// Used to indicator a time-consuming operation's progress.
-public protocol ADProgressConfigurable {
+public protocol ADProgressConfigurable where Self: UIView {
     
     /// Task progress.
     var progress: CGFloat { set get }
     
 }
 
-/// View showed when load albums and assets or request images from assets.
-public typealias ADProgressHUDable = (UIView & ADProgressHUDConfigurable)
 /// Used to indicator a time-consuming operation is in progress.
-public protocol ADProgressHUDConfigurable {
+public protocol ADProgressHUDConfigurable where Self: UIView {
     
     /// Called when task timeout.
     var timeoutBlock: (() -> Void)? { set get }
@@ -36,11 +33,11 @@ public protocol ADProgressHUDConfigurable {
 
 struct ADProgress {
     
-    static func progressHUD() -> ADProgressHUDable {
+    static func progressHUD() -> ADProgressHUDConfigurable {
         return ADPhotoKitConfiguration.default.customProgressHUDBlock?() ?? ADProgressHUD()
     }
     
-    static func progress() -> ADProgressableable {
+    static func progress() -> ADProgressConfigurable {
         return ADPhotoKitConfiguration.default.customProgressBlock?() ?? ADProgressView()
     }
     

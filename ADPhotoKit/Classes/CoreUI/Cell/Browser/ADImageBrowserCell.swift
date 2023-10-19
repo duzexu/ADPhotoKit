@@ -127,7 +127,7 @@ class ADImageBrowserView: UIView {
     var contentView: UIView!
     var imageView: UIImageView!
     
-    var progressView: ADProgressableable!
+    var progressView: ADProgressConfigurable!
     
     private var identifier: String?
     

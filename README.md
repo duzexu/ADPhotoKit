@@ -40,7 +40,7 @@ Select up to 9 images or videos:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                        params: [.maxCount(max: 9)],
+                          params: [.maxCount(max: 9)],
                         selected: { (assets, origin) in
     // do something
 })
@@ -50,9 +50,9 @@ Select 1 video or 9 images:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                                 assetOpts: .exclusive,
-                                 params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
-                                 selected: { (assets, origin) in
+                       assetOpts: .exclusive,
+                          params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -61,10 +61,10 @@ Select max 8 images:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                                 albumOpts: [.allowImage],
-                                 assetOpts: .exclusive,
-                                 params: [.maxCount(max: 8)],
-                                 selected: { (assets, origin) in
+                       albumOpts: [.allowImage],
+                       assetOpts: .exclusive,
+                          params: [.maxCount(max: 8)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -72,7 +72,8 @@ ADPhotoKitUI.imagePicker(present: self,
 Browser network image and video:
 
 ```swift
-ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
+ADPhotoKitUI.assetBrowser(present: self, 
+                           assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
     // do something
 }
 ```

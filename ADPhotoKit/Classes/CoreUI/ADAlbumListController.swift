@@ -84,7 +84,7 @@ extension ADAlbumListController {
         
         ADPhotoKitConfiguration.default.customAlbumListCellRegistor?(tableView)
                 
-        var navBarView = ADPhotoUIConfigurable.albumListNavBar()
+        let navBarView = ADPhotoUIConfigurable.albumListNavBar()
         navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
         navBarView.rightActionBlock = { [weak self] btn in
             ADPhotoKitUI.config.canceled?()
@@ -113,7 +113,7 @@ extension ADAlbumListController: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
+        let cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
         
         cell.style = .normal
         cell.configure(with: dataSource.list[indexPath.row])

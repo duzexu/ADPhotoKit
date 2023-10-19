@@ -249,7 +249,7 @@ public class ADPhotoKitConfig {
 extension ADAssetListDataSource {
     
     func fetchSelectImages(original: Bool, asGif: Bool, completion: @escaping (()->Void)) {
-        var hud = ADProgress.progressHUD()
+        let hud = ADProgress.progressHUD()
         
         var timeout: Bool = false
         hud.timeoutBlock = {

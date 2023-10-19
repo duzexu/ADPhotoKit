@@ -8,13 +8,13 @@ ADPhotoKit can set selection conditions by different parameters according to dif
 
 ## Scenes
 
-* Upload avatar - Select 1 image only and don't show video assets
+* Upload avatar - Select only 1 image and don't show video assets
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                         albumOpts: [.allowImage],
-                         params: [.imageCount(min: nil, max: 1)],
-                         selected: { (assets, origin) in
+                       albumOpts: [.allowImage],
+                          params: [.imageCount(min: nil, max: 1)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -23,9 +23,9 @@ ADPhotoKitUI.imagePicker(present: self,
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                         albumOpts: [.allowVideo],
-                         params: [.videoCount(min: nil, max: 1),.videoTime(min: 5, max: 120)],
-                         selected: { (assets, origin) in
+                       albumOpts: [.allowVideo],
+                          params: [.videoCount(min: nil, max: 1),.videoTime(min: 5, max: 120)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -34,30 +34,30 @@ ADPhotoKitUI.imagePicker(present: self,
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                        params: [.maxCount(max: 9)],
+                          params: [.maxCount(max: 9)],
                         selected: { (assets, origin) in
     // do something
 })
 ```
 
-* Post Moments - Select 1 video only or max 9 images
+* Post Moments - Select only 1 video or max 9 images
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                         assetOpts: .exclusive,
-                         params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
-                         selected: { (assets, origin) in
+                       assetOpts: .exclusive,
+                          params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
 
-* Post vlog - Select 1 video only or max 8 images and video duration is greater than 30 seconds but less than 5 minutes
+* Post vlog - Select only 1 video or max 8 images and video duration is greater than 30 seconds but less than 5 minutes
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                         assetOpts: .exclusive,
-                         params: [.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1),.videoTime(min: 30, max: 300)],
-                         selected: { (assets, origin) in
+                       assetOpts: .exclusive,
+                          params: [.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1),.videoTime(min: 30, max: 300)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```

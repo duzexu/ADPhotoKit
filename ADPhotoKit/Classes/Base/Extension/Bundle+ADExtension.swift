@@ -38,7 +38,6 @@ extension Bundle {
             return bundle?.image(name: name) ?? imageEditBundle?.image(name: name)
             #endif
         }
-        return nil
     }
 }
 
@@ -118,7 +117,7 @@ extension Bundle {
         #endif
 
         for candidate in candidates {
-            let bundlePath = candidate?.appendingPathComponent(name + ".bundle")
+            let bundlePath: URL? = candidate?.absoluteString.range(of: ".bundle") == nil ? candidate?.appendingPathComponent(name + ".bundle") : candidate
             if let bundle = bundlePath.flatMap(Bundle.init(url:)) {
                 return bundle
             }

@@ -32,8 +32,8 @@ public class ADAssetBrowserController: UIViewController {
     public var collectionView: UICollectionView!
     
     var controlsView: ADBrowserControlsView!
-    var navBarView: ADBrowserNavBarable!
-    var toolBarView: ADBrowserToolBarable!
+    var navBarView: ADBrowserNavBarConfigurable!
+    var toolBarView: ADBrowserToolBarConfigurable!
     
     /// trans
     var popTransition: ADAssetBrowserInteractiveTransition?
@@ -307,7 +307,7 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let model = dataSource.list[indexPath.row]
-        var cell = ADPhotoUIConfigurable.browserCell(collectionView: collectionView, indexPath: indexPath, asset: model.browseAsset)
+        let cell = ADPhotoUIConfigurable.browserCell(collectionView: collectionView, indexPath: indexPath, asset: model.browseAsset)
         cell.singleTapBlock = { [weak self] in
             self?.hideOrShowControlsView()
         }
@@ -318,7 +318,7 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
         let model = dataSource.list[indexPath.row]
         switch model.browseAsset {
         case let .image(source):
-            if let imageCell = cell as? ADImageBrowserCellable {
+            if let imageCell = cell as? ADImageBrowserCellConfigurable {
                 #if Module_ImageEdit
                 if let editImg = model.imageEditInfo?.editImg {
                     imageCell.configure(with: .local(editImg, UUID().uuidString))
@@ -330,15 +330,15 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
                 #endif
             }
         case let .video(source):
-            if let videoCell = cell as? ADVideoBrowserCellable {
+            if let videoCell = cell as? ADVideoBrowserCellConfigurable {
                 videoCell.configure(with: source)
             }
         }
-        (cell as? ADBrowserCellable)?.cellWillDisplay()
+        (cell as? ADBrowserCellConfigurable)?.cellWillDisplay()
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? ADBrowserCellable)?.cellDidEndDisplay()
+        (cell as? ADBrowserCellConfigurable)?.cellDidEndDisplay()
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -381,7 +381,7 @@ extension ADAssetBrowserController: ADAssetBrowserInteractiveTransitionDelegate 
     }
     
     func transitionDidCancel(view: UIView?) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellable
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellConfigurable
         cell.transationCancel(view: view!)
     }
     
@@ -397,7 +397,7 @@ extension ADAssetBrowserController: ADAssetBrowserTransitionContextFrom {
     }
     
     func transitionInfo(convertTo: UIView) -> (UIView, CGRect) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellable
+        let cell = collectionView.cellForItem(at: IndexPath(row: dataSource.index, section: 0)) as! ADBrowserCellConfigurable
         let info = cell.transationBegin()
         return (info.0, cell.convert(info.1, to: convertTo))
     }

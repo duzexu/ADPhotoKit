@@ -11,9 +11,6 @@
 - <doc:CustomLocalization>
 - ``locale``
 - ``customLocaleValue``
-- ``customAlert``
-- ``customProgressHUDBlock``
-- ``customProgressBlock``
 
 ### Core Config
 
@@ -21,6 +18,9 @@
 
 ### CoreUI Config
 
+- ``customAlert``
+- ``customProgressHUDBlock``
+- ``customProgressBlock``
 - <doc:CustomImageIcons>
 - ``customCoreUIBundle``
 - ``statusBarStyle``
