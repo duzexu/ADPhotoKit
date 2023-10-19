@@ -17,7 +17,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
     
     var playBtn: UIButton!
     
-    var progressView: ADProgressableable!
+    var progressView: ADProgressConfigurable!
     
     var imageView: UIImageView!
     var errorLabel: UILabel!
@@ -116,7 +116,7 @@ private extension ADVideoBrowserCell {
             make.top.equalToSuperview().offset(60)
         }
         
-        progressView = ADPhotoUIConfigurable.progress()
+        progressView = ADProgress.progress()
         progressView.isHidden = true
         contentView.addSubview(progressView)
         progressView.snp.makeConstraints { (make) in

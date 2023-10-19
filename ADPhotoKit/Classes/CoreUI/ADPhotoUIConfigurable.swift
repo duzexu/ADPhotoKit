@@ -9,10 +9,8 @@ import Foundation
 import UIKit
 import Photos
 
-/// Albumlist controller's navigation bar.
-public typealias ADAlbumListNavBarable = (UIView & ADAlbumListNavBarConfigurable)
 /// Use to define albumlist controller's navigation bar.
-public protocol ADAlbumListNavBarConfigurable {
+public protocol ADAlbumListNavBarConfigurable where Self: UIView {
     
     /// Navigation bar height.
     var height: CGFloat { get }
@@ -23,10 +21,8 @@ public protocol ADAlbumListNavBarConfigurable {
     
 }
 
-/// Albumlist controller's tableView cell.
-public typealias ADAlbumListCellable = (UITableViewCell & ADAlbumListCellConfigurable)
 /// Use to define albumlist controller's tableView cell.
-public protocol ADAlbumListCellConfigurable {
+public protocol ADAlbumListCellConfigurable where Self: UITableViewCell {
     
     /// Album model to config cell interface.
     var albumModel: ADAlbumModel! { set get }
@@ -38,10 +34,8 @@ public protocol ADAlbumListCellConfigurable {
     
 }
 
-/// Thumbnail controller's navigation bar.
-public typealias ADThumbnailNavBarable = (UIView & ADThumbnailNavBarConfigurable)
 /// Use to define thumbnail controller's navigation bar.
-public protocol ADThumbnailNavBarConfigurable {
+public protocol ADThumbnailNavBarConfigurable where Self: UIView {
     
     /// Navigation bar height.
     var height: CGFloat { get }
@@ -58,10 +52,8 @@ public protocol ADThumbnailNavBarConfigurable {
     
 }
 
-/// Thumbnail controller's tool bar.
-public typealias ADThumbnailToolBarable = (UIView & ADThumbnailToolBarConfigurable)
 /// Use to define thumbnail controller's tool bar.
-public protocol ADThumbnailToolBarConfigurable {
+public protocol ADThumbnailToolBarConfigurable where Self: UIView {
     
     /// Tool bar height.
     var height: CGFloat { get }
@@ -76,10 +68,8 @@ public protocol ADThumbnailToolBarConfigurable {
     
 }
 
-/// Thumbnail controller's collection view cell.
-public typealias ADThumbnailCellable = (UICollectionViewCell & ADThumbnailCellConfigurable)
 /// Use to define thumbnail controller's collection view cell.
-public protocol ADThumbnailCellConfigurable {
+public protocol ADThumbnailCellConfigurable where Self: UICollectionViewCell {
     
     /// Thumbnail cell select status.
     var selectStatus: ADAssetModel.SelectStatus { set get }
@@ -88,7 +78,7 @@ public protocol ADThumbnailCellConfigurable {
     /// Cell indexPath in collection view.
     var indexPath: IndexPath! { set get }
     /// Called when cell select or deselect. The parameter `Bool` represent asset is selet or not.
-    var selectAction: ((ADThumbnailCellable,Bool)->Void)? { set get }
+    var selectAction: ((ADThumbnailCellConfigurable,Bool)->Void)? { set get }
     /// Config cell with asset model.
     /// - Parameter model: Asset info.
     func configure(with model: ADAssetModel)
@@ -97,11 +87,9 @@ public protocol ADThumbnailCellConfigurable {
     
 }
 
-/// Browser controller's collection view cell.
-/// - Note: Don't use this protocol directly. User `ADImageBrowserCellable` or `ADVideoBrowserCellable` instead.
-public typealias ADBrowserCellable = (UICollectionViewCell & ADBrowserCellConfigurable)
 /// Use to define browser controller's collection view cell.
-public protocol ADBrowserCellConfigurable {
+/// - Note: Don't use this protocol directly. User `ADImageBrowserCellable` or `ADVideoBrowserCellable` instead.
+public protocol ADBrowserCellConfigurable where Self: UICollectionViewCell {
     
     /// Called when tap cell.
     var singleTapBlock: (() -> Void)? { set get }
@@ -118,8 +106,6 @@ public protocol ADBrowserCellConfigurable {
     
 }
 
-/// Browser controller's image collection view cell.
-public typealias ADImageBrowserCellable = (UICollectionViewCell & ADImageBrowserCellConfigurable)
 /// Use to define browser controller's image collection view cell.
 public protocol ADImageBrowserCellConfigurable: ADBrowserCellConfigurable {
     
@@ -129,8 +115,6 @@ public protocol ADImageBrowserCellConfigurable: ADBrowserCellConfigurable {
     
 }
 
-/// Browser controller's video collection view cell.
-public typealias ADVideoBrowserCellable = (UICollectionViewCell & ADVideoBrowserCellConfigurable)
 /// Use to define browser controller's video collection view cell.
 public protocol ADVideoBrowserCellConfigurable: ADBrowserCellConfigurable {
     
@@ -140,10 +124,8 @@ public protocol ADVideoBrowserCellConfigurable: ADBrowserCellConfigurable {
     
 }
 
-/// Browser controller's navigation bar.
-public typealias ADBrowserNavBarable = (UIView & ADBrowserNavBarConfigurable)
 /// Use to define browser controller's navigation bar.
-public protocol ADBrowserNavBarConfigurable {
+public protocol ADBrowserNavBarConfigurable where Self: UIView {
     
     /// Navigation bar height.
     var height: CGFloat { get }
@@ -159,10 +141,8 @@ public protocol ADBrowserNavBarConfigurable {
         
 }
 
-/// Browser controller's tool bar.
-public typealias ADBrowserToolBarable = (UIView & ADBrowserToolBarConfigurable)
 /// Use to define browser controller's tool bar.
-public protocol ADBrowserToolBarConfigurable {
+public protocol ADBrowserToolBarConfigurable where Self: UIView {
     
     /// Tool bar height.
     var height: CGFloat { get }
@@ -180,84 +160,47 @@ public protocol ADBrowserToolBarConfigurable {
         
 }
 
-/// View use to show download or loading progress.
-public typealias ADProgressableable = (UIView & ADProgressConfigurable)
-/// Used to indicator a time-consuming operation's progress.
-public protocol ADProgressConfigurable {
-    
-    /// Task progress.
-    var progress: CGFloat { set get }
-    
-}
-
-/// View showed when load albums and assets or request images from assets.
-public typealias ADProgressHUDable = (UIView & ADProgressHUDConfigurable)
-/// Used to indicator a time-consuming operation is in progress.
-public protocol ADProgressHUDConfigurable {
-    
-    /// Called when task timeout.
-    var timeoutBlock: (() -> Void)? { set get }
-    
-    /// Show ProgressHUD.
-    /// - Parameter timeout: The duration before the task is timeout. If set 0, view will not hide automatic.
-    func show(timeout: TimeInterval)
-    
-    /// Dismiss ProgressHUD.
-    func hide()
-    
-}
-
 class ADPhotoUIConfigurable {
     
-    static func albumListNavBar() -> ADAlbumListNavBarable {
+    static func albumListNavBar() -> ADAlbumListNavBarConfigurable {
         return ADPhotoKitConfiguration.default.customAlbumListNavBarBlock?() ?? ADAlbumListNavBarView()
     }
     
-    static func albumListCell(tableView: UITableView, indexPath: IndexPath) -> ADAlbumListCellable {
+    static func albumListCell(tableView: UITableView, indexPath: IndexPath) -> ADAlbumListCellConfigurable {
         if ADPhotoKitConfiguration.default.customAlbumListCellBlock != nil {
             assert(ADPhotoKitConfiguration.default.customAlbumListCellRegistor != nil, "you must set 'customAlbumListCellRegistor' and regist your custom cell")
         }
-        return ADPhotoKitConfiguration.default.customAlbumListCellBlock?(tableView, indexPath) ?? tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCellable
+        return ADPhotoKitConfiguration.default.customAlbumListCellBlock?(tableView, indexPath) ?? tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCellConfigurable
     }
     
-    static func thumbnailNavBar(style: ADPickerStyle) -> ADThumbnailNavBarable {
+    static func thumbnailNavBar(style: ADPickerStyle) -> ADThumbnailNavBarConfigurable {
         return ADPhotoKitConfiguration.default.customThumbnailNavBarBlock?(style) ?? ADThumbnailNavBarView(style: style)
     }
     
-    static func thumbnailToolBar() -> ADThumbnailToolBarable {
+    static func thumbnailToolBar() -> ADThumbnailToolBarConfigurable {
         return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(ADPhotoKitUI.config) ?? ADThumbnailToolBarView(config: ADPhotoKitUI.config)
     }
     
-    static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellable {
+    static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellConfigurable {
         if ADPhotoKitConfiguration.default.customThumbnailCellBlock != nil {
             assert(ADPhotoKitConfiguration.default.customThumbnailCellRegistor != nil, "you must set 'customThumbnailCellRegistor' and regist your custom cell")
         }
-        return ADPhotoKitConfiguration.default.customThumbnailCellBlock?(collectionView, indexPath) ?? collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailCellable
+        return ADPhotoKitConfiguration.default.customThumbnailCellBlock?(collectionView, indexPath) ?? collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailCellConfigurable
     }
     
-    static func browserNavBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserNavBarable {
+    static func browserNavBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserNavBarConfigurable {
         return ADPhotoKitConfiguration.default.customBrowserNavBarBlock?(dataSource) ?? ADBrowserNavBarView(dataSource: dataSource)
     }
     
-    static func browserToolBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserToolBarable {
+    static func browserToolBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserToolBarConfigurable {
         return ADPhotoKitConfiguration.default.customBrowserToolBarBlock?(dataSource) ?? ADBrowserToolBarView(dataSource: dataSource)
     }
     
-    static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, asset: ADAsset) -> ADBrowserCellable {
+    static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, asset: ADAsset) -> ADBrowserCellConfigurable {
         if ADPhotoKitConfiguration.default.customBrowserCellBlock != nil {
             assert(ADPhotoKitConfiguration.default.customBrowserCellRegistor != nil, "you must set 'customBrowserCellRegistor' and regist your custom cell")
         }
-        return ADPhotoKitConfiguration.default.customBrowserCellBlock?(collectionView, indexPath, asset) ?? collectionView.dequeueReusableCell(withReuseIdentifier: asset.reuseIdentifier, for: indexPath) as! ADBrowserCellable
+        return ADPhotoKitConfiguration.default.customBrowserCellBlock?(collectionView, indexPath, asset) ?? collectionView.dequeueReusableCell(withReuseIdentifier: asset.reuseIdentifier, for: indexPath) as! ADBrowserCellConfigurable
     }
-    
-    static func progressHUD() -> ADProgressHUDable {
-        return ADPhotoKitConfiguration.default.customProgressHUDBlock?() ?? ADProgressHUD()
-    }
-    
-    static func progress() -> ADProgressableable {
-        return ADPhotoKitConfiguration.default.customProgressBlock?() ?? ADProgressView()
-    }
-    
-    
     
 }

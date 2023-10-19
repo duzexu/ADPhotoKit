@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol ADImageClipDismissTransitionContextFrom: AnyObject {
     func transitionInfo(convertTo: UIView) -> (UIImage,CGRect)

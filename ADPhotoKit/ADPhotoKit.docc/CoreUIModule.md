@@ -11,16 +11,20 @@ UI and logic for asset select.
 - ``ADConstraintParams``
 - ``ADPickerStyle``
 
+### UI Configuration
+
+- ``ADAlertConfigurable``
+- ``ADProgressConfigurable``
+- ``ADProgressHUDConfigurable``
+
 ### Album List
 
 - ``ADAlbumListController``
 - ``ADAlbumListCell``
 
 - ``ADAlbumListNavBarConfigurable``
-- ``ADAlbumListNavBarable``
 
 - ``ADAlbumListCellConfigurable``
-- ``ADAlbumListCellable``
 
 ### Thumbnail List
 
@@ -30,13 +34,10 @@ UI and logic for asset select.
 - ``ADCameraCell``
 
 - ``ADThumbnailNavBarConfigurable``
-- ``ADThumbnailNavBarable``
 
 - ``ADThumbnailToolBarConfigurable``
-- ``ADThumbnailToolBarable``
 
 - ``ADThumbnailCellConfigurable``
-- ``ADThumbnailCellable``
 
 ### Browser
 
@@ -48,17 +49,12 @@ UI and logic for asset select.
 - ``ADBrowserToolBarCell``
 
 - ``ADBrowserNavBarConfigurable``
-- ``ADBrowserNavBarable``
 
 - ``ADBrowserToolBarConfigurable``
-- ``ADBrowserToolBarable``
 
 - ``ADBrowserCellConfigurable``
-- ``ADBrowserCellable``
 
 - ``ADImageBrowserCellConfigurable``
-- ``ADImageBrowserCellable``
 
 - ``ADVideoBrowserCellConfigurable``
-- ``ADVideoBrowserCellable``
 

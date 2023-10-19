@@ -21,7 +21,7 @@ class ThumbnailCell: UICollectionViewCell, ADThumbnailCellConfigurable {
     
     var indexPath: IndexPath!
     
-    var selectAction: ((ADThumbnailCellable, Bool) -> Void)?
+    var selectAction: ((ADThumbnailCellConfigurable, Bool) -> Void)?
     
     func configure(with model: ADAssetModel) {
         assetModel = model

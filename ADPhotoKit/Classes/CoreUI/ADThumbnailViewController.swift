@@ -23,7 +23,7 @@ public class ADThumbnailViewController: UIViewController {
     /// Return back to `albumListController` when ADPickerStyle is `normal`
     public var selectAlbumBlock: (([ADSelectAssetModel]) -> Void)?
     
-    var toolBarView: ADThumbnailToolBarable!
+    var toolBarView: ADThumbnailToolBarConfigurable!
     
     init(config: ADPhotoKitConfig, album: ADAlbumModel, style: ADPickerStyle = .normal, selects: [ADSelectAssetModel] = []) {
         self.config = config
@@ -87,7 +87,7 @@ public class ADThumbnailViewController: UIViewController {
     
     func reloadAssets() {
         if dataSource.list.isEmpty {
-            let hud = ADPhotoUIConfigurable.progressHUD()
+            let hud = ADProgress.progressHUD()
             hud.show(timeout: 0)
             dataSource.reloadData() {
                 hud.hide()
@@ -161,7 +161,7 @@ extension ADThumbnailViewController {
             }
         }
         
-        var navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style)
+        let navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style)
         navBarView.title = album.title
         navBarView.leftActionBlock = { [weak self] in
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -284,7 +284,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             }
         }
         
-        var cell = ADPhotoUIConfigurable.thumbnailCell(collectionView: collectionView, indexPath: indexPath)
+        let cell = ADPhotoUIConfigurable.thumbnailCell(collectionView: collectionView, indexPath: indexPath)
         
         let modify = dataSource.modifyIndexPath(indexPath)
         let model = dataSource.list[modify.row]
@@ -315,7 +315,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard var c = cell as? ADThumbnailCellable else {
+        guard let c = cell as? ADThumbnailCellConfigurable else {
             return
         }
         let index = dataSource.modifyIndexPath(indexPath).row
@@ -384,7 +384,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             if #available(iOS 14, *) {
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
-        }else if let c = cell as? ADThumbnailCellable {
+        }else if let c = cell as? ADThumbnailCellConfigurable {
             if !config.assetOpts.contains(.allowBrowser) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
@@ -408,7 +408,7 @@ private extension ADThumbnailViewController {
         guard let indexPath = collectionView.indexPathForItem(at: point) else {
             return
         }
-        let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailCellable
+        let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailCellConfigurable
         if pan.state == .began {
             if cell != nil {
                 slideRangeDidChange(indexPath: indexPath, cell: cell!)
@@ -425,7 +425,7 @@ private extension ADThumbnailViewController {
         }
     }
     
-    func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailCellable) {
+    func slideRangeDidChange(indexPath: IndexPath, cell: ADThumbnailCellConfigurable) {
         let index = dataSource.modifyIndexPath(indexPath).row
         let model = dataSource.list[index]
         //已经有第一个
@@ -592,7 +592,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true) {
             if let image = info[.originalImage] as? UIImage {
-                let hud = ADPhotoUIConfigurable.progressHUD()
+                let hud = ADProgress.progressHUD()
                 hud.show(timeout: 0)
                 ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
                     if suc {
@@ -612,7 +612,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                     }
                 }
                 
-                let hud = ADPhotoUIConfigurable.progressHUD()
+                let hud = ADProgress.progressHUD()
                 hud.show(timeout: 0)
                 ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
                     if suc {

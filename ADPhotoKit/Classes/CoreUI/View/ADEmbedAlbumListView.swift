@@ -145,7 +145,7 @@ extension ADEmbedAlbumListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
+        let cell = ADPhotoUIConfigurable.albumListCell(tableView: tableView, indexPath: indexPath)
         
         cell.style = .embed
         cell.configure(with: dataSource.list[indexPath.row])

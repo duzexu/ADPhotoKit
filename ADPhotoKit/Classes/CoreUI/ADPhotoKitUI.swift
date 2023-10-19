@@ -32,27 +32,27 @@ public struct ADAssetResult {
 public struct ADConstraintParams {
     
     /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
-    public var maxCount: Int?
+    public fileprivate(set) var maxCount: Int?
     
     /// Limit the min image count you can select. Set `nil` means no limit. Default is no limit.
-    public var minImageCount: Int?
+    public fileprivate(set) var minImageCount: Int?
     /// Limit the max image count you can select. Set `nil` means no limit. Default is no limit.
-    public var maxImageCount: Int?
+    public fileprivate(set) var maxImageCount: Int?
     
     /// Limit the min video count you can select. Set `nil` means no limit. Default is no limit.
-    public var minVideoCount: Int?
+    public fileprivate(set) var minVideoCount: Int?
     /// Limit the max video count you can select. Set `nil` means no limit. Default is no limit.
-    public var maxVideoCount: Int?
+    public fileprivate(set) var maxVideoCount: Int?
     
     /// Limit the min video time you can select. Set `nil` means no limit. Default is no limit.
-    public var minVideoTime: Int?
+    public fileprivate(set) var minVideoTime: Int?
     /// Limit the max video time you can select. Set `nil` means no limit. Default is no limit.
-    public var maxVideoTime: Int?
+    public fileprivate(set) var maxVideoTime: Int?
     
     /// Limit the min video time you can record. Set `nil` means no limit. Default is no limit.
-    public var minRecordTime: Int?
+    public fileprivate(set) var minRecordTime: Int?
     /// Limit the max video time you can record. Set `nil` means no limit. Default is no limit.
-    public var maxRecordTime: Int?
+    public fileprivate(set) var maxRecordTime: Int?
 }
 
 extension ADSelectAssetModel {
@@ -249,7 +249,7 @@ public class ADPhotoKitConfig {
 extension ADAssetListDataSource {
     
     func fetchSelectImages(original: Bool, asGif: Bool, completion: @escaping (()->Void)) {
-        var hud = ADPhotoUIConfigurable.progressHUD()
+        let hud = ADProgress.progressHUD()
         
         var timeout: Bool = false
         hud.timeoutBlock = {

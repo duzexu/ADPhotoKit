@@ -26,9 +26,9 @@ let package = Package(
             dependencies: [
                 "SnapKit","Kingfisher"
             ],
-            path: "ADPhotoKit/Classes",
+            path: "ADPhotoKit",
             resources: [
-                .process(".")
+                .process("Assets/")
             ],
             swiftSettings: [
                 .define("Module_Core"),

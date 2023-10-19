@@ -87,12 +87,12 @@ extension UIImageView {
     
     /// Sets an image to imageView with video url.
     /// - Parameter url: Video url.
-    public func setVideoUrlAsset(_ url: URL) {
+    public func setVideoUrlAsset(_ url: URL, time: CMTime = .zero) {
         let assert = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: assert)
         generator.appliesPreferredTrackTransform = true
         generator.apertureMode = .encodedPixels
-        if let img = try? generator.copyCGImage(at: .zero, actualTime: nil) {
+        if let img = try? generator.copyCGImage(at: time, actualTime: nil) {
             image = UIImage(cgImage: img)
         }
     }

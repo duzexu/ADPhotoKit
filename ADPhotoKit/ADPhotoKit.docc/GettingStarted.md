@@ -7,7 +7,7 @@ Learn how to install and use ADPhotoKit from the first step.
 * iOS 10.0
 * Swift 5.0+
 
-> Objective-C is not supported. Swift is the future and dropping Obj-C is the price to pay to keep our velocity on this library :)
+> Objective-C is not supported. Swift is the future and dropping Obj-C is the price to pay to keep our velocity on this library.
 
 ## Installation
 
@@ -119,7 +119,7 @@ Select up to 9 images or videos:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                        params: [.maxCount(max: 9)],
+                          params: [.maxCount(max: 9)],
                         selected: { (assets, origin) in
     // do something
 })
@@ -129,9 +129,9 @@ Select 1 video or 9 images:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                                 assetOpts: .exclusive,
-                                 params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
-                                 selected: { (assets, origin) in
+                       assetOpts: .exclusive,
+                          params: [.maxCount(max: 9),.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -140,10 +140,9 @@ Select max 8 images:
 
 ```swift
 ADPhotoKitUI.imagePicker(present: self,
-                                 albumOpts: [.allowImage],
-                                 assetOpts: .exclusive,
-                                 params: [.maxCount(max: 8)],
-                                 selected: { (assets, origin) in
+                       albumOpts: [.allowImage],
+                          params: [.maxCount(max: 8)],
+                        selected: { (assets, origin) in
     // do something
 })
 ```
@@ -151,11 +150,12 @@ ADPhotoKitUI.imagePicker(present: self,
 Browser network image and video:
 
 ```swift
-ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
+ADPhotoKitUI.assetBrowser(present: self, 
+                           assets: [NetImage(url: "https://example.com/xx.png"), NetVideo(url: "https://example.com/xx.mp4")]) { assets in
     // do something
 }
 ```
 
-For more usage configuration, you can see ``ADPhotoKitUI``.
+For more usage configuration, you can see ``ADPhotoKitUI`` and ``ADPhotoKitConfiguration``.
 
 

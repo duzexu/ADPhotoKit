@@ -127,7 +127,7 @@ class ADImageBrowserView: UIView {
     var contentView: UIView!
     var imageView: UIImageView!
     
-    var progressView: ADProgressableable!
+    var progressView: ADProgressConfigurable!
     
     private var identifier: String?
     
@@ -168,7 +168,7 @@ private extension ADImageBrowserView {
             make.edges.equalToSuperview()
         }
         
-        progressView = ADPhotoUIConfigurable.progress()
+        progressView = ADProgress.progress()
         progressView.isHidden = true
         addSubview(progressView)
         progressView.snp.makeConstraints { (make) in

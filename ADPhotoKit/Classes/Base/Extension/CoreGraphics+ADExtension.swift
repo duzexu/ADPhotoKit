@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 infix operator |-> : MultiplicationPrecedence
 func |->(left: CGRect, right: CGRect) -> CGRect {

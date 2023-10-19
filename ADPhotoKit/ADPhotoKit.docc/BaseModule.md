@@ -10,12 +10,5 @@ Modify configuration for ADPhotoKit.
 
 ### Multi-language Configuration
 
+- <doc:CustomLocalization>
 - ``ADLocale``
-
-### UI Configuration
-
-- ``ADAlertConfigurable``
-- ``ADProgressConfigurable``
-- ``ADProgressableable``
-- ``ADProgressHUDConfigurable``
-- ``ADProgressHUDable``

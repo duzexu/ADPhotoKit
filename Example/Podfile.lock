@@ -1,12 +1,14 @@
 PODS:
-  - ADPhotoKit/Base (1.1.1)
-  - ADPhotoKit/Core (1.1.1):
+  - ADPhotoKit/Base (1.2.0):
+    - ADPhotoKit/DocC
+  - ADPhotoKit/Core (1.2.0):
     - ADPhotoKit/Base
     - Kingfisher (<= 5.15.8)
-  - ADPhotoKit/CoreUI (1.1.1):
+  - ADPhotoKit/CoreUI (1.2.0):
     - ADPhotoKit/Core
     - SnapKit
-  - ADPhotoKit/ImageEdit (1.1.1):
+  - ADPhotoKit/DocC (1.2.0)
+  - ADPhotoKit/ImageEdit (1.2.0):
     - ADPhotoKit/Base
     - SnapKit
   - Kingfisher (5.15.8):
@@ -31,11 +33,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ADPhotoKit: 467029e64be141cc6965301d70fef283b522ac51
+  ADPhotoKit: 61b79528a925a6c923be22c88e3cd72df0515a89
   Kingfisher: a3c03d702433fa6cfedabb2bddbe076fb8f2e902
   ProgressHUD: e603e8b8622c47d8818b9fb38b3cfe9d3e7ca421
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
 PODFILE CHECKSUM: 66f014e4709e241a5b52edb80d616e1e7437ef7c
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.13.0

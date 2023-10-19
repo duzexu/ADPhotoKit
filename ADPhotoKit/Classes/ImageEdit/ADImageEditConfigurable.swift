@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Use to save or revert edit tool info.
 public protocol ADImageEditToolCodable: AnyObject {

@@ -9,18 +9,18 @@ import Photos
 
 extension PHAsset {
     
-    var isInCloud: Bool {
+    public var isInCloud: Bool {
         guard let resource = PHAssetResource.assetResources(for: self).first else {
             return false
         }
         return !(resource.value(forKey: "locallyAvailable") as? Bool ?? true)
     }
     
-    var whRatio: CGFloat {
+    public var whRatio: CGFloat {
         return CGFloat(pixelWidth) / CGFloat(pixelHeight)
     }
     
-    var isGif: Bool {
+    public var isGif: Bool {
         switch mediaType {
         case .image:
             if (value(forKey: "filename") as? String)?.hasSuffix("GIF") == true {
@@ -33,7 +33,7 @@ extension PHAsset {
     }
     
     @available(iOS 9.1, *)
-    var isLivePhoto: Bool {
+    public var isLivePhoto: Bool {
         switch mediaType {
         case .image:
             if mediaSubtypes == .photoLive || mediaSubtypes.rawValue == 10 {

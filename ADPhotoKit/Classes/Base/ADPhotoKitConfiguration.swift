@@ -5,8 +5,8 @@
 //  Created by MAC on 2021/3/14.
 //
 
-@_exported import Foundation
-@_exported import UIKit
+import Foundation
+import UIKit
 
 /// Class to modify ADPhotoKit's configuration.
 public class ADPhotoKitConfiguration {
@@ -30,12 +30,18 @@ public class ADPhotoKitConfiguration {
     /// Custom album orders, if type not contain, it will not display. Default is ordered by `ADAlbumType.allCases` 's order.
     public var customAlbumOrders: [ADAlbumType]?
     
-    /// Custom alert. Default to use alert in framework.
-    public var customAlert: ADAlertConfigurable.Type?
-    
     #endif
     
     #if Module_UI
+    
+    /// Custom alert. Default to use alert in framework.
+    public var customAlert: ADAlertConfigurable.Type?
+    
+    /// Bolck to generate `ProgressHUD`. Default to use hud in framework.
+    public var customProgressHUDBlock: (() -> ADProgressHUDConfigurable)?
+    
+    /// Bolck to generate `ProgressView`. Default to use view in framework.
+    public var customProgressBlock: (() -> ADProgressConfigurable)?
     
     /// You can custom `core` image Bundle by this property or simple replace image in `ADPhotoKitCoreUI.bundle`. Default is `ADPhotoKitCoreUI.bundle`.
     public var customCoreUIBundle: Bundle?
@@ -43,12 +49,6 @@ public class ADPhotoKitConfiguration {
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
     
-    /// Bolck to generate `ProgressHUD`. Default to use hud in framework.
-    public var customProgressHUDBlock: (() -> ADProgressHUDable)?
-    
-    /// Bolck to generate `ProgressView`. Default to use view in framework.
-    public var customProgressBlock: (() -> ADProgressableable)?
-
     /// Timeout for request images from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20
     
@@ -58,13 +58,13 @@ public class ADPhotoKitConfiguration {
     public var customAlbumListControllerBlock: ((ADAlbumListController) -> Void)?
     
     /// Bolck to generate `AlbumListNavBar`. Default to use `ADAlbumListNavBarView`.
-    public var customAlbumListNavBarBlock: (() -> ADAlbumListNavBarable)?
+    public var customAlbumListNavBarBlock: (() -> ADAlbumListNavBarConfigurable)?
     
     /// Bolck to regist cells used in albumlist controller.
     public var customAlbumListCellRegistor: ((UITableView) -> Void)?
     /// Bolck to return custom album list cell.
     /// - Note: If use your custom cells, you must regist cells first by set `customAlbumListCellRegistor` block.
-    public var customAlbumListCellBlock: ((UITableView, IndexPath) -> ADAlbumListCellable)?
+    public var customAlbumListCellBlock: ((UITableView, IndexPath) -> ADAlbumListCellConfigurable)?
         
     /* =============== thumbnail =============== */
     
@@ -89,17 +89,17 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `ThumbnailNavBar`. Default to use `ADThumbnailNavBarView`.
     /// The parameter `ADPickerStyle` is the style of bar.
-    public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarable)?
+    public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarConfigurable)?
     
     /// Bolck to generate `ThumbnailToolBar`. Default to use `ADThumbnailToolBarView`.
     /// The parameter `ADPhotoKitConfig` is the config pass through.
-    public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarable)?
+    public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable)?
     
     /// Bolck to regist cells used in thumbnail controller.
     public var customThumbnailCellRegistor: ((UICollectionView) -> Void)?
     /// Bolck to return custom thumbnail collection cell.
     /// - Note: If use your custom cells, you must regist cells first by set `customThumbnailCellRegistor` block.
-    public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellable)?
+    public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellConfigurable)?
     
     /* =============== browser =============== */
         
@@ -111,18 +111,18 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `BrowserNavBar`. Default to use `ADBrowserNavBarView`.
     /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
-    public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarable)?
+    public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarConfigurable)?
     
     /// Bolck to generate `BrowserToolBar`. Default to use `ADBrowserToolBarView`.
     /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
-    public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarable)?
+    public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarConfigurable)?
     
     /// Bolck to regist cells used in browser controller.
     public var customBrowserCellRegistor: ((UICollectionView) -> Void)?
     /// Bolck to return custom browser collection cell.
     /// The parameter `ADAsset` is the asset to browser.
     /// - Note: If use your custom cells, you must regist cells first by set `customBrowserCellRegistor` block.
-    public var customBrowserCellBlock: ((UICollectionView, IndexPath, ADAsset) -> ADBrowserCellable)?
+    public var customBrowserCellBlock: ((UICollectionView, IndexPath, ADAsset) -> ADBrowserCellConfigurable)?
         
     #endif
     
@@ -131,7 +131,7 @@ public class ADPhotoKitConfiguration {
     /// You can custom `image edit` image Bundle by this property or simple replace image in `ADPhotoKitImageEdit.bundle`. Default is `ADPhotoKitImageEdit.bundle`.
     public var customImageEditBundle: Bundle?
     
-    /// System image edit tools. Default is ordered by `ADImageEditTools.all` 's order. You can remove some tools or reorder.
+    /// System image edit tools. Default is ordered by `ADImageEditTools.all` 's order. You can remove some tools or reorder as you wish.
     /// - Note: If contain `.imageStkr`, you must set `imageStickerDataSource` or `customImageStickerSelectVC`.
     public var systemImageEditTools: ADImageEditTools = .all
     

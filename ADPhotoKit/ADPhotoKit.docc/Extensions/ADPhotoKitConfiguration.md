@@ -8,20 +8,22 @@
 
 ### Base Config
 
+- <doc:CustomLocalization>
 - ``locale``
 - ``customLocaleValue``
 
 ### Core Config
 
 - ``customAlbumOrders``
-- ``customAlert``
 
 ### CoreUI Config
 
-- ``customCoreUIBundle``
-- ``statusBarStyle``
+- ``customAlert``
 - ``customProgressHUDBlock``
 - ``customProgressBlock``
+- <doc:CustomImageIcons>
+- ``customCoreUIBundle``
+- ``statusBarStyle``
 - ``fetchTimeout``
 
 ### CoreUI Album Config
@@ -53,6 +55,7 @@
 
 ### ImageEdit Config
 
+- <doc:CustomImageIcons>
 - ``customImageEditBundle``
 - ``systemImageEditTools``
 - ``customImageEditToolsBlock``
