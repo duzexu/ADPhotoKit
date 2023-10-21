@@ -2,13 +2,15 @@
 
 name: Documentation
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  workflow_dispatch: {}
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master
+    paths:
+      - .github/workflows/Documentation.yaml
+      - ADPhotoKit/Classes/**.swift
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,15 +21,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Login to the GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-            registry: ghcr.io
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Generate Documentation
-        uses: SwiftDocOrg/swift-doc@1.0.0-rc.1
+        uses: SwiftDocOrg/swift-doc@master
         with:
           inputs: "ADPhotoKit/Classes"
           module-name: "ADPhotoKit"
