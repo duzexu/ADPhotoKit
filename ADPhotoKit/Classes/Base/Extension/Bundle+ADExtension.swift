@@ -31,11 +31,15 @@ extension Bundle {
             #if Module_UI
             let bundle = ADPhotoKitConfiguration.default.customCoreUIBundle
             return bundle?.image(name: name) ?? coreUIBundle?.image(name: name)
+            #else
+            return nil
             #endif
         case .imageEdit:
             #if Module_ImageEdit
             let bundle = ADPhotoKitConfiguration.default.customImageEditBundle
             return bundle?.image(name: name) ?? imageEditBundle?.image(name: name)
+            #else
+            return nil
             #endif
         }
     }
