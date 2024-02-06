@@ -40,12 +40,13 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     override func finishSelection() {
         didSelectsUpdate()
         if config.browserOpts.contains(.fetchImage) {
-            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: config.assetOpts.contains(.selectAsGif)) { [weak self] in
+            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: config.assetOpts.contains(.selectAsGif), inQueue: config.fetchImageQueue) { [weak self] selected in
+                self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }else{
             let selected = listData.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
-            ADPhotoKitUI.config.pickerSelect?(selected, toolBarView.isOriginal)
+            config.pickerSelect?(selected, toolBarView.isOriginal)
             navigationController?.dismiss(animated: true, completion: nil)
         }
     }

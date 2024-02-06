@@ -48,7 +48,7 @@ public protocol ADThumbnailNavBarConfigurable where Self: UIView {
     /// Called when select album model changed.
     var reloadAlbumBlock: ((ADAlbumModel)->Void)? { set get }
     /// Create with the style of bar.
-    init(style: ADPickerStyle)
+    init(style: ADPickerStyle, config: ADPhotoKitConfig)
     
 }
 
@@ -81,7 +81,8 @@ public protocol ADThumbnailCellConfigurable where Self: UICollectionViewCell {
     var selectAction: ((ADThumbnailCellConfigurable,Bool)->Void)? { set get }
     /// Config cell with asset model.
     /// - Parameter model: Asset info.
-    func configure(with model: ADAssetModel)
+    /// - Parameter config: The config pass through.
+    func configure(with model: ADAssetModel, config: ADPhotoKitConfig)
     /// Select or deselect cell.
     func cellSelectAction()
     
@@ -111,7 +112,8 @@ public protocol ADImageBrowserCellConfigurable: ADBrowserCellConfigurable {
     
     /// Config cell with image browser source.
     /// - Parameter source: Image browser info.
-    func configure(with source: ADImageSource)
+    /// - Parameter config: The config pass through.
+    func configure(with source: ADImageSource, config: ADPhotoKitConfig)
     
 }
 
@@ -173,12 +175,12 @@ class ADPhotoUIConfigurable {
         return ADPhotoKitConfiguration.default.customAlbumListCellBlock?(tableView, indexPath) ?? tableView.dequeueReusableCell(withIdentifier: ADAlbumListCell.reuseIdentifier, for: indexPath) as! ADAlbumListCellConfigurable
     }
     
-    static func thumbnailNavBar(style: ADPickerStyle) -> ADThumbnailNavBarConfigurable {
-        return ADPhotoKitConfiguration.default.customThumbnailNavBarBlock?(style) ?? ADThumbnailNavBarView(style: style)
+    static func thumbnailNavBar(style: ADPickerStyle, config: ADPhotoKitConfig) -> ADThumbnailNavBarConfigurable {
+        return ADPhotoKitConfiguration.default.customThumbnailNavBarBlock?(style,config) ?? ADThumbnailNavBarView(style: style, config: config)
     }
     
-    static func thumbnailToolBar() -> ADThumbnailToolBarConfigurable {
-        return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(ADPhotoKitUI.config) ?? ADThumbnailToolBarView(config: ADPhotoKitUI.config)
+    static func thumbnailToolBar(config: ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable {
+        return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(config) ?? ADThumbnailToolBarView(config: config)
     }
     
     static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellConfigurable {

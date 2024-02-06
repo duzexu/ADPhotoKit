@@ -21,7 +21,7 @@ public class ADPhotoManager {
         let allowVideo = options.contains(.allowVideo)
         
         if !allowImage && !allowVideo {
-            fatalError("you must add 'allowImage' or 'allowVideo' to options at least one.")
+            fatalError("you must add at least one of 'allowImage' or 'allowVideo' to the options.")
         }
         
         let option = PHFetchOptions()
@@ -65,6 +65,21 @@ public class ADPhotoManager {
         completion(albumListByOrder(albumList))
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch all album.
+    /// - Parameter options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
+    /// - Returns: albums.
+    @available(iOS 13.0, *)
+    public class func allPhotoAlbumList(options: ADAlbumSelectOptions = .default) async -> [ADAlbumModel] {
+        let albumList = await withCheckedContinuation { continuation in
+            allPhotoAlbumList(options: options) { list in
+                continuation.resume(returning: list)
+            }
+        }
+        return albumList
+    }
+    #endif
+    
     /// Fetch cameraRoll album.
     /// - Parameters:
     ///   - options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
@@ -74,7 +89,7 @@ public class ADPhotoManager {
         let allowVideo = options.contains(.allowVideo)
         
         if !allowImage && !allowVideo {
-            fatalError("you must add 'allowImage' or 'allowVideo' to options.")
+            fatalError("you must add at least one of 'allowImage' or 'allowVideo' to the options.")
         }
         
         let option = PHFetchOptions()
@@ -95,6 +110,41 @@ public class ADPhotoManager {
             }
         }
     }
+    
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch cameraRoll album.
+    /// - Parameter options: Options to set the album type and order. It is `ADAlbumSelectOptions.default` by default.
+    /// - Returns: cameraRoll album.
+    @available(iOS 13.0, *)
+    public class func cameraRollAlbum(options: ADAlbumSelectOptions = .default) async -> ADAlbumModel {
+        let allowImage = options.contains(.allowImage)
+        let allowVideo = options.contains(.allowVideo)
+        
+        if !allowImage && !allowVideo {
+            fatalError("you must add 'allowImage' or 'allowVideo' to options.")
+        }
+        
+        let option = PHFetchOptions()
+        if !allowImage {
+            option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.video.rawValue)
+        }
+        if !allowVideo {
+            option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.image.rawValue)
+        }
+        
+        let smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
+        return await withCheckedContinuation { continuation in
+            smartAlbums.enumerateObjects { (collection, _, stop) in
+                if collection.assetCollectionSubtype == .smartAlbumUserLibrary {
+                    let result = PHAsset.fetchAssets(in: collection, options: option)
+                    let albumModel = ADAlbumModel(result: result, collection: collection, option: option)
+                    stop.pointee = true
+                    continuation.resume(returning: albumModel)
+                }
+            }
+        }
+    }
+    #endif
     
     /// Fetch assets in album.
     /// - Parameters:
@@ -136,7 +186,7 @@ public class ADPhotoManager {
         /// Fetch result by `UIImage`.
         /// - Parameter size: Size of the image fetch, If nil, will fetch original image.
         /// - Parameter resizeMode: Image resize mode.
-        /// - Parameter synchronous: Return only a single result, blocking until available (or failure).
+        /// - Parameter synchronous: If `true`, return only a single result, blocking until available (or failure).
         case image(size: CGSize?, resizeMode: PHImageRequestOptionsResizeMode = .fast, synchronous: Bool = false)
         /// Fetch result by original `Data`.
         case originImageData
@@ -186,12 +236,38 @@ public class ADPhotoManager {
         case .video:
             return fetchVideo(for: asset, progress: progress, completion: completion)
         case .assert:
-            return fetchAVAsset(forVideo: asset, progress: progress, completion: completion)
+            return fetchAVAsset(for: asset, progress: progress, completion: completion)
         case .filePath:
-            fetchFilePath(asset: asset, completion: completion)
+            fetchFilePath(for: asset, completion: completion)
             return nil
         }
     }
+    
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch assset's data by type.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - type: Type of fetch result.
+    ///   - progress: Progress of fetching request.
+    /// - Returns: fetch result.
+    @available(iOS 13.0.0, *)
+    public class func fetch<T>(for asset: PHAsset, type: AssetResultType, progress: ADAssetProgressHandler? = nil) async throws  -> T? {
+        switch type {
+        case let .image(size, resizeMode, _):
+            return try await fetchImage(for: asset, size: size, resizeMode: resizeMode, progress: progress) as? T
+        case .originImageData:
+            return try await fetchOriginImageData(for: asset, progress: progress) as? T
+        case .livePhoto:
+            return try await fetchLivePhoto(for: asset, progress: progress) as? T
+        case .video:
+            return try await fetchVideo(for: asset, progress: progress) as? T
+        case .assert:
+            return try await fetchAVAsset(for: asset, progress: progress) as? T
+        case .filePath:
+            return try await fetchFilePath(for: asset) as? T
+        }
+    }
+    #endif
         
     /// Fetch image for asset.
     /// - Parameters:
@@ -199,7 +275,7 @@ public class ADPhotoManager {
     ///   - size: Size of the image fetch, If nil, will fetch original image.
     ///   - resizeMode: Image resize mode.
     ///   - synchronous: Return only a single result, blocking until available (or failure).
-    ///   - progress: Progress of fetching request.
+    ///   - progress: Progress of fetching request. Only called when the data is not available locally and is retrieved from iCloud.
     ///   - completion: Called after fetch result.
     /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
@@ -228,11 +304,44 @@ public class ADPhotoManager {
             }
         }
     }
+
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch image for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - size: Size of the image fetch, If nil, will fetch original image.
+    ///   - resizeMode: Image resize mode.
+    ///   - progress: Progress of fetching request. Only called when the data is not available locally and is retrieved from iCloud.
+    /// - Returns: image asset.
+    @available(iOS 13.0, *)
+    public class func fetchImage(for asset: PHAsset, size: CGSize? = nil, resizeMode: PHImageRequestOptionsResizeMode = .fast, progress: PHAssetImageProgressHandler? = nil) async throws -> UIImage? {
+        let option = PHImageRequestOptions()
+        option.resizeMode = resizeMode
+        option.isNetworkAccessAllowed = true
+        option.isSynchronous = true
+        option.progressHandler = { (pro, error, stop, info) in
+            DispatchQueue.main.async {
+                progress?(pro, error, stop, info)
+            }
+        }
+        
+        let targetSize = size ?? PHImageManagerMaximumSize
+        return try await withCheckedThrowingContinuation { continuation in
+            PHImageManager.default().requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: option) { (image, info) in
+                if let error = info?[PHImageErrorKey] as? Error {
+                    continuation.resume(throwing: error)
+                }else{
+                    continuation.resume(returning: image)
+                }
+           }
+        }
+    }
+    #endif
     
     /// Fetch origin data for asset.
     /// - Parameters:
     ///   - asset: Asset to fetch result.
-    ///   - progress: Progress of fetching request.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
     ///   - completion: Called after fetch result.
     /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
@@ -261,10 +370,44 @@ public class ADPhotoManager {
         }
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch origin data for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
+    /// - Returns: data asset.
+    @available(iOS 13.0, *)
+    public class func fetchOriginImageData(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil) async throws -> Data? {
+        let option = PHImageRequestOptions()
+        if (asset.value(forKey: "filename") as? String)?.hasSuffix("GIF") == true {
+            option.version = .original
+        }
+        option.isNetworkAccessAllowed = true
+        option.resizeMode = .fast
+        option.deliveryMode = .highQualityFormat
+        option.isSynchronous = true
+        option.progressHandler = { (pro, error, stop, info) in
+            DispatchQueue.main.async {
+                progress?(pro, error, stop, info)
+            }
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            PHImageManager.default().requestImageData(for: asset, options: option) { (data, _, _, info) in
+                if let error = info?[PHImageErrorKey] as? Error {
+                    continuation.resume(throwing: error)
+                }else{
+                    continuation.resume(returning: data)
+                }
+            }
+        }
+    }
+    #endif
+    
     /// Fetch livePhoto for asset.
     /// - Parameters:
     ///   - asset: Asset to fetch result.
-    ///   - progress: Progress of fetching request.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
     ///   - completion: Called after fetch result.
     /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
@@ -279,21 +422,53 @@ public class ADPhotoManager {
             }
         }
         
-        return PHImageManager.default().requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: option) { (livePhoto, info) in
+        return PHImageManager.default().requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: option) { (livePhoto, info) in
             let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool ?? false)
             completion(livePhoto, info, isDegraded)
         }
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch livePhoto for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
+    /// - Returns: livePhoto asset.
+    @available(iOS 13.0.0, *)
+    public class func fetchLivePhoto(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil) async throws -> PHLivePhoto? {
+        let option = PHLivePhotoRequestOptions()
+        option.version = .current
+        option.deliveryMode = .highQualityFormat
+        option.isNetworkAccessAllowed = true
+        option.progressHandler = { (pro, error, stop, info) in
+            DispatchQueue.main.async {
+                progress?(pro, error, stop, info)
+            }
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            PHImageManager.default().requestLivePhoto(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: option) { (livePhoto, info) in
+                if let error = info?[PHImageErrorKey] as? Error {
+                    continuation.resume(throwing: error)
+                }else{
+                    continuation.resume(returning: livePhoto)
+                }
+            }
+        }
+    }
+    #endif
+    
     /// Fetch video for asset.
     /// - Parameters:
     ///   - asset: Asset to fetch result.
-    ///   - progress: Progress of fetching request.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
     ///   - completion: Called after fetch result.
     /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
     public class func fetchVideo(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADPlayItemCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
+        option.version = .current
+        option.deliveryMode = .automatic
         option.isNetworkAccessAllowed = true
         option.progressHandler = { (pro, error, stop, info) in
             DispatchQueue.main.async {
@@ -323,14 +498,67 @@ public class ADPhotoManager {
         }
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch video for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
+    /// - Returns: AVPlayerItem asset.
+    @available(iOS 13.0.0, *)
+    public class func fetchVideo(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil) async throws -> AVPlayerItem? {
+        let option = PHVideoRequestOptions()
+        option.version = .current
+        option.deliveryMode = .automatic
+        option.isNetworkAccessAllowed = true
+        option.progressHandler = { (pro, error, stop, info) in
+            DispatchQueue.main.async {
+                progress?(pro, error, stop, info)
+            }
+        }
+                
+        if asset.isInCloud {
+            return try await withCheckedThrowingContinuation { continuation in
+                PHImageManager.default().requestExportSession(forVideo: asset, options: option, exportPreset: AVAssetExportPresetHighestQuality, resultHandler: { (session, info) in
+                    // iOS11 and earlier, callback is not on the main thread.
+                    DispatchQueue.main.async {
+                        if let error = info?[PHImageErrorKey] as? Error {
+                            continuation.resume(throwing: error)
+                        }else{
+                            if let avAsset = session?.asset {
+                                let item = AVPlayerItem(asset: avAsset)
+                                continuation.resume(returning: item)
+                            }else{
+                                continuation.resume(returning: nil)
+                            }
+                        }
+                    }
+                })
+            }
+        } else {
+            return try await withCheckedThrowingContinuation { continuation in
+                PHImageManager.default().requestPlayerItem(forVideo: asset, options: option) { (item, info) in
+                    // iOS11 and earlier, callback is not on the main thread.
+                    DispatchQueue.main.async {
+                        if let error = info?[PHImageErrorKey] as? Error {
+                            continuation.resume(throwing: error)
+                        }else{
+                            continuation.resume(returning: item)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endif
+    
     /// Fetch AVAsset for asset.
     /// - Parameters:
     ///   - asset: Asset to fetch result.
-    ///   - progress: Progress of fetching request.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
     ///   - completion: Called after fetch result.
     /// - Returns: A numeric identifier for the request. If you need to cancel the request before it completes, pass this identifier to the cancelImageRequest: method.
     @discardableResult
-    public class func fetchAVAsset(forVideo asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
+    public class func fetchAVAsset(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil, completion: @escaping ADAVAssertCompletionHandler) -> PHImageRequestID {
         let option = PHVideoRequestOptions()
         option.version = .current
         option.deliveryMode = .automatic
@@ -359,19 +587,92 @@ public class ADPhotoManager {
         }
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch video for asset.
+    /// - Parameters:
+    ///   - asset: Asset to fetch result.
+    ///   - progress: Progress of fetching request.Only called when the data is not available locally and is retrieved from iCloud.
+    /// - Returns: AVAsset asset.
+    @available(iOS 13.0.0, *)
+    public class func fetchAVAsset(for asset: PHAsset, progress: PHAssetImageProgressHandler? = nil) async throws -> AVAsset? {
+        let option = PHVideoRequestOptions()
+        option.version = .current
+        option.deliveryMode = .automatic
+        option.isNetworkAccessAllowed = true
+        option.progressHandler = { (pro, error, stop, info) in
+            DispatchQueue.main.async {
+                progress?(pro, error, stop, info)
+            }
+        }
+                
+        if asset.isInCloud {
+            return try await withCheckedThrowingContinuation { continuation in
+                PHImageManager.default().requestExportSession(forVideo: asset, options: option, exportPreset: AVAssetExportPresetHighestQuality, resultHandler: { (session, info) in
+                    // iOS11 and earlier, callback is not on the main thread.
+                    DispatchQueue.main.async {
+                        if let error = info?[PHImageErrorKey] as? Error {
+                            continuation.resume(throwing: error)
+                        }else{
+                            continuation.resume(returning: session?.asset)
+                        }
+                    }
+                })
+            }
+        } else {
+            return try await withCheckedThrowingContinuation { continuation in
+                PHImageManager.default().requestAVAsset(forVideo: asset, options: option) { (avAsset, _, info) in
+                    DispatchQueue.main.async {
+                        if let error = info?[PHImageErrorKey] as? Error {
+                            continuation.resume(throwing: error)
+                        }else{
+                            continuation.resume(returning: avAsset)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endif
+    
     /// Fetch file path for asset.
     /// - Parameters:
     ///   - asset: Asset to fetch result.
     ///   - completion: Called after fetch result.
-    public class func fetchFilePath(asset: PHAsset, completion: @escaping ADFilePathCompletionHandler) {
+    public class func fetchFilePath(for asset: PHAsset, completion: @escaping ADFilePathCompletionHandler) {
         asset.requestContentEditingInput(with: nil) { (input, info) in
-            var path = input?.fullSizeImageURL?.absoluteString
-            if path == nil, let dir = asset.value(forKey: "directory") as? String, let name = asset.value(forKey: "filename") as? String {
-                path = String(format: "file:///var/mobile/Media/%@/%@", dir, name)
+            DispatchQueue.main.async {
+                var path = input?.fullSizeImageURL?.absoluteString
+                if path == nil, let dir = asset.value(forKey: "directory") as? String, let name = asset.value(forKey: "filename") as? String {
+                    path = String(format: "file:///var/mobile/Media/%@/%@", dir, name)
+                }
+                completion(path,info,true)
             }
-            completion(path,info,true)
         }
     }
+    
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Fetch file path for asset.
+    /// - Parameter asset: Asset to fetch result.
+    /// - Returns: file path.
+    @available(iOS 13.0.0, *)
+    public class func fetchFilePath(for asset: PHAsset) async throws -> String? {
+        return try await withCheckedThrowingContinuation { continuation in
+            asset.requestContentEditingInput(with: nil) { (input, info) in
+                DispatchQueue.main.async {
+                    if let error = info[PHImageErrorKey] as? Error {
+                        continuation.resume(throwing: error)
+                    }else{
+                        var path = input?.fullSizeImageURL?.absoluteString
+                        if path == nil, let dir = asset.value(forKey: "directory") as? String, let name = asset.value(forKey: "filename") as? String {
+                            path = String(format: "file:///var/mobile/Media/%@/%@", dir, name)
+                        }
+                        continuation.resume(returning: path)
+                    }
+                }
+            }
+        }
+    }
+    #endif
 }
 
 /// Private
@@ -427,6 +728,18 @@ extension ADPhotoManager {
         }
     }
     
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Save image to album.
+    /// - Parameters:
+    ///   - image: Image to save.
+    @available(iOS 13.0.0, *)
+    public class func saveImageToAlbum(image: UIImage) async throws {
+        return try await PHPhotoLibrary.shared().performChanges {
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }
+    }
+    #endif
+    
     /// Save video to album.
     /// - Parameters:
     ///   - url: Video asset's path.
@@ -454,6 +767,18 @@ extension ADPhotoManager {
             }
         }
     }
+    
+    #if swift(>=5.5) && canImport(_Concurrency)
+    /// Save image to album.
+    /// - Parameters:
+    ///   - image: Image to save.
+    @available(iOS 13.0.0, *)
+    public class func saveVideoToAlbum(url: URL) async throws {
+        return try await PHPhotoLibrary.shared().performChanges {
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+        }
+    }
+    #endif
     
     private class func getAsset(from localIdentifier: String?) -> PHAsset? {
         guard let id = localIdentifier else {

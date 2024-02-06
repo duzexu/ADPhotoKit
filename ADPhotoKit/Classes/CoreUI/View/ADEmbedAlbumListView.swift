@@ -11,15 +11,15 @@ class ADEmbedAlbumListView: UIView {
     
     var selectAlbumBlock: ((ADAlbumModel?)->Void)?
     
-    let config: ADPhotoKitConfig
+    let options: ADAlbumSelectOptions
     
     var tableBgView: UIView!
     var tableBgMask: CAShapeLayer!
     var tableView: UITableView!
     var dataSource: ADAlbumListDataSource!
 
-    init(config: ADPhotoKitConfig) {
-        self.config = config
+    init(options: ADAlbumSelectOptions) {
+        self.options = options
         super.init(frame: .zero)
         isHidden = true
         setupUI()
@@ -118,7 +118,7 @@ private extension ADEmbedAlbumListView {
         
         ADPhotoKitConfiguration.default.customAlbumListCellRegistor?(tableView)
         
-        dataSource = ADAlbumListDataSource(reloadable: tableView, options: config.albumOpts)
+        dataSource = ADAlbumListDataSource(reloadable: tableView, options: options)
     }
     
     @objc func tapAction(_ tap: UITapGestureRecognizer) {

@@ -11,7 +11,7 @@ import ADPhotoKit
 
 class ImageBrowserCell: UICollectionViewCell, ADImageBrowserCellConfigurable {
     
-    func configure(with source: ADImageSource) {
+    func configure(with source: ADImageSource, config: ADPhotoKitConfig) {
         switch source {
         case let .network(url):
             imageView.kf.setImage(with: url)

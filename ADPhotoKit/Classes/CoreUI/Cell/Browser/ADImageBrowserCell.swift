@@ -82,10 +82,10 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with source: ADImageSource) {
+    func configure(with source: ADImageSource, config: ADPhotoKitConfig) {
         imageBrowserView.isHidden = source.isLivePhoto
         livePhotoBrowserView.isHidden = !source.isLivePhoto
-        if source.isLivePhoto && ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
+        if source.isLivePhoto && config.assetOpts.contains(.selectAsLivePhoto) {
             livePhotoBrowserView.asset = source.livePhotoAsset!
         }else{
             imageBrowserView.isHidden = false

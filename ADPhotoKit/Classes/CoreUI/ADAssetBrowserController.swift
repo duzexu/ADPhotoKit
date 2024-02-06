@@ -54,18 +54,20 @@ public class ADAssetBrowserController: UIViewController {
         ADPhotoKitConfiguration.default.customBrowserControllerBlock?(self)
         setupTransition()
         collectionView.layoutIfNeeded()
-        collectionView.scrollToItem(at: IndexPath(row: dataSource.index, section: 0), at: .centeredHorizontally, animated: false)
+        if dataSource.list.count > 0 {
+            collectionView.scrollToItem(at: IndexPath(row: dataSource.index, section: 0), at: .centeredHorizontally, animated: false)
+        }
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
+        toolBarView.isOriginal = config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
+        config.isOriginal = toolBarView.isOriginal
     }
     
     public override var prefersStatusBarHidden: Bool {
@@ -83,7 +85,7 @@ public class ADAssetBrowserController: UIViewController {
     
     /// Called when finish selection. Subclass can override to do something.
     open func finishSelection() {
-        ADPhotoKitUI.config.browserSelect?(dataSource.selects)
+        config.browserSelect?(dataSource.selects)
         navigationController?.dismiss(animated: true, completion: nil)
     }
     
@@ -187,13 +189,25 @@ private extension ADAssetBrowserController {
             self?.collectionView.isHidden = !exist
             self?.popTransition?.isEnabled = exist
         }
+        dataSource.selectAssetChanged = { [weak self] count in
+            #if Module_UI
+            if count == 1 {
+                if let model = self?.dataSource.selects.randomElement() {
+                    self?.config.selectMediaImage = model.browseAsset.isImage
+                }
+            }
+            if count == 0 {
+                self?.config.selectMediaImage = nil
+            }
+            #endif
+        }
         
         navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource)
         navBarView.leftActionBlock = { [weak self] in
             self?.didSelectsUpdate()
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
-                ADPhotoKitUI.config.canceled?()
+                self?.config.canceled?()
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
@@ -272,7 +286,7 @@ private extension ADAssetBrowserController {
     
     func editImage(_ img: UIImage?) {
         #if Module_ImageEdit
-        if let image = img, !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto) {
+        if let image = img, !config.assetOpts.contains(.selectAsLivePhoto) {
             let vc = ADImageEditController(image: image, editInfo: dataSource.current!.imageEditInfo)
             vc.imageDidEdit = { [weak self] editInfo in
                 self?.didImageEditInfoUpdate(editInfo)
@@ -321,9 +335,9 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
             if let imageCell = cell as? ADImageBrowserCellConfigurable {
                 #if Module_ImageEdit
                 if let editImg = model.imageEditInfo?.editImg {
-                    imageCell.configure(with: .local(editImg, UUID().uuidString))
+                    imageCell.configure(with: .local(editImg, UUID().uuidString), config: config)
                 }else{
-                    imageCell.configure(with: source)
+                    imageCell.configure(with: source, config: config)
                 }
                 #else
                 imageCell.configure(with: source)

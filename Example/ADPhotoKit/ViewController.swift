@@ -7,7 +7,7 @@
 //
 
 import UIKit
-@_exported import ADPhotoKit
+import ADPhotoKit
 import Photos
 import ProgressHUD
 
@@ -32,23 +32,25 @@ struct NetVideo: ADAssetBrowsable {
     let url: String
 }
 
-class ViewController: UIViewController {
-    
-    @IBOutlet weak var tableView: UITableView!
-    
+class Configs {
     var pickerStyle: ADPickerStyle = .normal
     var albumOptions: ADAlbumSelectOptions = .default
     var assetOptions: ADAssetSelectOptions = .default
     var browserOptions: ADAssetBrowserOptions = .default
     var params: Set<ADPhotoSelectParams> = []
+}
+
+class ViewController: UIViewController {
     
-    var selected: [ADPhotoKitUI.Asset] = []
+    @IBOutlet weak var tableView: UITableView!
+    
+    let configs = Configs()
     
     private var dataSource: [ConfigSection] = []
-    private var keepSelect: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Configurations"
         // image sticker
         var sections: [ADImageStickerDataSource.StickerSection] = []
         do {
@@ -88,36 +90,13 @@ class ViewController: UIViewController {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 20
-        let browser = UIButton(type: .system)
-        browser.setTitle("Browser", for: .normal)
-        browser.addTarget(self, action: #selector(presentAssetBrowser(_:)), for: .touchUpInside)
-        stack.addArrangedSubview(browser)
-        let picker = UIButton(type: .system)
-        picker.setTitle("Picker", for: .normal)
-        picker.addTarget(self, action: #selector(presentImagePicker(_:)), for: .touchUpInside)
-        stack.addArrangedSubview(picker)
-        let selected = UIButton(type: .system)
-        selected.setTitle("ShowSel", for: .normal)
-        selected.addTarget(self, action: #selector(presentSelectAsset(_:)), for: .touchUpInside)
-        stack.addArrangedSubview(selected)
-        let control = UIView()
-        let label = UILabel()
-        label.text = "KeepSelect"
-        label.font = UIFont.systemFont(ofSize: 10)
-        control.addSubview(label)
-        let sw = UISwitch()
-        control.addSubview(sw)
-        sw.addTarget(self, action: #selector(switchAction(sender:)), for: .touchUpInside)
-        label.snp.makeConstraints { (make) in
-            make.top.equalToSuperview()
-            make.bottom.equalTo(sw.snp.top)
-        }
-        sw.snp.makeConstraints { (make) in
-            make.left.bottom.right.equalToSuperview()
-        }
-        stack.addArrangedSubview(control)
+        let config = UIButton(type: .system)
+        config.setTitle("Demos", for: .normal)
+        config.addTarget(self, action: #selector(pushDemos), for: .touchUpInside)
+        stack.addArrangedSubview(config)
         let rightBtnItem = UIBarButtonItem(customView: stack)
         navigationItem.rightBarButtonItem = rightBtnItem
+        
         setupConfig()
     }
     
@@ -149,9 +128,9 @@ class ViewController: UIViewController {
         let pickerConfig = ConfigSection(title: "Picker", models: [ConfigModel(title: "PickerStyle", mode: .segment(["Normal","Embed"], 0), action: { [weak self] (index) in
             if let idx = index as? Int {
                 if idx == 0 {
-                    self?.pickerStyle = .normal
+                    self?.configs.pickerStyle = .normal
                 }else{
-                    self?.pickerStyle = .embed
+                    self?.configs.pickerStyle = .embed
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -163,9 +142,9 @@ class ViewController: UIViewController {
         let allowImg = ConfigModel(title: "AllowImage", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.albumOptions.insert(.allowImage)
+                    self?.configs.albumOptions.insert(.allowImage)
                 }else{
-                    self?.albumOptions.remove(.allowImage)
+                    self?.configs.albumOptions.remove(.allowImage)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -175,9 +154,9 @@ class ViewController: UIViewController {
         let allowVideo = ConfigModel(title: "AllowVideo", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.albumOptions.insert(.allowVideo)
+                    self?.configs.albumOptions.insert(.allowVideo)
                 }else{
-                    self?.albumOptions.remove(.allowVideo)
+                    self?.configs.albumOptions.remove(.allowVideo)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -187,9 +166,9 @@ class ViewController: UIViewController {
         let ascending = ConfigModel(title: "Ascending", mode: .switch(false), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.albumOptions.insert(.ascending)
+                    self?.configs.albumOptions.insert(.ascending)
                 }else{
-                    self?.albumOptions.remove(.ascending)
+                    self?.configs.albumOptions.remove(.ascending)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -204,9 +183,9 @@ class ViewController: UIViewController {
         let mixSelect = ConfigModel(title: "MixSelect", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.mixSelect)
+                    self?.configs.assetOptions.insert(.mixSelect)
                 }else{
-                    self?.assetOptions.remove(.mixSelect)
+                    self?.configs.assetOptions.remove(.mixSelect)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -216,9 +195,9 @@ class ViewController: UIViewController {
         let selectAsGif = ConfigModel(title: "SelectAsGif", mode: .switch(false)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.selectAsGif)
+                    self?.configs.assetOptions.insert(.selectAsGif)
                 }else{
-                    self?.assetOptions.remove(.selectAsGif)
+                    self?.configs.assetOptions.remove(.selectAsGif)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -228,9 +207,9 @@ class ViewController: UIViewController {
         let selectAsLivePhoto = ConfigModel(title: "SelectAsLivePhoto", mode: .switch(false)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.selectAsLivePhoto)
+                    self?.configs.assetOptions.insert(.selectAsLivePhoto)
                 }else{
-                    self?.assetOptions.remove(.selectAsLivePhoto)
+                    self?.configs.assetOptions.remove(.selectAsLivePhoto)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -240,9 +219,9 @@ class ViewController: UIViewController {
         let slideSelect = ConfigModel(title: "SlideSelect", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.slideSelect)
+                    self?.configs.assetOptions.insert(.slideSelect)
                 }else{
-                    self?.assetOptions.remove(.slideSelect)
+                    self?.configs.assetOptions.remove(.slideSelect)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -252,9 +231,9 @@ class ViewController: UIViewController {
         let autoScroll = ConfigModel(title: "AutoScroll", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.autoScroll)
+                    self?.configs.assetOptions.insert(.autoScroll)
                 }else{
-                    self?.assetOptions.remove(.autoScroll)
+                    self?.configs.assetOptions.remove(.autoScroll)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -264,9 +243,9 @@ class ViewController: UIViewController {
         let allowTakePhotoAsset = ConfigModel(title: "AllowTakePhotoAsset", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.allowTakePhotoAsset)
+                    self?.configs.assetOptions.insert(.allowTakePhotoAsset)
                 }else{
-                    self?.assetOptions.remove(.allowTakePhotoAsset)
+                    self?.configs.assetOptions.remove(.allowTakePhotoAsset)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -276,9 +255,9 @@ class ViewController: UIViewController {
         let allowTakeVideoAsset = ConfigModel(title: "AllowTakeVideoAsset", mode: .switch(false)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.allowTakeVideoAsset)
+                    self?.configs.assetOptions.insert(.allowTakeVideoAsset)
                 }else{
-                    self?.assetOptions.remove(.allowTakeVideoAsset)
+                    self?.configs.assetOptions.remove(.allowTakeVideoAsset)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -288,9 +267,9 @@ class ViewController: UIViewController {
         let captureOnTakeAsset = ConfigModel(title: "CaptureOnTakeAsset", mode: .switch(false)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.captureOnTakeAsset)
+                    self?.configs.assetOptions.insert(.captureOnTakeAsset)
                 }else{
-                    self?.assetOptions.remove(.captureOnTakeAsset)
+                    self?.configs.assetOptions.remove(.captureOnTakeAsset)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -301,9 +280,9 @@ class ViewController: UIViewController {
             let allowAddAsset = ConfigModel(title: "AllowAddAsset", mode: .switch(false)) { [weak self] (value) in
                 if let isOn = value as? Bool {
                     if isOn {
-                        self?.assetOptions.insert(.allowAddAsset)
+                        self?.configs.assetOptions.insert(.allowAddAsset)
                     }else{
-                        self?.assetOptions.remove(.allowAddAsset)
+                        self?.configs.assetOptions.remove(.allowAddAsset)
                     }
                     ProgressHUD.showSuccess("Update Success!")
                 }
@@ -313,9 +292,9 @@ class ViewController: UIViewController {
             let allowAuthTips = ConfigModel(title: "AllowAuthTips", mode: .switch(false)) { [weak self] (value) in
                 if let isOn = value as? Bool {
                     if isOn {
-                        self?.assetOptions.insert(.allowAuthTips)
+                        self?.configs.assetOptions.insert(.allowAuthTips)
                     }else{
-                        self?.assetOptions.remove(.allowAuthTips)
+                        self?.configs.assetOptions.remove(.allowAuthTips)
                     }
                     ProgressHUD.showSuccess("Update Success!")
                 }
@@ -326,9 +305,9 @@ class ViewController: UIViewController {
         let allowBrowser = ConfigModel(title: "AllowBrowser", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.allowBrowser)
+                    self?.configs.assetOptions.insert(.allowBrowser)
                 }else{
-                    self?.assetOptions.remove(.allowBrowser)
+                    self?.configs.assetOptions.remove(.allowBrowser)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -338,9 +317,9 @@ class ViewController: UIViewController {
         let thumbnailToolBar = ConfigModel(title: "ThumbnailToolBar", mode: .switch(true)) { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.assetOptions.insert(.thumbnailToolBar)
+                    self?.configs.assetOptions.insert(.thumbnailToolBar)
                 }else{
-                    self?.assetOptions.remove(.thumbnailToolBar)
+                    self?.configs.assetOptions.remove(.thumbnailToolBar)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -355,9 +334,9 @@ class ViewController: UIViewController {
         let selectOri = ConfigModel(title: "SelectOriginal", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.browserOptions.insert(.selectOriginal)
+                    self?.configs.browserOptions.insert(.selectOriginal)
                 }else{
-                    self?.browserOptions.remove(.selectOriginal)
+                    self?.configs.browserOptions.remove(.selectOriginal)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -367,9 +346,9 @@ class ViewController: UIViewController {
         let selectBrowser = ConfigModel(title: "SelectBrowser", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.browserOptions.insert(.selectThumbnil)
+                    self?.configs.browserOptions.insert(.selectThumbnil)
                 }else{
-                    self?.browserOptions.remove(.selectThumbnil)
+                    self?.configs.browserOptions.remove(.selectThumbnil)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -379,9 +358,9 @@ class ViewController: UIViewController {
         let selectIndex = ConfigModel(title: "SelectIndex", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.browserOptions.insert(.selectIndex)
+                    self?.configs.browserOptions.insert(.selectIndex)
                 }else{
-                    self?.browserOptions.remove(.selectIndex)
+                    self?.configs.browserOptions.remove(.selectIndex)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -391,9 +370,9 @@ class ViewController: UIViewController {
         let fetchImage = ConfigModel(title: "FetchImage", mode: .switch(true), action: { [weak self] (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    self?.browserOptions.insert(.fetchImage)
+                    self?.configs.browserOptions.insert(.fetchImage)
                 }else{
-                    self?.browserOptions.remove(.fetchImage)
+                    self?.configs.browserOptions.remove(.fetchImage)
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -407,7 +386,7 @@ class ViewController: UIViewController {
         
         let maxCount = ConfigModel(title: "MaxCount", mode: .stepper(0)) { [weak self] (value) in
             if let count = value as? Int {
-                self?.params.update(with: .maxCount(max: count))
+                self?.configs.params.update(with: .maxCount(max: count))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -415,7 +394,7 @@ class ViewController: UIViewController {
         
         let imageCount = ConfigModel(title: "ImageCount", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.update(with: .imageCount(min: trup.0, max: trup.1))
+                self?.configs.params.update(with: .imageCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -423,7 +402,7 @@ class ViewController: UIViewController {
         
         let videoCount = ConfigModel(title: "VideoCount", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.update(with: .videoCount(min: trup.0, max: trup.1))
+                self?.configs.params.update(with: .videoCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -431,7 +410,7 @@ class ViewController: UIViewController {
         
         let videoTime = ConfigModel(title: "VideoTime", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.update(with: .videoTime(min: trup.0, max: trup.1))
+                self?.configs.params.update(with: .videoTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -439,7 +418,7 @@ class ViewController: UIViewController {
         
         let recordTime = ConfigModel(title: "RecordTime", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
-                self?.params.update(with: .recordTime(min: trup.0, max: trup.1))
+                self?.configs.params.update(with: .recordTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
@@ -642,8 +621,8 @@ class ViewController: UIViewController {
         let thumbnailNav = ConfigModel(title: "Thumbnail Navbar", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.customThumbnailNavBarBlock = { style in
-                        return ThumbnailNavBar(style: style)
+                    ADPhotoKitConfiguration.default.customThumbnailNavBarBlock = { style, config in
+                        return ThumbnailNavBar(style: style, config: config)
                     }
                 }else{
                     ADPhotoKitConfiguration.default.customThumbnailNavBarBlock = nil
@@ -775,56 +754,10 @@ class ViewController: UIViewController {
         let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
         dataSource.append(imageEditConfig)
     }
-
-    @IBAction func presentImagePicker(_ sender: UIButton) {
-        ADPhotoKitUI.imagePicker(present: self,
-                                 assetOpts: .exclusive,
-                                 params: [.imageCount(min: nil, max: 9),.videoCount(min: nil, max: 1),.videoTime(min: 30, max: 300)],
-                                 selected: { (assets, origin) in
-            // do something
-        })
-//        let s: [ADSelectAssetModel] = keepSelect ? selected.map {
-//            let model = ADSelectAssetModel(asset: $0.asset)
-//            model.imageEditInfo = $0.result?.imageEditInfo
-//            return model
-//        } : []
-//        ADPhotoKitUI.imagePicker(present: self,
-//                                 style: pickerStyle,
-//                                 models: s,
-//                                 albumOpts: albumOptions,
-//                                 assetOpts: assetOptions,
-//                                 browserOpts: browserOptions,
-//                                 params: params,
-//                                 selected: { [weak self] (assets, value) in
-//            self?.selected = assets
-//            print(assets)
-//        },
-//                                 canceled: {
-//            print("cancel")
-//        })
-    }
     
-    @IBAction func presentAssetBrowser(_ sender: UIButton) {
-        ADPhotoKitUI.assetBrowser(present: self, assets: [NetImage(url: "https://cdn.pixabay.com/photo/2020/10/14/18/35/sign-post-5655110_1280.png"),NetImage(url: "https://pic.netbian.com/uploads/allimg/190518/174718-1558172838db13.jpg"),NetImage(url: "http://5b0988e595225.cdn.sohucs.com/images/20190420/1d1070881fd540db817b2a3bdd967f37.gif"),NetVideo(url: "https://freevod.nf.migu.cn/mORsHmtum1AysKe3Ry%2FUb5rA1WelPRwa%2BS7ylo4qQCjcD5a2YuwiIC7rpFwwdGcgkgMxZVi%2FVZ%2Fnxf6NkQZ75HC0xnJ5rlB8UwiH8cZUuvErkVufDlxxLUBF%2FIgUEwjiq%2F%2FV%2FoxBQBVMUzAZaWTvOE5dxUFh4V3Oa489Ec%2BPw0IhEGuR64SuKk3MOszdFg0Q/600575Y9FGZ040325.mp4?msisdn=2a257d4c-1ee0-4ad8-8081-b1650c26390a&spid=600906&sid=50816168212200&timestamp=20201026155427&encrypt=70fe12c7473e6d68075e9478df40f207&k=dc156224f8d0835e&t=1603706067279&ec=2&flag=+&FN=%E5%B0%86%E6%95%85%E4%BA%8B%E5%86%99%E6%88%90%E6%88%91%E4%BB%AC")], options: browserOptions, selected: { (assets) in
-            print(assets)
-        }, canceled: {
-            print("cancel")
-        })
-    }
-    
-    @IBAction func presentSelectAsset(_ sender: UIButton) {
-        let assets: [PHAsset] = selected.map {
-            let asset = $0.asset
-            asset.imageEditInfo = $0.result?.imageEditInfo
-            return asset
-        }
-        ADPhotoKitUI.assetBrowser(present: self, assets: assets, options: browserOptions) { (assets) in
-            print(assets)
-        }
-    }
-
-    @IBAction func switchAction(sender: UISwitch) {
-        keepSelect = sender.isOn
+    @IBAction func pushDemos() {
+        let config = DemosViewController(conifgs: configs)
+        navigationController?.pushViewController(config, animated: true)
     }
 }
 

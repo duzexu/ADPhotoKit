@@ -47,7 +47,7 @@ Pod::Spec.new do |s|
   
   s.subspec "Core" do |c|
     c.dependency 'ADPhotoKit/Base'
-    c.dependency 'Kingfisher', '<= 5.15.8'
+    c.dependency 'Kingfisher', '~> 6.3.1'
     c.source_files  = ["ADPhotoKit/Classes/Core/**/*.swift"]
     c.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_Core'}
   end

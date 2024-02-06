@@ -28,7 +28,7 @@ class ThumbnailNavBar: UIView, ADThumbnailNavBarConfigurable {
     
     let titleLabel = UILabel()
     
-    required init(style: ADPickerStyle) {
+    required init(style: ADPickerStyle, config: ADPhotoKitConfig) {
         super.init(frame: .zero)
         backgroundColor = UIColor(white: 0, alpha: 0.9)
         

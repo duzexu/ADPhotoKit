@@ -23,7 +23,7 @@ class ThumbnailCell: UICollectionViewCell, ADThumbnailCellConfigurable {
     
     var selectAction: ((ADThumbnailCellConfigurable, Bool) -> Void)?
     
-    func configure(with model: ADAssetModel) {
+    func configure(with model: ADAssetModel, config: ADPhotoKitConfig) {
         assetModel = model
         selectStatus = model.selectStatus
         switch model.type {

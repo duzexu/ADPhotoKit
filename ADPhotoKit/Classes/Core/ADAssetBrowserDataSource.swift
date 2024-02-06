@@ -30,6 +30,9 @@ public class ADAssetBrowserDataSource: NSObject {
         if index < 0 {
             return nil
         }
+        if index >= list.count {
+            return nil
+        }
         return list[index]
     }
 
@@ -44,6 +47,10 @@ public class ADAssetBrowserDataSource: NSObject {
     /// Current browser asset index in `selects`.
     @objc
     public dynamic var selectIndex: Int = -1
+    
+    /// Total select browser asset count.
+    @objc
+    public dynamic var selectCount: Int = 0
     
     /// Called when selet or deselect asset.
     public var selectAssetChanged: ((Int)->Void)?
@@ -83,6 +90,7 @@ public class ADAssetBrowserDataSource: NSObject {
         if isSelected {
             self.selectIndex = selectIndexs.firstIndex(of: self.index)!
         }
+        selectCount = selects.count
         selectAssetChanged?(selects.count)
         super.init()
     }
@@ -141,14 +149,8 @@ public class ADAssetBrowserDataSource: NSObject {
         selectIndex = selects.count-1
         selectView?.insertItems(at: [ip])
         selectView?.scrollToItem(at: ip, at: .centeredHorizontally, animated: true)
+        selectCount = selects.count
         selectAssetChanged?(selects.count)
-        #if Module_UI
-        if selects.count == 1 {
-            if let model = selects.randomElement() {
-                ADPhotoKitUI.config.selectMediaImage = model.browseAsset.isImage
-            }
-        }
-        #endif
     }
     
     /// Deselect the asset.
@@ -160,12 +162,8 @@ public class ADAssetBrowserDataSource: NSObject {
             selects.remove(at: i)
             isSelected = selectIndexs.contains(index)
             selectView?.deleteItems(at: [IndexPath(row: i, section: 0)])
+            selectCount = selects.count
             selectAssetChanged?(selects.count)
-            #if Module_UI
-            if selects.count == 0 {
-                ADPhotoKitUI.config.selectMediaImage = nil
-            }
-            #endif
         }
     }
     

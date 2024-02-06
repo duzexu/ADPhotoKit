@@ -41,7 +41,8 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     
     var selectView: ADBrowserToolBarSelectView!
     
-    private var token: NSKeyValueObservation?
+    private var indexToken: NSKeyValueObservation?
+    private var selectCountToken: NSKeyValueObservation?
 
     required init(dataSource: ADAssetBrowserDataSource) {
         self.dataSource = dataSource
@@ -52,9 +53,6 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
         setupUI()
         
         reloadCount(dataSource.selects.count)
-        dataSource.selectAssetChanged = { [weak self] count in
-            self?.reloadCount(count)
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -62,7 +60,8 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     }
     
     deinit {
-        token?.invalidate()
+        indexToken?.invalidate()
+        selectCountToken?.invalidate()
     }
 }
 
@@ -139,7 +138,7 @@ private extension ADBrowserToolBarView {
         if let ass = dataSource?.current {
             reload(asset: ass)
         }
-        token = dataSource?.observe(\.index, options: .new) { [weak self] (dataSource, change) in
+        indexToken = dataSource?.observe(\.index, options: .new) { [weak self] (dataSource, change) in
             if let ass = self?.dataSource?.current {
                 self?.reload(asset: ass)
             }else{
@@ -147,6 +146,10 @@ private extension ADBrowserToolBarView {
                 self?.originalBtn.alpha = 0
             }
         }
+        selectCountToken = dataSource?.observe(\.selectCount, options: .new, changeHandler: { (dataSource, change) in
+            guard let count = change.newValue else { return }
+            self.reloadCount(count)
+        })
     }
     
     func createBtn(_ title: String, _ action: Selector) -> UIButton {

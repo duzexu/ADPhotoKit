@@ -72,13 +72,13 @@ public class ADThumbnailViewController: UIViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        toolBarView.isOriginal = ADPhotoKitUI.config.isOriginal
+        toolBarView.isOriginal = config.isOriginal
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        ADPhotoKitUI.config.isOriginal = toolBarView.isOriginal
+        config.isOriginal = toolBarView.isOriginal
     }
     
     public override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -104,6 +104,16 @@ public class ADThumbnailViewController: UIViewController {
             dataSource = ADAssetListDataSource(reloadable: collectionView, album: album, selects: selects, albumOpts: config.albumOpts, assetOpts: config.assetOpts)
         }
         dataSource.selectAssetChanged = { [weak self] count in
+            #if Module_UI
+            if count == 1 {
+                if let model = self?.dataSource.selects.randomElement() {
+                    self?.config.selectMediaImage = ADAssetModel(asset: model.asset).type.isImage
+                }
+            }
+            if count == 0 {
+                self?.config.selectMediaImage = nil
+            }
+            #endif
             self?.toolBarView.selectCount = count
         }
 
@@ -136,7 +146,7 @@ extension ADThumbnailViewController {
         
         ADPhotoKitConfiguration.default.customThumbnailCellRegistor?(collectionView)
         
-        toolBarView = ADPhotoUIConfigurable.thumbnailToolBar()
+        toolBarView = ADPhotoUIConfigurable.thumbnailToolBar(config: config)
         toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
@@ -151,17 +161,18 @@ extension ADThumbnailViewController {
         toolBarView.doneActionBlock = { [weak self] in
             guard let strong = self else { return }
             if strong.config.browserOpts.contains(.fetchImage) {
-                self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif)) { [weak self] in
+                self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif), inQueue: strong.config.fetchImageQueue) { [weak self] selected in
+                    self?.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
                     self?.navigationController?.dismiss(animated: true, completion: nil)
                 }
             }else{
                 let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
-                ADPhotoKitUI.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
+                strong.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
                 strong.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
         
-        let navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style)
+        let navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style, config: config)
         navBarView.title = album.title
         navBarView.leftActionBlock = { [weak self] in
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -169,12 +180,12 @@ extension ADThumbnailViewController {
                     self?.selectAlbumBlock?(strong.dataSource.selects)
                 }
             }else{
-                ADPhotoKitUI.config.canceled?()
+                self?.config.canceled?()
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
         navBarView.rightActionBlock = { [weak self] btn in
-            ADPhotoKitUI.config.canceled?()
+            self?.config.canceled?()
             self?.navigationController?.dismiss(animated: true, completion: nil)
         }
         view.addSubview(navBarView)
@@ -289,7 +300,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
         let modify = dataSource.modifyIndexPath(indexPath)
         let model = dataSource.list[modify.row]
         cell.indexPath = indexPath
-        cell.configure(with: model)
+        cell.configure(with: model, config: config)
         cell.selectAction = { [weak self] cell, sel in
             guard let strong = self else {
                 return
@@ -304,7 +315,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             }
             
             /// 单独刷新这个cell 防止选择动画停止
-            cell.configure(with: strong.dataSource.list[index])
+            cell.configure(with: strong.dataSource.list[index], config: strong.config)
             
             var indexs = strong.collectionView.indexPathsForVisibleItems
             indexs.removeAll {$0 == cell.indexPath}
@@ -492,7 +503,7 @@ private extension ADThumbnailViewController {
                 }else{
                     dataSource.selectAssetAt(index: index)
                 }
-                cell.configure(with: model)
+                cell.configure(with: model, config: config)
             }
         }
     }

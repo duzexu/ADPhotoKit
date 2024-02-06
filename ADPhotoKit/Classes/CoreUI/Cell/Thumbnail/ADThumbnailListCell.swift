@@ -200,10 +200,10 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
     
     /// Config cell with asset model.
     /// - Parameter model: Asset info.
-    public func configure(with model: ADAssetModel) {
+    public func configure(with model: ADAssetModel, config: ADPhotoKitConfig) {
         assetModel = model
         selectStatus = model.selectStatus
-        selectBtn.isHidden = !ADPhotoKitUI.config.displaySelectBtn(model: model)
+        selectBtn.isHidden = !config.displaySelectBtn(model: model)
         
         switch model.type {
         case .unknown:
@@ -211,11 +211,11 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
         case .image:
             bottomMaskView.isHidden = true
         case .gif:
-            bottomMaskView.isHidden = !ADPhotoKitUI.config.assetOpts.contains(.selectAsGif)
+            bottomMaskView.isHidden = !config.assetOpts.contains(.selectAsGif)
             tagImageView.image = nil
             descLabel.text = "GIF"
         case .livePhoto:
-            bottomMaskView.isHidden = !ADPhotoKitUI.config.assetOpts.contains(.selectAsLivePhoto)
+            bottomMaskView.isHidden = !config.assetOpts.contains(.selectAsLivePhoto)
             tagImageView.image = Bundle.image(name: "livePhoto")
             descLabel.text = "Live"
         case let .video(_, format):

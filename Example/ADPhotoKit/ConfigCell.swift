@@ -20,9 +20,9 @@ class ConfigCell: UITableViewCell {
         titleLabel.text = model.title
         customView?.removeFromSuperview()
         customView = nil
-        if let v = model.rightView() {
+        if let v = model.rightView {
             customView = v
-            contentView.addSubview(v)
+            addSubview(v)
             v.snp.makeConstraints { (make) in
                 make.right.equalToSuperview().offset(-16)
                 make.centerY.equalToSuperview()

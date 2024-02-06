@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ADPhotoKit
 
 enum Filter: CaseIterable {
     case none

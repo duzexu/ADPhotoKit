@@ -9,6 +9,12 @@ import UIKit
 
 class ADPhotoNavController: UINavigationController {
     
+    override var prefersStatusBarHidden: Bool {
+        return topViewController?.prefersStatusBarHidden ?? false
+    }
     
-    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return topViewController?.preferredStatusBarStyle ?? .default
+    }
+        
 }

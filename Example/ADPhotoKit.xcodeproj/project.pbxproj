@@ -12,6 +12,10 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		81D9AA9A2B6A433000CE472F /* SwiftUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA992B6A433000CE472F /* SwiftUIViewController.swift */; };
+		81D9AA9D2B6A44C700CE472F /* MainSwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */; };
+		81D9AA9F2B6A45CC00CE472F /* DemosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */; };
+		81D9AAA12B6A502D00CE472F /* ConfigCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 81D9AAA02B6A502D00CE472F /* ConfigCell.xib */; };
 		9522FB332655133D00A0D360 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB322655133D00A0D360 /* ProgressHUD.swift */; };
 		9522FB3826551A4400A0D360 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB3726551A4400A0D360 /* Progress.swift */; };
 		9551F0A7263A98D80089C8DE /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0A6263A98D80089C8DE /* LanguageViewController.swift */; };
@@ -107,6 +111,10 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		6F6E6C84A9FE07B23F93C7EB /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		781C69769B128467B470C297 /* ADPhotoKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ADPhotoKit.podspec; path = ../ADPhotoKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		81D9AA992B6A433000CE472F /* SwiftUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIViewController.swift; sourceTree = "<group>"; };
+		81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSwiftUIView.swift; sourceTree = "<group>"; };
+		81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemosViewController.swift; sourceTree = "<group>"; };
+		81D9AAA02B6A502D00CE472F /* ConfigCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigCell.xib; sourceTree = "<group>"; };
 		9522FB322655133D00A0D360 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		9522FB3726551A4400A0D360 /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		9551F0A6263A98D80089C8DE /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
@@ -238,11 +246,15 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */,
+				81D9AA992B6A433000CE472F /* SwiftUIViewController.swift */,
 				9551F0B1263BA9130089C8DE /* ConfigModel.swift */,
 				9551F0B8263C0AF10089C8DE /* Stepper.swift */,
 				9551F0BB263C0F600089C8DE /* Ranger.swift */,
 				9551F0B5263BACB70089C8DE /* ConfigCell.swift */,
+				81D9AAA02B6A502D00CE472F /* ConfigCell.xib */,
 				9551F0A6263A98D80089C8DE /* LanguageViewController.swift */,
+				81D9AA9B2B6A443C00CE472F /* SwiftUIViews */,
 				9582CACA26F337DA00C250E7 /* Edit */,
 				9522FB312655130E00A0D360 /* Custom */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -272,6 +284,14 @@
 				AD6AD32727AAE9474B8F3EE1 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
+			sourceTree = "<group>";
+		};
+		81D9AA9B2B6A443C00CE472F /* SwiftUIViews */ = {
+			isa = PBXGroup;
+			children = (
+				81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */,
+			);
+			name = SwiftUIViews;
 			sourceTree = "<group>";
 		};
 		9522FB312655130E00A0D360 /* Custom */ = {
@@ -446,7 +466,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = 498TALM54C;
+						DevelopmentTeam = DCWWYXN3CF;
 						LastSwiftMigration = 0900;
 					};
 				};
@@ -538,6 +558,7 @@
 				9555814726BA4657007AA13C /* agg_13.png in Resources */,
 				9555813F26BA4657007AA13C /* agg_1.png in Resources */,
 				9555817526BA4C7C007AA13C /* like_4.jpeg in Resources */,
+				81D9AAA12B6A502D00CE472F /* ConfigCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,6 +626,7 @@
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				95792A872657920E00AE8ED5 /* BrowserToolBar.swift in Sources */,
 				9551F0BC263C0F600089C8DE /* Ranger.swift in Sources */,
+				81D9AA9F2B6A45CC00CE472F /* DemosViewController.swift in Sources */,
 				95792A402657675A00AE8ED5 /* BrowserNavBar.swift in Sources */,
 				9522FB332655133D00A0D360 /* ProgressHUD.swift in Sources */,
 				9551F0B9263C0AF10089C8DE /* Stepper.swift in Sources */,
@@ -612,6 +634,8 @@
 				9582CACE26F33B1700C250E7 /* ImageFilterSelectView.swift in Sources */,
 				9551F0B6263BACB70089C8DE /* ConfigCell.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				81D9AA9D2B6A44C700CE472F /* MainSwiftUIView.swift in Sources */,
+				81D9AA9A2B6A433000CE472F /* SwiftUIViewController.swift in Sources */,
 				95792A9026579AA300AE8ED5 /* VideoBrowserCell.swift in Sources */,
 				95792A2926563F2200AE8ED5 /* AlbumCell.swift in Sources */,
 				95792A8B26579A9200AE8ED5 /* ImageBrowserCell.swift in Sources */,
@@ -746,8 +770,9 @@
 			baseConfigurationReference = 3CB39CA1E981703801E81343 /* Pods-ADPhotoKit_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 498TALM54C;
+				DEVELOPMENT_TEAM = DCWWYXN3CF;
 				INFOPLIST_FILE = ADPhotoKit/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -762,8 +787,9 @@
 			baseConfigurationReference = 08395E3DCFD85DA8A140A2E4 /* Pods-ADPhotoKit_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 498TALM54C;
+				DEVELOPMENT_TEAM = DCWWYXN3CF;
 				INFOPLIST_FILE = ADPhotoKit/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";

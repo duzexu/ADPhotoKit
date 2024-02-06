@@ -23,7 +23,10 @@ class ADThumbnailNavBarView: ADBaseNavBarView, ADThumbnailNavBarConfigurable {
         }
     }
     
-    required init(style: ADPickerStyle) {
+    let config: ADPhotoKitConfig
+    
+    required init(style: ADPickerStyle, config: ADPhotoKitConfig) {
+        self.config = config
         if style == .normal {
             super.init(rightItem: (nil,nil,ADLocale.LocaleKey.cancel.localeTextValue))
         }else{
@@ -82,7 +85,7 @@ private extension ADThumbnailNavBarView {
             var reload: Bool = false
             if albumListView == nil {
                 reload = true
-                albumListView = ADEmbedAlbumListView(config: ADPhotoKitUI.config)
+                albumListView = ADEmbedAlbumListView(options: config.albumOpts)
                 albumListView!.selectAlbumBlock = { [weak self] album in
                     self?.reset()
                     if let al = album {

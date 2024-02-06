@@ -87,7 +87,7 @@ extension ADAlbumListController {
         let navBarView = ADPhotoUIConfigurable.albumListNavBar()
         navBarView.title = ADLocale.LocaleKey.photo.localeTextValue
         navBarView.rightActionBlock = { [weak self] btn in
-            ADPhotoKitUI.config.canceled?()
+            self?.config.canceled?()
             if let _ = self?.navigationController?.popViewController(animated: true) {
             }else{
                 self?.navigationController?.dismiss(animated: true, completion: nil)

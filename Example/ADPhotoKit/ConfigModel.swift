@@ -74,9 +74,9 @@ class ConfigModel {
         self.action = action
     }
     
-    func rightView() -> UIView? {
+    lazy var rightView: UIView? = {
         return mode.view(target: self)
-    }
+    }()
     
     @objc func segmentedAction(_ sender: UISegmentedControl) {
         refreshMode(value: sender.selectedSegmentIndex)

@@ -89,7 +89,8 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `ThumbnailNavBar`. Default to use `ADThumbnailNavBarView`.
     /// The parameter `ADPickerStyle` is the style of bar.
-    public var customThumbnailNavBarBlock: ((ADPickerStyle) -> ADThumbnailNavBarConfigurable)?
+    /// The parameter `ADPhotoKitConfig` is the config pass through.
+    public var customThumbnailNavBarBlock: ((ADPickerStyle,ADPhotoKitConfig) -> ADThumbnailNavBarConfigurable)?
     
     /// Bolck to generate `ThumbnailToolBar`. Default to use `ADThumbnailToolBarView`.
     /// The parameter `ADPhotoKitConfig` is the config pass through.

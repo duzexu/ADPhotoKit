@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ADPhotoKit
 
 class ImageFilterSelectView: UIView, ADToolConfigable {
 

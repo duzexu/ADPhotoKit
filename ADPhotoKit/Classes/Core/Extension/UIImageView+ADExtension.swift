@@ -92,8 +92,10 @@ extension UIImageView {
         let generator = AVAssetImageGenerator(asset: assert)
         generator.appliesPreferredTrackTransform = true
         generator.apertureMode = .encodedPixels
-        if let img = try? generator.copyCGImage(at: time, actualTime: nil) {
-            image = UIImage(cgImage: img)
+        generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { [weak self] (requestedTime, image, imageTime, result, error) in
+            if let cgImage = image {
+                self?.image = UIImage(cgImage: cgImage)
+            }
         }
     }
     

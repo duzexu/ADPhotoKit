@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import Photos
+import SwiftUI
 
 /// Style to display picker.
 public enum ADPickerStyle {
@@ -90,7 +91,7 @@ public class ADPhotoKitUI {
     /// - Parameters:
     ///   - on: The controller to show picker.
     ///   - style: Style to display picker.
-    ///   - models: Asset models have been selected.
+    ///   - modelsSel: Asset models have been selected.
     ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
     ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
     ///   - browserOpts: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
@@ -99,7 +100,7 @@ public class ADPhotoKitUI {
     ///   - canceled: Called when cancel select.
     public class func imagePicker(present on: UIViewController,
                                     style: ADPickerStyle = .normal,
-                                    models: [ADSelectAssetModel] = [],
+                                    modelsSel: [ADSelectAssetModel] = [],
                                     albumOpts: ADAlbumSelectOptions = .default,
                                     assetOpts: ADAssetSelectOptions = .default,
                                     browserOpts: ADAssetBrowserOptions = .default,
@@ -107,13 +108,12 @@ public class ADPhotoKitUI {
                                     selected: @escaping AssetSelectHandler,
                                     canceled: AssetCancelHandler? = nil) {
         let configuration = ADPhotoKitConfig(albumOpts: albumOpts, assetOpts: assetOpts, browserOpts: browserOpts, params: params, pickerSelect: selected, browserSelect: nil, canceled: canceled)
-        if let asset = models.randomElement() {
+        if let asset = modelsSel.randomElement() {
             configuration.selectMediaImage = ADAssetModel(asset: asset.asset).type.isImage
         }
-        config = configuration
         if style == .normal {
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let album = ADAlbumListController(config: configuration, selects: models)
+                let album = ADAlbumListController(config: configuration, selects: modelsSel)
                 let nav = ADPhotoNavController(rootViewController: album)
                 album.pushThumbnail(with: model, style: style, animated: false)
                 nav.modalPresentationStyle = .fullScreen
@@ -121,7 +121,7 @@ public class ADPhotoKitUI {
             }
         }else{
             ADPhotoManager.cameraRollAlbum(options: albumOpts) { (model) in
-                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: models)
+                let thumbnail = ADThumbnailViewController(config: configuration, album: model, style: style, selects: modelsSel)
                 let nav = ADPhotoNavController(rootViewController: thumbnail)
                 nav.modalPresentationStyle = .fullScreen
                 on.present(nav, animated: true, completion: nil)
@@ -149,16 +149,68 @@ public class ADPhotoKitUI {
             fatalError("assets count must>0")
         }
         let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
-        config = configuration
         let browser = ADAssetBrowserController(config: configuration, assets: assets, selects: selects, index: index)
         let nav = ADPhotoNavController(rootViewController: browser)
         nav.modalPresentationStyle = .fullScreen
         on.present(nav, animated: true, completion: nil)
     }
     
-    /// Config pass through.
-    public static var config: ADPhotoKitConfig!
 }
+
+@available(iOS 13.0, *)
+extension View {
+    public func imagePicker(isPresented: Binding<Bool>,
+                            style: ADPickerStyle = .normal,
+                            modelsSel: [ADSelectAssetModel] = [],
+                            albumOpts: ADAlbumSelectOptions = .default,
+                            assetOpts: ADAssetSelectOptions = .default,
+                            browserOpts: ADAssetBrowserOptions = .default,
+                            params: Set<ADPhotoSelectParams> = [],
+                            selected: @escaping ADPhotoKitUI.AssetSelectHandler,
+                            canceled: ADPhotoKitUI.AssetCancelHandler? = nil) -> some View {
+        let configuration = ADPhotoKitConfig(albumOpts: albumOpts, assetOpts: assetOpts, browserOpts: browserOpts, params: params, pickerSelect: selected, browserSelect: nil, canceled: canceled)
+        if let asset = modelsSel.randomElement() {
+            configuration.selectMediaImage = ADAssetModel(asset: asset.asset).type.isImage
+        }
+        if #available(iOS 14.0, *) {
+            return fullScreenCover(isPresented: isPresented) {
+                
+            } content: {
+                ADAlbumListSwiftUIView(style: style, configuration: configuration, models: modelsSel)
+            }
+        } else {
+            return sheet(isPresented: isPresented, onDismiss: {
+                
+            }, content: {
+                ADAlbumListSwiftUIView(style: style, configuration: configuration, models: modelsSel)
+            })
+        }
+    }
+    
+    public func assetBrowser(isPresented: Binding<Bool>,
+                             assets:  [ADAssetBrowsable],
+                             selects: [ADAssetBrowsable] = [],
+                             index: Int? = nil,
+                             options: ADAssetBrowserOptions = .default,
+                             selected: @escaping ADPhotoKitUI.AssetableSelectHandler,
+                             canceled: ADPhotoKitUI.AssetCancelHandler? = nil) -> some View {
+        let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
+        if #available(iOS 14.0, *) {
+            return fullScreenCover(isPresented: isPresented) {
+                
+            } content: {
+                ADAssetBrowserSwiftUIView(configuration: configuration, assets: assets, selects: selects, index: index)
+            }
+        } else {
+            return sheet(isPresented: isPresented, onDismiss: {
+                
+            }, content: {
+                ADAssetBrowserSwiftUIView(configuration: configuration, assets: assets, selects: selects, index: index)
+            })
+        }
+    }
+}
+
 
 extension ADPhotoKitUI {
     
@@ -248,13 +300,13 @@ public class ADPhotoKitConfig {
 
 extension ADAssetListDataSource {
     
-    func fetchSelectImages(original: Bool, asGif: Bool, completion: @escaping (()->Void)) {
+    func fetchSelectImages(original: Bool, asGif: Bool, inQueue: OperationQueue, completion: @escaping (([ADPhotoKitUI.Asset])->Void)) {
         let hud = ADProgress.progressHUD()
         
         var timeout: Bool = false
         hud.timeoutBlock = {
             timeout = true
-            ADPhotoKitUI.config.fetchImageQueue.cancelAllOperations()
+            inQueue.cancelAllOperations()
         }
         
         hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
@@ -269,11 +321,12 @@ extension ADAssetListDataSource {
         }
         
         DispatchQueue.main.async {
-            ADPhotoKitUI.config.fetchImageQueue.addOperations(operations, waitUntilFinished: true)
+            inQueue.addOperations(operations, waitUntilFinished: true)
             hud.hide()
             if !timeout {
-                ADPhotoKitUI.config.pickerSelect?(result.compactMap { $0 }, original)
-                completion()
+                completion(result.compactMap { $0 })
+            }else{
+                completion([])
             }
         }
     }
