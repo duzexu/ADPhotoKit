@@ -7,6 +7,7 @@ UI and logic for asset select.
 ### Essentials
 
 - ``ADPhotoKitUI``
+- <doc:SelectionRestrict>
 - ``ADPhotoKitConfig``
 - ``ADConstraintParams``
 - ``ADPickerStyle``

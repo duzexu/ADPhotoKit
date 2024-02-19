@@ -114,7 +114,6 @@ public class ADAssetBrowserDataSource: NSObject {
                 selectView?.reloadItems(at: selectView!.indexPathsForVisibleItems)
             }
         }else{
-            index = -1
             isSelected = false
             selectIndex = -1
             selectView?.reloadItems(at: selectView!.indexPathsForVisibleItems)

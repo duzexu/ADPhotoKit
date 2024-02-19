@@ -19,6 +19,7 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 * [x] Supports batch export PHAsset to image.
 * [x] Image editor.
 * [x] DocC support.
+* [x] SwiftUI support.
 * [ ] Custom camera.
 * [ ] Video editor.
 
@@ -31,6 +32,27 @@ The simplest use-case is present the image picker on your controller:
 ```swift
 ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
     // do something
+}
+```
+
+Also you can present the image pricker on swiftUI:
+
+```
+import SwiftUI
+
+struct SwiftUIView: View {
+    
+    @State private var showImagePicker = false
+    
+    var body: some View {
+        Button("PickerImage") {
+            showImagePicker.toggle()
+        }
+        .imagePicker(isPresented: $showImagePicker,
+                     selected: { (assets, origin) in
+            // do something
+        })
+    }
 }
 ```
 
@@ -78,7 +100,7 @@ ADPhotoKitUI.assetBrowser(present: self,
 }
 ```
 
-For more usage configuration, you can see [ADPhotoKitUI](./ADPhotoKit/Classes/CoreUI/ADPhotoKitUI.swift).
+For more usage configuration, you can see [ADPhotoKitConfiguration](./ADPhotoKit/Classes/Base/ADPhotoKitConfiguration.swift) and [SelectionRestrict](./ADPhotoKit/ADPhotoKit.docc/SelectionRestrict.md).
 
 ## Learn More
 

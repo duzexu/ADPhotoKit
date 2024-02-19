@@ -9,7 +9,7 @@
 import UIKit
 import SwiftUI
 
-@available(iOS 14.0, *)
+@available(iOS 13.0, *)
 class SwiftUIViewController: UIHostingController<MainSwiftUIView> {
 
     init(configs: Configs) {
@@ -22,6 +22,7 @@ class SwiftUIViewController: UIHostingController<MainSwiftUIView> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "SwiftUIDemo"
     }
 
 }

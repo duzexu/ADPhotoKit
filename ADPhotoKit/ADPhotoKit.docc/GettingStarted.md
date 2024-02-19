@@ -113,6 +113,27 @@ ADPhotoKitUI.imagePicker(present: self) { (assets, origin) in
 }
 ```
 
+Also you can present the image pricker on swiftUI:
+
+```
+import SwiftUI
+
+struct SwiftUIView: View {
+    
+    @State private var showImagePicker = false
+    
+    var body: some View {
+        Button("PickerImage") {
+            showImagePicker.toggle()
+        }
+        .imagePicker(isPresented: $showImagePicker,
+                     selected: { (assets, origin) in
+            // do something
+        })
+    }
+}
+```
+
 ### More Advanced Example
 
 Select up to 9 images or videos:
@@ -156,6 +177,6 @@ ADPhotoKitUI.assetBrowser(present: self,
 }
 ```
 
-For more usage configuration, you can see ``ADPhotoKitUI`` and ``ADPhotoKitConfiguration``.
+For more usage configuration, you can see ``ADPhotoKitConfiguration`` and <doc:SelectionRestrict>.
 
 

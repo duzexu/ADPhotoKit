@@ -24,6 +24,7 @@ ADPhotoKit contains four moudles:
 * [x] Supports batch export PHAsset to image.
 * [x] Image editor.
 * [x] DocC support.
+* [x] SwiftUI support.
 
 ## License
 

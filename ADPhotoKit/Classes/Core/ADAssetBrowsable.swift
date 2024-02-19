@@ -112,10 +112,9 @@ struct ADAssetBrowsableRuntimeKey {
     static let ImageEditInfo : UnsafeRawPointer! = UnsafeRawPointer.init(bitPattern: "ImageEditInfo:".hashValue)
 }
 
-
+/// PHAsset conforms to `ADAssetBrowsable` in ADPhotoKit.
 extension PHAsset: ADAssetBrowsable {
     
-    /// PHAsset conforms to `ADAssetBrowsable` in ADPhotoKit.
     public var browseAsset: ADAsset {
         switch self.mediaType {
         case .video:
@@ -140,9 +139,9 @@ extension PHAsset: ADAssetBrowsable {
     
 }
 
+/// UIImage conforms to `ADAssetBrowsable` in ADPhotoKit. It use random uuid string as identifier.
 extension UIImage: ADAssetBrowsable {
     
-    /// UIImage conforms to `ADAssetBrowsable` in ADPhotoKit. It use random uuid string as identifier.
     public var browseAsset: ADAsset {
         return .image(.local(self, UUID().uuidString))
     }

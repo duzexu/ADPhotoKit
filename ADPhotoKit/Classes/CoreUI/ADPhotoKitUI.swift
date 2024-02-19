@@ -83,7 +83,7 @@ public class ADPhotoKitUI {
     /// Return select assets and if original or not.
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
     /// Return browsable asset array.
-    public typealias AssetableSelectHandler = (([ADAssetBrowsable]) -> Void)
+    public typealias BrowsableSelectHandler = (([ADAssetBrowsable]) -> Void)
     /// Cancel select.
     public typealias AssetCancelHandler = (() -> Void)
     
@@ -143,7 +143,7 @@ public class ADPhotoKitUI {
                                     selects: [ADAssetBrowsable] = [],
                                     index: Int? = nil,
                                     options: ADAssetBrowserOptions = .default,
-                                    selected: @escaping AssetableSelectHandler,
+                                    selected: @escaping BrowsableSelectHandler,
                                     canceled: AssetCancelHandler? = nil) {
         if assets.count == 0 {
             fatalError("assets count must>0")
@@ -159,6 +159,18 @@ public class ADPhotoKitUI {
 
 @available(iOS 13.0, *)
 extension View {
+    
+    /// Show picker with select assets.
+    /// - Parameters:
+    ///   - isPresented: Present when changes to true.
+    ///   - style: Style to display picker.
+    ///   - modelsSel: Asset models have been selected.
+    ///   - albumOpts: Options to limit album type and order. It is `ADAlbumSelectOptions.default` by default.
+    ///   - assetOpts: Options to control the asset select condition and ui. It is `ADAssetSelectOptions.default` by default.
+    ///   - browserOpts: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - params: Params to control the asset select condition.
+    ///   - selected: Called after selection finish.
+    ///   - canceled: Called when cancel select.
     public func imagePicker(isPresented: Binding<Bool>,
                             style: ADPickerStyle = .normal,
                             modelsSel: [ADSelectAssetModel] = [],
@@ -187,12 +199,21 @@ extension View {
         }
     }
     
+    /// Show controller to browser and select assets.
+    /// - Parameters:
+    ///   - isPresented: Present when changes to true.
+    ///   - assets: Assets to browser.
+    ///   - selects: Assets heave been selected.
+    ///   - index: Current browser asset index.
+    ///   - options: Options to control browser controller. It is `ADAssetBrowserOptions.default` by default.
+    ///   - selected: Called after selection finish.
+    ///   - canceled: Called when cancel select.
     public func assetBrowser(isPresented: Binding<Bool>,
                              assets:  [ADAssetBrowsable],
                              selects: [ADAssetBrowsable] = [],
                              index: Int? = nil,
                              options: ADAssetBrowserOptions = .default,
-                             selected: @escaping ADPhotoKitUI.AssetableSelectHandler,
+                             selected: @escaping ADPhotoKitUI.BrowsableSelectHandler,
                              canceled: ADPhotoKitUI.AssetCancelHandler? = nil) -> some View {
         let configuration = ADPhotoKitConfig(browserOpts: options, pickerSelect: nil, browserSelect: selected, canceled: canceled)
         if #available(iOS 14.0, *) {
@@ -238,7 +259,7 @@ public class ADPhotoKitConfig {
     public let params: ADConstraintParams
     
     let pickerSelect: ADPhotoKitUI.AssetSelectHandler?
-    let browserSelect: ADPhotoKitUI.AssetableSelectHandler?
+    let browserSelect: ADPhotoKitUI.BrowsableSelectHandler?
     let canceled: ADPhotoKitUI.AssetCancelHandler?
     
     var selectMediaImage: Bool?
@@ -252,7 +273,7 @@ public class ADPhotoKitConfig {
          browserOpts: ADAssetBrowserOptions,
          params: Set<ADPhotoSelectParams> = [],
          pickerSelect: ADPhotoKitUI.AssetSelectHandler?,
-         browserSelect: ADPhotoKitUI.AssetableSelectHandler?,
+         browserSelect: ADPhotoKitUI.BrowsableSelectHandler?,
          canceled: ADPhotoKitUI.AssetCancelHandler?) {
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts

@@ -186,7 +186,6 @@ private extension ADAssetBrowserController {
         
         dataSource?.listView = collectionView
         dataSource.selectAssetExistOrNot = { [weak self] exist in
-            self?.collectionView.isHidden = !exist
             self?.popTransition?.isEnabled = exist
         }
         dataSource.selectAssetChanged = { [weak self] count in
