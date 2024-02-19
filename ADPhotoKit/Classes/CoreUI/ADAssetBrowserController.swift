@@ -339,7 +339,7 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
                     imageCell.configure(with: source, config: config)
                 }
                 #else
-                imageCell.configure(with: source)
+                imageCell.configure(with: source, config: config)
                 #endif
             }
         case let .video(source):
