@@ -135,7 +135,7 @@ private extension ADProgressHUD {
         label.textAlignment = .center
         label.textColor = style.textColor()
         label.font = UIFont.systemFont(ofSize: 16)
-        label.text = ADLocale.LocaleKey.hudLoading.localeTextValue
+        label.text = ADLocale.LocaleKey.hudProcessing.localeTextValue
         view.addSubview(label)
         label.snp.makeConstraints { (make) in
             make.top.equalToSuperview().offset(50)

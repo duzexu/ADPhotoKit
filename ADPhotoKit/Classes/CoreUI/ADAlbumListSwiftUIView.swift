@@ -5,6 +5,7 @@
 //  Created by du on 2024/2/1.
 //
 
+#if canImport(SwiftUI)
 import SwiftUI
 
 @available(iOS 13.0.0, *)
@@ -56,3 +57,4 @@ struct ADAlbumListSwiftUIView: View {
             .preferredColorScheme(.light)
     }
 }
+#endif

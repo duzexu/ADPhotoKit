@@ -4,6 +4,7 @@
 "cancel" = "Cancel";
 
 "originalPhoto" = "Full Image";
+"originalTotalSize" = "Total";
 "done" = "Done";
 "ok" = "OK";
 "editFinish" = "Done";
@@ -11,29 +12,36 @@
 "back" = "Back";
 "edit" = "Edit";
 "revert" = "Undo";
+"brightness" = "Brightness";
+"contrast" = "Contrast";
+"saturation" = "Saturation";
 
 "photo" = "Photos";
 "preview" = "Preview";
 
-"noPhotoTips" = "No Photo";
 "notAllowMixSelect" = "Unable to select video";
+"noPhotoTips" = "No Photos";
 
-"loading" = "loading, waiting please";
-"hudLoading" = "waiting...";
+"hudLoading" = "Loading";
+"hudProcessing" = "Processing";
 
 "exceededMaxSelectCount" = "Max count for selection: %ld";
 "exceededMaxImageSelectCount" = "Max count for image selection: %ld";
 "imageNotSelectable" = "Cannot select image";
 "videoNotSelectable" = "Cannot select video";
-"longerThanMaxVideoDuration" = "Unable to select video with a duration longer than %lds";
-"shorterThanMaxVideoDuration" = "Unable to select video with a duration shorter than %lds";
+"longerThanMaxVideoDuration" = "Can't select videos longer than %lds";
+"shorterThanMinVideoDuration" = "Can't select videos shorter than %lds";
+"largerThanMaxVideoDataSize" = "Can't select videos larger than %@MB";
+"smallerThanMinVideoDataSize" = "Can't select videos smaller than %@MB";
 "exceededMaxVideoSelectCount" = "Max count for video selection: %ld";
 "lessThanMinVideoSelectCount" = "Min count for video selection: %ld";
 
-"noCameraAuthority" = "Please allow %@ to access your device's camera in \"Settings\"->\"Privacy\"->\"Camera\"";
-"noPhotoLibratyAuthority" = "Please allow %@ to access your album in \"Settings\"->\"Privacy\"->\"Photos\"";
-"noMicrophoneAuthority" = "Please allow %@ to access your device's microphone in \"Settings\"->\"Privacy\"->\"Microphone\"";
+"noCameraAuthority" = "Please allow %@ to access your device's camera in \"Settings\" > \"Privacy\" > \"Camera\"";
+"noPhotoLibratyAuthority" = "Please allow %@ to access your album in \"Settings\" > \"Privacy\" > \"Photos\"";
+"noMicrophoneAuthority" = "Unable to record audio. Go to \"Settings\" > \"%@\" and enable microphone access";
 "cameraUnavailable" = "Camera is unavailable";
+"keepRecording" = "Keep Recording";
+"gotoSettings" = "Go to Settings";
 
 "iCloudVideoLoadFaild" = "Unable to sync from iCloud";
 "imageLoadFailed" = "loading failed";

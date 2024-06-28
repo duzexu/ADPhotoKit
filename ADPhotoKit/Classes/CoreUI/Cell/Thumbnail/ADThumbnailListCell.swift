@@ -204,7 +204,8 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
         assetModel = model
         selectStatus = model.selectStatus
         selectBtn.isHidden = !config.displaySelectBtn(model: model)
-        
+        indexLabel.alpha = config.assetOpts.contains(.selectIndex) ? 1 : 0
+
         switch model.type {
         case .unknown:
             bottomMaskView.isHidden = true
@@ -360,7 +361,7 @@ extension ADPhotoKitConfig {
                     return true
                 }
             }else{
-                return false
+                return assetOpts.contains(.selectBtnWhenSingleSelect)
             }
         }
         return true

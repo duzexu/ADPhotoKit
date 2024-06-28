@@ -115,6 +115,9 @@ public class ADImageEditController: UIViewController {
     /// Called when finish image edit.
     public var imageDidEdit: ((ADImageEditInfo) -> Void)?
     
+    /// Called when cancel image edit.
+    public var cancelEdit: (() -> Void)?
+    
     let image: UIImage
     var editInfo: ADImageEditInfo
     
@@ -218,6 +221,9 @@ extension ADImageEditController {
         }
         controlsView.confirmActionBlock = { [weak self] in
             self?.confirmAction()
+        }
+        controlsView.cancelActionBlock = { [weak self] in
+            self?.cancelEdit?()
         }
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { make in

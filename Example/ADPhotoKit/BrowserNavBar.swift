@@ -29,7 +29,7 @@ class BrowserNavBar: UIView, ADBrowserNavBarConfigurable {
     
     private var selectToken: NSKeyValueObservation?
     
-    required init(dataSource: ADAssetBrowserDataSource) {
+    required init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) {
         super.init(frame: .zero)
         backgroundColor = UIColor(white: 1, alpha: 0.9)
         

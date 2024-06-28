@@ -8,7 +8,9 @@
 import Foundation
 import UIKit
 import Photos
+#if canImport(SwiftUI)
 import SwiftUI
+#endif
 
 /// Style to display picker.
 public enum ADPickerStyle {
@@ -50,10 +52,15 @@ public struct ADConstraintParams {
     /// Limit the max video time you can select. Set `nil` means no limit. Default is no limit.
     public fileprivate(set) var maxVideoTime: Int?
     
-    /// Limit the min video time you can record. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var minRecordTime: Int?
-    /// Limit the max video time you can record. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var maxRecordTime: Int?
+    /// Limit the min video size you can select. Set `nil` means no limit. Default is no limit.
+    public fileprivate(set) var minVideoSize: CGFloat?
+    /// Limit the max video size you can select. Set `nil` means no limit. Default is no limit.
+    public fileprivate(set) var maxVideoSize: CGFloat?
+    
+    /// Limit the min video time you can record. Default is 2 second.
+    public fileprivate(set) var minRecordTime: Int
+    /// Limit the max video time you can record. Default is 60 second.
+    public fileprivate(set) var maxRecordTime: Int
 }
 
 extension ADSelectAssetModel {
@@ -157,6 +164,7 @@ public class ADPhotoKitUI {
     
 }
 
+#if canImport(SwiftUI)
 @available(iOS 13.0, *)
 extension View {
     
@@ -231,7 +239,7 @@ extension View {
         }
     }
 }
-
+#endif
 
 extension ADPhotoKitUI {
     
@@ -246,6 +254,27 @@ extension ADPhotoKitUI {
                           CATransform3DMakeScale(0.8, 0.8, 1),
                           CATransform3DMakeScale(1, 1, 1)]
         return animate
+    }
+    
+    enum AnimationType: String {
+        case fade = "opacity"
+        case scale = "transform.scale"
+        case rotate = "transform.rotation"
+    }
+    
+    class func animation(
+        type: AnimationType,
+        fromValue: CGFloat,
+        toValue: CGFloat,
+        duration: TimeInterval
+    ) -> CAAnimation {
+        let animation = CABasicAnimation(keyPath: type.rawValue)
+        animation.fromValue = fromValue
+        animation.toValue = toValue
+        animation.duration = duration
+        animation.fillMode = .forwards
+        animation.isRemovedOnCompletion = true
+        return animation
     }
     
 }
@@ -282,7 +311,7 @@ public class ADPhotoKitConfig {
         self.browserSelect = browserSelect
         self.canceled = canceled
         
-        var value = ADConstraintParams()
+        var value = ADConstraintParams(minRecordTime: 2, maxRecordTime: 60)
         for item in params {
             switch item {
             case let .maxCount(max):
@@ -306,10 +335,16 @@ public class ADPhotoKitConfig {
                     assert(l <= r, "min time must less than or equal max")
                 }
             case let .recordTime(min, max):
-                value.minRecordTime = min
-                value.maxRecordTime = max
+                value.minRecordTime = min ?? 2
+                value.maxRecordTime = max ?? 60
                 if let l = min, let r = max {
                     assert(l <= r, "min time must less than or equal max")
+                }
+            case let .videoSize(min, max):
+                value.minVideoSize = min
+                value.maxVideoSize = max
+                if let l = min, let r = max {
+                    assert(l <= r, "min size must less than or equal max")
                 }
             }
         }

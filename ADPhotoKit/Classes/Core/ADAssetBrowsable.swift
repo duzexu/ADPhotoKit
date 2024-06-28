@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import Photos
+import Kingfisher
 
 /// Represents an asset source for browser.
 public protocol ADAssetBrowsable {
@@ -39,6 +40,17 @@ public enum ADImageSource {
         }
     }
     
+    /// Return the file size of asset. Size return in kb.
+    public var assetSize: CGFloat? {
+        switch self {
+        case .network(_):
+            return nil
+        case let .album(asset):
+            return asset.assetSize
+        case let .local(image, _):
+            return CGFloat((image.pngData()?.count ?? 0)) / 1024
+        }
+    }
 }
 
 /// Video asset support browser.
@@ -88,6 +100,16 @@ public enum ADAsset: Equatable {
             return true
         case .video(_):
             return false
+        }
+    }
+    
+    /// Return the file size of asset. Size return in kb.
+    public var assetSize: CGFloat? {
+        switch self {
+        case let .image(source):
+            return source.assetSize
+        case .video(_):
+            return nil
         }
     }
     

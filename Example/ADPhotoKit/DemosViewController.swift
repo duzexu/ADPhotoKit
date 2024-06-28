@@ -74,6 +74,7 @@ class DemosViewController: UIViewController {
         
         var swiftuiModels: [ConfigModel] = []
         
+        #if canImport(SwiftUI)
         let swiftui = ConfigModel(title: "SwiftUI Demo", mode: .none, action: { [weak self] (_) in
             if #available(iOS 13.0, *) {
                 let vc = SwiftUIViewController(configs: self!.configs)
@@ -83,6 +84,7 @@ class DemosViewController: UIViewController {
             }
         })
         swiftuiModels.append(swiftui)
+        #endif
         
         let swiftuiConfig = ConfigSection(title: "SwiftUI Demos", models: swiftuiModels)
         dataSource.append(swiftuiConfig)

@@ -4,6 +4,7 @@
 "cancel" = "Huỷ";
 
 "originalPhoto" = "Toàn bộ hình ảnh";
+"originalTotalSize" = "Tổng cộng";
 "done" = "Xong";
 "ok" = "đồng ý";
 "editFinish" = "Xong";
@@ -11,6 +12,9 @@
 "back" = "Trở lại";
 "edit" = "Chỉnh sửa";
 "revert" = "Hoàn tác";
+"brightness" = "độ sáng";
+"contrast" = "Sự tương phản";
+"saturation" = "Bão hòa";
 
 "photo" = "Ảnh";
 "preview" = "Xem trước";
@@ -18,22 +22,26 @@
 "noPhotoTips" = "Không có ảnh";
 "notAllowMixSelect" = "Không thể chọn video";
 
-"loading" = "đang tải, vui lòng đợi";
-"hudLoading" = "đang chờ đợi...";
+"hudLoading" = "Đang tải";
+"hudProcessing" = "Đang xử lý";
 
 "exceededMaxSelectCount" = "Số lượng lựa chọn tối đa: %ld";
 "exceededMaxImageSelectCount" = "Số lượng lựa chọn tối đa của image: %ld";
 "imageNotSelectable" = "Không thể chọn ảnh";
 "videoNotSelectable" = "Không thể chọn video";
 "longerThanMaxVideoDuration" = "Không thể chọn video có thời lượng dài hơn %ld giây";
-"shorterThanMaxVideoDuration" = "Không thể chọn video có thời lượng ngắn hơn %ld giây";
+"shorterThanMinVideoDuration" = "Không thể chọn video có thời lượng ngắn hơn %ld giây";
+"largerThanMaxVideoDataSize" = "Không thể chọn video lớn hơn %@MB";
+"smallerThanMinVideoDataSize" = "Không thể chọn video nhỏ hơn %@MB";
 "exceededMaxVideoSelectCount" = "Số lượng lựa chọn tối đa của video: %ld";
 "lessThanMinVideoSelectCount" = "Số phút chọn tối thiểu của video: %ld";
 
-"noCameraAuthority" = "Vui lòng cho phép %@ truy cập máy ảnh trên thiết bị của bạn trong \"Cài đặt\" -> \"Quyền riêng tư\" -> \"Máy ảnh\"";
-"noPhotoLibratyAuthority" = "Vui lòng cho phép %@ truy cập anbom của bạn trong \"Cài đặt\" -> \"Bảo mật\" -> \"Ảnh\"";
-"noMicrophoneAuthority" = "Vui lòng cho phép %@ truy cập micrô trên thiết bị của bạn trong \"Cài đặt\" -> \"Quyền riêng tư\" -> \"Micrô\"";
+"noCameraAuthority" = "Vui lòng cho phép %@ truy cập máy ảnh trên thiết bị của bạn trong \"Cài đặt\" > \"Quyền riêng tư\" > \"Máy ảnh\"";
+"noPhotoLibratyAuthority" = "Vui lòng cho phép %@ truy cập anbom của bạn trong \"Cài đặt\" > \"Bảo mật\" > \"Ảnh\"";
+"noMicrophoneAuthority" = "Không thểghi hình. Đi tới \"Cài đặt\" > \"%@\" và bật quyên truy cập mic";
 "cameraUnavailable" = "Máy ảnh không khả dụng";
+"keepRecording" = "Tiếp tục ghi hình";
+"gotoSettings" = "Đi đến Cài đặt";
 
 "iCloudVideoLoadFaild" = "Không thể đồng bộ hóa từ iCloud";
 "imageLoadFailed" = "tải không thành công";

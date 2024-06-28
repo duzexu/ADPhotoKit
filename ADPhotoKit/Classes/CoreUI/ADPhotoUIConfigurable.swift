@@ -65,7 +65,10 @@ public protocol ADThumbnailToolBarConfigurable where Self: UIView {
     var browserActionBlock: (()->Void)? { set get }
     /// Called when done button click.
     var doneActionBlock: (()->Void)? { set get }
-    
+    /// Create with browser controller's datasource.
+    /// - Parameter dataSource: Browser controller datasource.
+    /// - Parameter config: The config pass through.
+    init(dataSource: ADAssetListDataSource, config: ADPhotoKitConfig)
 }
 
 /// Use to define thumbnail controller's collection view cell.
@@ -139,7 +142,8 @@ public protocol ADBrowserNavBarConfigurable where Self: UIView {
     var selectActionBlock: ((Bool)->Bool)? { set get }
     /// Create with browser controller's datasource.
     /// - Parameter dataSource: Browser controller datasource.
-    init(dataSource: ADAssetBrowserDataSource)
+    /// - Parameter config: The config pass through.
+    init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig)
         
 }
 
@@ -158,7 +162,8 @@ public protocol ADBrowserToolBarConfigurable where Self: UIView {
     var doneActionBlock: (()->Void)? { set get }
     /// Create with browser controller's datasource.
     /// - Parameter dataSource: Browser controller datasource.
-    init(dataSource: ADAssetBrowserDataSource)
+    /// - Parameter config: The config pass through.
+    init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig)
         
 }
 
@@ -179,8 +184,8 @@ class ADPhotoUIConfigurable {
         return ADPhotoKitConfiguration.default.customThumbnailNavBarBlock?(style,config) ?? ADThumbnailNavBarView(style: style, config: config)
     }
     
-    static func thumbnailToolBar(config: ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable {
-        return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(config) ?? ADThumbnailToolBarView(config: config)
+    static func thumbnailToolBar(dataSource: ADAssetListDataSource, config: ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable {
+        return ADPhotoKitConfiguration.default.customThumbnailToolBarBlock?(dataSource,config) ?? ADThumbnailToolBarView(dataSource: dataSource, config: config)
     }
     
     static func thumbnailCell(collectionView: UICollectionView, indexPath: IndexPath) -> ADThumbnailCellConfigurable {
@@ -190,12 +195,12 @@ class ADPhotoUIConfigurable {
         return ADPhotoKitConfiguration.default.customThumbnailCellBlock?(collectionView, indexPath) ?? collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailCellConfigurable
     }
     
-    static func browserNavBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserNavBarConfigurable {
-        return ADPhotoKitConfiguration.default.customBrowserNavBarBlock?(dataSource) ?? ADBrowserNavBarView(dataSource: dataSource)
+    static func browserNavBar(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) -> ADBrowserNavBarConfigurable {
+        return ADPhotoKitConfiguration.default.customBrowserNavBarBlock?(dataSource,config) ?? ADBrowserNavBarView(dataSource: dataSource, config: config)
     }
     
-    static func browserToolBar(dataSource: ADAssetBrowserDataSource) -> ADBrowserToolBarConfigurable {
-        return ADPhotoKitConfiguration.default.customBrowserToolBarBlock?(dataSource) ?? ADBrowserToolBarView(dataSource: dataSource)
+    static func browserToolBar(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) -> ADBrowserToolBarConfigurable {
+        return ADPhotoKitConfiguration.default.customBrowserToolBarBlock?(dataSource,config) ?? ADBrowserToolBarView(dataSource: dataSource, config: config)
     }
     
     static func browserCell(collectionView: UICollectionView, indexPath: IndexPath, asset: ADAsset) -> ADBrowserCellConfigurable {

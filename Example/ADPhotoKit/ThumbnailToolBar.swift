@@ -36,7 +36,7 @@ class ThumbnailToolBar: UIView, ADThumbnailToolBarConfigurable {
     var originalBtn: UISwitch!
     var doneBtn: UIButton!
     
-    init() {
+    required init(dataSource: ADAssetListDataSource, config: ADPhotoKitConfig) {
         super.init(frame: .zero)
         backgroundColor = UIColor(white: 0, alpha: 0.9)
         

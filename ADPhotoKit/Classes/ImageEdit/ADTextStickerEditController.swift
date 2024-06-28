@@ -55,7 +55,7 @@ private extension ADTextStickerEditController {
     func setupUI() {
         view.backgroundColor = UIColor(white: 0, alpha: 0.6)
         
-        let top = isPhoneX ? 7 + statusBarHeight : 7
+        let top = isPhoneXOrLater ? 7 + statusBarHeight : 7
         
         cancelBtn = UIButton(type: .custom)
         cancelBtn.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)

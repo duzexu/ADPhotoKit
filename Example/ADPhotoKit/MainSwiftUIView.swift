@@ -6,6 +6,7 @@
 //  Copyright © 2024 CocoaPods. All rights reserved.
 //
 
+#if canImport(SwiftUI)
 import SwiftUI
 import ADPhotoKit
 import Kingfisher
@@ -157,7 +158,8 @@ struct MainSwiftUIView: View {
     }
 }
 
-@available(iOS 13, *)
-#Preview {
-    MainSwiftUIView(configs: Configs())
-}
+//@available(iOS 13, *)
+//#Preview {
+//    MainSwiftUIView(configs: Configs())
+//}
+#endif

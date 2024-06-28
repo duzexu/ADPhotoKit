@@ -30,7 +30,11 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     public var selectCount: Int = 0 {
         didSet {
             if selectCount > 0 {
-                doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(selectCount))", for: .normal)
+                var title = ADLocale.LocaleKey.done.localeTextValue
+                if (config.browserOpts.contains(.selectCountOnDoneBtn)) {
+                    title += "(\(selectCount))"
+                }
+                doneBtn.setTitle(title, for: .normal)
                 doneBtn.isEnabled = true
                 browseBtn.isEnabled = true
             }else{
@@ -38,6 +42,7 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
                 doneBtn.isEnabled = false
                 browseBtn.isEnabled = false
             }
+            refreshTotalSize()
         }
     }
     
@@ -52,14 +57,17 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     var browserActionBlock: (()->Void)?
     var doneActionBlock: (()->Void)?
     
+    weak var dataSource: ADAssetListDataSource?
     let config: ADPhotoKitConfig
     
     /// ui
     var browseBtn: UIButton!
     var originalBtn: UIButton!
     var doneBtn: UIButton!
+    var sizeLabel: UILabel!
     
-    init(config: ADPhotoKitConfig) {
+    required init(dataSource: ADAssetListDataSource, config: ADPhotoKitConfig) {
+        self.dataSource = dataSource
         self.config = config
         super.init(frame: .zero)
         backgroundColor = UIColor(hex: 0x232323, alpha: 0.3)
@@ -153,6 +161,21 @@ private extension ADThumbnailToolBarView {
             make.height.equalTo(34)
         }
         
+        sizeLabel = UILabel()
+        sizeLabel.font = UIFont.systemFont(ofSize: 12)
+        sizeLabel.textColor = UIColor(hex: 0x828282)
+        sizeLabel.textAlignment = .center
+        sizeLabel.minimumScaleFactor = 0.5
+        sizeLabel.adjustsFontSizeToFitWidth = true
+        sizeLabel.isHidden = true
+        btnsView.addSubview(sizeLabel)
+        sizeLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(originalBtn.snp.bottom)
+            make.height.equalTo(14)
+            make.centerX.equalTo(originalBtn.snp.centerX)
+            make.width.equalTo(230)
+        }
+        
         doneBtn = createBtn(ADLocale.LocaleKey.done.localeTextValue, #selector(doneAction))
         doneBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x10C060)!), for: .normal)
         doneBtn.setBackgroundImage(UIImage.image(color: UIColor(hex: 0x323232)!), for: .disabled)
@@ -177,6 +200,19 @@ private extension ADThumbnailToolBarView {
         return btn
     }
     
+    func refreshTotalSize() {
+        guard config.assetOpts.contains(.totalOriginalSize) else {
+            return
+        }
+        if !originalBtn.isSelected {
+            sizeLabel.isHidden = true
+        }else{
+            sizeLabel.isHidden = false
+            let total = dataSource?.selects.reduce(into: 0) { $0 += ($1.asset.assetSize ?? 0) * 1024 } ?? 0
+            let str = ByteCountFormatter.string(fromByteCount: Int64(total), countStyle: .binary).replacingOccurrences(of: " ", with: "")
+            sizeLabel.text = ADLocale.LocaleKey.originalTotalSize.localeTextValue + "\(str)"
+        }
+    }
 }
 
 private extension ADThumbnailToolBarView {
@@ -199,6 +235,7 @@ private extension ADThumbnailToolBarView {
     @objc
     func originalAction() {
         isOriginal = !isOriginal
+        refreshTotalSize()
     }
     
     @objc

@@ -94,13 +94,32 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `ThumbnailToolBar`. Default to use `ADThumbnailToolBarView`.
     /// The parameter `ADPhotoKitConfig` is the config pass through.
-    public var customThumbnailToolBarBlock: ((ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable)?
+    public var customThumbnailToolBarBlock: ((ADAssetListDataSource,ADPhotoKitConfig) -> ADThumbnailToolBarConfigurable)?
     
     /// Bolck to regist cells used in thumbnail controller.
     public var customThumbnailCellRegistor: ((UICollectionView) -> Void)?
     /// Bolck to return custom thumbnail collection cell.
     /// - Note: If use your custom cells, you must regist cells first by set `customThumbnailCellRegistor` block.
     public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellConfigurable)?
+    
+    public struct AssetCaptureConfig {
+        /// Default device position.
+        public var cameraPosition: ADDevicePosition = .back
+        /// Whether to show flash switch button.
+        public var flashSwitch: Bool = true
+        /// Whether to show camera switch button.
+        public var cameraSwitch: Bool = true
+        /// Indicates whether the video flowing through the connection should be mirrored about its vertical axis.
+        public var videoMirrored = true
+        /// Capture video resolution.
+        public var sessionPreset: ADCapturePreset = .hd1280x720
+        // Camera focus mode. Defaults to continuousAutoFocus
+        public var focusMode: ADFocusMode = .continuousAutoFocus
+        /// Camera exposure mode. Defaults to continuousAutoExposure
+        public var exposureMode: ADExposureMode = .continuousAutoExposure
+    }
+    
+    public var captureConfig = AssetCaptureConfig()
     
     /* =============== browser =============== */
         
@@ -112,11 +131,13 @@ public class ADPhotoKitConfiguration {
     
     /// Bolck to generate `BrowserNavBar`. Default to use `ADBrowserNavBarView`.
     /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
-    public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserNavBarConfigurable)?
+    /// The parameter `ADPhotoKitConfig` is the config pass through.
+    public var customBrowserNavBarBlock: ((ADAssetBrowserDataSource,ADPhotoKitConfig) -> ADBrowserNavBarConfigurable)?
     
     /// Bolck to generate `BrowserToolBar`. Default to use `ADBrowserToolBarView`.
     /// The parameter `ADAssetBrowserDataSource` is the datasource of browser controller.
-    public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource) -> ADBrowserToolBarConfigurable)?
+    /// The parameter `ADPhotoKitConfig` is the config pass through.
+    public var customBrowserToolBarBlock: ((ADAssetBrowserDataSource,ADPhotoKitConfig) -> ADBrowserToolBarConfigurable)?
     
     /// Bolck to regist cells used in browser controller.
     public var customBrowserCellRegistor: ((UICollectionView) -> Void)?

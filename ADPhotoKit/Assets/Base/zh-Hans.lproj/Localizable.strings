@@ -4,6 +4,7 @@
 "cancel" = "取消";
 
 "originalPhoto" = "原图";
+"originalTotalSize" = "共";
 "done" = "确定";
 "ok" = "确定";
 "editFinish" = "完成";
@@ -11,6 +12,9 @@
 "back" = "返回";
 "edit" = "编辑";
 "revert" = "还原";
+"brightness" = "亮度";
+"contrast" = "对比度";
+"saturation" = "饱和度";
 
 "photo" = "照片";
 "preview" = "预览";
@@ -18,22 +22,26 @@
 "noPhotoTips" = "无照片";
 "notAllowMixSelect" = "不能同时选择照片和视频";
 
-"loading" = "加载中，请稍后";
-"hudLoading" = "正在处理...";
+"hudLoading" = "正在加载";
+"hudProcessing" = "正在处理";
 
-"exceededMaxSelectCount" = "最多选择数%ld";
-"exceededMaxImageSelectCount" = "最多只能选择%ld张图片";
 "imageNotSelectable" = "无法选择图片";
 "videoNotSelectable" = "无法选择视频";
+"exceededMaxSelectCount" = "最多选择数%ld";
+"exceededMaxImageSelectCount" = "最多只能选择%ld张图片";
 "longerThanMaxVideoDuration" = "不能选择超过%ld秒的视频";
-"shorterThanMaxVideoDuration" = "不能选择低于%ld秒的视频";
+"shorterThanMinVideoDuration" = "不能选择低于%ld秒的视频";
+"largerThanMaxVideoDataSize" = "不能选择大于%@MB的视频";
+"smallerThanMinVideoDataSize" = "不能选择小于%@MB的视频";
 "exceededMaxVideoSelectCount" = "最多只能选择%ld个视频";
 "lessThanMinVideoSelectCount" = "最少选择%ld个视频";
 
-"noCameraAuthority" = "请在iPhone的\"设置-隐私-相机\"选项中，允许%@访问你的相机";
-"noPhotoLibratyAuthority" = "请在iPhone的\"设置-隐私-照片\"选项中，允许%@访问你的照片";
-"noMicrophoneAuthority" = "请在iPhone的\"设置-隐私-麦克风\"选项中，允许%@访问你的麦克风";
+"noCameraAuthority" = "请在iPhone的\"设置 > 隐私 > 相机\"选项中，允许%@访问你的相机";
+"noPhotoLibratyAuthority" = "请在iPhone的\"设置 > 隐私 >照片\"选项中，允许%@访问你的照片";
+"noMicrophoneAuthority" = "无法录制声音，前往\"设置 > %@\"中打开麦克风权限";
 "cameraUnavailable" = "相机不可用";
+"keepRecording" = "继续拍摄";
+"gotoSettings" = "前往设置";
 
 "iCloudVideoLoadFaild" = "iCloud无法同步";
 "imageLoadFailed" = "图片加载失败";

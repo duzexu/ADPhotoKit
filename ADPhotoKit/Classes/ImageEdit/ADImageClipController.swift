@@ -47,7 +47,7 @@ class ADImageClipController: UIViewController, ADImageClipConfigurable {
     private var toolBarView: ADClipToolBarView!
     private var grideView: ADClipGrideView!
     
-    private let clipAreaInsets: UIEdgeInsets = isPhoneX ? UIEdgeInsets(top: 70, left: 20, bottom: 160, right: 20) : UIEdgeInsets(top: 20, left: 20, bottom: 126, right: 20)
+    private let clipAreaInsets: UIEdgeInsets = isPhoneXOrLater ? UIEdgeInsets(top: 70, left: 20, bottom: 160, right: 20) : UIEdgeInsets(top: 20, left: 20, bottom: 126, right: 20)
     
     private var editedImage: UIImage
     private var isOrigin: Bool = true {

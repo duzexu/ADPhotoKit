@@ -26,10 +26,10 @@ public class ADLocale {
         case cancel
         /// No Photo (无照片)
         case noPhotoTips
-        /// loading, waiting please (加载中，请稍后)
-        case loading
-        /// waiting... (正在处理...)
+        /// loading... (正在加载)
         case hudLoading
+        /// waiting... (正在处理...)
+        case hudProcessing
         /// Done (确定)
         case done
         /// OK (确定)
@@ -51,6 +51,8 @@ public class ADLocale {
         case photo
         /// Full Image (原图)
         case originalPhoto
+        /// Total (共)
+        case originalTotalSize
         /// Back (返回)
         case back
         /// Edit (编辑)
@@ -86,7 +88,13 @@ public class ADLocale {
         case longerThanMaxVideoDuration
         /// Unable to select video with a duration shorter than %lds
         /// (不能选择低于%ld秒的视频)
-        case shorterThanMaxVideoDuration
+        case shorterThanMinVideoDuration
+        /// Can't select videos larger than %@MB
+        /// (不能选择大于%@MB的视频)
+        case largerThanMaxVideoDataSize
+        /// Can't select videos smaller than %@MB
+        /// (不能选择小于%@MB的视频)
+        case smallerThanMinVideoDataSize
         /// Unable to sync from iCloud (iCloud无法同步)
         case iCloudVideoLoadFaild
         /// loading failed (图片加载失败)
@@ -135,6 +143,16 @@ public class ADLocale {
         case textStickerReleaseToDelete
         /// Drag here to remove (拖到此处删除)
         case textStickerDeleteTips
+        /// Brightness (亮度)
+        case brightness
+        /// Contrast (对比度)
+        case contrast
+        /// Saturation (饱和度)
+        case saturation
+        /// Keep Recording (继续拍摄)
+        case keepRecording
+        /// Go to Settings (前往设置)
+        case gotoSettings
         
         /// Return key's localizable text.
         public var localeTextValue: String {

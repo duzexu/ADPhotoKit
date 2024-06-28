@@ -66,8 +66,6 @@ public class ADThumbnailViewController: UIViewController {
                 view.addGestureRecognizer(panGesture!)
             }
         }
-        
-        reloadAlbum(album, initial: true)
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -144,9 +142,11 @@ extension ADThumbnailViewController {
         collectionView.regisiter(cell: ADCameraCell.self)
         collectionView.regisiter(cell: ADAddPhotoCell.self)
         
+        reloadAlbum(album, initial: true)
+        
         ADPhotoKitConfiguration.default.customThumbnailCellRegistor?(collectionView)
         
-        toolBarView = ADPhotoUIConfigurable.thumbnailToolBar(config: config)
+        toolBarView = ADPhotoUIConfigurable.thumbnailToolBar(dataSource: dataSource, config: config)
         toolBarView.selectCount = selects.count
         view.addSubview(toolBarView)
         toolBarView.snp.makeConstraints { (make) in
@@ -379,6 +379,18 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                             item.selectStatus = .deselect
                         }
                     }
+                    if let max = config.params.maxVideoSize, let size = item.assetSize {
+                        if size > max {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }
+                    }
+                    if let min = config.params.minVideoSize, let size = item.assetSize {
+                        if size < min {
+                            c.selectStatus = .deselect
+                            item.selectStatus = .deselect
+                        }
+                    }
                 }
             }else{
                 c.selectStatus = .deselect
@@ -578,13 +590,25 @@ private extension ADThumbnailViewController {
 extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func presentCameraController() {
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+        if !config.assetOpts.contains(.allowTakePhotoAsset) && !config.assetOpts.contains(.allowTakeVideoAsset) {
+            return
+        }
+        if !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+            return
+        }
+        if config.assetOpts.contains(.systemCapture) {
             let picker = UIImagePickerController()
             picker.delegate = self
             picker.allowsEditing = false
             picker.videoQuality = .typeHigh
             picker.sourceType = .camera
-            picker.cameraFlashMode = .off
+            picker.cameraDevice = ADPhotoKitConfiguration.default.captureConfig.cameraPosition.cameraDevice
+            if ADPhotoKitConfiguration.default.captureConfig.flashSwitch {
+                picker.cameraFlashMode = .auto
+            }else{
+                picker.cameraFlashMode = .off
+            }
             var mediaTypes = [String]()
             if config.assetOpts.contains(.allowTakePhotoAsset) {
                 mediaTypes.append("public.image")
@@ -593,46 +617,55 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
                 mediaTypes.append("public.movie")
             }
             picker.mediaTypes = mediaTypes
-            if let max = config.params.maxRecordTime {
-                picker.videoMaximumDuration = TimeInterval(max)
-            }
+            picker.videoMaximumDuration = TimeInterval(config.params.maxRecordTime)
             showDetailViewController(picker, sender: nil)
+        }else{
+            let capture = ADCaptureViewController(config: config)
+            capture.assetCapture = { [weak self] image, url in
+                self?.save(image: image, url: url)
+            }
+            showDetailViewController(capture, sender: nil)
         }
     }
     
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true) {
-            if let image = info[.originalImage] as? UIImage {
-                let hud = ADProgress.progressHUD()
-                hud.show(timeout: 0)
-                ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
-                    if suc {
-                        self.dataSource.reloadData()
-                    } else {
-                        
-                    }
-                    hud.hide()
+            let image = info[.originalImage] as? UIImage
+            let url = info[.mediaURL] as? URL
+            self.save(image: image, url: url)
+        }
+    }
+    
+    func save(image: UIImage?, url: URL?, timeCheck: Bool = false) {
+        if let image = image {
+            let hud = ADProgress.progressHUD()
+            hud.show(timeout: 0)
+            ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
+                if suc {
+                    self.dataSource.reloadData()
+                } else {
+                    print("save image error")
+                }
+                hud.hide()
+            }
+        }
+        if let url = url {
+            if timeCheck {
+                let asset = AVAsset(url: url)
+                if Int(asset.duration.seconds) < config.params.minRecordTime {
+                    ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, config.params.minRecordTime), actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                    return
                 }
             }
-            if let url = info[.mediaURL] as? URL {
-                if let min = self.config.params.minRecordTime {
-                    let asset = AVAsset(url: url)
-                    if Int(asset.duration.seconds) < min {
-                        ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, min), completion: nil)
-                        return
-                    }
+            let hud = ADProgress.progressHUD()
+            hud.show(timeout: 0)
+            ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
+                if suc {
+                    self.dataSource.reloadData()
+                } else {
+                    print("save video error")
                 }
-                
-                let hud = ADProgress.progressHUD()
-                hud.show(timeout: 0)
-                ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
-                    if suc {
-                        self.dataSource.reloadData()
-                    } else {
-                        
-                    }
-                    hud.hide()
-                }
+                hud.hide()
             }
         }
     }

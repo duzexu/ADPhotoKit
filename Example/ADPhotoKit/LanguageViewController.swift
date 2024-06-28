@@ -25,6 +25,12 @@ class LanguageViewController: UITableViewController {
         case korean
         case malay
         case italian
+        case indonesian
+        case portuguese
+        case spanish
+        case turkish
+        case arabic
+        case dutch
     }
     
     let dataSource: [Language] = Language.allCases
@@ -91,6 +97,18 @@ extension LanguageViewController.Language {
             return "Bahasa Melayu (Malay)"
         case .italian:
             return "Italiano (Italian)"
+        case .indonesian:
+            return "Bahasa Indonesia (Indonesian)"
+        case .portuguese:
+            return "Português (Portuguese)"
+        case .spanish:
+            return "Español (Spanish)"
+        case .turkish:
+            return "Türkçe (Turkish)"
+        case .arabic:
+            return "عربي (Arabic)"
+        case .dutch:
+            return "Nederlands (Dutch)"
         }
     }
     
@@ -120,6 +138,18 @@ extension LanguageViewController.Language {
             return "ms"
         case .italian:
             return "it"
+        case .indonesian:
+            return "id"
+        case .portuguese:
+            return "pt-BR"
+        case .spanish:
+            return "es-419"
+        case .turkish:
+            return "tr"
+        case .arabic:
+            return "ar"
+        case .dutch:
+            return "nl"
         }
     }
     

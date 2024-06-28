@@ -49,4 +49,12 @@ extension PHAsset {
         return false
     }
     
+    /// Fetch the file size of asset. Size return in kb.
+    public var assetSize: CGFloat? {
+        guard let resource = PHAssetResource.assetResources(for: self).first,
+              let size = resource.value(forKey: "fileSize") as? CGFloat else {
+            return nil
+        }
+        return size / 1024
+    }
 }

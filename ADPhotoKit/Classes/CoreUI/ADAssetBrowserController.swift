@@ -98,6 +98,9 @@ public class ADAssetBrowserController: UIViewController {
             dataSource.appendSelect(dataSource.index)
         }
         dataSource.selectView?.reloadData()
+        if config.browserOpts.contains(.saveAfterEdit), let img = info.editImg {
+            ADPhotoManager.saveImageToAlbum(image: img, completion: nil)
+        }
     }
     #endif
     
@@ -117,19 +120,19 @@ public class ADAssetBrowserController: UIViewController {
                 let maxImageCount = config.params.maxImageCount ?? Int.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                    ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                     return false
                 }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
-                    ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                     return false
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     if selectMediaImage {
-                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.videoNotSelectable.localeTextValue, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.videoNotSelectable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                     }else{
-                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.imageNotSelectable.localeTextValue, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.imageNotSelectable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                     }
                     return false
                 }else{
@@ -138,18 +141,18 @@ public class ADAssetBrowserController: UIViewController {
                     let maxImageCount = config.params.maxImageCount ?? Int.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                         return false
                     }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                         return false
                     }
                 }
             }
         }else{
             let message = String(format: ADLocale.LocaleKey.exceededMaxSelectCount.localeTextValue, max)
-            ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
             return false
         }
         return true
@@ -201,7 +204,7 @@ private extension ADAssetBrowserController {
             #endif
         }
         
-        navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource)
+        navBarView = ADPhotoUIConfigurable.browserNavBar(dataSource: dataSource, config: config)
         navBarView.leftActionBlock = { [weak self] in
             self?.didSelectsUpdate()
             if let _ = self?.navigationController?.popViewController(animated: true) {
@@ -223,7 +226,7 @@ private extension ADAssetBrowserController {
             }
             return true
         }
-        toolBarView = ADPhotoUIConfigurable.browserToolBar(dataSource: dataSource)
+        toolBarView = ADPhotoUIConfigurable.browserToolBar(dataSource: dataSource, config: config)
         controlsView = ADBrowserControlsView(topView: navBarView, bottomView: toolBarView)
         view.addSubview(controlsView)
         controlsView.snp.makeConstraints { (make) in

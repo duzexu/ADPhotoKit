@@ -5,6 +5,7 @@
 //  Created by du on 2024/2/4.
 //
 
+#if canImport(SwiftUI)
 import SwiftUI
 
 @available(iOS 13.0.0, *)
@@ -44,3 +45,4 @@ struct ADAssetBrowserSwiftUIView: View {
             .preferredColorScheme(.light)
     }
 }
+#endif

@@ -283,6 +283,11 @@ public class ADAssetModel: Equatable {
     /// Asset's select status.
     public var selectStatus: SelectStatus = .select(index: nil)
     
+    /// Asset's data size.
+    public lazy var assetSize: CGFloat? = {
+        return asset.assetSize
+    }()
+    
     /// Create asset info model.
     /// - Parameter asset: Asset to bind.
     public init(asset: PHAsset) {

@@ -13,6 +13,7 @@ class ADImageEditControlsView: UIView {
     weak var vc: UIViewController?
     
     var confirmActionBlock: (() -> Void)?
+    var cancelActionBlock: (() -> Void)?
     
     var contentStatus: ((Bool) -> Void)?
     
@@ -123,7 +124,7 @@ private extension ADImageEditControlsView {
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(_:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
-            let top = isPhoneX ? 2 + statusBarHeight : 2
+            let top = isPhoneXOrLater ? 2 + statusBarHeight : 2
             make.top.equalToSuperview().offset(top)
             make.left.equalToSuperview().offset(30)
             make.height.equalTo(44)
@@ -176,7 +177,12 @@ private extension ADImageEditControlsView {
 extension ADImageEditControlsView {
     @objc
     func leftBtnItemAction(_ sender: UIButton) {
-        vc?.navigationController?.popViewController(animated: false)
+        if vc?.presentationController != nil {
+            vc?.dismiss(animated: false, completion: cancelActionBlock)
+        }else{
+            cancelActionBlock?()
+            vc?.navigationController?.popViewController(animated: false)
+        }
     }
     
     @objc

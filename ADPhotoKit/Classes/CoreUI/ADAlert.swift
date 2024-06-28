@@ -15,19 +15,22 @@ public protocol ADAlertConfigurable {
     ///   - on: The controller to show alert.
     ///   - title: Alert title.
     ///   - message: Alert message.
+    ///   - actions: Alert actions.
     ///   - completion: Called when confirm button click.
-    static func alert(on: UIViewController, title: String?, message: String?, completion: ((Int)->Void)?)
+    static func alert(on: UIViewController, title: String?, message: String?, actions: [String], completion: ((Int)->Void)?)
         
 }
 
 class ADAlert: ADAlertConfigurable {
 
-    static func alert(on: UIViewController, title: String? = nil, message: String? = nil, completion: ((Int)->Void)? = nil) {
+    static func alert(on: UIViewController, title: String?, message: String?, actions: [String], completion: ((Int)->Void)?) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: ADLocale.LocaleKey.ok.localeTextValue, style: .default) { (_) in
-            completion?(0)
+        for (index, item) in actions.enumerated() {
+            let action = UIAlertAction(title: item, style: .default) { (_) in
+                completion?(index)
+            }
+            alert.addAction(action)
         }
-        alert.addAction(action)
         on.present(alert, animated: true, completion: nil)
     }
 

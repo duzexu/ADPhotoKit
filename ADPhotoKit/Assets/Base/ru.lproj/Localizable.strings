@@ -4,6 +4,7 @@
 "cancel" = "Отмена";
 
 "originalPhoto" = "Полный формат";
+"originalTotalSize" = "Всего";
 "done" = "Готово";
 "ok" = "в порядке";
 "editFinish" = "Готово";
@@ -11,6 +12,9 @@
 "back" = "Назад";
 "edit" = "Pед";
 "revert" = "Отменить";
+"brightness" = "Яркость";
+"contrast" = "Контраст";
+"saturation" = "Насыщенность";
 
 "photo" = "Фото";
 "preview" = "Предпросмотр";
@@ -18,22 +22,26 @@
 "noPhotoTips" = "Нет фотографии";
 "notAllowMixSelect" = "Невозможно выбрать видео";
 
-"loading" = "загрузка, подождите пожалуйста";
-"hudLoading" = "ожидание...";
+"hudLoading" = "Загрузка";
+"hudProcessing" = "Обработка";
 
 "exceededMaxSelectCount" = "Максимальное количество выбранных: %ld";
 "exceededMaxImageSelectCount" = "Максимальное количество выбранных изображений: %ld";
 "imageNotSelectable" = "Не могу выбрать картинку";
 "videoNotSelectable" = "Невозможно выбрать видео";
-"longerThanMaxVideoDuration" = "Невозможно выбрать видео длительностью более %ld с";
-"shorterThanMaxVideoDuration" = "Невозможно выбрать видео продолжительностью менее 2 с";
+"longerThanMaxVideoDuration" = "Невозможно выбрать видео продолжительностью более %ld сек";
+"shorterThanMinVideoDuration" = "Невозможно выбрать видео короче %ld сек";
+"largerThanMaxVideoDataSize" = "Невозможно выбрать видео размером более %@МБ";
+"smallerThanMinVideoDataSize" = "Невозможно выбрать видео размером менее %@МБ";
 "exceededMaxVideoSelectCount" = "Максимальное количество выбранных видео: %ld";
 "lessThanMinVideoSelectCount" = "Количество мин. Выбора видео: %ld";
 
-"noCameraAuthority" = "Разрешите %@ доступ к камере вашего устройства в \"Настройки\" -> \"Конфиденциальность\" -> \"Камера\"";
-"noPhotoLibratyAuthority" = "Разрешите %@ доступ к вашему альбому в \"Настройки\" -> \"Конфиденциальность\" -> \"Фото\"";
-"noMicrophoneAuthority" = "Разрешите %@ доступ к микрофону вашего устройства в \"Настройки\" -> \"Конфиденциальность\" -> \"Микрофон\"";
+"noCameraAuthority" = "Разрешите %@ доступ к камере вашего устройства в \"Настройки\" > \"Конфиденциальность\" > \"Камера\"";
+"noPhotoLibratyAuthority" = "Разрешите %@ доступ к вашему альбому в \"Настройки\" > \"Конфиденциальность\" > \"Фото\"";
+"noMicrophoneAuthority" = "Не удалось записать звук. Перейдите в меню \"Настройки\" > \"%@\" и включите доступ к микрофону";
 "cameraUnavailable" = "Камера недоступна";
+"keepRecording" = "Продолжить запись";
+"gotoSettings" = "Перейти в настройки";
 
 "iCloudVideoLoadFaild" = "Невозможно синхронизировать из iCloud";
 "imageLoadFailed" = "загрузка не удалась";

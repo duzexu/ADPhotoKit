@@ -635,8 +635,8 @@ class ViewController: UIViewController {
         let thumbnailTool = ConfigModel(title: "Thumbnail Toolbar", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.customThumbnailToolBarBlock = { config in
-                        return ThumbnailToolBar()
+                    ADPhotoKitConfiguration.default.customThumbnailToolBarBlock = { dataSource,config in
+                        return ThumbnailToolBar(dataSource: dataSource, config: config)
                     }
                 }else{
                     ADPhotoKitConfiguration.default.customThumbnailToolBarBlock = nil
@@ -682,8 +682,8 @@ class ViewController: UIViewController {
         let browserNav = ConfigModel(title: "Browser Navbar", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.customBrowserNavBarBlock = { dataSource in
-                        return BrowserNavBar(dataSource: dataSource)
+                    ADPhotoKitConfiguration.default.customBrowserNavBarBlock = { dataSource,config in
+                        return BrowserNavBar(dataSource: dataSource, config: config)
                     }
                 }else{
                     ADPhotoKitConfiguration.default.customBrowserNavBarBlock = nil
@@ -696,8 +696,8 @@ class ViewController: UIViewController {
         let browserTool = ConfigModel(title: "Browser Toolbar", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.customBrowserToolBarBlock = { dataSource in
-                        return BrowserToolBar(dataSource: dataSource)
+                    ADPhotoKitConfiguration.default.customBrowserToolBarBlock = { dataSource,config in
+                        return BrowserToolBar(dataSource: dataSource, config: config)
                     }
                 }else{
                     ADPhotoKitConfiguration.default.customBrowserToolBarBlock = nil

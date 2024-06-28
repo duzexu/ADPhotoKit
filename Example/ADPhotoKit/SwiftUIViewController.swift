@@ -6,6 +6,7 @@
 //  Copyright © 2024 CocoaPods. All rights reserved.
 //
 
+#if canImport(SwiftUI)
 import UIKit
 import SwiftUI
 
@@ -26,3 +27,4 @@ class SwiftUIViewController: UIHostingController<MainSwiftUIView> {
     }
 
 }
+#endif

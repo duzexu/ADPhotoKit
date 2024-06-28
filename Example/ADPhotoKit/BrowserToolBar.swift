@@ -31,7 +31,7 @@ class BrowserToolBar: UIView, ADBrowserToolBarConfigurable {
     
     var originalBtn: UISwitch!
     
-    required init(dataSource: ADAssetBrowserDataSource) {
+    required init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) {
         super.init(frame: .zero)
         backgroundColor = UIColor(white: 1, alpha: 0.6)
         

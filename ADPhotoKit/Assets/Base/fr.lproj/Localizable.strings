@@ -4,6 +4,7 @@
 "cancel" = "Annuler";
 
 "originalPhoto" = "image complète";
+"originalTotalSize" = "Total";
 "done" = "Terminé";
 "ok" = "D'accord";
 "editFinish" = "Terminé";
@@ -11,29 +12,36 @@
 "back" = "Retour";
 "edit" = "Modifier";
 "revert" = "Annuler";
+"brightness" = "Luminosité";
+"contrast" = "Contraste";
+"saturation" = "Saturation";
 
 "photo" = "Photos";
 "preview" = "Aperçu";
 
-"noPhotoTips" = "Pas de photo";
 "notAllowMixSelect" = "Impossible de sélectionner la vidéo";
+"noPhotoTips" = "Pas de photos";
 
-"loading" = "chargement, attente s'il vous plaît";
-"hudLoading" = "attendre...";
+"hudLoading" = "Chargement";
+"hudProcessing" = "Traitement encours";
 
 "exceededMaxSelectCount" = "Nombre maximal de sélections: %ld";
 "exceededMaxImageSelectCount" = "Nombre maximal de sélections l'image: %ld";
 "imageNotSelectable" = "Impossible de sélectionner l'image";
 "videoNotSelectable" = "Impossible de sélectionner la vidéo";
 "longerThanMaxVideoDuration" = "Impossible de sélectionner une vidéo d'une durée supérieure à %lds";
-"shorterThanMaxVideoDuration" = "Impossible de sélectionner une vidéo d'une durée inférieure à %lds";
+"shorterThanMinVideoDuration" = "Impossible de sélectionner une vidéo d'une durée inférieure à %lds";
+"largerThanMaxVideoDataSize" = "Impossible de sélectionner des vidéos de plus de %@Mo";
+"smallerThanMinVideoDataSize" = "Impossible de sélectionner des vidéos de moins de %@Mo";
 "exceededMaxVideoSelectCount" = "Nombre maximal de sélections vidéo: %ld";
 "lessThanMinVideoSelectCount" = "Nombre minimal de sélection de vidéo: %ld";
 
-"noCameraAuthority" = "Veuillez autoriser %@ à accéder à la caméra de votre appareil dans \"Paramètres\" -> \"Confidentialité\" -> \"Caméra\"";
-"noPhotoLibratyAuthority" = "Veuillez autoriser %@ à accéder à votre album dans \"Paramètres\" -> \"Confidentialité\" -> \"Photos\"";
-"noMicrophoneAuthority" = "Veuillez autoriser %@ à accéder au microphone de votre appareil dans \"Paramètres\" -> \"Confidentialité\" -> \"Microphone\"";
+"noCameraAuthority" = "Veuillez autoriser %@ à accéder à la caméra de votre appareil dans \"Paramètres\" > \"Confidentialité\" > \"Caméra\"";
+"noPhotoLibratyAuthority" = "Veuillez autoriser %@ à accéder à votre album dans \"Paramètres\" > \"Confidentialité\" > \"Photos\"";
+"noMicrophoneAuthority" = "Impossible d'enregistrer le son. Rendez-vous dans « Paramètres >> > << %@ » et activez l'accès au microphone";
 "cameraUnavailable" = "La caméra n'est pas disponible";
+"keepRecording" = "Continuer à enregistrer";
+"gotoSettings" = "Accéder à Paramètres";
 
 "iCloudVideoLoadFaild" = "Impossible de synchroniser depuis iCloud";
 "imageLoadFailed" = "chargement échoué";

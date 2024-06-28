@@ -100,7 +100,7 @@ public class ADPhotoManager {
             option.predicate = NSPredicate(format: "mediaType == %ld", PHAssetMediaType.image.rawValue)
         }
         
-        let smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
+        let smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil)
         smartAlbums.enumerateObjects { (collection, _, stop) in
             if collection.assetCollectionSubtype == .smartAlbumUserLibrary {
                 let result = PHAsset.fetchAssets(in: collection, options: option)
@@ -359,13 +359,23 @@ public class ADPhotoManager {
             }
         }
         
-        return PHImageManager.default().requestImageData(for: asset, options: option) { (data, _, _, info) in
+        let completionHandle: (Data?, [AnyHashable: Any]?) -> Void = { (data, info) in
             let cancel = info?[PHImageCancelledKey] as? Bool ?? false
             let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool ?? false)
             if !cancel, let data = data {
                 completion(data, info, isDegraded)
             }else{
                 completion(nil, info, false)
+            }
+        }
+        
+        if #available(iOS 13.0, *) {
+            return PHImageManager.default().requestImageDataAndOrientation(for: asset, options: option) { data, _, _, info in
+                completionHandle(data, info)
+            }
+        } else {
+            return PHImageManager.default().requestImageData(for: asset, options: option) { data, _, _, info in
+                completionHandle(data, info)
             }
         }
     }
@@ -393,7 +403,7 @@ public class ADPhotoManager {
         }
         
         return try await withCheckedThrowingContinuation { continuation in
-            PHImageManager.default().requestImageData(for: asset, options: option) { (data, _, _, info) in
+            PHImageManager.default().requestImageDataAndOrientation(for: asset, options: option) { (data, _, _, info) in
                 if let error = info?[PHImageErrorKey] as? Error {
                     continuation.resume(throwing: error)
                 }else{
@@ -713,18 +723,30 @@ extension ADPhotoManager {
         }
         
         var placeholderAsset: PHObjectPlaceholder? = nil
-        PHPhotoLibrary.shared().performChanges {
-            let newAssetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-            placeholderAsset = newAssetRequest.placeholderForCreatedAsset
-        } completionHandler: { (suc, error) in
-            DispatchQueue.main.async {
-                if suc {
-                    let asset = self.getAsset(from: placeholderAsset?.localIdentifier)
+        let completionHandler: ((Bool, Error?) -> Void) = { suc, _ in
+            if suc {
+                let asset = self.getAsset(from: placeholderAsset?.localIdentifier)
+                DispatchQueue.main.async {
                     completion?(suc, asset)
-                } else {
+                }
+            } else {
+                DispatchQueue.main.async {
                     completion?(false, nil)
                 }
             }
+        }
+        
+        if image.hasAlphaChannel(), let data = image.pngData() {
+            PHPhotoLibrary.shared().performChanges({
+                let newAssetRequest = PHAssetCreationRequest.forAsset()
+                newAssetRequest.addResource(with: .photo, data: data, options: nil)
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset
+            }, completionHandler: completionHandler)
+        }else{
+            PHPhotoLibrary.shared().performChanges({
+                let newAssetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset
+            }, completionHandler: completionHandler)
         }
     }
     
@@ -733,10 +755,21 @@ extension ADPhotoManager {
     /// - Parameters:
     ///   - image: Image to save.
     @available(iOS 13.0.0, *)
-    public class func saveImageToAlbum(image: UIImage) async throws {
-        return try await PHPhotoLibrary.shared().performChanges {
-            PHAssetChangeRequest.creationRequestForAsset(from: image)
+    public class func saveImageToAlbum(image: UIImage) async throws -> PHAsset? {
+        var placeholderAsset: PHObjectPlaceholder? = nil
+        if image.hasAlphaChannel(), let data = image.pngData() {
+            try await PHPhotoLibrary.shared().performChanges{
+                let newAssetRequest = PHAssetCreationRequest.forAsset()
+                newAssetRequest.addResource(with: .photo, data: data, options: nil)
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset
+            }
+        }else{
+            try await PHPhotoLibrary.shared().performChanges {
+                let newAssetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset
+            }
         }
+        return self.getAsset(from: placeholderAsset?.localIdentifier)
     }
     #endif
     
@@ -773,10 +806,13 @@ extension ADPhotoManager {
     /// - Parameters:
     ///   - image: Image to save.
     @available(iOS 13.0.0, *)
-    public class func saveVideoToAlbum(url: URL) async throws {
-        return try await PHPhotoLibrary.shared().performChanges {
-            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+    public class func saveVideoToAlbum(url: URL) async throws -> PHAsset? {
+        var placeholderAsset: PHObjectPlaceholder? = nil
+        try await PHPhotoLibrary.shared().performChanges {
+            let newAssetRequest = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+            placeholderAsset = newAssetRequest?.placeholderForCreatedAsset
         }
+        return self.getAsset(from: placeholderAsset?.localIdentifier)
     }
     #endif
     
@@ -801,4 +837,23 @@ extension ADPhotoManager {
         return PHPhotoLibrary.authorizationStatus() == .authorized
     }
     
+    /// Check authority access to camera.
+    /// - Returns: If have authority.
+    public class func cameraAuthority() -> Bool {
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        if status == .restricted || status == .denied {
+            return false
+        }
+        return true
+    }
+    
+    /// Check authority access to microphone.
+    /// - Returns: If have authority.
+    public class func microphoneAuthority() -> Bool {
+        let status = AVCaptureDevice.authorizationStatus(for: .audio)
+        if status == .restricted || status == .denied {
+            return false
+        }
+        return true
+    }
 }

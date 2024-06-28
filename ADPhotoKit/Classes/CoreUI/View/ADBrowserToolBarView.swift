@@ -24,10 +24,12 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     var isOriginal: Bool = false {
         didSet {
             originalBtn.isSelected = isOriginal
+            refreshTotalSize()
         }
     }
 
     weak var dataSource: ADAssetBrowserDataSource?
+    let config: ADPhotoKitConfig
     
     var editActionBlock: (()->Void)?
     var doneActionBlock: (()->Void)?
@@ -38,14 +40,16 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
     var editBtn: UIButton?
     var originalBtn: UIButton!
     var doneBtn: UIButton!
+    var sizeLabel: UILabel!
     
     var selectView: ADBrowserToolBarSelectView!
     
     private var indexToken: NSKeyValueObservation?
     private var selectCountToken: NSKeyValueObservation?
 
-    required init(dataSource: ADAssetBrowserDataSource) {
+    required init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) {
         self.dataSource = dataSource
+        self.config = config
         super.init(frame: .zero)
         
         selectView = ADBrowserToolBarSelectView(dataSource: dataSource)
@@ -113,6 +117,21 @@ private extension ADBrowserToolBarView {
         originalBtn.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
             make.height.equalTo(34)
+        }
+        
+        sizeLabel = UILabel()
+        sizeLabel.font = UIFont.systemFont(ofSize: 12)
+        sizeLabel.textColor = UIColor(hex: 0x828282)
+        sizeLabel.textAlignment = .center
+        sizeLabel.minimumScaleFactor = 0.5
+        sizeLabel.adjustsFontSizeToFitWidth = true
+        sizeLabel.isHidden = true
+        btnsView.addSubview(sizeLabel)
+        sizeLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(originalBtn.snp.bottom)
+            make.height.equalTo(14)
+            make.centerX.equalTo(originalBtn.snp.centerX)
+            make.width.equalTo(230)
         }
         
         doneBtn = createBtn(ADLocale.LocaleKey.done.localeTextValue, #selector(doneAction))
@@ -202,7 +221,12 @@ private extension ADBrowserToolBarView {
     func reloadCount(_ count: Int) {
         if count > 0 {
             selectView.isHidden = false
-            doneBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue + "(\(count))", for: .normal)
+            var title = ADLocale.LocaleKey.done.localeTextValue
+            let selectCount = config.browserOpts.contains(.selectCountOnDoneBtn)
+            if (selectCount) {
+                title += "(\(count))"
+            }
+            doneBtn.setTitle(title, for: .normal)
             for item in bgView.constraints {
                 if item.identifier == "bgViewHeight" {
                     item.constant = height
@@ -219,8 +243,22 @@ private extension ADBrowserToolBarView {
                 }
             }
         }
+        refreshTotalSize()
     }
     
+    func refreshTotalSize() {
+        guard config.assetOpts.contains(.totalOriginalSize) else {
+            return
+        }
+        if !originalBtn.isSelected {
+            sizeLabel.isHidden = true
+        }else{
+            sizeLabel.isHidden = false
+            let total = dataSource?.selects.reduce(into: 0) { $0 += ($1.browseAsset.assetSize ?? 0) * 1024 } ?? 0
+            let str = ByteCountFormatter.string(fromByteCount: Int64(total), countStyle: .binary).replacingOccurrences(of: " ", with: "")
+            sizeLabel.text = ADLocale.LocaleKey.originalTotalSize.localeTextValue + "\(str)"
+        }
+    }
 }
 
 private extension ADBrowserToolBarView {
@@ -233,6 +271,7 @@ private extension ADBrowserToolBarView {
     @objc
     func originalAction() {
         isOriginal = !isOriginal
+        refreshTotalSize()
     }
     
     @objc

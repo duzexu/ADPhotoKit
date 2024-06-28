@@ -16,10 +16,10 @@ class ADBrowserNavBarView: ADBaseNavBarView, ADBrowserNavBarConfigurable {
     private var selectToken: NSKeyValueObservation?
     private var selectIndexToken: NSKeyValueObservation?
 
-    required init(dataSource: ADAssetBrowserDataSource) {
+    required init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) {
         self.dataSource = dataSource
         super.init(rightItem: (Bundle.image(name: "btn_circle"), Bundle.image(name: "btn_selected"),nil))
-        
+        rightBtnItem.isHidden = config.params.maxCount == 1 && !config.browserOpts.contains(.selectBtnWhenSingleSelect)
         setupChildUI()
     }
     

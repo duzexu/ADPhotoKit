@@ -69,15 +69,31 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                 if let max = config.params.maxVideoTime {
                     if duration > max {
                         let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                         return false
                     }
                 }
                 if let min = config.params.minVideoTime {
                     if duration < min {
-                        let message = String(format: ADLocale.LocaleKey.shorterThanMaxVideoDuration.localeTextValue, min)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, completion: nil)
+                        let message = String(format: ADLocale.LocaleKey.shorterThanMinVideoDuration.localeTextValue, min)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
                         return false
+                    }
+                }
+                if let size = item.assetSize {
+                    if let max = config.params.maxVideoSize {
+                        if size > max {
+                            let message = String(format: ADLocale.LocaleKey.largerThanMaxVideoDataSize.localeTextValue, max)
+                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                            return false
+                        }
+                    }
+                    if let min = config.params.minVideoSize {
+                        if size < min {
+                            let message = String(format: ADLocale.LocaleKey.smallerThanMinVideoDataSize.localeTextValue, min)
+                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                            return false
+                        }
                     }
                 }
                 return true
