@@ -107,7 +107,7 @@ public struct ADAssetBrowserOptions: OptionSet {
     public static let saveAfterEdit = ADAssetBrowserOptions(rawValue: 1 << 7)
     
     /// Default options.
-    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage, .totalOriginalSize, .selectCountOnDoneBtn,.saveAfterEdit]
+    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage, .totalOriginalSize, .selectCountOnDoneBtn, .saveAfterEdit]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue

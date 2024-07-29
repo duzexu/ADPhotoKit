@@ -24,6 +24,7 @@ class ADThumbnailToolBarView: UIView, ADThumbnailToolBarConfigurable {
     var isOriginal: Bool = false {
         didSet {
             originalBtn.isSelected = isOriginal
+            refreshTotalSize()
         }
     }
     

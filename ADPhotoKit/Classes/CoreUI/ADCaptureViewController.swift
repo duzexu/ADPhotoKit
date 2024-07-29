@@ -9,9 +9,12 @@ import UIKit
 import AVFoundation
 import CoreMotion
 
-public class ADCaptureViewController: UIViewController {
+/// Controller to capture assets.
+class ADCaptureViewController: UIViewController, ADAssetCaptureConfigurable {
     
+    /// Called when finish capture asset.
     public var assetCapture: ((UIImage?, URL?) -> Void)?
+    /// Called when cancel capture asset.
     public var cancelCapture: (() -> Void)?
     
     private let config: ADPhotoKitConfig
@@ -49,8 +52,10 @@ public class ADCaptureViewController: UIViewController {
     private var videoURL: URL?
     
     private let captureConfig = ADPhotoKitConfiguration.default.captureConfig
-        
-    public init(config: ADPhotoKitConfig) {
+    
+    /// Create capture asset controller.
+    /// - Parameter config: input config setting.
+    required public init(config: ADPhotoKitConfig) {
         self.config = config
         super.init(nibName: nil, bundle: nil)
     }
@@ -314,7 +319,7 @@ private extension ADCaptureViewController {
                 if self.config.assetOpts.contains(.allowTakeVideoAsset) {
                     AVCaptureDevice.requestAccess(for: .audio) { granted in
                         if !granted {
-                            ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.noMicrophoneAuthority.localeTextValue, appName), actions: [ADLocale.LocaleKey.keepRecording.localeTextValue,ADLocale.LocaleKey.gotoSettings.localeTextValue]) { index in
+                            ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.noMicrophoneAuthority.localeTextValue, appName), actions: [.cancel(ADLocale.LocaleKey.keepRecording.localeTextValue),.default(ADLocale.LocaleKey.gotoSettings.localeTextValue)]) { index in
                                 if index == 1 {
                                     guard let url = URL(string: UIApplication.openSettingsURLString) else {
                                         return
@@ -328,7 +333,7 @@ private extension ADCaptureViewController {
                     }
                 }
             }else{
-                ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.noCameraAuthority.localeTextValue, appName), actions: [ADLocale.LocaleKey.ok.localeTextValue]) { _ in
+                ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.noCameraAuthority.localeTextValue, appName), actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)]) { _ in
                     self.closeBtnAction()
                 }
             }
@@ -431,7 +436,7 @@ private extension ADCaptureViewController {
             return
         }
         guard session.outputs.contains(imageOutput) else {
-            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
             return
         }
         isTakingPhoto = true
@@ -456,7 +461,7 @@ private extension ADCaptureViewController {
             return
         }
         guard session.outputs.contains(fileOutput) else {
-            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
             return
         }
         closeBtn.isHidden = true
@@ -508,7 +513,7 @@ private extension ADCaptureViewController {
                 if let url = url {
                     self?.playVideo(fileURL: url)
                 }else if let strong = self {
-                    ADAlert.alert().alert(on: strong, title: nil, message: "", actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                    ADAlert.alert().alert(on: strong, title: nil, message: "video merge failed", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                 }
                 self?.recordInfos.forEach { try? FileManager.default.removeItem(at: $0.0) }
                 self?.recordInfos.removeAll()
@@ -837,7 +842,7 @@ extension ADCaptureViewController: AVCaptureFileOutputRecordingDelegate {
                 recordInfos.removeAll()
                 DispatchQueue.main.async {
                     self.refreshUI()
-                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                 }
                 return
             }

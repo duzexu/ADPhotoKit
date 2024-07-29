@@ -177,7 +177,7 @@ private extension ADImageEditControlsView {
 extension ADImageEditControlsView {
     @objc
     func leftBtnItemAction(_ sender: UIButton) {
-        if vc?.presentationController != nil {
+        if vc?.presentedViewController != nil {
             vc?.dismiss(animated: false, completion: cancelActionBlock)
         }else{
             cancelActionBlock?()

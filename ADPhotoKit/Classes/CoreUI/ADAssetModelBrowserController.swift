@@ -69,14 +69,14 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                 if let max = config.params.maxVideoTime {
                     if duration > max {
                         let message = String(format: ADLocale.LocaleKey.longerThanMaxVideoDuration.localeTextValue, max)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                         return false
                     }
                 }
                 if let min = config.params.minVideoTime {
                     if duration < min {
                         let message = String(format: ADLocale.LocaleKey.shorterThanMinVideoDuration.localeTextValue, min)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                         return false
                     }
                 }
@@ -84,14 +84,14 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
                     if let max = config.params.maxVideoSize {
                         if size > max {
                             let message = String(format: ADLocale.LocaleKey.largerThanMaxVideoDataSize.localeTextValue, max)
-                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                             return false
                         }
                     }
                     if let min = config.params.minVideoSize {
                         if size < min {
                             let message = String(format: ADLocale.LocaleKey.smallerThanMinVideoDataSize.localeTextValue, min)
-                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                            ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                             return false
                         }
                     }

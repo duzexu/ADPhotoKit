@@ -14,6 +14,7 @@ UI and logic for asset select.
 
 ### UI Configuration
 
+- ``ADAlertAction``
 - ``ADAlertConfigurable``
 - ``ADProgressConfigurable``
 - ``ADProgressHUDConfigurable``
@@ -59,3 +60,10 @@ UI and logic for asset select.
 
 - ``ADVideoBrowserCellConfigurable``
 
+### AssetCapture
+
+- ``ADCapturePreset``
+- ``ADDevicePosition``
+- ``ADExposureMode``
+- ``ADFocusMode``
+- ``ADAssetCaptureConfigurable``

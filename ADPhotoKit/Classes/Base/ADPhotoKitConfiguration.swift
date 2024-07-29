@@ -102,6 +102,7 @@ public class ADPhotoKitConfiguration {
     /// - Note: If use your custom cells, you must regist cells first by set `customThumbnailCellRegistor` block.
     public var customThumbnailCellBlock: ((UICollectionView, IndexPath) -> ADThumbnailCellConfigurable)?
     
+    /// Config to control asset capture.
     public struct AssetCaptureConfig {
         /// Default device position.
         public var cameraPosition: ADDevicePosition = .back
@@ -119,7 +120,11 @@ public class ADPhotoKitConfiguration {
         public var exposureMode: ADExposureMode = .continuousAutoExposure
     }
     
+    /// Control asset capture controller.
     public var captureConfig = AssetCaptureConfig()
+    
+    /// Custom asset capture controller.
+    public var customAssetCaptureVCBlock: ((ADPhotoKitConfig) -> ADAssetCaptureConfigurable)?
     
     /* =============== browser =============== */
         
@@ -181,12 +186,12 @@ public class ADPhotoKitConfiguration {
     public var imageStickerDataSource: ADImageStickerDataSource?
     
     /// Custom image sticker select controller.
-    public var customImageStickerSelectVC: ADImageStickerSelectable?
+    public var customImageStickerSelectVC: ADImageStickerSelectConfigurable?
     
     /* =============== text sticker =============== */
     
     /// Custom text sticker edit controller.
-    public var customTextStickerEditVCBlock: ((ADTextSticker?) -> ADTextStickerEditable)?
+    public var customTextStickerEditVCBlock: ((ADTextSticker?) -> ADTextStickerEditConfigurable)?
     
     /// System text sticker selectable colors. 
     public var textStickerColors: [ADTextStickerColor] = [(.white,.black),(.black,.white),(UIColor(hex: 0xF14F4F)!,.white),(UIColor(hex: 0xF3AA4E)!,.white),(UIColor(hex: 0x10C060)!,.white),(UIColor(hex: 0x1EB7F3)!,.white),(UIColor(hex: 0x8B69EA)!,.white)]
@@ -197,7 +202,7 @@ public class ADPhotoKitConfiguration {
     /* =============== clip =============== */
     
     /// Custom image clip controller.
-    public var customImageClipVCBlock: ((ADClipInfo) -> ADImageClipable)?
+    public var customImageClipVCBlock: ((ADClipInfo) -> ADImageClipConfigurable)?
     
     #endif
 

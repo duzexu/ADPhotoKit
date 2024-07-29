@@ -180,10 +180,8 @@ extension ADToolInteractable {
     public func didEndRenderImage() { }
 }
 
-/// Image sticker select controller.
-public typealias ADImageStickerSelectable = (UIViewController & ADImageStickerSelectConfigurable)
 /// Use to define image sticker select controller.
-public protocol ADImageStickerSelectConfigurable: AnyObject {
+public protocol ADImageStickerSelectConfigurable where Self: UIViewController {
     
     /// Called when image is selected.
     var imageDidSelect: ((UIImage) -> Void)? { get set }
@@ -213,10 +211,8 @@ public struct ADTextSticker {
     public var text: String?
 }
 
-/// Text sticker edit controller.
-public typealias ADTextStickerEditable = (UIViewController & ADTextStickerEditConfigurable)
 /// Use to define text sticker edit controller.
-public protocol ADTextStickerEditConfigurable: AnyObject {
+public protocol ADTextStickerEditConfigurable where Self: UIViewController {
     
     /// Called when end edit.
     /// - Parameters:
@@ -226,10 +222,8 @@ public protocol ADTextStickerEditConfigurable: AnyObject {
     
 }
 
-/// Image clip controller.
-public typealias ADImageClipable = (UIViewController & ADImageClipConfigurable)
 /// Use to define Image clip controller.
-public protocol ADImageClipConfigurable: AnyObject {
+public protocol ADImageClipConfigurable where Self: UIViewController {
     
     /// Called when clip finished.
     /// - Parameters:
@@ -245,15 +239,15 @@ public protocol ADImageClipConfigurable: AnyObject {
 
 class ADImageEditConfigurable {
     
-    static func imageStickerSelectVC() -> ADImageStickerSelectable {
+    static func imageStickerSelectVC() -> ADImageStickerSelectConfigurable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
     }
     
-    static func textStickerEditVC(sticker: ADTextSticker?) -> ADTextStickerEditable {
+    static func textStickerEditVC(sticker: ADTextSticker?) -> ADTextStickerEditConfigurable {
         return ADPhotoKitConfiguration.default.customTextStickerEditVCBlock?(sticker) ?? ADTextStickerEditController(sticker: sticker)
     }
     
-    static func imageClipVC(clipInfo: ADClipInfo) -> ADImageClipable {
+    static func imageClipVC(clipInfo: ADClipInfo) -> ADImageClipConfigurable {
         return ADPhotoKitConfiguration.default.customImageClipVCBlock?(clipInfo) ?? ADImageClipController(clipInfo: clipInfo)
     }
     

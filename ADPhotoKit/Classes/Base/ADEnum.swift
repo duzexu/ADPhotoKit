@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Capture resolution.
 public enum ADCapturePreset {
     case cif352x288
     case vga640x480
@@ -16,16 +17,19 @@ public enum ADCapturePreset {
     case photo
 }
 
+// Camera focus mode.
 public enum ADFocusMode {
     case autoFocus
     case continuousAutoFocus
 }
 
+/// Camera exposure mode.
 public enum ADExposureMode {
     case autoExpose
     case continuousAutoExposure
 }
 
+/// Capture device position.
 public enum ADDevicePosition {
     case back
     case front

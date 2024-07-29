@@ -25,6 +25,7 @@ ADPhotoKit contains four moudles:
 * [x] Image editor.
 * [x] DocC support.
 * [x] SwiftUI support.
+* [x] Custom capture support.
 
 ## License
 

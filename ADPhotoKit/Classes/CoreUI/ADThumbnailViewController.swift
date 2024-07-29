@@ -594,7 +594,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
             return
         }
         if !UIImagePickerController.isSourceTypeAvailable(.camera) {
-            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.cameraUnavailable.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
             return
         }
         if config.assetOpts.contains(.systemCapture) {
@@ -620,7 +620,8 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
             picker.videoMaximumDuration = TimeInterval(config.params.maxRecordTime)
             showDetailViewController(picker, sender: nil)
         }else{
-            let capture = ADCaptureViewController(config: config)
+            let capture = ADPhotoUIConfigurable.assetCaptureController(config: config)
+            capture.modalPresentationStyle = .fullScreen
             capture.assetCapture = { [weak self] image, url in
                 self?.save(image: image, url: url)
             }
@@ -653,7 +654,7 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
             if timeCheck {
                 let asset = AVAsset(url: url)
                 if Int(asset.duration.seconds) < config.params.minRecordTime {
-                    ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, config.params.minRecordTime), actions: [ADLocale.LocaleKey.ok.localeTextValue], completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, config.params.minRecordTime), actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                     return
                 }
             }

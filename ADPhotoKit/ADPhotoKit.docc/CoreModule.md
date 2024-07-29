@@ -45,8 +45,14 @@ Get system album raw data and wrap as list dataSource.
 - ``Photos/PHAsset/isInCloud``
 - ``Photos/PHAsset/isLivePhoto``
 - ``Photos/PHAsset/whRatio``
+- ``Photos/PHAsset/assetSize``
 
 ### UIImageView Extensions
 
 - ``UIKit/UIImageView/setAsset(_:size:placeholder:progress:completionHandler:)``
 - ``UIKit/UIImageView/setVideoUrlAsset(_:time:)``
+
+### UIImage Extensions
+
+- ``UIKit/UIImage/browseAsset``
+- ``UIKit/UIImage/imageEditInfo``

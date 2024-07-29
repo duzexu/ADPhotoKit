@@ -91,6 +91,19 @@ public protocol ADThumbnailCellConfigurable where Self: UICollectionViewCell {
     
 }
 
+/// Use to define asset capture controller.
+public protocol ADAssetCaptureConfigurable where Self: UIViewController {
+    
+    /// Called when finish capture asset.
+    var assetCapture: ((UIImage?, URL?) -> Void)? { set get }
+    /// Called when cancel capture asset.
+    var cancelCapture: (() -> Void)? { set get }
+    
+    /// Create asset capture controller.
+    /// - Parameter config: input config setting.
+    init(config: ADPhotoKitConfig)
+}
+
 /// Use to define browser controller's collection view cell.
 /// - Note: Don't use this protocol directly. User `ADImageBrowserCellable` or `ADVideoBrowserCellable` instead.
 public protocol ADBrowserCellConfigurable where Self: UICollectionViewCell {
@@ -193,6 +206,10 @@ class ADPhotoUIConfigurable {
             assert(ADPhotoKitConfiguration.default.customThumbnailCellRegistor != nil, "you must set 'customThumbnailCellRegistor' and regist your custom cell")
         }
         return ADPhotoKitConfiguration.default.customThumbnailCellBlock?(collectionView, indexPath) ?? collectionView.dequeueReusableCell(withReuseIdentifier: ADThumbnailListCell.reuseIdentifier, for: indexPath) as! ADThumbnailCellConfigurable
+    }
+    
+    static func assetCaptureController(config: ADPhotoKitConfig) -> ADAssetCaptureConfigurable {
+        return ADPhotoKitConfiguration.default.customAssetCaptureVCBlock?(config) ?? ADCaptureViewController(config: config)
     }
     
     static func browserNavBar(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) -> ADBrowserNavBarConfigurable {

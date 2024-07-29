@@ -108,16 +108,28 @@ class ViewController: UIViewController {
         })
         globalModels.append(lang)
         
-        let locale = ConfigModel(title: "Custom Locale Text", mode: .none, action: { (_) in
-            ADPhotoKitConfiguration.default.locale = Locale(identifier: "en")
-            ADPhotoKitConfiguration.default.customLocaleValue = [ Locale(identifier: "en"):[.cancel:"Cancel Select",.cameraRoll:"All"] ]
-            ProgressHUD.showSuccess("Update Success!")
+        let locale = ConfigModel(title: "Custom Locale Text", mode: .switch(false), action: { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.locale = Locale(identifier: "en")
+                    ADPhotoKitConfiguration.default.customLocaleValue = [ Locale(identifier: "en"):[.cancel:"Cancel Select",.cameraRoll:"All"] ]
+                }else{
+                    ADPhotoKitConfiguration.default.customLocaleValue = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }            
         })
         globalModels.append(locale)
         
-        let order = ConfigModel(title: "Custom Album Order", mode: .none, action: { (_) in
-            ADPhotoKitConfiguration.default.customAlbumOrders = [.cameraRoll,.videos,.screenshots]
-            ProgressHUD.showSuccess("Update Success!")
+        let order = ConfigModel(title: "Custom Album Order", mode: .switch(false), action: { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customAlbumOrders = [.cameraRoll,.videos,.screenshots]
+                }else{
+                    ADPhotoKitConfiguration.default.customAlbumOrders = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
         })
         globalModels.append(order)
         
@@ -178,209 +190,321 @@ class ViewController: UIViewController {
         let albumConfig = ConfigSection(title: "AlbumOptions", models: albumModels)
         dataSource.append(albumConfig)
         
-        var assetModels: [ConfigModel] = []
-        
-        let mixSelect = ConfigModel(title: "MixSelect", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.mixSelect)
-                }else{
-                    self?.configs.assetOptions.remove(.mixSelect)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(mixSelect)
-        
-        let selectAsGif = ConfigModel(title: "SelectAsGif", mode: .switch(false)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.selectAsGif)
-                }else{
-                    self?.configs.assetOptions.remove(.selectAsGif)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(selectAsGif)
-        
-        let selectAsLivePhoto = ConfigModel(title: "SelectAsLivePhoto", mode: .switch(false)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.selectAsLivePhoto)
-                }else{
-                    self?.configs.assetOptions.remove(.selectAsLivePhoto)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(selectAsLivePhoto)
-        
-        let slideSelect = ConfigModel(title: "SlideSelect", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.slideSelect)
-                }else{
-                    self?.configs.assetOptions.remove(.slideSelect)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(slideSelect)
-        
-        let autoScroll = ConfigModel(title: "AutoScroll", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.autoScroll)
-                }else{
-                    self?.configs.assetOptions.remove(.autoScroll)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(autoScroll)
-        
-        let allowTakePhotoAsset = ConfigModel(title: "AllowTakePhotoAsset", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.allowTakePhotoAsset)
-                }else{
-                    self?.configs.assetOptions.remove(.allowTakePhotoAsset)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(allowTakePhotoAsset)
-        
-        let allowTakeVideoAsset = ConfigModel(title: "AllowTakeVideoAsset", mode: .switch(false)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.allowTakeVideoAsset)
-                }else{
-                    self?.configs.assetOptions.remove(.allowTakeVideoAsset)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(allowTakeVideoAsset)
-        
-        let captureOnTakeAsset = ConfigModel(title: "CaptureOnTakeAsset", mode: .switch(false)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.captureOnTakeAsset)
-                }else{
-                    self?.configs.assetOptions.remove(.captureOnTakeAsset)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(captureOnTakeAsset)
-        
-        if #available(iOS 14, *) {
-            let allowAddAsset = ConfigModel(title: "AllowAddAsset", mode: .switch(false)) { [weak self] (value) in
-                if let isOn = value as? Bool {
-                    if isOn {
-                        self?.configs.assetOptions.insert(.allowAddAsset)
-                    }else{
-                        self?.configs.assetOptions.remove(.allowAddAsset)
-                    }
-                    ProgressHUD.showSuccess("Update Success!")
-                }
-            }
-            assetModels.append(allowAddAsset)
+        do {
+            var assetModels: [ConfigModel] = []
             
-            let allowAuthTips = ConfigModel(title: "AllowAuthTips", mode: .switch(false)) { [weak self] (value) in
+            let mixSelect = ConfigModel(title: "MixSelect", mode: .switch(true)) { [weak self] (value) in
                 if let isOn = value as? Bool {
                     if isOn {
-                        self?.configs.assetOptions.insert(.allowAuthTips)
+                        self?.configs.assetOptions.insert(.mixSelect)
                     }else{
-                        self?.configs.assetOptions.remove(.allowAuthTips)
+                        self?.configs.assetOptions.remove(.mixSelect)
                     }
                     ProgressHUD.showSuccess("Update Success!")
                 }
             }
-            assetModels.append(allowAuthTips)
+            assetModels.append(mixSelect)
+            
+            let selectAsGif = ConfigModel(title: "SelectAsGif", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.selectAsGif)
+                    }else{
+                        self?.configs.assetOptions.remove(.selectAsGif)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(selectAsGif)
+            
+            let selectAsLivePhoto = ConfigModel(title: "SelectAsLivePhoto", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.selectAsLivePhoto)
+                    }else{
+                        self?.configs.assetOptions.remove(.selectAsLivePhoto)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(selectAsLivePhoto)
+            
+            let slideSelect = ConfigModel(title: "SlideSelect", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.slideSelect)
+                    }else{
+                        self?.configs.assetOptions.remove(.slideSelect)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(slideSelect)
+            
+            let autoScroll = ConfigModel(title: "AutoScroll", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.autoScroll)
+                    }else{
+                        self?.configs.assetOptions.remove(.autoScroll)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(autoScroll)
+            
+            let allowTakePhotoAsset = ConfigModel(title: "AllowTakePhotoAsset", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.allowTakePhotoAsset)
+                    }else{
+                        self?.configs.assetOptions.remove(.allowTakePhotoAsset)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(allowTakePhotoAsset)
+            
+            let allowTakeVideoAsset = ConfigModel(title: "AllowTakeVideoAsset", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.allowTakeVideoAsset)
+                    }else{
+                        self?.configs.assetOptions.remove(.allowTakeVideoAsset)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(allowTakeVideoAsset)
+            
+            let captureOnTakeAsset = ConfigModel(title: "CaptureOnTakeAsset", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.captureOnTakeAsset)
+                    }else{
+                        self?.configs.assetOptions.remove(.captureOnTakeAsset)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(captureOnTakeAsset)
+            
+            if #available(iOS 14, *) {
+                let allowAddAsset = ConfigModel(title: "AllowAddAsset", mode: .switch(false)) { [weak self] (value) in
+                    if let isOn = value as? Bool {
+                        if isOn {
+                            self?.configs.assetOptions.insert(.allowAddAsset)
+                        }else{
+                            self?.configs.assetOptions.remove(.allowAddAsset)
+                        }
+                        ProgressHUD.showSuccess("Update Success!")
+                    }
+                }
+                assetModels.append(allowAddAsset)
+                
+                let allowAuthTips = ConfigModel(title: "AllowAuthTips", mode: .switch(false)) { [weak self] (value) in
+                    if let isOn = value as? Bool {
+                        if isOn {
+                            self?.configs.assetOptions.insert(.allowAuthTips)
+                        }else{
+                            self?.configs.assetOptions.remove(.allowAuthTips)
+                        }
+                        ProgressHUD.showSuccess("Update Success!")
+                    }
+                }
+                assetModels.append(allowAuthTips)
+            }
+            
+            let allowBrowser = ConfigModel(title: "AllowBrowser", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.allowBrowser)
+                    }else{
+                        self?.configs.assetOptions.remove(.allowBrowser)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(allowBrowser)
+            
+            let thumbnailToolBar = ConfigModel(title: "ThumbnailToolBar", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.thumbnailToolBar)
+                    }else{
+                        self?.configs.assetOptions.remove(.thumbnailToolBar)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(thumbnailToolBar)
+            
+            let selectIndex = ConfigModel(title: "SelectIndex", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.selectIndex)
+                    }else{
+                        self?.configs.assetOptions.remove(.selectIndex)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(selectIndex)
+            
+            let selectBtnWhenSingleSelect = ConfigModel(title: "SelectBtnWhenSingleSelect", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.selectBtnWhenSingleSelect)
+                    }else{
+                        self?.configs.assetOptions.remove(.selectBtnWhenSingleSelect)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(selectBtnWhenSingleSelect)
+            
+            let selectCountOnDoneBtn = ConfigModel(title: "SelectCountOnDoneBtn", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.selectCountOnDoneBtn)
+                    }else{
+                        self?.configs.assetOptions.remove(.selectCountOnDoneBtn)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(selectCountOnDoneBtn)
+            
+            let totalOriginalSize = ConfigModel(title: "TotalOriginalSize", mode: .switch(true)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.totalOriginalSize)
+                    }else{
+                        self?.configs.assetOptions.remove(.totalOriginalSize)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(totalOriginalSize)
+            
+            let systemCapture = ConfigModel(title: "SystemCapture", mode: .switch(false)) { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.assetOptions.insert(.systemCapture)
+                    }else{
+                        self?.configs.assetOptions.remove(.systemCapture)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            }
+            assetModels.append(systemCapture)
+            
+            let assetConfig = ConfigSection(title: "AssetOptions", models: assetModels)
+            dataSource.append(assetConfig)
         }
         
-        let allowBrowser = ConfigModel(title: "AllowBrowser", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.allowBrowser)
-                }else{
-                    self?.configs.assetOptions.remove(.allowBrowser)
+        do {
+            var browserModels: [ConfigModel] = []
+            
+            let selectOri = ConfigModel(title: "SelectOriginal", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.selectOriginal)
+                    }else{
+                        self?.configs.browserOptions.remove(.selectOriginal)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
                 }
-                ProgressHUD.showSuccess("Update Success!")
-            }
+            })
+            browserModels.append(selectOri)
+            
+            let selectThumbnil = ConfigModel(title: "selectThumbnil", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.selectThumbnil)
+                    }else{
+                        self?.configs.browserOptions.remove(.selectThumbnil)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(selectThumbnil)
+            
+            let selectIndex = ConfigModel(title: "SelectIndex", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.selectIndex)
+                    }else{
+                        self?.configs.browserOptions.remove(.selectIndex)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(selectIndex)
+            
+            let fetchImage = ConfigModel(title: "FetchImage", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.fetchImage)
+                    }else{
+                        self?.configs.browserOptions.remove(.fetchImage)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(fetchImage)
+            
+            let selectBtnWhenSingleSelect = ConfigModel(title: "SelectBtnWhenSingleSelect", mode: .switch(false), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.selectBtnWhenSingleSelect)
+                    }else{
+                        self?.configs.browserOptions.remove(.selectBtnWhenSingleSelect)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(selectBtnWhenSingleSelect)
+            
+            let selectCountOnDoneBtn = ConfigModel(title: "SelectCountOnDoneBtn", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.selectCountOnDoneBtn)
+                    }else{
+                        self?.configs.browserOptions.remove(.selectCountOnDoneBtn)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(selectCountOnDoneBtn)
+            
+            let totalOriginalSize = ConfigModel(title: "TotalOriginalSize", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.totalOriginalSize)
+                    }else{
+                        self?.configs.browserOptions.remove(.totalOriginalSize)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(totalOriginalSize)
+            
+            let saveAfterEdit = ConfigModel(title: "SaveAfterEdit", mode: .switch(true), action: { [weak self] (value) in
+                if let isOn = value as? Bool {
+                    if isOn {
+                        self?.configs.browserOptions.insert(.saveAfterEdit)
+                    }else{
+                        self?.configs.browserOptions.remove(.saveAfterEdit)
+                    }
+                    ProgressHUD.showSuccess("Update Success!")
+                }
+            })
+            browserModels.append(saveAfterEdit)
+            
+            let browserConfig = ConfigSection(title: "BrowserConfig", models: browserModels)
+            dataSource.append(browserConfig)
         }
-        assetModels.append(allowBrowser)
-        
-        let thumbnailToolBar = ConfigModel(title: "ThumbnailToolBar", mode: .switch(true)) { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.assetOptions.insert(.thumbnailToolBar)
-                }else{
-                    self?.configs.assetOptions.remove(.thumbnailToolBar)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        }
-        assetModels.append(thumbnailToolBar)
-        
-        let assetConfig = ConfigSection(title: "AssetOptions", models: assetModels)
-        dataSource.append(assetConfig)
-        
-        var browserModels: [ConfigModel] = []
-        
-        let selectOri = ConfigModel(title: "SelectOriginal", mode: .switch(true), action: { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.browserOptions.insert(.selectOriginal)
-                }else{
-                    self?.configs.browserOptions.remove(.selectOriginal)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        })
-        browserModels.append(selectOri)
-        
-        let selectBrowser = ConfigModel(title: "SelectBrowser", mode: .switch(true), action: { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.browserOptions.insert(.selectThumbnil)
-                }else{
-                    self?.configs.browserOptions.remove(.selectThumbnil)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        })
-        browserModels.append(selectBrowser)
-        
-        let selectIndex = ConfigModel(title: "SelectIndex", mode: .switch(true), action: { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.browserOptions.insert(.selectIndex)
-                }else{
-                    self?.configs.browserOptions.remove(.selectIndex)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        })
-        browserModels.append(selectIndex)
-        
-        let fetchImage = ConfigModel(title: "FetchImage", mode: .switch(true), action: { [weak self] (value) in
-            if let isOn = value as? Bool {
-                if isOn {
-                    self?.configs.browserOptions.insert(.fetchImage)
-                }else{
-                    self?.configs.browserOptions.remove(.fetchImage)
-                }
-                ProgressHUD.showSuccess("Update Success!")
-            }
-        })
-        browserModels.append(fetchImage)
-        
-        let browserConfig = ConfigSection(title: "BrowserConfig", models: browserModels)
-        dataSource.append(browserConfig)
         
         var paramsModels: [ConfigModel] = []
         
@@ -407,6 +531,14 @@ class ViewController: UIViewController {
             }
         }
         paramsModels.append(videoCount)
+        
+        let videoSize = ConfigModel(title: "VideoSize", mode: .range(0, 0)) { [weak self] (value) in
+            if let trup = value as? (Int,Int) {
+                self?.configs.params.update(with: .videoSize(min: CGFloat(trup.0), max: CGFloat(trup.1)))
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        paramsModels.append(videoSize)
         
         let videoTime = ConfigModel(title: "VideoTime", mode: .range(0, 0)) { [weak self] (value) in
             if let trup = value as? (Int,Int) {
@@ -526,7 +658,98 @@ class ViewController: UIViewController {
         let uiConfig = ConfigSection(title: "UIConfig", models: uiModels)
         dataSource.append(uiConfig)
         
+        var captureModels: [ConfigModel] = []
+        
+        let cameraPositionCell = ConfigModel(title: "CameraPosition", mode: .segment(["back","front"], 0)) { (index) in
+            if let idx = index as? Int {
+                if idx == 0 {
+                    ADPhotoKitConfiguration.default.captureConfig.cameraPosition = .back
+                }else{
+                    ADPhotoKitConfiguration.default.captureConfig.cameraPosition = .front
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(cameraPositionCell)
+        
+        let flashSwitchCell = ConfigModel(title: "FlashSwitch", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                ADPhotoKitConfiguration.default.captureConfig.flashSwitch = isOn
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(flashSwitchCell)
+        
+        let cameraSwitchCell = ConfigModel(title: "CameraSwitch", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                ADPhotoKitConfiguration.default.captureConfig.cameraSwitch = isOn
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(cameraSwitchCell)
+        
+        let videoMirroredCell = ConfigModel(title: "VideoMirrored", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                ADPhotoKitConfiguration.default.captureConfig.videoMirrored = isOn
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(videoMirroredCell)
+        
+        let sessionPresetCell = ConfigModel(title: "SessionPreset", mode: .segment(["1280*720","1920*1080","3840*2160"], 0)) { (index) in
+            if let idx = index as? Int {
+                if idx == 0 {
+                    ADPhotoKitConfiguration.default.captureConfig.sessionPreset = .hd1280x720
+                }else if idx == 1 {
+                    ADPhotoKitConfiguration.default.captureConfig.sessionPreset = .hd1920x1080
+                }else if idx == 2 {
+                    ADPhotoKitConfiguration.default.captureConfig.sessionPreset = .hd4K3840x2160
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(sessionPresetCell)
+        
+        let focusModeCell = ConfigModel(title: "FocusMode", mode: .segment(["continuousAuto","auto"], 0)) { (index) in
+            if let idx = index as? Int {
+                if idx == 0 {
+                    ADPhotoKitConfiguration.default.captureConfig.focusMode = .continuousAutoFocus
+                }else if idx == 1 {
+                    ADPhotoKitConfiguration.default.captureConfig.focusMode = .autoFocus
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(focusModeCell)
+        
+        let exposureModeCell = ConfigModel(title: "exposureMode", mode: .segment(["continuousAuto","auto"], 0)) { (index) in
+            if let idx = index as? Int {
+                if idx == 0 {
+                    ADPhotoKitConfiguration.default.captureConfig.exposureMode = .continuousAutoExposure
+                }else if idx == 1 {
+                    ADPhotoKitConfiguration.default.captureConfig.exposureMode = .autoExpose
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        captureModels.append(exposureModeCell)
+        
+        let captureConfig = ConfigSection(title: "CaptureConfig", models: captureModels)
+        dataSource.append(captureConfig)
+        
         var customModels: [ConfigModel] = []
+        
+        let alert = ConfigModel(title: "Custom Alert", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customAlert = CustomAlertViewController.self
+                }else{
+                    ADPhotoKitConfiguration.default.customAlert = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        customModels.append(alert)
         
         let progressHud = ConfigModel(title: "Hud", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
@@ -737,6 +960,18 @@ class ViewController: UIViewController {
         
         var imageEditModels: [ConfigModel] = []
         
+        let systenTools = ConfigModel(title: "System Tools", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.systemImageEditTools = .all
+                }else{
+                    ADPhotoKitConfiguration.default.systemImageEditTools = [.clip, .textStkr]
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(systenTools)
+        
         let filter = ConfigModel(title: "Image Filter", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
@@ -750,6 +985,46 @@ class ViewController: UIViewController {
             }
         }
         imageEditModels.append(filter)
+        
+        let drawColors = ConfigModel(title: "Draw Colors", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.lineDrawColors = [.systemBlue, .systemRed, .systemPink]
+                }else{
+                    ADPhotoKitConfiguration.default.lineDrawColors = [.white, .black]
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(drawColors)
+        
+        let lineWidth = ConfigModel(title: "Line Width", mode: .stepper(5)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.lineDrawWidth = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(lineWidth)
+        
+        let mosaicWidth = ConfigModel(title: "Mosaic Width", mode: .stepper(5)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.mosaicDrawWidth = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(mosaicWidth)
+        
+        let textColors = ConfigModel(title: "Text Colors", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.white,.black),(.black,.white)]
+                }else{
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.systemBlue,.black),(.systemGray,.white)]
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(textColors)
         
         let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
         dataSource.append(imageEditConfig)
