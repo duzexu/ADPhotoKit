@@ -20,7 +20,7 @@ ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,liveph
 * [x] Image editor.
 * [x] DocC support.
 * [x] SwiftUI support.
-* [ ] Custom camera.
+* [x] Custom capture support.
 * [ ] Video editor.
 
 ## Usage
