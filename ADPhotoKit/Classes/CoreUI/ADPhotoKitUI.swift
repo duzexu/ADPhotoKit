@@ -304,6 +304,7 @@ public class ADPhotoKitConfig {
          pickerSelect: ADPhotoKitUI.AssetSelectHandler?,
          browserSelect: ADPhotoKitUI.BrowsableSelectHandler?,
          canceled: ADPhotoKitUI.AssetCancelHandler?) {
+        Bundle.updateLayout()
         self.albumOpts = albumOpts
         self.assetOpts = assetOpts
         self.browserOpts = browserOpts

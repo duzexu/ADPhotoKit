@@ -89,6 +89,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
 
 private extension ADVideoBrowserCell {
     func setupUI() {
+        contentView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
@@ -99,6 +100,7 @@ private extension ADVideoBrowserCell {
         
         playerLayer = AVPlayerLayer()
         playerLayer.contentsGravity = .resizeAspect
+        playerLayer.transform = ADLocale.isRTL ? CATransform3DMakeScale(-1.0, 1, 1) : CATransform3DIdentity
         layer.insertSublayer(playerLayer, at: 0)
         
         let attStr = NSMutableAttributedString()

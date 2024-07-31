@@ -61,6 +61,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
     override init(frame: CGRect) {
         super.init(frame: frame)
         imageBrowserView = ADImageBrowserView(frame: .zero)
+        imageBrowserView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         imageBrowserView.singleTapBlock = { [weak self] in
             self?.singleTapBlock?()
         }
@@ -69,6 +70,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
             make.edges.equalToSuperview()
         }
         livePhotoBrowserView = ADLivePhotoBrowserView(frame: .zero)
+        livePhotoBrowserView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         livePhotoBrowserView.singleTapBlock = { [weak self] in
             self?.singleTapBlock?()
         }

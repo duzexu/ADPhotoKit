@@ -152,7 +152,7 @@ private extension ADImageEditControlsView {
         
         userInteractionBtns.append(confirmBtn)
         
-        let layout = UICollectionViewFlowLayout()
+        let layout = ADCollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 30, height: 30)
         layout.minimumLineSpacing = 20
         layout.minimumInteritemSpacing = 20

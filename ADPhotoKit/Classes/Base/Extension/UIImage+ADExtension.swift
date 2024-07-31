@@ -133,4 +133,8 @@ extension UIImage {
         }
         return UIImage(cgImage: newCgImage)
     }
+    
+    func adaptRTL() -> UIImage {
+        return ADLocale.isRTL ? UIImage(cgImage: self.cgImage!, scale: self.scale, orientation: .upMirrored) : self
+    }
 }

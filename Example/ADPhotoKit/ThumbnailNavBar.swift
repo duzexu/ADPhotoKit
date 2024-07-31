@@ -55,7 +55,7 @@ class ThumbnailNavBar: UIView, ADThumbnailNavBarConfigurable {
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview()
-            make.left.equalToSuperview().offset(15)
+            make.leading.equalToSuperview().offset(15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }
@@ -68,7 +68,7 @@ class ThumbnailNavBar: UIView, ADThumbnailNavBarConfigurable {
         addSubview(rightBtnItem)
         rightBtnItem.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview()
-            make.right.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }

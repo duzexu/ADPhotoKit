@@ -111,8 +111,13 @@ private extension ADBrowserToolBarView {
         originalBtn.isSelected = isOriginal
         originalBtn.setImage(Bundle.image(name: "btn_original_circle"), for: .normal)
         originalBtn.setImage(Bundle.image(name: "btn_original_selected"), for: .selected)
-        originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
-        originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
+        if ADLocale.isRTL {
+            originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
+            originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
+        } else {
+            originalBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 5)
+            originalBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: -5)
+        }
         btnsView.addSubview(originalBtn)
         originalBtn.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
@@ -250,7 +255,7 @@ private extension ADBrowserToolBarView {
         guard config.assetOpts.contains(.totalOriginalSize) else {
             return
         }
-        if !originalBtn.isSelected {
+        if !originalBtn.isSelected || dataSource?.selects.count == 0 {
             sizeLabel.isHidden = true
         }else{
             sizeLabel.isHidden = false

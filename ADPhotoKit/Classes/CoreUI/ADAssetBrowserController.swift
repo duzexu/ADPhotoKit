@@ -165,7 +165,7 @@ private extension ADAssetBrowserController {
         automaticallyAdjustsScrollViewInsets = false
         view.backgroundColor = .black
         
-        let layout = UICollectionViewFlowLayout()
+        let layout = ADCollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)

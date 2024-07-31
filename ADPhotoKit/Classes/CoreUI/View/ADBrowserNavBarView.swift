@@ -64,7 +64,7 @@ private extension ADBrowserNavBarView {
             indexLabel.isHidden = true
             rightBtnItem.addSubview(indexLabel)
             indexLabel.snp.makeConstraints { (make) in
-                make.right.equalToSuperview()
+                make.trailing.equalToSuperview()
                 make.centerY.equalToSuperview()
                 make.size.equalTo(CGSize(width: 26, height: 26))
             }

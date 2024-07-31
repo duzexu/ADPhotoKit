@@ -30,7 +30,7 @@ class ADBrowserToolBarSelectView: UIView {
 
 private extension ADBrowserToolBarSelectView {
     func setupUI() {
-        let layout = UICollectionViewFlowLayout()
+        let layout = ADCollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 60, height: 60)
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10

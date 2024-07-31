@@ -48,7 +48,7 @@ class ThumbnailToolBar: UIView, ADThumbnailToolBarConfigurable {
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
-            make.left.equalToSuperview().offset(15)
+            make.leading.equalToSuperview().offset(15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }
@@ -72,7 +72,7 @@ class ThumbnailToolBar: UIView, ADThumbnailToolBarConfigurable {
         addSubview(rightBtnItem)
         rightBtnItem.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
-            make.right.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }

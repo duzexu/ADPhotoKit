@@ -36,6 +36,8 @@ public enum ADAlbumType: CaseIterable {
     case animated
     /// User created (用户或APP建立)
     case custom
+    /// Recently Added (最近添加)
+    case recentlyAdded
     
     var localeKey: ADLocale.LocaleKey? {
         switch self {
@@ -63,6 +65,8 @@ public enum ADAlbumType: CaseIterable {
             return .bursts
         case .animated:
             return .animated
+        case .recentlyAdded:
+            return .recentlyAdded
         case .custom:
             return nil
         }
@@ -147,8 +151,7 @@ public class ADAlbumModel: Equatable {
         case .smartAlbumTimelapses:
             type = .timelapses
         case .smartAlbumRecentlyAdded:
-            //type = .recentlyAdded
-            break
+            type = .recentlyAdded
         case .smartAlbumBursts:
             type = .bursts
         case .smartAlbumSlomoVideos:
@@ -161,10 +164,13 @@ public class ADAlbumModel: Equatable {
             type = .depthEffect
         case .smartAlbumLivePhotos:
             type = .livePhotos
-        case .smartAlbumAnimated:
-            type = .animated
         default:
             break
+        }
+        if #available(iOS 11.0, *) {
+            if collection.assetCollectionSubtype == PHAssetCollectionSubtype.smartAlbumAnimated {
+                type = .animated
+            }
         }
         if let _ = ADPhotoKitConfiguration.default.locale {
             title = type?.localeKey?.localeTextValue ?? collection.localizedTitle

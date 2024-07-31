@@ -233,6 +233,11 @@ class ADTextStickerInputView: UIView {
         let framesetter = CTFramesetterCreateWithAttributedString(attributeString)
         let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
         contentSize = CGSize(width: width, height: max(35, frameSize.height))
+        guard frameSize.width > 0 && frameSize.height > 0 else {
+            borderView.isHidden = true
+            textLabel.isHidden = true
+            return
+        }
         UIGraphicsBeginImageContext(frameSize)
         guard let context = UIGraphicsGetCurrentContext() else {
             borderView.isHidden = true

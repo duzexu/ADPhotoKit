@@ -51,7 +51,7 @@ extension Bundle {
     class func localizedString(_ key: String) -> String {
         if self.locale_bundle == nil {
             guard let path = Bundle.baseBundle?.path(forResource: languageCode(), ofType: "lproj") else {
-                return ""
+                return key
             }
             self.locale_bundle = Bundle(path: path)
         }
@@ -62,6 +62,15 @@ extension Bundle {
     
     class func resetLocaleBundle() {
         locale_bundle = nil
+        updateLayout()
+    }
+    
+    class func updateLayout() {
+        if languageCode() == "ar" {
+            UIView.appearance().semanticContentAttribute = .forceRightToLeft
+        }else{
+            UIView.appearance().semanticContentAttribute = .unspecified
+        }
     }
     
     private static var locale_bundle: Bundle? = nil

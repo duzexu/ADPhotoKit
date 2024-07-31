@@ -28,7 +28,7 @@ class ADBaseNavBarView: UIView {
     var rightBtnItem: UIButton!
     var titleLabel: UILabel!
 
-    init(leftItem: ButtonItem? = (Bundle.image(name: "navBack"),nil,nil), rightItem: ButtonItem? = nil) {
+    init(leftItem: ButtonItem? = (Bundle.image(name: "navBack")?.adaptRTL(),nil,nil), rightItem: ButtonItem? = nil) {
         super.init(frame: .zero)
         setupUI(leftItem: leftItem, rightItem: rightItem)
     }
@@ -60,14 +60,14 @@ private extension ADBaseNavBarView {
         }
         
         leftBtnItem = UIButton(type: .custom)
-        leftBtnItem.contentHorizontalAlignment = .left
+        leftBtnItem.contentHorizontalAlignment = ADLocale.isRTL ? .right : .left
         leftBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         leftBtnItem.setTitleColor(.white, for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview()
-            make.left.equalToSuperview().offset(15)
+            make.leading.equalToSuperview().offset(15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }
@@ -81,14 +81,14 @@ private extension ADBaseNavBarView {
         }
         
         rightBtnItem = UIButton(type: .custom)
-        rightBtnItem.contentHorizontalAlignment = .right
+        rightBtnItem.contentHorizontalAlignment = ADLocale.isRTL ? .left : .right
         rightBtnItem.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         rightBtnItem.setTitleColor(.white, for: .normal)
         rightBtnItem.addTarget(self, action: #selector(rightBtnItemAction(sender:)), for: .touchUpInside)
         addSubview(rightBtnItem)
         rightBtnItem.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview()
-            make.right.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }

@@ -111,7 +111,7 @@ private extension ADImageStickerSelectController {
             make.height.equalTo(60)
         }
         
-        let layout = UICollectionViewFlowLayout()
+        let layout = ADCollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0

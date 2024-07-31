@@ -163,4 +163,8 @@ public class ADLocale {
         }
     }
 
+    class var isRTL: Bool {
+        return UIView.userInterfaceLayoutDirection(for: UIView.appearance().semanticContentAttribute) == .rightToLeft
+    }
+
 }

@@ -51,7 +51,7 @@ class BrowserNavBar: UIView, ADBrowserNavBarConfigurable {
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview()
-            make.left.equalToSuperview().offset(15)
+            make.leading.equalToSuperview().offset(15)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }
@@ -61,7 +61,7 @@ class BrowserNavBar: UIView, ADBrowserNavBarConfigurable {
         addSubview(sw)
         sw.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview().offset(-5)
-            make.right.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-15)
         }
         
         sw.isOn = dataSource.isSelected

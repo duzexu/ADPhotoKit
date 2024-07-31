@@ -18,17 +18,17 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
     public var style: ADPickerStyle! = .normal {
         didSet {
             if style == .normal {
-                accessoryView = nil
+                accessory.image = Bundle.image(name: "ablumList_arrow")?.adaptRTL()
                 albumImageView.snp.remakeConstraints { (make) in
-                    make.left.equalToSuperview().offset(12)
+                    make.leading.equalToSuperview().offset(12)
                     make.top.equalToSuperview().offset(2)
                     make.bottom.equalToSuperview().offset(-2)
                     make.width.equalTo(albumImageView.snp.height)
                 }
             }else{
-                accessoryView = accessory
+                accessory.image = Bundle.image(name: "albumSelect")
                 albumImageView.snp.remakeConstraints { (make) in
-                    make.left.equalToSuperview()
+                    make.leading.equalToSuperview()
                     make.top.equalToSuperview().offset(2)
                     make.bottom.equalToSuperview().offset(-2)
                     make.width.equalTo(albumImageView.snp.height)
@@ -73,7 +73,7 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         albumImageView.clipsToBounds = true
         contentView.addSubview(albumImageView)
         albumImageView.snp.makeConstraints { (make) in
-            make.left.equalToSuperview().offset(12)
+            make.leading.equalToSuperview().offset(12)
             make.top.equalToSuperview().offset(2)
             make.bottom.equalToSuperview().offset(-2)
             make.width.equalTo(albumImageView.snp.height)
@@ -85,7 +85,7 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         albumTitleLabel.lineBreakMode = .byTruncatingTail
         contentView.addSubview(albumTitleLabel)
         albumTitleLabel.snp.makeConstraints { (make) in
-            make.left.equalTo(albumImageView.snp.right).offset(10)
+            make.leading.equalTo(albumImageView.snp.trailing).offset(10)
             make.centerY.equalToSuperview()
         }
         
@@ -95,19 +95,21 @@ public class ADAlbumListCell: UITableViewCell, ADAlbumListCellConfigurable {
         albumCountLabel.textColor = UIColor(hex: 0xB4B4B4)
         contentView.addSubview(albumCountLabel)
         albumCountLabel.snp.makeConstraints { (make) in
-            make.left.equalTo(albumTitleLabel.snp.right).offset(10)
+            make.leading.equalTo(albumTitleLabel.snp.trailing).offset(10)
             make.centerY.equalToSuperview()
             make.right.lessThanOrEqualToSuperview().offset(-40)
         }
         
         accessory = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-        accessory.image = Bundle.image(name: "albumSelect")
-        accessory.isHidden = true
+        accessory.isHidden = style == .embed
+        accessoryView = accessory
     }
     
     public override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        accessoryView?.isHidden = !selected
+        if style == .embed {
+            accessoryView?.isHidden = !selected
+        }
     }
     
 }

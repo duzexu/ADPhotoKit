@@ -27,7 +27,7 @@ class ADImageStickerSectionsView: UIView {
         self.dataSource = dataSource
         super.init(frame: .zero)
         
-        let layout = UICollectionViewFlowLayout()
+        let layout = ADCollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         layout.minimumLineSpacing = 10

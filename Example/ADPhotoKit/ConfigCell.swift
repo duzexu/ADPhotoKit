@@ -22,9 +22,9 @@ class ConfigCell: UITableViewCell {
         customView = nil
         if let v = model.rightView {
             customView = v
-            addSubview(v)
+            contentView.addSubview(v)
             v.snp.makeConstraints { (make) in
-                make.right.equalToSuperview().offset(-16)
+                make.trailing.equalToSuperview().offset(-16)
                 make.centerY.equalToSuperview()
             }
         }

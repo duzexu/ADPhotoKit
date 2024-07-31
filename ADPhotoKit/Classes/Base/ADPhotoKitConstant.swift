@@ -44,4 +44,3 @@ let safeAreaInsets:UIEdgeInsets = {
 }()
 
 let isNotchScreen:Bool = { return safeAreaInsets.top > 0 }();
-let isRTL:Bool = { return UIView.userInterfaceLayoutDirection(for: UIView.appearance().semanticContentAttribute) == .rightToLeft }();

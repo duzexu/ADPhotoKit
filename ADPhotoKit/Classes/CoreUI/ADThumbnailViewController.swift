@@ -126,7 +126,7 @@ extension ADThumbnailViewController {
         automaticallyAdjustsScrollViewInsets = false
         view.backgroundColor = UIColor(hex: 0x323232)
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: ADCollectionViewFlowLayout())
         collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
