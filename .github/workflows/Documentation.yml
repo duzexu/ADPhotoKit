@@ -30,7 +30,7 @@ jobs:
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
       - name: Install swift-doc
         run: |
-          brew install swiftdocorg/formulae/swift-doc
+          /home/linuxbrew/.linuxbrew/bin/brew install swiftdocorg/formulae/swift-doc
       - name: Generate Documentation
         run: |
           swift doc generate ADPhotoKit/Classes --module-name ADPhotoKit --output Wiki
