@@ -23,15 +23,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Clone swift-doc
-        uses: actions/checkout@v3
-        with:
-          repository: SwiftDocOrg/swift-doc
-          path: swift-doc
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" -y
       - name: Install swift-doc
         run: |
-          cd swift-doc
-          make install
+          brew install swiftdocorg/formulae/swift-doc
       - name: Generate Documentation
         run: |
           swift doc generate ADPhotoKit/Classes --module-name ADPhotoKit --output Wiki
