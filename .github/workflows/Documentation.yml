@@ -23,12 +23,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" -y
+          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bashrc
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+      - name: Install swift-doc
+        run: |
+          /home/linuxbrew/.linuxbrew/bin/brew install swiftdocorg/formulae/swift-doc
       - name: Generate Documentation
-        uses: SwiftDocOrg/swift-doc@master
-        with:
-          inputs: "ADPhotoKit/Classes"
-          module-name: "ADPhotoKit"
-          output: "Wiki"
+        run: |
+          swift doc generate ADPhotoKit/Classes --module-name ADPhotoKit --output Wiki
       - name: Upload Documentation to Wiki
         uses: SwiftDocOrg/github-wiki-publish-action@v1
         with:
@@ -37,13 +42,12 @@ jobs:
           GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           
       - name: Generate Documentation
-        uses: SwiftDocOrg/swift-doc@master
-        with:
-          inputs: "ADPhotoKit/Classes"
-          module-name: "ADPhotoKit"
-          output: "Documentation"
-          format: "html"
-          base-url: https://duzexu.github.io/ADPhotoKit/
+        run: |
+          swift doc generate ADPhotoKit/Classes \
+          --module-name ADPhotoKit \
+          --output Documentation \
+          --format html \
+          --base-url https://duzexu.github.io/ADPhotoKit/
           
       - name: Permissions
         run: sudo chown -R $USER:$USER /home/runner/work/
