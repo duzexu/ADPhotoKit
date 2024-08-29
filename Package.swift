@@ -16,8 +16,8 @@ let package = Package(
     ],
     
     dependencies: [
-        .package(url: "https://gitee.com/zexu007/SnapKit", .upToNextMajor(from: "5.0.1")),
-        .package(url: "https://gitee.com/zexu007/Kingfisher.git", from: "6.0.0")
+        .package(url: "https://github.com/SnapKit/SnapKit", .upToNextMajor(from: "5.0.1")),
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "6.0.0")
     ],
     
     targets: [

@@ -122,7 +122,7 @@ class ADTextStickerInputView: UIView {
     
     private var selectRange: NSRange?
     
-    private let font = UIFont.systemFont(ofSize: 32, weight: .bold)
+    private let font = UIFont.systemFont(ofSize: ADPhotoKitConfiguration.default.textStickerDefaultFontSize, weight: .bold)
     
     private var contentSize: CGSize = .zero
     private var topBottom: CGFloat!
@@ -165,6 +165,7 @@ class ADTextStickerInputView: UIView {
         textView.showsHorizontalScrollIndicator = false
         textView.showsVerticalScrollIndicator = false
         textView.font = font
+        textView.textColor = .clear
         if #available(iOS 11.0, *) {
             textView.contentInsetAdjustmentBehavior = .never
         }
@@ -215,21 +216,28 @@ class ADTextStickerInputView: UIView {
     }
     
     private func update() {
-        var foregroundColor: UIColor
-        var borderColor: UIColor
-        switch style {
-        case .normal:
-            foregroundColor = color.primaryColor
-            borderColor = color.secondaryColor
-        case .border:
-            foregroundColor = color.secondaryColor
+        var foregroundColor: UIColor = color.primaryColor
+        var borderColor: UIColor = color.borderColor
+        let outlineColor: UIColor = color.outlineColor
+        if style == .border {
+            foregroundColor = color.borderColor
             borderColor = color.primaryColor
         }
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = -0.32;
-        textView.attributedText = NSAttributedString(string: text ?? "", attributes: [.font:font,.paragraphStyle:paragraphStyle,.foregroundColor:UIColor.clear])
+        var attributes: [NSAttributedString.Key : Any] = [.font:font,.foregroundColor:foregroundColor]
+        if style == .outline {
+            attributes[.strokeColor] = outlineColor
+            attributes[.strokeWidth] = -ADPhotoKitConfiguration.default.textStickerDefaultStrokeWidth
+        }
+        let attributeString = NSAttributedString(string: text ?? "", attributes: attributes)
+        attributes[.paragraphStyle] = paragraphStyle
+        attributes[.foregroundColor] = UIColor.clear
+        attributes[.strokeColor] = UIColor.clear
+        if textView.markedTextRange == nil {
+            textView.attributedText = NSAttributedString(string: text ?? "", attributes: attributes)
+        }
         textView.selectedRange = selectRange ?? NSRange(location: textView.attributedText.length, length: 0)
-        let attributeString = NSAttributedString(string: text ?? "", attributes: [.font:font,.foregroundColor:foregroundColor])
         let framesetter = CTFramesetterCreateWithAttributedString(attributeString)
         let frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRange(), nil, CGSize(width: width, height: CGFloat.infinity), nil)
         contentSize = CGSize(width: width, height: max(35, frameSize.height))
@@ -261,7 +269,7 @@ class ADTextStickerInputView: UIView {
                 rects.append(lineBounds)
             }
         }
-        borderView.isHidden = style == .normal
+        borderView.isHidden = style != .border
         textLabel.isHidden = false
         borderView.borderInfo = (rects,borderColor)
         UIGraphicsEndImageContext()
@@ -282,7 +290,11 @@ extension ADTextStickerInputView: UITextViewDelegate {
                 selectRange = range
             }
         }
-        text = string
+        if string.last == "\n" {
+            text = string + " "
+        }else{
+            text = string
+        }
     }
 }
 

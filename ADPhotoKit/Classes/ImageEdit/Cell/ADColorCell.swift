@@ -7,20 +7,28 @@
 
 import UIKit
 
-class ADColorCell: UIView {
+class ADColorCell: UICollectionViewCell {
 
     var isSelect: Bool = false {
         didSet {
-            bgView.transform = isSelect ? CGAffineTransform(scaleX: 1.2, y: 1.2) : .identity
+            centerView.transform = isSelect ? CGAffineTransform(scaleX: 1.2, y: 1.2) : .identity
+            bgView.transform = isSelect ? CGAffineTransform(scaleX: 1.3, y: 1.3) : .identity
+        }
+    }
+    
+    var color: UIColor = .white {
+        didSet {
+            centerView.backgroundColor = color
         }
     }
     
     var cellSelectBlock: ((Int) -> Void)?
     
     private var bgView: UIView!
+    private var centerView: UIView!
     
-    init(color: UIColor) {
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         bgView = UIView()
         bgView.backgroundColor = .white
         bgView.layer.masksToBounds = true
@@ -31,21 +39,14 @@ class ADColorCell: UIView {
             make.size.equalTo(CGSize(width: 22, height: 22))
         }
         
-        let center = UIView()
-        center.backgroundColor = color
-        center.layer.masksToBounds = true
-        center.layer.cornerRadius = 9
-        addSubview(center)
-        center.snp.makeConstraints { make in
+        centerView = UIView()
+        centerView.backgroundColor = color
+        centerView.layer.masksToBounds = true
+        centerView.layer.cornerRadius = 9
+        addSubview(centerView)
+        centerView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.size.equalTo(CGSize(width: 18, height: 18))
-        }
-        
-        let btn = UIButton(type: .custom)
-        btn.addTarget(self, action: #selector(colorCellAction), for: .touchUpInside)
-        addSubview(btn)
-        btn.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
     
@@ -53,8 +54,4 @@ class ADColorCell: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func colorCellAction(_ sender: UIButton) {
-        cellSelectBlock?(tag)
-    }
-
 }

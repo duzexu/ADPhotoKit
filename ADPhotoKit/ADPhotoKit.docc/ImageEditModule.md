@@ -6,9 +6,9 @@ Provide image editing capabilities.
 
 ### Essentials
 
+- ``ADImageEditConfigurable``
 - ``ADImageEditTools``
 - ``ADImageEditInfo``
-- ``ADImageEditController``
 
 ###  Edit Tool
 
@@ -25,7 +25,6 @@ Provide image editing capabilities.
 - ``ADClipInfo``
 - ``ADRotation``
 - ``ADImageClipConfigurable``
-- ``ADImageClipable``
 
 ### Interact View
 
@@ -36,7 +35,9 @@ Provide image editing capabilities.
 
 ### Sticker Interact
 
+- ``ADStickerInfo``
 - ``ADStickerInteractView``
+- ``ADStickerInteractHandle``
 - ``ADStickerContentView``
 - ``ADImageStickerContentView``
 
@@ -45,12 +46,16 @@ Provide image editing capabilities.
 - ``ADTextSticker``
 - ``ADTextStickerColor``
 - ``ADTextStickerEditConfigurable``
-- ``ADTextStickerEditable``
 
 ### Image Sticker
 
-- ``ADImageStickerSelectable``
+- ``ADImageStickerInfo``
 - ``ADImageStickerDataSource``
 - ``ADImageStickerSelectConfigurable``
 
+### Undo & Redo
 
+- ``ADEditAction``
+- ``ADUndoManageable``
+- ``ADEditToolUndoable``
+- ``ADStickerActionData``

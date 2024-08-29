@@ -70,6 +70,20 @@ enum Filter: CaseIterable {
     }
 }
 
+enum FilterActionData {
+    case update(old: Int, new: Int)
+}
+
+class FilterAction: ADEditAction {
+    var data: FilterActionData
+    var identifier: String
+    
+    init(data: FilterActionData, identifier: String) {
+        self.data = data
+        self.identifier = identifier
+    }
+}
+
 class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
     
     var modifySourceImage: ((UIImage) -> Void)?
@@ -86,9 +100,9 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
     
     var contentLockStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ADToolConfigable)?
+    var toolConfigView: ADToolConfigable?
     
-    var toolInteractView: (UIView & ADToolInteractable)?
+    var toolInteractView: ADToolInteractable?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         return true
@@ -112,7 +126,7 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
     let originImage: UIImage
     var filterInfos: [(String,UIImage)] = []
     var filterImages: [UIImage] = []
-    var selectIndex: Int = 0
+    var selectIndex: Int = -1
     
     init(image: UIImage, filters: [Filter] = Filter.allCases) {
         originImage = image
@@ -152,11 +166,36 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
     }
     
     func indexDidChange() {
+        guard selectIndex >= 0 else {
+            (toolConfigView as? ImageFilterSelectView)?.collectionView.reloadData()
+            modifySourceImage?(originImage)
+            return
+        }
         guard selectIndex < filterImages.count else {
             return
         }
         (toolConfigView as? ImageFilterSelectView)?.collectionView.reloadData()
         modifySourceImage?(filterImages[selectIndex])
+    }
+    
+    func undo(action: any ADEditAction) {
+        if let action = action as? FilterAction {
+            switch action.data {
+            case .update(let old, _):
+                selectIndex = old
+                indexDidChange()
+            }
+        }
+    }
+    
+    func redo(action: any ADEditAction) {
+        if let action = action as? FilterAction {
+            switch action.data {
+            case .update(_, let new):
+                selectIndex = new
+                indexDidChange()
+            }
+        }
     }
     
 }
@@ -183,6 +222,7 @@ extension ImageFilterTool: UICollectionViewDataSource, UICollectionViewDelegate 
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        undoManager.push(action: FilterAction(data: .update(old: selectIndex, new: indexPath.row), identifier: identifier))
         selectIndex = indexPath.row
         indexDidChange()
     }

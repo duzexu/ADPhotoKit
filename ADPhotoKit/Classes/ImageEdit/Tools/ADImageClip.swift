@@ -20,6 +20,25 @@ protocol ADImageClipSource: AnyObject {
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation)
 }
 
+enum ClipActionData {
+    case update(old: ClipInfo, new: ClipInfo)
+}
+
+struct ClipInfo {
+    var clipRect: CGRect? = nil
+    var rotation: ADRotation = .idle
+}
+
+class ADClipAction: ADEditAction {
+    var data: ClipActionData
+    let identifier: String
+    
+    init(data: ClipActionData, identifier: String) {
+        self.data = data
+        self.identifier = identifier
+    }
+}
+
 class ADImageClip: ADImageEditTool {
     
     var image: UIImage {
@@ -30,17 +49,18 @@ class ADImageClip: ADImageEditTool {
     
     var contentLockStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ADToolConfigable)?
-    var toolInteractView: (UIView & ADToolInteractable)?
+    var toolConfigView: ADToolConfigable?
+    var toolInteractView: ADToolInteractable?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         if let sourceInfo = source?.clipSource() {
-            let info = ADClipInfo(image: sourceInfo.image, clipRect: clipRect, rotation: rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
-            let clip = ADImageEditConfigurable.imageClipVC(clipInfo: info)
+            let info = ADClipInfo(image: sourceInfo.image, clipRect: clipInfo.clipRect, rotation: clipInfo.rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
+            let clip = ADImageEditConfigure.imageClipVC(clipInfo: info)
             clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
-                self?.clipRect = clipRect
-                self?.rotation = rotation
+                let new = ClipInfo(clipRect: clipRect, rotation: rotation)
                 self?.source?.clipInfoDidConfirmed(clipRect, rotation: rotation)
+                self?.undoManager.push(action: ADClipAction(data: .update(old: self!.clipInfo, new: new), identifier: self!.identifier))
+                self?.clipInfo = new
             }
             clip.modalPresentationStyle = .overCurrentContext
             ctx?.present(clip, animated: false, completion: nil)
@@ -50,11 +70,10 @@ class ADImageClip: ADImageEditTool {
     
     weak var source: ADImageClipSource?
     
-    var clipRect: CGRect? = nil
-    var rotation: ADRotation = .idle
+    var clipInfo = ClipInfo()
     
     var isOrigin: Bool {
-        return clipRect == nil && rotation == .idle
+        return clipInfo.clipRect == nil && clipInfo.rotation == .idle
     }
     
     init(source: ADImageClipSource) {
@@ -67,10 +86,10 @@ class ADImageClip: ADImageEditTool {
     
     func encode() -> Any? {
         if !isOrigin {
-            if clipRect == nil {
-                return ["rotation":rotation]
+            if clipInfo.clipRect == nil {
+                return ["rotation":clipInfo.rotation]
             }else{
-                return ["clipRect":clipRect!,"rotation":rotation]
+                return ["clipRect":clipInfo.clipRect!,"rotation":clipInfo.rotation]
             }
         }
         return nil
@@ -78,10 +97,30 @@ class ADImageClip: ADImageEditTool {
     
     func decode(from: Any) {
         if let json = from as? Dictionary<String,Any> {
-            clipRect = json["clipRect"] as? CGRect
-            rotation = json["rotation"] as? ADRotation ?? .idle
+            clipInfo.clipRect = json["clipRect"] as? CGRect
+            clipInfo.rotation = json["rotation"] as? ADRotation ?? .idle
         }
-        source?.clipInfoDidConfirmed(clipRect, rotation: rotation)
+        source?.clipInfoDidConfirmed(clipInfo.clipRect, rotation: clipInfo.rotation)
+    }
+    
+    func undo(action: any ADEditAction) {
+        if let action = action as? ADClipAction {
+            switch action.data {
+            case .update(let old, _):
+                source?.clipInfoDidConfirmed(old.clipRect, rotation: old.rotation)
+                clipInfo = old
+            }
+        }
+    }
+    
+    func redo(action: any ADEditAction) {
+        if let action = action as? ADClipAction {
+            switch action.data {
+            case .update(_, let new):
+                source?.clipInfoDidConfirmed(new.clipRect, rotation: new.rotation)
+                clipInfo = new
+            }
+        }
     }
     
 }

@@ -29,3 +29,13 @@ class ADWeakProxy: NSObject {
     }
     
 }
+
+class ADWeakRef<T> where T: AnyObject {
+
+    private(set) weak var value: T?
+
+    init(value: T?) {
+        self.value = value
+    }
+
+}

@@ -7,6 +7,70 @@
 
 import UIKit
 
+/// Base class for storing sticker information.
+/// - Note: You need to inherit and use it's subclass.
+/// - Note: To create a new sticker type you need to create a class that inherits `ADStickerInfo` and a corresponding class that inherits `ADStickerContentView`.
+/// - SeeAlso ``ADStickerContentView``
+public class ADStickerInfo {
+    
+    /// Identifier of content view.
+    public let id: String
+    /// Transform of content view.
+    public let transform: CGAffineTransform
+    /// Scale of content view.
+    public let scale: CGFloat
+    /// Center of content view.
+    public let center: CGPoint
+    
+    /// Default Initialization Method.
+    public init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint) {
+        self.id = id
+        self.transform = transform
+        self.scale = scale
+        self.center = center
+    }
+}
+
+/// Class for storing image sticker information.
+public class ADImageStickerInfo: ADStickerInfo {
+    
+    /// Stciker image.
+    public let image: UIImage
+    
+    /// Default Initialization Method.
+    public init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint, image: UIImage) {
+        self.image = image
+        super.init(id: id, transform: transform, scale: scale, center: center)
+    }
+}
+
+class ADTextStickerInfo: ADImageStickerInfo {
+    let sticker: ADTextSticker
+    
+    init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint, image: UIImage, sticker: ADTextSticker) {
+        self.sticker = sticker
+        super.init(id: id, transform: transform, scale: scale, center: center, image: image)
+    }
+}
+
+/// Used to record sticker editing operations.
+public enum ADStickerActionData {
+    /// Add or remove sticker operation.
+    case update(old: ADStickerInfo?, new: ADStickerInfo?)
+    /// Move sticker operation.
+    case move(old: ADStickerInfo, new: ADStickerInfo)
+}
+
+/// Handler for different sticker types.
+public struct ADStickerInteractHandle<T: ADStickerInfo> {
+    
+    /// Called when editing operation changed.
+    public var actionDataDidChange: ((ADStickerActionData) -> Void)
+    
+    /// Called when create view from sticker info.
+    public var contentViewWithInfo: ((T) -> ADStickerContentView)
+}
+
 /// Shared view that you can add sticker to.
 public class ADStickerInteractView: UIView, ADToolInteractable {
     
@@ -59,8 +123,8 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         return false
     }
     
-    public func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval? {
-        switch type {
+    public func interact(with interactType: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval? {
+        switch interactType {
         case let .pan(loc, trans):
             target?.translation(by: CGPoint(x: trans.x/scale, y: trans.y/scale))
             if state == .changed {
@@ -79,6 +143,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         }
         switch state {
         case .began:
+            oldSrickerInfo = target?.stickerInfo
             presentTrashView()
             target?.beginActive(resignable: false)
             if let tg = target {
@@ -87,6 +152,11 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             }
         case .ended, .cancelled, .failed:
             if trashView.isConfirmed && !trashView.isHidden {
+                if let _ = target?.stickerID {
+                    if let handle = stickerHandles[String(describing: type(of: oldSrickerInfo!))] {
+                        handle.actionDataDidChange(.update(old: oldSrickerInfo, new: nil))
+                    }
+                }
                 target?.removeFromSuperview()
                 target = nil
             }
@@ -102,6 +172,10 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                     tg.center = convert(tg.center, to: container)
                 }
                 
+                if let handle = stickerHandles[String(describing: type(of: oldSrickerInfo!))] {
+                    handle.actionDataDidChange(.move(old: oldSrickerInfo!, new: tg.stickerInfo))
+                }
+
                 if animated {
                     UIView.animate(withDuration: 0.3) {
                         tg.center = clipCenter
@@ -115,6 +189,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             target?.beginActive()
             activeTarget = target
             target = nil
+            oldSrickerInfo = nil
             if animated {
                 return 0.3
             }
@@ -136,8 +211,8 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     }
     
     /// Get shared sticker interact view.
-    public static var share = ADStickerInteractView()
-    
+    public static var shared = ADStickerInteractView()
+        
     weak var ctx: UIViewController?
     
     private var clipView: UIView!
@@ -154,6 +229,14 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         
     private weak var target: ADStickerContentView?
     private weak var activeTarget: ADStickerContentView?
+    private var oldSrickerInfo: ADStickerInfo?
+    
+    struct InteractHandleInternal {
+        var actionDataDidChange: ((ADStickerActionData) -> Void)
+        var contentViewWithInfo: ((ADStickerInfo) -> ADStickerContentView)
+    }
+    
+    private var stickerHandles: [String:InteractHandleInternal] = [:]
     
     init() {
         super.init(frame: .zero)
@@ -165,13 +248,14 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         clipView.addSubview(container)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     /// Add sticker content to shared view.
     /// - Parameter view: Sticker content.
-    public func addContent(_ view: ADStickerContentView) {
+    public func addContent<T>(_ view: T) where T : ADStickerContentView {
         activeTarget?.resignActive()
         activeTarget = view
         if let info = clipingScreenInfo {
@@ -183,20 +267,124 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             view.center = CGPoint(x: bounds.width/2, y: bounds.height/2)
         }
         container.addSubview(view)
+        view.actionDataDidChange = { [weak self] cls,action in
+            if let handle = self?.stickerHandles[String(describing: cls)] as? ADStickerInteractHandle {
+                handle.actionDataDidChange(action)
+            }
+        }
         view.beginActive()
     }
     
     /// Add sticker content to shared view.
     /// - Parameter view: Sticker content
     /// - Note: Use this method when revert saved data from encode data.
-    /// - Note: The difference from `addContent(_ view: ADStickerContentView)` is you must set `contentView`'s transform, center and scale by yourself.`
-    public func appendContent(_ view: ADStickerContentView) {
+    /// - Note: The difference from ``addContent(_:)`` is you must set `contentView`'s transform, center and scale by yourself.`
+    public func appendContent<T>(_ view: T) where T : ADStickerContentView {
         container.addSubview(view)
+        view.actionDataDidChange = { [weak self] cls,action in
+            if let handle = self?.stickerHandles[String(describing: cls)] as? ADStickerInteractHandle {
+                handle.actionDataDidChange(action)
+            }
+        }
+    }
+    
+    /// Regist handler for different sticker types.
+    /// - Parameters:
+    ///   - handle: sticker handle.
+    ///   - cls: Your sticker info type.
+    public func registHandle<T: ADStickerInfo>(_ handle: ADStickerInteractHandle<T>, for cls: T.Type) {
+        stickerHandles[String(describing: cls)] = InteractHandleInternal(actionDataDidChange: handle.actionDataDidChange, contentViewWithInfo: { info in
+            handle.contentViewWithInfo(info as! T)
+        })
+    }
+    
+    /// Add sticker content with sticker info.
+    /// - Parameter info: Sticker info.
+    /// - Returns: Added content view.
+    /// - Note: You must call ``registHandle(_:for:)`` first to make it possible to create different views based on different sticker infos.
+    @discardableResult
+    public func addContentWithInfo(_ info: ADStickerInfo) -> ADStickerContentView? {
+        if let handle = stickerHandles[String(describing: type(of: info))] {
+            let content = handle.contentViewWithInfo(info)
+            appendContent(content)
+            return content
+        }
+        return nil
+    }
+    
+    /// Undo sticker editing action.
+    /// - Parameter action: Edit action data.
+    /// - Returns: Added content view.
+    @discardableResult
+    public func undo(action: ADStickerActionData) -> ADStickerContentView? {
+        switch action {
+        case .update(let old, let new):
+            guard let old else {
+                if let id = new?.id {
+                    removeContent(id)
+                }
+                return nil
+            }
+            removeContent(old.id)
+            if let handle = stickerHandles[String(describing: type(of: old))] {
+                let content = handle.contentViewWithInfo(old)
+                appendContent(content)
+                return content
+            }
+        case .move(old: let old, new: _):
+            for sub in container.subviews.reversed() {
+                if (sub as! ADStickerContentView).stickerID == old.id {
+                    (sub as! ADStickerContentView).update(info: old)
+                    break
+                }
+            }
+        }
+        return nil
+    }
+    
+    /// Redo sticker editing action.
+    /// - Parameter action: Edit action data.
+    /// - Returns: Added content view.
+    @discardableResult
+    public func redo(action: ADStickerActionData) -> ADStickerContentView? {
+        switch action {
+        case .update(let old, let new):
+            guard let new else {
+                if let id = old?.id {
+                    removeContent(id)
+                }
+                return nil
+            }
+            removeContent(new.id)
+            if let handle = stickerHandles[String(describing: type(of: new))] {
+                let content = handle.contentViewWithInfo(new)
+                appendContent(content)
+            }
+        case .move(old: _, new: let new):
+            for sub in container.subviews.reversed() {
+                if (sub as! ADStickerContentView).stickerID == new.id {
+                    (sub as! ADStickerContentView).update(info: new)
+                    break
+                }
+            }
+        }
+        return nil
     }
     
     /// Clear all content in shared view.
     public func clear() {
         container.subviews.forEach { $0.removeFromSuperview() }
+    }
+    
+    /// Remove sticker content.
+    /// - Parameter stickerID: Sticker stickerID.
+    public func removeContent(_ stickerID: String) {
+        for sub in container.subviews.reversed() {
+            if (sub as! ADStickerContentView).stickerID == stickerID {
+                sub.removeFromSuperview()
+                break
+            }
+        }
     }
         
     func presentTrashView() {
@@ -306,7 +494,27 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
 }
 
 /// Sticker base content view that you can add to `ADStickerInteractView`.
+/// - Note: You need to inherit and use it's subclass.
+/// - Note: To create a new sticker type you need to create a class that inherits `ADStickerInfo` and a corresponding class that inherits `ADStickerContentView`.
+/// - SeeAlso ``ADStickerInfo``
 public class ADStickerContentView: UIView {
+    
+    /// Identifier of the content view.
+    public let stickerID: String
+    
+    /// Sticker info from current view state.
+    public var stickerInfo: ADStickerInfo {
+        return ADStickerInfo(id: stickerID, transform: transform, scale: scale, center: center)
+    }
+    
+    /// View's scale.
+    public var scale: CGFloat = 1 {
+        didSet {
+            updateBorderWidth()
+        }
+    }
+    
+    var actionDataDidChange: ((AnyClass,ADStickerActionData) -> Void)?
     
     var isActive: Bool = false
     
@@ -318,25 +526,37 @@ public class ADStickerContentView: UIView {
         }
     }
     
-    /// View's scale.
-    public var scale: CGFloat = 1 {
-        didSet {
-            updateBorderWidth()
-        }
-    }
-    
-    /// Initial view whith frame
-    /// - Parameter frame: View rect.
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    /// Initial view whith frame.
+    /// - Parameter size: View size.
+    /// - Parameter id: View identifier.
+    public init(size: CGSize, id: String = UUID().uuidString) {
+        self.stickerID = id
+        super.init(frame: CGRect(origin: .zero, size: size))
         layer.borderWidth = 0.5
         layer.borderColor = UIColor.clear.cgColor
     }
     
-    /// Called when double tap the content view. Subclass can override and do some operation.
-    /// - Parameter ctx: Image edit controller.
-    open func doubleTapAction(ctx: UIViewController?) {
-        
+    /// Initial view whith sticker info.
+    /// - Parameter info: Sticker info.
+    public init(info: ADStickerInfo) {
+        stickerID = info.id
+        super.init(frame: .zero)
+        layer.borderWidth = 0.5
+        layer.borderColor = UIColor.clear.cgColor
+        transform = info.transform
+        center = info.center
+        scale = info.scale
+    }
+    
+    /// Update view whith sticker info.
+    /// - Parameter info: Sticker info.
+    public func update(info: ADStickerInfo) {
+        guard info.id == stickerID else {
+            return
+        }
+        transform = info.transform
+        center = info.center
+        scale = info.scale
     }
     
     /// Call this method when sticker size changed.
@@ -348,6 +568,12 @@ public class ADStickerContentView: UIView {
         frame.size = size
         transform = oldTrans
         center = oldCenter
+    }
+    
+    /// Called when double tap the content view. Subclass can override and do some operation.
+    /// - Parameter ctx: Image edit controller.
+    open func doubleTapAction(ctx: UIViewController?) {
+        
     }
     
     required init?(coder: NSCoder) {
@@ -399,17 +625,42 @@ public class ADImageStickerContentView: ADStickerContentView {
     
     var imageView: UIImageView!
     
+    public override var stickerInfo: ADImageStickerInfo {
+        return ADImageStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, image: image)
+    }
+    
     /// Create content view with image.
     /// - Parameter image: Sticker image.
     public init(image: UIImage) {
         self.image = image
-        super.init(frame: CGRect(origin: .zero, size: image.size).insetBy(dx: -10, dy: -10))
+        super.init(size: CGSize(width: image.size.width+20, height: image.size.height+20))
         
         imageView = UIImageView(image: image)
         addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+    }
+    
+    /// Initial view whith info.
+    /// - Parameter info: Image sticker info.
+    public init(info: ADImageStickerInfo) {
+        image = info.image
+        super.init(info: info)
+        imageView = UIImageView(image: image)
+        addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        updateImage(image)
+        transform = info.transform
+        center = info.center
+        scale = info.scale
+    }
+    
+    public func update(info: ADImageStickerInfo) {
+        updateImage(info.image)
+        super.update(info: info)
     }
     
     /// Call when image changed.
@@ -429,9 +680,23 @@ class ADTextStickerContentView: ADImageStickerContentView {
     
     var sticker: ADTextSticker
     
+    override var stickerInfo: ADTextStickerInfo {
+        return ADTextStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, image: image, sticker: sticker)
+    }
+    
     init(image: UIImage, sticker: ADTextSticker) {
         self.sticker = sticker
         super.init(image: image)
+    }
+    
+    init(info: ADTextStickerInfo) {
+        sticker = info.sticker
+        super.init(info: info)
+    }
+    
+    func update(info: ADTextStickerInfo) {
+        super.update(info: info)
+        sticker = info.sticker
     }
     
     required init?(coder: NSCoder) {
@@ -439,10 +704,12 @@ class ADTextStickerContentView: ADImageStickerContentView {
     }
     
     override func doubleTapAction(ctx: UIViewController?) {
-        let sticker = ADImageEditConfigurable.textStickerEditVC(sticker: sticker)
+        let sticker = ADImageEditConfigure.textStickerEditVC(sticker: sticker)
         sticker.textDidEdit = { [weak self] image, sticker in
+            let old = self?.stickerInfo
             self?.updateImage(image)
             self?.sticker = sticker
+            self?.actionDataDidChange?(ADTextStickerInfo.self,.update(old: old, new: self?.stickerInfo))
         }
         sticker.modalPresentationStyle = .custom
         sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate

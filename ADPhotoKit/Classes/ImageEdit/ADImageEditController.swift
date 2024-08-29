@@ -42,9 +42,6 @@ public struct ADImageEditInfo {
     /// Edit result image.
     public var editImg: UIImage?
     
-    var clipRect: CGRect?
-    var rotation: ADRotation?
-    
 }
 
 /// Image rotation.
@@ -109,17 +106,15 @@ public enum ADRotation: CGFloat {
     }
 }
 
-/// Controller to edit image.
-public class ADImageEditController: UIViewController {
+class ADImageEditController: UIViewController, ADImageEditConfigurable {
     
-    /// Called when finish image edit.
-    public var imageDidEdit: ((ADImageEditInfo) -> Void)?
+    var imageDidEdit: ((ADImageEditInfo) -> Void)?
     
-    /// Called when cancel image edit.
-    public var cancelEdit: (() -> Void)?
+    var cancelEdit: (() -> Void)?
     
     let image: UIImage
     var editInfo: ADImageEditInfo
+    var clipInfo: ClipInfo = ClipInfo()
     
     var contentView: ADImageEditContentView!
     var controlsView: ADImageEditControlsView!
@@ -139,12 +134,8 @@ public class ADImageEditController: UIViewController {
             }
         }
     }
-    
-    /// Create image edit controller.
-    /// - Parameters:
-    ///   - image: Image to edit.
-    ///   - editInfo: Edited info.
-    public init(image: UIImage, editInfo: ADImageEditInfo? = nil) {
+
+    required init(image: UIImage, editInfo: ADImageEditInfo?) {
         self.image = image
         self.editInfo = editInfo ?? ADImageEditInfo()
         super.init(nibName: nil, bundle: nil)
@@ -159,9 +150,13 @@ public class ADImageEditController: UIViewController {
         view.backgroundColor = UIColor.black
         definesPresentationContext = true
         
-        ADStickerInteractView.share.clear()
-        ADStickerInteractView.share.ctx = self
+        ADUndoManager.shared.clear()
+        ADStickerInteractView.shared.ctx = self
         setupUI()
+    }
+    
+    deinit {
+        ADStickerInteractView.shared.clear()
     }
     
     public override var prefersStatusBarHidden: Bool {
@@ -201,6 +196,7 @@ extension ADImageEditController {
         }
         
         for tool in tools {
+            ADUndoManager.shared.regist(tool: tool)
             if var editable = tool as? ADSourceImageEditable {
                 editable.modifySourceImage = { [weak self] image in
                     self?.sourceImageDidChanged(image)
@@ -294,7 +290,7 @@ extension ADImageEditController {
     @objc func panAction(_ pan: UIPanGestureRecognizer) {
         let point = pan.location(in: view)
         var trans = pan.translation(in: view)
-        let rotation = editInfo.rotation ?? .idle
+        let rotation = clipInfo.rotation
         switch rotation {
         case .idle:
             break
@@ -358,14 +354,14 @@ extension ADImageEditController {
         }
         editInfo.toolsJson = json
         if let editImage = contentView.editImage() {
-            let ori = editInfo.rotation?.imageOrientation ?? .up
+            let ori = clipInfo.rotation.imageOrientation
             let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
-            if editInfo.clipRect == nil {
+            if clipInfo.clipRect == nil {
                 editInfo.editImg = edit
             }else{
-                let rotation = editInfo.rotation ?? .idle
+                let rotation = clipInfo.rotation
                 let imageSize = rotation.imageSize(editImage.size)
-                let clipRect = imageSize|->editInfo.clipRect!
+                let clipRect = imageSize|->clipInfo.clipRect!
                 UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
                 edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
                 let result = UIGraphicsGetImageFromCurrentImageContext()
@@ -391,8 +387,8 @@ extension ADImageEditController: ADImageClipSource {
     }
     
     func clipInfoDidConfirmed(_ clipRect: CGRect?, rotation: ADRotation) {
-        editInfo.clipRect = clipRect
-        editInfo.rotation = rotation
+        clipInfo.clipRect = clipRect
+        clipInfo.rotation = rotation
         contentView.update(clipRect: clipRect, rotation: rotation)
     }
 }

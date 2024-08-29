@@ -27,8 +27,52 @@ public protocol ADImageEditToolCodable: AnyObject {
     func decode(from: Any)
 }
 
+/// Edit action user perform.
+public protocol ADEditAction {
+    
+    associatedtype Action
+    
+    /// Identifier of the action. It will be used to identify the action when
+    /// undo and redo action. 
+    ///
+    /// - Note: You must use the identifier that corresponds to the tool. This way, the corresponding action can be dispatch to the correct tool
+    var identifier: String { get }
+    
+    /// Data carried by action.
+    var data: Action { set get }
+}
+
+/// Manager to undo or redo edit operation.
+public protocol ADUndoManageable {
+    
+    /// Push new action to manager.
+    /// - Parameter action: Edit action.
+    func push(action: any ADEditAction)
+
+}
+
+/// Use to undo or redo edit operation.
+public protocol ADEditToolUndoable {
+    
+    /// Tool's undo manager.
+    var undoManager: ADUndoManageable { get }
+    
+    /// Called when undo action performed.
+    /// - Parameter action: Edit action.
+    func undo(action: any ADEditAction)
+    
+    /// Called when redo action performed.
+    /// - Parameter action: Edit action.
+    func redo(action: any ADEditAction)
+        
+}
+
+extension ADEditToolUndoable {
+     public var undoManager: ADUndoManageable { return ADUndoManager.shared }
+}
+
 /// An `ADImageEditTool` would be used to edit image.
-public protocol ADImageEditTool: ADImageEditToolCodable {
+public protocol ADImageEditTool: ADImageEditToolCodable, ADEditToolUndoable {
     
     /// Tool's icon for default state. Which is display on bottom of the edit controller.
     var image: UIImage { get }
@@ -43,9 +87,9 @@ public protocol ADImageEditTool: ADImageEditToolCodable {
     var contentLockStatus: ((Bool) -> Void)? { set get }
     
     /// View showed when tool is selected, use to change tool's setting. Return `nil` if no needed.
-    var toolConfigView: (UIView & ADToolConfigable)? { set get }
+    var toolConfigView: ADToolConfigable? { set get }
     /// View interaction with user operations. Return `nil` if no needed.
-    var toolInteractView: (UIView & ADToolInteractable)? { set get }
+    var toolInteractView: ADToolInteractable? { set get }
     
     /// Called when tool is selected.
     /// - Parameter ctx: The controller to present tool's detail view.
@@ -69,7 +113,7 @@ public protocol ADSourceImageModify {
 }
 
 /// Use to control tool's setting config view.
-public protocol ADToolConfigable {
+public protocol ADToolConfigable where Self : UIView {
     
     /// Whether it can respond when clicked.
     /// - Parameters:
@@ -131,7 +175,7 @@ public enum ADInteractType {
 public typealias ADClipingInfo = (screen: CGRect, clip: CGRect, rotate: ADRotation, scale: CGFloat)
 
 /// Use to control tool's interaction view.
-public protocol ADToolInteractable {
+public protocol ADToolInteractable where Self : UIView  {
     
     /// Tool's interaction view z-Index in superview. The higher the value, the top the view.
     /// - Note: You can use `ADInteractZIndex.rawValue` or custom int value.
@@ -190,8 +234,9 @@ public protocol ADImageStickerSelectConfigurable where Self: UIViewController {
 
 /// Text sticker color.
 /// - Note: If sticker style is `normal`, text color is `primaryColor`.
-///         If sticker style is `border`, text color is `secondaryColor` and border color is `primaryColor`.
-public typealias ADTextStickerColor = (primaryColor: UIColor, secondaryColor: UIColor)
+///         If sticker style is `border`, text color is `borderColor` and border color is `primaryColor`.
+///         If sticker style is `outline`, text color is `primaryColor` and outline color is `outlineColor`.
+public typealias ADTextStickerColor = (primaryColor: UIColor, borderColor: UIColor, outlineColor: UIColor)
 
 /// Text sticker info.
 public struct ADTextSticker {
@@ -201,6 +246,8 @@ public struct ADTextSticker {
         case normal
         /// Text with border.
         case border
+        /// Text with outline.
+        case outline
     }
     
     /// Text sticker color.
@@ -209,6 +256,23 @@ public struct ADTextSticker {
     public var style: Style = .normal
     /// Text string.
     public var text: String?
+}
+
+/// Use to define image edit controller.
+public protocol ADImageEditConfigurable where Self: UIViewController {
+    
+    /// Called when finish image edit.
+    var imageDidEdit: ((ADImageEditInfo) -> Void)? { set get }
+    
+    /// Called when cancel image edit.
+    var cancelEdit: (() -> Void)? { set get }
+    
+    /// Create image edit controller.
+    /// - Parameters:
+    ///   - image: Image to edit.
+    ///   - editInfo: Edited info.
+    init(image: UIImage, editInfo: ADImageEditInfo?)
+    
 }
 
 /// Use to define text sticker edit controller.
@@ -229,7 +293,7 @@ public protocol ADImageClipConfigurable where Self: UIViewController {
     /// - Parameters:
     ///   - rect: Normalized clip rect. Return `nil` means no clip.
     ///   - rotation: Image rotation.
-    var clipInfoConfirmBlock: ((CGRect?,ADRotation) -> Void)? { get set }
+    var clipInfoConfirmBlock: ((CGRect?, ADRotation) -> Void)? { get set }
     
     /// Create with clip info.
     /// - Parameter clipInfo: Image clip info.
@@ -237,7 +301,11 @@ public protocol ADImageClipConfigurable where Self: UIViewController {
     
 }
 
-class ADImageEditConfigurable {
+class ADImageEditConfigure {
+    
+    static func imageEditVC(image: UIImage, editInfo: ADImageEditInfo?) -> ADImageEditConfigurable {
+        return ADPhotoKitConfiguration.default.customImageEditVCBlock?(image, editInfo) ?? ADImageEditController(image: image, editInfo: editInfo)
+    }
     
     static func imageStickerSelectVC() -> ADImageStickerSelectConfigurable {
         return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)

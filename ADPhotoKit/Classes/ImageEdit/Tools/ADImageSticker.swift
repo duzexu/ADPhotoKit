@@ -8,12 +8,14 @@
 import Foundation
 import UIKit
 
-struct ADStickerInfo {
-    let image: UIImage
-    let transform: CGAffineTransform
-    let scale: CGFloat
-    let center: CGPoint
-    let sticker: ADTextSticker?
+class ADStickerAction: ADEditAction {
+    var data: ADStickerActionData
+    let identifier: String
+    
+    init(data: ADStickerActionData, identifier: String) {
+        self.data = data
+        self.identifier = identifier
+    }
 }
 
 class ADImageSticker: ADImageEditTool {
@@ -21,7 +23,7 @@ class ADImageSticker: ADImageEditTool {
     var image: UIImage {
         switch style {
         case .text:
-            return Bundle.image(name: "icons_filled_text2", module: .imageEdit) ?? UIImage()
+            return Bundle.image(name: "icons_filled_text", module: .imageEdit) ?? UIImage()
         case .image:
             return Bundle.image(name: "icons_filled_sticker", module: .imageEdit) ?? UIImage()
         }
@@ -31,30 +33,31 @@ class ADImageSticker: ADImageEditTool {
     
     var contentLockStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ADToolConfigable)?
-    var toolInteractView: (UIView & ADToolInteractable)?
+    var toolConfigView: ADToolConfigable?
+    var toolInteractView: ADToolInteractable?
     
-    private var textStkrs: [ADWeakProxy] = []
-    private var imageStkrs: [ADWeakProxy] = []
+    private var stkrs: [ADWeakRef<ADStickerContentView>] = []
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text:
-            let sticker = ADImageEditConfigurable.textStickerEditVC(sticker: nil)
+            let sticker = ADImageEditConfigure.textStickerEditVC(sticker: nil)
             sticker.textDidEdit = { [weak self] image, sticker in
                 let content = ADTextStickerContentView(image: image, sticker: sticker)
-                self?.textStkrs.append(ADWeakProxy(target: content))
-                ADStickerInteractView.share.addContent(content)
+                self?.stkrs.append(ADWeakRef(value: content))
+                (self?.toolInteractView as? ADStickerInteractView)?.addContent(content)
+                self?.undoManager.push(action: ADStickerAction(data: .update(old: nil, new: content.stickerInfo), identifier: self!.identifier))
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
             ctx?.present(sticker, animated: true, completion: nil)
         case .image:
-            let sticker = ADImageEditConfigurable.imageStickerSelectVC()
+            let sticker = ADImageEditConfigure.imageStickerSelectVC()
             sticker.imageDidSelect = { [weak self] image in
                 let content = ADImageStickerContentView(image: image)
-                self?.imageStkrs.append(ADWeakProxy(target: content))
-                ADStickerInteractView.share.addContent(content)
+                self?.stkrs.append(ADWeakRef(value: content))
+                (self?.toolInteractView as? ADStickerInteractView)?.addContent(content)
+                self?.undoManager.push(action: ADStickerAction(data: .update(old: nil, new: content.stickerInfo), identifier: self!.identifier))
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
@@ -72,7 +75,20 @@ class ADImageSticker: ADImageEditTool {
     
     init(style: Style) {
         self.style = style
-        toolInteractView = ADStickerInteractView.share
+        toolInteractView = ADStickerInteractView.shared
+        let actionDataDidChange: (ADStickerActionData) -> Void = { [weak self] action in
+            self?.undoManager.push(action: ADStickerAction(data: action, identifier: self!.identifier))
+        }
+        switch style {
+        case .text:
+            ADStickerInteractView.shared.registHandle(ADStickerInteractHandle(actionDataDidChange: actionDataDidChange, contentViewWithInfo: { info in
+                return ADTextStickerContentView(info: info)
+            }), for: ADTextStickerInfo.self)
+        case .image:
+            ADStickerInteractView.shared.registHandle(ADStickerInteractHandle(actionDataDidChange: actionDataDidChange, contentViewWithInfo: { info in
+                return ADImageStickerContentView(info: info)
+            }), for: ADImageStickerInfo.self)
+        }
     }
     
     var identifier: String {
@@ -85,45 +101,36 @@ class ADImageSticker: ADImageEditTool {
     }
     
     func encode() -> Any? {
-        switch style {
-        case .text:
-            let stkrs: [ADStickerInfo] = textStkrs.compactMap { $0.target }.map { obj in
-                let content = (obj as! ADTextStickerContentView)
-                return ADStickerInfo(image: content.image, transform: content.transform, scale: content.scale, center: content.center, sticker: content.sticker)
-            }
-            return ["stkrs":stkrs]
-        case .image:
-            let stkrs: [ADStickerInfo] = imageStkrs.compactMap { $0.target }.map { obj in
-                let content = obj as! ADImageStickerContentView
-                return ADStickerInfo(image: content.image, transform: content.transform, scale: content.scale, center: content.center, sticker: nil)
-            }
-            return ["stkrs":stkrs]
+        let stkrs: [ADStickerInfo] = stkrs.compactMap { $0.value }.map { obj in
+            return obj.stickerInfo
         }
+        return ["stkrs":stkrs]
     }
     
     func decode(from: Any) {
         if let json = from as? Dictionary<String,Any> {
             if let stkrs = json["stkrs"] as? [ADStickerInfo] {
-                switch style {
-                case .text:
-                    for item in stkrs {
-                        let content = ADTextStickerContentView(image: item.image, sticker: item.sticker!)
-                        content.transform = item.transform
-                        content.center = item.center
-                        content.scale = item.scale
-                        textStkrs.append(ADWeakProxy(target: content))
-                        ADStickerInteractView.share.appendContent(content)
-                    }
-                case .image:
-                    for item in stkrs {
-                        let content = ADImageStickerContentView(image: item.image)
-                        content.transform = item.transform
-                        content.center = item.center
-                        content.scale = item.scale
-                        imageStkrs.append(ADWeakProxy(target: content))
-                        ADStickerInteractView.share.appendContent(content)
+                for item in stkrs {
+                    if let content = (toolInteractView as? ADStickerInteractView)?.addContentWithInfo(item) {
+                        self.stkrs.append(ADWeakRef(value: content))
                     }
                 }
+            }
+        }
+    }
+    
+    func undo(action: any ADEditAction) {
+        if let action = action as? ADStickerAction {
+            if let content = (toolInteractView as? ADStickerInteractView)?.undo(action: action.data) {
+                stkrs.append(ADWeakRef(value: content))
+            }
+        }
+    }
+    
+    func redo(action: any ADEditAction) {
+        if let action = action as? ADStickerAction {
+            if let content = (toolInteractView as? ADStickerInteractView)?.redo(action: action.data) {
+                stkrs.append(ADWeakRef(value: content))
             }
         }
     }

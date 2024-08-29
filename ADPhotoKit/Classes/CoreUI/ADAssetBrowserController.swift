@@ -289,7 +289,7 @@ private extension ADAssetBrowserController {
     func editImage(_ img: UIImage?) {
         #if Module_ImageEdit
         if let image = img, !config.assetOpts.contains(.selectAsLivePhoto) {
-            let vc = ADImageEditController(image: image, editInfo: dataSource.current!.imageEditInfo)
+            let vc = ADImageEditConfigure.imageEditVC(image: image, editInfo: dataSource.current!.imageEditInfo)
             vc.imageDidEdit = { [weak self] editInfo in
                 self?.didImageEditInfoUpdate(editInfo)
             }

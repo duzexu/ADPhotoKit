@@ -33,44 +33,41 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         case mosaic(UIImage)
     }
     
-    var lineCountChange: ((Int) -> Void)?
+    var actionsDidChange: ((DrawActionData) -> Void)?
     
     let style: Style
         
     var paths: [DrawPath] = [] {
         didSet {
-            switch style {
-            case .line:
-                setNeedsDisplay()
-            case .mosaic:
-                pathMaskView?.paths = paths
-            }
+            reloadPaths()
         }
     }
     
-    var pathMaskView: MaskView?
+    var erase: Bool = false {
+        didSet {
+            eraserView.isHidden = !erase
+        }
+    }
+    
+    private var eraserView: UIImageView!
+    private var mosaicView: MosaicView?
+    private var impactFeedback: UIImpactFeedbackGenerator!
     
     init(style: Style) {
         self.style = style
         super.init(frame: .zero)
+        impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        eraserView = UIImageView(image: Bundle.image(name: "eraser_circle", module: .imageEdit))
+        eraserView.frame = CGRect(origin: .zero, size: CGSize(width: 44, height: 44))
+        eraserView.isHidden = true
+        eraserView.alpha = 0
+        addSubview(eraserView)
         switch style {
         case .line:
             break
         case let .mosaic(img):
-            pathMaskView = MaskView()
-            pathMaskView?.isOpaque = false
-            addSubview(pathMaskView!)
-            mask = pathMaskView
-            if let cgImg = img.cgImage {
-                let ciImage = CIImage(cgImage: cgImg)
-                let filter = CIFilter(name: "CIPixellate")
-                filter?.setValue(ciImage, forKey: kCIInputImageKey)
-                filter?.setValue(20, forKey: kCIInputScaleKey)
-                if let output = filter?.outputImage {
-                    let context = CIContext()
-                    layer.contents = context.createCGImage(output, from: CGRect(origin: .zero, size: img.size))
-                }
-            }
+            mosaicView = MosaicView(image: img)
+            addSubview(mosaicView!)
         }
     }
     
@@ -88,36 +85,77 @@ class ADDrawInteractView: UIView, ADToolInteractable {
     func interact(with type: ADInteractType, scale: CGFloat, state: UIGestureRecognizer.State) -> TimeInterval? {
         switch type {
         case let .pan(point, _):
-            switch style {
-            case let .line(color):
-                switch state {
-                case .began:
-                    let width = ADPhotoKitConfiguration.default.lineDrawWidth
-                    let path = DrawPath(color: color(), width: width/scale, point: point)
-                    paths.append(path)
-                    setNeedsDisplay()
-                case .changed:
-                    paths.last?.move(to: point)
-                    setNeedsDisplay()
-                case .ended, .cancelled, .failed:
-                    lineCountChange?(paths.count)
-                default:
-                    break
+            if erase {
+                var needReload = false
+                if state == .began {
+                    impactFeedback.prepare()
+                    eraserView.center = point
+                    eraserView.alpha = 1
+                    for path in paths {
+                        if path.path.contains(point) {
+                            if !path.delete {
+                                impactFeedback.impactOccurred()
+                            }
+                            path.delete = true
+                            needReload = true
+                        }
+                    }
+                }else if state == .changed {
+                    eraserView.center = point
+                    for path in paths {
+                        if path.path.contains(point) {
+                            if !path.delete {
+                                impactFeedback.impactOccurred()
+                            }
+                            path.delete = true
+                            needReload = true
+                        }
+                    }
+                }else{
+                    eraserView.alpha = 0
+                    let new = paths.filter { !$0.delete }
+                    if new.count != paths.count {
+                        let erased = paths.filter { $0.delete }
+                        needReload = true
+                        paths = new
+                        actionsDidChange?(.erase(erased))
+                    }
                 }
-            case .mosaic:
-                switch state {
-                case .began:
-                    let width = ADPhotoKitConfiguration.default.mosaicDrawWidth
-                    let path = DrawPath(color: .black, width: width/scale, point: point)
-                    paths.append(path)
-                    pathMaskView?.paths = paths
-                case .changed:
-                    paths.last?.move(to: point)
-                    pathMaskView?.paths = paths
-                case .ended, .cancelled, .failed:
-                    lineCountChange?(paths.count)
-                default:
-                    break
+                if needReload {
+                    reloadPaths()
+                }
+            }else{
+                switch style {
+                case let .line(color):
+                    switch state {
+                    case .began:
+                        let width = ADPhotoKitConfiguration.default.lineDrawWidth
+                        let path = DrawPath(color: color(), width: width, scale: scale, point: point)
+                        paths.append(path)
+                        setNeedsDisplay()
+                    case .changed:
+                        paths.last?.move(to: point)
+                        setNeedsDisplay()
+                    case .ended, .cancelled, .failed:
+                        actionsDidChange?(.draw(paths.last!))
+                    default:
+                        break
+                    }
+                case .mosaic:
+                    switch state {
+                    case .began:
+                        let width = ADPhotoKitConfiguration.default.mosaicDrawWidth
+                        let path = DrawPath(color: .black, width: width, scale: scale, point: point)
+                        paths.append(path)
+                        mosaicView?.paths = paths
+                    case .changed:
+                        paths.last?.move(to: point)
+                        mosaicView?.paths = paths
+                    case .ended, .cancelled, .failed:
+                        actionsDidChange?(.draw(paths.last!))
+                    default:
+                        break
+                    }
                 }
             }
         default:
@@ -126,25 +164,44 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         return nil
     }
     
-    func revoke() {
-        switch style {
-        case .line(_):
-            if paths.count > 0 {
-                paths.removeLast()
+    func undo(action: DrawActionData) {
+        switch action {
+        case .draw(_):
+            paths.removeLast()
+            reloadPaths()
+        case let .erase(data):
+            data.forEach { $0.delete = false }
+            paths.append(contentsOf: data)
+            paths = paths.sorted { $0.index < $1.index }
+            reloadPaths()
+        }
+    }
+    
+    func redo(action: DrawActionData) {
+        switch action {
+        case let .draw(path):
+            paths.append(path)
+            reloadPaths()
+        case let .erase(data):
+            paths.removeAll { path in
+                data.contains(path)
             }
+            reloadPaths()
+        }
+    }
+    
+    private func reloadPaths() {
+        switch style {
+        case .line:
             setNeedsDisplay()
         case .mosaic:
-            if paths.count > 0 {
-                paths.removeLast()
-                pathMaskView?.paths = paths
-            }
+            mosaicView?.paths = paths
         }
-        lineCountChange?(paths.count)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        pathMaskView?.frame = bounds
+        mosaicView?.frame = bounds
     }
     
     override func draw(_ rect: CGRect) {
@@ -152,31 +209,108 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         switch style {
         case .line:
             for path in paths {
-                path.color.set()
-                path.path.stroke()
+                path.draw()
             }
         case .mosaic:
             break
         }
     }
     
-    class MaskView: UIView {
+    class MosaicView: UIView {
         
         var paths: [DrawPath] = [] {
             didSet {
-                setNeedsDisplay()
+                outlineView.paths = paths
+                contentMaskView.paths = paths
             }
         }
         
-        override func draw(_ rect: CGRect) {
-            super.draw(rect)
-            for path in paths {
-                path.color.set()
-                path.path.stroke()
+        var image: UIImage {
+            didSet {
+                update(image: image)
+            }
+        }
+        
+        var contentView: UIView!
+        var contentMaskView: MaskView!
+        var outlineView: OutlineView!
+        
+        init(image: UIImage) {
+            self.image = image
+            super.init(frame: .zero)
+            isUserInteractionEnabled = false
+            contentView = UIView()
+            addSubview(contentView)
+            contentMaskView = MaskView()
+            contentMaskView?.isOpaque = false
+            contentView.mask = contentMaskView
+            outlineView = OutlineView()
+            outlineView.isOpaque = false
+            addSubview(outlineView)
+            update(image: image)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            contentView.frame = bounds
+            contentMaskView.frame = bounds
+            outlineView.frame = bounds
+        }
+        
+        func update(image: UIImage) {
+            if let cgImg = image.cgImage {
+                let ciImage = CIImage(cgImage: cgImg)
+                let filter = CIFilter(name: "CIPixellate")
+                filter?.setValue(ciImage, forKey: kCIInputImageKey)
+                filter?.setValue(20, forKey: kCIInputScaleKey)
+                if let output = filter?.outputImage {
+                    let context = CIContext()
+                    contentView.layer.contents = context.createCGImage(output, from: CGRect(origin: .zero, size: image.size))
+                }
+            }
+        }
+        
+        class MaskView: UIView {
+            
+            var paths: [DrawPath] = [] {
+                didSet {
+                    setNeedsDisplay()
+                }
+            }
+            
+            override func draw(_ rect: CGRect) {
+                super.draw(rect)
+                for path in paths {
+                    path.draw(outline: false)
+                }
+            }
+        }
+        
+        class OutlineView: UIView {
+            
+            var paths: [DrawPath] = [] {
+                didSet {
+                    setNeedsDisplay()
+                }
+            }
+            
+            override func draw(_ rect: CGRect) {
+                super.draw(rect)
+                for path in paths {
+                    if path.delete {
+                        UIColor.white.set()
+                        path.outline.stroke()
+                        path.color.set()
+                        path.path.stroke(with: .clear, alpha: 1)
+                    }
+                }
             }
         }
     }
-
 }
 
 extension ADDrawInteractView: ADSourceImageModify {
@@ -185,38 +319,58 @@ extension ADDrawInteractView: ADSourceImageModify {
         case .line(_):
             break
         case .mosaic(_):
-            if let cgImg = image.cgImage {
-                let ciImage = CIImage(cgImage: cgImg)
-                let filter = CIFilter(name: "CIPixellate")
-                filter?.setValue(ciImage, forKey: kCIInputImageKey)
-                filter?.setValue(20, forKey: kCIInputScaleKey)
-                if let output = filter?.outputImage {
-                    let context = CIContext()
-                    layer.contents = context.createCGImage(output, from: CGRect(origin: .zero, size: image.size))
-                }
-            }
+            mosaicView?.image = image
         }        
     }
 }
 
-struct DrawPath {
+class DrawPath: Equatable {
+    
+    private static var pathIndex = 0
     
     let width: CGFloat
     let color: UIColor
+    var delete: Bool = false
+    let index: Int
     
     let path: UIBezierPath
+    let outline: UIBezierPath
     
-    init(color: UIColor, width: CGFloat, point: CGPoint) {
+    init(color: UIColor, width: CGFloat, scale: CGFloat, point: CGPoint) {
         self.color = color
         self.width = width
+        self.index = DrawPath.pathIndex
+        DrawPath.pathIndex += 1
         path = UIBezierPath()
-        path.lineWidth = width
+        path.lineWidth = width/scale
         path.lineCapStyle = .round
         path.lineJoinStyle = .round
         path.move(to: point)
+        
+        outline = UIBezierPath()
+        outline.lineWidth = width/scale + ADPhotoKitConfiguration.default.eraseOutlineWidth*2
+        outline.lineCapStyle = .round
+        outline.lineJoinStyle = .round
+        outline.move(to: point)
     }
     
     func move(to point: CGPoint) {
         path.addLine(to: point)
+        outline.addLine(to: point)
+    }
+    
+    func draw(path: Bool = true, outline: Bool = true) {
+        if delete && outline {
+            UIColor.white.set()
+            self.outline.stroke()
+        }
+        if path {
+            color.set()
+            self.path.stroke()
+        }
+    }
+    
+    static func == (lhs: DrawPath, rhs: DrawPath) -> Bool {
+        return lhs.index == rhs.index
     }
 }

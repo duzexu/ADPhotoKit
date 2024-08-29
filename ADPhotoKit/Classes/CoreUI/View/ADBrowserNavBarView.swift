@@ -18,7 +18,7 @@ class ADBrowserNavBarView: ADBaseNavBarView, ADBrowserNavBarConfigurable {
 
     required init(dataSource: ADAssetBrowserDataSource, config: ADPhotoKitConfig) {
         self.dataSource = dataSource
-        super.init(rightItem: (Bundle.image(name: "btn_circle"), Bundle.image(name: "btn_selected"),nil))
+        super.init(rightItem: (Bundle.image(name: "btn_unselected_with_check"), Bundle.image(name: "btn_selected"),nil))
         rightBtnItem.isHidden = config.params.maxCount == 1 && !config.browserOpts.contains(.selectBtnWhenSingleSelect)
         setupChildUI()
     }

@@ -166,10 +166,13 @@ public class ADPhotoKitConfiguration {
     /// - Parameter image: Original image.
     public var customImageEditToolsBlock: ((UIImage) -> [ADImageEditTool])?
     
+    /// Custom image edit edit controller.
+    public var customImageEditVCBlock: ((UIImage,ADImageEditInfo?) -> ADImageEditConfigurable)?
+    
     /* =============== draw =============== */
     
     /// System line draw tool selectable colors.
-    public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0x10C060)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x8B69EA)!]
+    public var lineDrawColors: [UIColor] = [.white, .black, UIColor(hex: 0xF14F4F)!, UIColor(hex: 0xF3AA4E)!, UIColor(hex: 0xFFC300)!, UIColor(hex: 0x90D200)!, UIColor(hex: 0x10C060)!, UIColor(hex: 0x1EB7F3)!, UIColor(hex: 0x1384ED)!, UIColor(hex: 0x8B69EA)!, UIColor(hex: 0x7F7F7F)!]
     
     /// System line draw tool default color index.
     public var lineDrawDefaultColorIndex: Int = 2
@@ -179,6 +182,9 @@ public class ADPhotoKitConfiguration {
     
     /// System mosaic draw tool default line width.
     public var mosaicDrawWidth: CGFloat = 25
+    
+    /// Erase default highlight outline width.
+    public var eraseOutlineWidth: CGFloat = 8
     
     /* =============== image sticker =============== */
     
@@ -194,10 +200,16 @@ public class ADPhotoKitConfiguration {
     public var customTextStickerEditVCBlock: ((ADTextSticker?) -> ADTextStickerEditConfigurable)?
     
     /// System text sticker selectable colors. 
-    public var textStickerColors: [ADTextStickerColor] = [(.white,.black),(.black,.white),(UIColor(hex: 0xF14F4F)!,.white),(UIColor(hex: 0xF3AA4E)!,.white),(UIColor(hex: 0x10C060)!,.white),(UIColor(hex: 0x1EB7F3)!,.white),(UIColor(hex: 0x8B69EA)!,.white)]
+    public var textStickerColors: [ADTextStickerColor] = [(.white,.black,UIColor(hex: 0x8E8C90)!),(.black,.white,UIColor(hex: 0x8E8C90)!),(UIColor(hex: 0xF14F4F)!,.white,UIColor(hex: 0x8B3031)!),(UIColor(hex: 0xF3AA4E)!,.white,UIColor(hex: 0x7C4F20)!),(UIColor(hex: 0xFFC300)!,.white,UIColor(hex: 0x8C6E02)!),(UIColor(hex: 0x90D200)!,.white,UIColor(hex: 0x567603)!),(UIColor(hex: 0x10C060)!,.white,UIColor(hex: 0x056C39)!),(UIColor(hex: 0x1EB7F3)!,.white,UIColor(hex: 0x06628E)!),(UIColor(hex: 0x1384ED)!,.white,UIColor(hex: 0x0A4C84)!),(UIColor(hex: 0x8B69EA)!,.white,UIColor(hex: 0x3A3A85)!),(UIColor(hex: 0x7F7F7F)!,.white,UIColor(hex: 0x4C494C)!)]
     
     /// System text sticker tool default color index.
     public var textStickerDefaultColorIndex: Int = 0
+    
+    /// System text sticker tool default font size.
+    public var textStickerDefaultFontSize: CGFloat = 32
+    
+    /// System text sticker tool default stroke width.
+    public var textStickerDefaultStrokeWidth: Int = 6
     
     /* =============== clip =============== */
     

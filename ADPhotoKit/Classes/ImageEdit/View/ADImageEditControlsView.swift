@@ -49,6 +49,8 @@ class ADImageEditControlsView: UIView {
     private var toolConfigContainer: UIView!
     private var toolsCollectionView: UICollectionView!
     private var userInteractionBtns: [UIButton] = []
+    private var undoBtn: UIButton!
+    private var redoBtn: UIButton!
 
     init(vc: UIViewController, tools: [ADImageEditTool]) {
         self.vc = vc
@@ -62,6 +64,7 @@ class ADImageEditControlsView: UIView {
         }
         
         setupUI()
+        ADUndoManager.shared.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -119,19 +122,49 @@ private extension ADImageEditControlsView {
         }
         
         let leftBtnItem = UIButton(type: .custom)
-        leftBtnItem.contentHorizontalAlignment = .left
-        leftBtnItem.setImage(Bundle.image(name: "icons_filled_previous2", module: .imageEdit), for: .normal)
+        leftBtnItem.adjustsImageWhenHighlighted = false
+        leftBtnItem.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(_:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in
-            let top = isPhoneXOrLater ? 2 + statusBarHeight : 2
+            let top = isPhoneXOrLater ? statusBarHeight : 0
             make.top.equalToSuperview().offset(top)
-            make.left.equalToSuperview().offset(30)
+            make.leading.equalToSuperview().offset(5)
             make.height.equalTo(44)
             make.width.greaterThanOrEqualTo(60)
         }
         
         userInteractionBtns.append(leftBtnItem)
+        
+        redoBtn = UIButton(type: .custom)
+        redoBtn.adjustsImageWhenHighlighted = false
+        redoBtn.setImage(Bundle.image(name: "icons_redo", module: .imageEdit)?.adaptRTL(), for: .normal)
+        redoBtn.setImage(Bundle.image(name: "icons_redo_disable", module: .imageEdit)?.adaptRTL(), for: .disabled)
+        redoBtn.addTarget(self, action: #selector(redoBtnAction(_:)), for: .touchUpInside)
+        addSubview(redoBtn)
+        redoBtn.snp.makeConstraints { (make) in
+            let top = isPhoneXOrLater ? statusBarHeight : 0
+            make.top.equalToSuperview().offset(top)
+            make.trailing.equalToSuperview().offset(-8)
+            make.size.equalTo(CGSize(width: 44, height: 44))
+        }
+        
+        userInteractionBtns.append(redoBtn)
+        
+        undoBtn = UIButton(type: .custom)
+        undoBtn.adjustsImageWhenHighlighted = false
+        undoBtn.setImage(Bundle.image(name: "icons_undo", module: .imageEdit)?.adaptRTL(), for: .normal)
+        undoBtn.setImage(Bundle.image(name: "icons_undo_disable", module: .imageEdit)?.adaptRTL(), for: .disabled)
+        undoBtn.addTarget(self, action: #selector(undoBtnAction(_:)), for: .touchUpInside)
+        addSubview(undoBtn)
+        undoBtn.snp.makeConstraints { (make) in
+            let top = isPhoneXOrLater ? statusBarHeight : 0
+            make.top.equalToSuperview().offset(top)
+            make.trailing.equalTo(redoBtn.snp.leading)
+            make.size.equalTo(CGSize(width: 44, height: 44))
+        }
+        
+        userInteractionBtns.append(undoBtn)
         
         let confirmBtn = UIButton(type: .custom)
         confirmBtn.setTitle(ADLocale.LocaleKey.done.localeTextValue, for: .normal)
@@ -189,6 +222,16 @@ extension ADImageEditControlsView {
     func confirmBtnAction(_ sender: UIButton) {
         confirmActionBlock?()
     }
+    
+    @objc
+    func undoBtnAction(_ sender: UIButton) {
+        ADUndoManager.shared.undo()
+    }
+    
+    @objc
+    func redoBtnAction(_ sender: UIButton) {
+        ADUndoManager.shared.redo()
+    }
 }
 
 extension ADImageEditControlsView: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -213,4 +256,13 @@ extension ADImageEditControlsView: UICollectionViewDataSource, UICollectionViewD
             selectToolIndex = indexPath.row
         }
     }
+}
+
+extension ADImageEditControlsView: ADUndoManagerDelegate {
+    
+    func update(canUndo: Bool, canRedo: Bool) {
+        undoBtn.isEnabled = canUndo
+        redoBtn.isEnabled = canRedo
+    }
+    
 }

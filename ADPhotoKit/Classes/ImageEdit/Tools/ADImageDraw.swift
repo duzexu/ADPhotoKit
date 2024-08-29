@@ -8,6 +8,21 @@
 import Foundation
 import UIKit
 
+enum DrawActionData {
+    case draw(DrawPath)
+    case erase([DrawPath])
+}
+
+class ADDrawAction: ADEditAction {
+    var data: DrawActionData
+    let identifier: String
+    
+    init(data: DrawActionData, identifier: String) {
+        self.data = data
+        self.identifier = identifier
+    }
+}
+
 class ADImageDraw: ADImageEditTool {
     
     var image: UIImage
@@ -21,16 +36,10 @@ class ADImageDraw: ADImageEditTool {
     
     var contentLockStatus: ((Bool) -> Void)?
     
-    var toolConfigView: (UIView & ADToolConfigable)?
-    var toolInteractView: (UIView & ADToolInteractable)?
+    var toolConfigView: ADToolConfigable?
+    var toolInteractView: ADToolInteractable?
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
-        switch style {
-        case .line:
-            break
-        case .mosaic:
-            break
-        }
         return true
     }
     
@@ -49,29 +58,29 @@ class ADImageDraw: ADImageEditTool {
             let interact = ADDrawInteractView(style: .line({ [weak colorSelect] in
                 return colorSelect?.selectColor ?? .clear
             }))
-            colorSelect.revokeAction = { [weak interact] in
-                interact?.revoke()
-            }
-            interact.lineCountChange = { [weak colorSelect] count in
-                colorSelect?.lineCount = count
+            colorSelect.eraseAction = { [weak interact] sel in
+                interact?.erase = sel
             }
             toolInteractView = interact
             toolConfigView = colorSelect
             image = Bundle.image(name: "icons_filled_pencil3", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "icons_filled_pencil3_on", module: .imageEdit)
+            interact.actionsDidChange = { [weak self] data in
+                self?.undoManager.push(action: ADDrawAction(data: data, identifier: self!.identifier))
+            }
         case let .mosaic(img):
             let config = ADMosaicDrawView()
             let interact = ADDrawInteractView(style: .mosaic(img))
-            config.revokeAction = { [weak interact] in
-                interact?.revoke()
-            }
-            interact.lineCountChange = { [weak config] count in
-                config?.lineCount = count
+            config.eraseAction = { [weak interact] sel in
+                interact?.erase = sel
             }
             toolInteractView = interact
             toolConfigView = config
             image = Bundle.image(name: "icons_filled_mosaic", module: .imageEdit) ?? UIImage()
             selectImage = Bundle.image(name: "icons_filled_mosaic_on", module: .imageEdit)
+            interact.actionsDidChange = { [weak self] data in
+                self?.undoManager.push(action: ADDrawAction(data: data, identifier: self!.identifier))
+            }
         }
         toolInteractView?.isOpaque = false
     }
@@ -95,18 +104,22 @@ class ADImageDraw: ADImageEditTool {
     }
     
     func decode(from: Any) {
-        var count: Int = 0
         if let json = from as? Dictionary<String,Any> {
             if let paths = json["paths"] as? [DrawPath] {
-                count = paths.count
                 (toolInteractView as? ADDrawInteractView)?.paths = paths
             }
         }
-        switch style {
-        case .line:
-            (toolConfigView as? ADLineDrawView)?.lineCount = count
-        case .mosaic:
-            (toolConfigView as? ADMosaicDrawView)?.lineCount = count
+    }
+    
+    func undo(action: any ADEditAction) {
+        if let action = action as? ADDrawAction {
+            (toolInteractView as? ADDrawInteractView)?.undo(action: action.data)
+        }
+    }
+    
+    func redo(action: any ADEditAction) {
+        if let action = action as? ADDrawAction {
+            (toolInteractView as? ADDrawInteractView)?.redo(action: action.data)
         }
     }
     

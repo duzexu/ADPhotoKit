@@ -1017,9 +1017,9 @@ class ViewController: UIViewController {
         let textColors = ConfigModel(title: "Text Colors", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.textStickerColors = [(.white,.black),(.black,.white)]
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.white,.black,.gray),(.black,.white,.gray)]
                 }else{
-                    ADPhotoKitConfiguration.default.textStickerColors = [(.systemBlue,.black),(.systemGray,.white)]
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.systemBlue,.black,.gray),(.systemGray,.white,.gray)]
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }

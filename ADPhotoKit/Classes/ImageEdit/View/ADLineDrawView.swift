@@ -13,60 +13,62 @@ class ADLineDrawView: UIView, ADToolConfigable {
         return colors[select]
     }
     
-    var revokeAction: (() -> Void)?
-    var lineCount: Int = 0 {
+    var eraseAction: ((Bool) -> Void)?
+    
+    private let colors: [UIColor]
+    private var select: Int = 0 {
         didSet {
-            revokeBtn.isEnabled = lineCount > 0
+            index = select
+            eraserBtn.isSelected = false
+            eraseAction?(false)
+            collectionView.reloadData()
         }
     }
+    private var index: Int = 0
     
-    let colors: [UIColor]
-    var select: Int = 0 {
-        didSet {
-            for (i,cell) in colorCells.enumerated() {
-                cell.isSelect = i == select
-            }
-        }
-    }
-    
-    private var stackView: UIStackView!
-    private var revokeBtn: UIButton!
-    private var colorCells: [ADColorCell] = []
+    private var collectionView: UICollectionView!
+    private var eraserBtn: ADEraserButton!
 
     init(colors: [UIColor], select: Int) {
         self.colors = colors
         self.select = select
+        self.index = select
         super.init(frame: .zero)
         
-        stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.alignment = .fill
-        stackView.distribution = .fillEqually
-        addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.bottom.equalTo(self.snp.bottomMargin).offset(-64)
-            make.left.equalToSuperview().offset(15)
-            make.right.equalToSuperview().offset(-15)
-            make.height.equalTo(30)
-        }
-        
-        revokeBtn = UIButton(type: .custom)
-        revokeBtn.addTarget(self, action: #selector(revokeAction(_:)), for: .touchUpInside)
-        revokeBtn.isEnabled = false
-        revokeBtn.setImage(Bundle.image(name: "icons_filled_previous", module: .imageEdit), for: .normal)
-        
-        for (i,color) in colors.enumerated() {
-            let cell = ADColorCell(color: color)
-            cell.cellSelectBlock = { [weak self] index in
-                self?.select = index
+        eraserBtn = ADEraserButton()
+        eraserBtn.clickAction = { [weak self] sel in
+            if sel {
+                self?.index = -1
+            }else{
+                self?.index = self!.select
             }
-            cell.isSelect = i == select
-            cell.tag = i
-            stackView.addArrangedSubview(cell)
-            colorCells.append(cell)
+            self?.eraseAction?(sel)
+            self?.collectionView.reloadData()
+        }
+        addSubview(eraserBtn)
+        eraserBtn.snp.makeConstraints { make in
+            make.bottom.equalTo(self.snp.bottomMargin).offset(-64)
+            make.left.equalToSuperview().offset(20)
+            make.size.equalTo(CGSize(width: 36, height: 36))
         }
         
-        stackView.addArrangedSubview(revokeBtn)
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 30, height: 30)
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 8
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.regisiter(cell: ADColorCell.self)
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.backgroundColor = .clear
+        addSubview(collectionView)
+        collectionView.snp.makeConstraints { make in
+            make.bottom.equalTo(self.snp.bottomMargin).offset(-55)
+            make.left.equalToSuperview().offset(80)
+            make.right.equalToSuperview().offset(-20)
+            make.height.equalTo(50)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -74,11 +76,29 @@ class ADLineDrawView: UIView, ADToolConfigable {
     }
     
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        return stackView.frame.contains(point)
+        return collectionView.frame.contains(point) || eraserBtn.frame.contains(point)
     }
     
-    @objc func revokeAction(_ sender: UIButton) {
-        revokeAction?()
+}
+
+extension ADLineDrawView: UICollectionViewDataSource, UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return colors.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADColorCell.reuseIdentifier, for: indexPath) as! ADColorCell
+        
+        cell.isSelect = indexPath.row == index
+        cell.color = colors[indexPath.row]
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: false)
+        select = indexPath.row
     }
     
 }

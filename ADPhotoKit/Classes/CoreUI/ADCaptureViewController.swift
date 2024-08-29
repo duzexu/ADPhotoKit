@@ -792,7 +792,7 @@ extension ADCaptureViewController: AVCapturePhotoCaptureDelegate {
                 self.takedImageView.isHidden = false
 #if Module_ImageEdit
                 if let image = image {
-                    let vc = ADImageEditController(image: image, editInfo: nil)
+                    let vc = ADImageEditConfigure.imageEditVC(image: image, editInfo: nil)
                     vc.cancelEdit = { [weak self] in
                         self?.retakeBtnAction()
                     }

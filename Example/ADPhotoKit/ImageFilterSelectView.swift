@@ -11,17 +11,6 @@ import ADPhotoKit
 
 class ImageFilterSelectView: UIView, ADToolConfigable {
 
-    func singleTap(with point: CGPoint) -> Bool {
-        if collectionView.frame.contains(point) {
-            let sub = convert(point, to: collectionView)
-            if let indexPath = collectionView.indexPathForItem(at: sub) {
-                dataSource?.collectionView?(collectionView, didSelectItemAt: indexPath)
-                return true
-            }
-        }
-        return false
-    }
-    
     weak var dataSource: (UICollectionViewDataSource & UICollectionViewDelegate)?
     
     var collectionView: UICollectionView!

@@ -19,7 +19,7 @@ class ADTextStickerEditController: UIViewController, ADTextStickerEditConfigurab
     private var confirmBtn: UIButton!
     
     private var colorsView: UIView!
-    private var stackView: UIStackView!
+    private var collectionView: UICollectionView!
     
     init(sticker: ADTextSticker? = nil) {
         if ADPhotoKitConfiguration.default.textStickerDefaultColorIndex > ADPhotoKitConfiguration.default.textStickerColors.count {
@@ -106,8 +106,7 @@ private extension ADTextStickerEditController {
         }
         
         let switchBtn = UIButton(type: .custom)
-        switchBtn.setImage(Bundle.image(name: "icons_outlined_text", module: .imageEdit), for: .normal)
-        switchBtn.setImage(Bundle.image(name: "icons_filled_text", module: .imageEdit), for: .selected)
+        switchBtn.setImage(sticker.style.icon, for: .normal)
         switchBtn.addTarget(self, action: #selector(modeSwitchAction(_:)), for: .touchUpInside)
         colorsView.addSubview(switchBtn)
         switchBtn.snp.makeConstraints { make in
@@ -116,22 +115,21 @@ private extension ADTextStickerEditController {
             make.width.equalTo(40)
         }
         
-        stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.alignment = .fill
-        stackView.distribution = .fillEqually
-        colorsView.addSubview(stackView)
-        stackView.snp.makeConstraints { make in
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 30, height: 30)
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 7
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.regisiter(cell: ADColorCell.self)
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.backgroundColor = .clear
+        colorsView.addSubview(collectionView)
+        collectionView.snp.makeConstraints { make in
             make.left.equalTo(switchBtn.snp.right).offset(6)
             make.right.equalToSuperview().offset(-20)
             make.top.bottom.equalToSuperview()
-        }
-        
-        let colors = ADPhotoKitConfiguration.default.textStickerColors
-        for color in colors {
-            let cell = ADColorCell(color: color.primaryColor)
-            cell.isSelect = color == sticker.color
-            stackView.addArrangedSubview(cell)
         }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))
@@ -159,35 +157,20 @@ extension ADTextStickerEditController {
     }
     
     @objc func modeSwitchAction(_ sender: UIButton) {
-        sender.isSelected = !sender.isSelected
-        textInputView.style = sender.isSelected ? .border : .normal
-        sticker.style = textInputView.style
+        sticker.style = sticker.style.next()
+        sender.setImage(sticker.style.icon, for: .normal)
+        textInputView.style = sticker.style
     }
     
     @objc func singleTapAction(_ tap: UITapGestureRecognizer) {
-        let point = tap.location(in: view)
-        if colorsView.frame.contains(point) {
-            let pos = view.convert(point, to: stackView)
-            for (i,cell) in stackView.arrangedSubviews.enumerated() {
-                if cell.frame.contains(pos) {
-                    (cell as! ADColorCell).isSelect = true
-                    let color = ADPhotoKitConfiguration.default.textStickerColors[i]
-                    textInputView.color = color
-                    sticker.color = color
-                }else{
-                    (cell as! ADColorCell).isSelect = false
-                }
-            }
-        }else{
-            textInputView.beginInput()
-        }
+        textInputView.beginInput()
     }
 }
 
 extension ADTextStickerEditController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let point = gestureRecognizer.location(in: view)
-        if cancelBtn.frame.contains(point) || confirmBtn.frame.contains(point) {
+        if cancelBtn.frame.contains(point) || confirmBtn.frame.contains(point) || colorsView.frame.contains(point) {
             return false
         }
         return true
@@ -213,4 +196,56 @@ extension ADTextStickerEditController {
             self.textInputView.transform = .identity
         }
     }
+}
+
+extension ADTextStickerEditController: UICollectionViewDataSource, UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return ADPhotoKitConfiguration.default.textStickerColors.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ADColorCell.reuseIdentifier, for: indexPath) as! ADColorCell
+        
+        let color = ADPhotoKitConfiguration.default.textStickerColors[indexPath.row]
+        cell.color = color.primaryColor
+        cell.isSelect = color == sticker.color
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: false)
+        let color = ADPhotoKitConfiguration.default.textStickerColors[indexPath.row]
+        textInputView.color = color
+        sticker.color = color
+        collectionView.reloadData()
+    }
+    
+}
+
+extension ADTextSticker.Style {
+    
+    func next() -> ADTextSticker.Style {
+        switch self {
+        case .normal:
+            return .border
+        case .border:
+            return .outline
+        case .outline:
+            return .normal
+        }
+    }
+    
+    var icon: UIImage? {
+        switch self {
+        case .normal:
+            return Bundle.image(name: "icons_input_font", module: .imageEdit)
+        case .border:
+            return Bundle.image(name: "icons_input_font_bg", module: .imageEdit)
+        case .outline:
+            return Bundle.image(name: "icons_input_outline", module: .imageEdit)
+        }
+    }
+    
 }
