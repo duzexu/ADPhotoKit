@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ADPhotoKit'
-  s.version          = '1.3.1'
+  s.version          = '1.4.0'
   s.summary          = 'A library for select photos from album implemented by pure-Swift.'
 
 # This description is used to generate tags and improve search results.

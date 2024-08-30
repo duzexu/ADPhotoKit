@@ -1,9 +1,15 @@
-![logo](./ADPhotoKit/ADPhotoKit.docc/Resources/logo@3x.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/duzexu/ADPhotoKit/master/ADPhotoKit/ADPhotoKit.docc/Resources/logo@3x.png" alt="ADPhotoKit" title="ADPhotoKit" width="557"/>
+</p>
 
-[![Version](https://img.shields.io/cocoapods/v/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
-[![License](https://img.shields.io/cocoapods/l/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
-[![Platform](https://img.shields.io/cocoapods/p/ADPhotoKit.svg?style=flat)](https://cocoapods.org/pods/ADPhotoKit)
-![Language](https://img.shields.io/badge/Language-%20Swift%20-E57141.svg)
+<p align="center">
+<a href="https://swift.org/"><img src="https://img.shields.io/badge/Language-%20Swift%20-E57141.svg"></a>
+<a href="https://duzexu.github.io/ADPhotoKit/"><img src="https://img.shields.io/cocoapods/p/ADPhotoKit.svg?style=flat"></a>
+<a href="https://duzexu.github.io/ADPhotoKit/"><img src="https://img.shields.io/badge/Swift-Doc-DE5C43.svg?style=flat"></a>
+<a href="https://cocoapods.org/pods/ADPhotoKit"><img src="https://img.shields.io/cocoapods/v/ADPhotoKit.svg?style=flat"></a>
+<a href="https://swift.org/package-manager/"><img src="https://img.shields.io/badge/SPM-supported-DE5C43.svg?style=flat"></a>
+<a href="https://raw.githubusercontent.com/duzexu/ADPhotoKit/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-black"></a>
+</p>
 
 ADPhotoKit is a pure-Swift library to select assets (e.g. photo,video,gif,livephoto) from system album. Default appearance is Wechat-like.
 
@@ -110,6 +116,7 @@ To lean more use of ADPhotoKit, refer to the example and [API Reference](https:/
 
 * iOS 10.0
 * Swift 5.0+
+* Xcode 15+
 
 > Objective-C is not supported. Swift is the future and dropping Obj-C is the price to pay to keep our velocity on this library :)
 
