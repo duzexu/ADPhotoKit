@@ -21,11 +21,12 @@ class ADEditToolCell: UICollectionViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with tool: ADImageEditTool) {
+    func configure(with tool: ADEditTool) {
         iconImageView.image = tool.isSelected ? (tool.selectImage ?? tool.image) : tool.image
     }
     

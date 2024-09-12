@@ -9,6 +9,7 @@
 import UIKit
 import ADPhotoKit
 
+#if Module_ImageEdit
 enum Filter: CaseIterable {
     case none
     case chrome
@@ -227,3 +228,4 @@ extension ImageFilterTool: UICollectionViewDataSource, UICollectionViewDelegate 
         indexDidChange()
     }
 }
+#endif

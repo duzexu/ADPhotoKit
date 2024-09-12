@@ -44,68 +44,6 @@ public struct ADImageEditInfo {
     
 }
 
-/// Image rotation.
-public enum ADRotation: CGFloat {
-    /// No rotation.
-    case idle = 0
-    /// Rotate left.
-    case left = -90
-    /// Rotate right.
-    case right = 90
-    /// Rotate upside down.
-    case down = 180
-    
-    /// Rotate left.
-    /// - Returns: Rotation after rotate left.
-    public func rotateLeft() -> ADRotation {
-        switch self {
-        case .idle:
-            return .left
-        case .left:
-            return .down
-        case .right:
-            return .idle
-        case .down:
-            return .right
-        }
-    }
-    
-    func imageSize(_ size: CGSize) -> CGSize {
-        switch self {
-        case .idle,.down:
-            return size
-        case .left,.right:
-            return CGSize(width: size.height, height: size.width)
-        }
-    }
-    
-    func clipRect(_ rect: CGRect) -> CGRect {
-        switch self {
-        case .idle:
-            return rect
-        case .left:
-            return rect.rotateRight()
-        case .right:
-            return rect.rotateRight().rotateRight().rotateRight()
-        case .down:
-            return rect.rotateRight().rotateRight()
-        }
-    }
-    
-    var imageOrientation: UIImage.Orientation {
-        switch self {
-        case .idle:
-            return .up
-        case .left:
-            return .left
-        case .right:
-            return .right
-        case .down:
-            return .down
-        }
-    }
-}
-
 class ADImageEditController: UIViewController, ADImageEditConfigurable {
     
     var imageDidEdit: ((ADImageEditInfo) -> Void)?
@@ -141,11 +79,12 @@ class ADImageEditController: UIViewController, ADImageEditConfigurable {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         definesPresentationContext = true
@@ -159,7 +98,7 @@ class ADImageEditController: UIViewController, ADImageEditConfigurable {
         ADStickerInteractView.shared.clear()
     }
     
-    public override var prefersStatusBarHidden: Bool {
+    override var prefersStatusBarHidden: Bool {
         return true
     }
 
@@ -227,7 +166,7 @@ extension ADImageEditController {
         }
         
         if let json = editInfo.toolsJson {
-            for tool in controlsView.tools {
+            for tool in tools {
                 if let data = json[tool.identifier] {
                     tool.decode(from: data)
                 }

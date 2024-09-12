@@ -35,22 +35,22 @@ public struct ADAssetResult {
 public struct ADConstraintParams {
     
     /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var maxCount: Int?
+    public fileprivate(set) var maxCount: UInt?
     
     /// Limit the min image count you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var minImageCount: Int?
+    public fileprivate(set) var minImageCount: UInt?
     /// Limit the max image count you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var maxImageCount: Int?
+    public fileprivate(set) var maxImageCount: UInt?
     
     /// Limit the min video count you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var minVideoCount: Int?
+    public fileprivate(set) var minVideoCount: UInt?
     /// Limit the max video count you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var maxVideoCount: Int?
+    public fileprivate(set) var maxVideoCount: UInt?
     
     /// Limit the min video time you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var minVideoTime: Int?
+    public fileprivate(set) var minVideoTime: UInt?
     /// Limit the max video time you can select. Set `nil` means no limit. Default is no limit.
-    public fileprivate(set) var maxVideoTime: Int?
+    public fileprivate(set) var maxVideoTime: UInt?
     
     /// Limit the min video size you can select. Set `nil` means no limit. Default is no limit.
     public fileprivate(set) var minVideoSize: CGFloat?
@@ -58,9 +58,9 @@ public struct ADConstraintParams {
     public fileprivate(set) var maxVideoSize: CGFloat?
     
     /// Limit the min video time you can record. Default is 2 second.
-    public fileprivate(set) var minRecordTime: Int
+    public fileprivate(set) var minRecordTime: UInt
     /// Limit the max video time you can record. Default is 60 second.
-    public fileprivate(set) var maxRecordTime: Int
+    public fileprivate(set) var maxRecordTime: UInt
 }
 
 extension ADSelectAssetModel {
@@ -312,38 +312,52 @@ public class ADPhotoKitConfig {
         self.browserSelect = browserSelect
         self.canceled = canceled
         
+        func valueTrans(_ v: UInt?) -> UInt? {
+            if let v = v {
+                return v == 0 ? nil : v
+            }
+            return v
+        }
+        
+        func valueTrans(_ v: CGFloat?) -> CGFloat? {
+            if let v = v {
+                return v == 0 ? nil : v
+            }
+            return v
+        }
+        
         var value = ADConstraintParams(minRecordTime: 2, maxRecordTime: 60)
         for item in params {
             switch item {
             case let .maxCount(max):
-                value.maxCount = max
+                value.maxCount = valueTrans(max)
             case let .imageCount(min, max):
-                value.minImageCount = min
-                value.maxImageCount = max
+                value.minImageCount = valueTrans(min)
+                value.maxImageCount = valueTrans(max)
                 if let l = min, let r = max {
                     assert(l <= r, "min count must less than or equal max")
                 }
             case let .videoCount(min, max):
-                value.minVideoCount = min
-                value.maxVideoCount = max
+                value.minVideoCount = valueTrans(min)
+                value.maxVideoCount = valueTrans(max)
                 if let l = min, let r = max {
                     assert(l <= r, "min count must less than or equal max")
                 }
             case let .videoTime(min, max):
-                value.minVideoTime = min
-                value.maxVideoTime = max
+                value.minVideoTime = valueTrans(min)
+                value.maxVideoTime = valueTrans(max)
                 if let l = min, let r = max {
                     assert(l <= r, "min time must less than or equal max")
                 }
             case let .recordTime(min, max):
-                value.minRecordTime = min ?? 2
-                value.maxRecordTime = max ?? 60
+                value.minRecordTime = valueTrans(min) ?? 2
+                value.maxRecordTime = valueTrans(max) ?? 60
                 if let l = min, let r = max {
                     assert(l <= r, "min time must less than or equal max")
                 }
             case let .videoSize(min, max):
-                value.minVideoSize = min
-                value.maxVideoSize = max
+                value.minVideoSize = valueTrans(min)
+                value.maxVideoSize = valueTrans(max)
                 if let l = min, let r = max {
                     assert(l <= r, "min size must less than or equal max")
                 }

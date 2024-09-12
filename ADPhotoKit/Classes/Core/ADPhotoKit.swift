@@ -117,17 +117,17 @@ public struct ADAssetBrowserOptions: OptionSet {
 /// Params to control the asset select condition.
 public enum ADPhotoSelectParams: Hashable, Equatable {
     /// Limit the max count you can select. Set `nil` means no limit. Default is no limit.
-    case maxCount(max: Int?)
+    case maxCount(max: UInt?)
     /// Limit the min and max image count you can select. Set `nil` means no limit. Default is no limit.
-    case imageCount(min: Int?, max: Int?)
+    case imageCount(min: UInt?, max: UInt?)
     /// Limit the min and max video count you can select. Set `nil` means no limit. Default is no limit.
-    case videoCount(min: Int?, max: Int?)
-    /// Limit the min and max video time you can select. Set `nil` means no limit. Default is no limit.
-    case videoTime(min: Int?, max: Int?)
-    /// Limit the min and max video size you can select. Set `nil` means no limit. Default is no limit.
+    case videoCount(min: UInt?, max: UInt?)
+    /// Limit the min and max video time you can select. Unit in seconds. Set `nil` means no limit. Default is no limit.
+    case videoTime(min: UInt?, max: UInt?)
+    /// Limit the min and max video size you can select. Unit in byte. Set `nil` means no limit. Default is no limit.
     case videoSize(min: CGFloat?, max: CGFloat?)
-    /// Limit the min and max video time you can record. Set `nil` means no limit. Default is no limit.
-    case recordTime(min: Int?, max: Int?)
+    /// Limit the min and max video time you can record. Unit in seconds. Set `nil` means no limit. Default is no limit.
+    case recordTime(min: UInt?, max: UInt?)
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(hashValue)

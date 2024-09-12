@@ -26,8 +26,8 @@ class ConfigModel {
         case none
         case segment([String],Int)
         case `switch`(Bool)
-        case stepper(Int)
-        case range(Int,Int)
+        case stepper(UInt)
+        case range(UInt,UInt)
         
         func view(target: ConfigModel) -> UIView? {
             switch self {
@@ -44,16 +44,16 @@ class ConfigModel {
                 control.addTarget(target, action: #selector(switchAction(_:)), for: .valueChanged)
                 return control
             case let .stepper(value):
-                let control = Stepper(value: value)
+                let control = Stepper(value: Int(value))
                 control.valueChanged = { [weak target] value in
-                    target?.refreshMode(value: value)
-                    target?.action?(value)
+                    target?.refreshMode(value: UInt(value))
+                    target?.action?(UInt(value))
                 }
                 return control
             case let .range(min, max):
-                let control = Ranger(min: min, max: max)
+                let control = Ranger(min: Int(min), max: Int(max))
                 control.valueChanged = { [weak target] min,max in
-                    let trup = (min,max)
+                    let trup = (UInt(min),UInt(max))
                     target?.refreshMode(value: trup)
                     target?.action?(trup)
                 }
@@ -97,9 +97,9 @@ class ConfigModel {
         case .switch(_):
             mode = .switch(value as! Bool)
         case .stepper(_):
-            mode = .stepper(value as! Int)
+            mode = .stepper(value as! UInt)
         case .range(_, _):
-            let trup = value as! (Int,Int)
+            let trup = value as! (UInt,UInt)
             mode = .range(trup.0, trup.1)
         }
     }

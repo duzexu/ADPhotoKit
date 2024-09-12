@@ -71,6 +71,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -250,6 +251,7 @@ class ADDrawInteractView: UIView, ADToolInteractable {
             update(image: image)
         }
         
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }

@@ -33,6 +33,7 @@ public class ADThumbnailViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -61,7 +62,7 @@ public class ADThumbnailViewController: UIViewController {
         ADPhotoKitConfiguration.default.customThumbnailControllerBlock?(self)
         
         if config.assetOpts.contains(.slideSelect) {
-            if (config.params.maxCount ?? Int.max) > 1 {
+            if (config.params.maxCount ?? UInt.max) > 1 {
                 panGesture = UIPanGestureRecognizer(target: self, action: #selector(slideSelectAction(_:)))
                 view.addGestureRecognizer(panGesture!)
             }
@@ -202,14 +203,14 @@ extension ADThumbnailViewController {
     
     func canSelectWithIndex(_ index: Int) -> Bool {
         let selected = dataSource.selects.count
-        let max = config.params.maxCount ?? Int.max
+        let max = config.params.maxCount ?? UInt.max
         let item = dataSource.list[index]
         if selected < max {
             let itemIsImage = item.type.isImage
             if config.assetOpts.contains(.mixSelect) {
                 let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
-                let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                let maxImageCount = config.params.maxImageCount ?? Int.max
+                let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                let maxImageCount = config.params.maxImageCount ?? UInt.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     return false
                 }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
@@ -220,8 +221,8 @@ extension ADThumbnailViewController {
                     return false
                 }else{
                     let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
-                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                    let maxImageCount = config.params.maxImageCount ?? Int.max
+                    let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                    let maxImageCount = config.params.maxImageCount ?? UInt.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         return false
                     }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
@@ -335,13 +336,13 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             c.selectStatus = .select(index: nil)
             item.selectStatus = .select(index: nil)
             let selected = dataSource.selects.count
-            let max = config.params.maxCount ?? Int.max
+            let max = config.params.maxCount ?? UInt.max
             if selected < max {
                 let itemIsImage = item.type.isImage
                 if config.assetOpts.contains(.mixSelect) {
                     let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
-                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                    let maxImageCount = config.params.maxImageCount ?? Int.max
+                    let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                    let maxImageCount = config.params.maxImageCount ?? UInt.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         c.selectStatus = .deselect
                         item.selectStatus = .deselect
@@ -355,8 +356,8 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                         item.selectStatus = .deselect
                     }else{
                         let videoCount = dataSource.selects.filter { $0.asset.mediaType == .video }.count
-                        let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                        let maxImageCount = config.params.maxImageCount ?? Int.max
+                        let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                        let maxImageCount = config.params.maxImageCount ?? UInt.max
                         if videoCount >= maxVideoCount, !itemIsImage {
                             c.selectStatus = .deselect
                             item.selectStatus = .deselect
@@ -367,6 +368,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                     }
                 }
                 if !itemIsImage {
+                    #if !Module_VideoEdit
                     if let max = config.params.maxVideoTime {
                         if item.type.duration > max {
                             c.selectStatus = .deselect
@@ -391,6 +393,7 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                             item.selectStatus = .deselect
                         }
                     }
+                    #endif
                 }
             }else{
                 c.selectStatus = .deselect

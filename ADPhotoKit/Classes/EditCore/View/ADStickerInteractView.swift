@@ -253,6 +253,11 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        updateClipingScreenInfo()
+    }
+    
     /// Add sticker content to shared view.
     /// - Parameter view: Sticker content.
     public func addContent<T>(_ view: T) where T : ADStickerContentView {
@@ -486,6 +491,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
             }
         }
         
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -576,6 +582,7 @@ public class ADStickerContentView: UIView {
         
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -671,6 +678,7 @@ public class ADImageStickerContentView: ADStickerContentView {
         imageView.image = img
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -699,12 +707,13 @@ class ADTextStickerContentView: ADImageStickerContentView {
         sticker = info.sticker
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func doubleTapAction(ctx: UIViewController?) {
-        let sticker = ADImageEditConfigure.textStickerEditVC(sticker: sticker)
+        let sticker = ADEditConfigure.textStickerEditVC(sticker: sticker)
         sticker.textDidEdit = { [weak self] image, sticker in
             let old = self?.stickerInfo
             self?.updateImage(image)

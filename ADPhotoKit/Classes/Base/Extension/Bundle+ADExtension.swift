@@ -20,9 +20,14 @@ extension Bundle {
     static var imageEditBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitImageEdit", cls: ADImageEditController.self)
     #endif
     
+    #if Module_VideoEdit
+    static var videoEditBundle: Bundle? = Bundle.bundle(name: "ADPhotoKitVideoEdit", cls: ADVideoEditController.self)
+    #endif
+    
     enum Module {
         case coreUI
         case imageEdit
+        case videoEdit
     }
     
     static func image(name: String, module: Module = .coreUI) -> UIImage? {
@@ -38,6 +43,13 @@ extension Bundle {
             #if Module_ImageEdit
             let bundle = ADPhotoKitConfiguration.default.customImageEditBundle
             return bundle?.image(name: name) ?? imageEditBundle?.image(name: name)
+            #else
+            return nil
+            #endif
+        case .videoEdit:
+            #if Module_VideoEdit
+            let bundle = ADPhotoKitConfiguration.default.customVideoEditBundle
+            return bundle?.image(name: name) ?? videoEditBundle?.image(name: name)
             #else
             return nil
             #endif

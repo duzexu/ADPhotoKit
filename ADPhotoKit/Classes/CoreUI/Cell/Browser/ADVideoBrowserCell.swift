@@ -31,6 +31,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
         setupUI()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -70,6 +71,7 @@ class ADVideoBrowserCell: ADBrowserBaseCell, ADVideoBrowserCellConfigurable {
             playerLayer.frame = bounds
         }
         
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }

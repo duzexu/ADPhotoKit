@@ -33,7 +33,8 @@ let package = Package(
             swiftSettings: [
                 .define("Module_Core"),
                 .define("Module_UI"),
-                .define("Module_ImageEdit")
+                .define("Module_ImageEdit"),
+                .define("Module_VideoEdit")
             ]
         )
     ]

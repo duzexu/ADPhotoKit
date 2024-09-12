@@ -14,7 +14,7 @@ class ADEditContainerView: UIView {
     fileprivate let clipBoundsView = UIView()
     fileprivate var imageView: UIImageView!
     
-    fileprivate var interactContainer: UIView!
+    fileprivate var interactContainer: ADInteractContainerView!
         
     init(image: UIImage) {
         super.init(frame: .zero)
@@ -34,7 +34,7 @@ class ADEditContainerView: UIView {
             make.center.equalToSuperview()
         }
         
-        interactContainer = UIView()
+        interactContainer = ADInteractContainerView()
         interactContainer.isUserInteractionEnabled = false
         addSubview(interactContainer)
         interactContainer.snp.remakeConstraints { make in
@@ -43,8 +43,8 @@ class ADEditContainerView: UIView {
         }
     }
     
-    func addInteractView(_ interact: (UIView & ADToolInteractable)) {
-        let package = InteractPackage(view: interact)
+    func addInteractView(_ interact: ADToolInteractable) {
+        let package = ADInteractMaskView(view: interact)
         interactContainer.addSubview(package)
         package.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -52,12 +52,7 @@ class ADEditContainerView: UIView {
     }
     
     func orderInteractViews() {
-        let order = interactContainer.subviews.sorted { v1, v2 in
-            return (v1 as! InteractPackage).interactView.zIndex < (v2 as! InteractPackage).interactView.zIndex
-        }
-        for item in order {
-            interactContainer.bringSubviewToFront(item)
-        }
+        interactContainer.orderInteractViews()
     }
     
     func setClipRect(_ clipRect: CGRect?, rotation: ADRotation, viewSize: CGSize) {
@@ -72,9 +67,7 @@ class ADEditContainerView: UIView {
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2+(0.5-clip.midX)*imageSize.width*ratio, y: viewSize.height/2+(0.5-clip.midY)*imageSize.height*ratio)
             scaleRatio = ratio
-            for sub in interactContainer.subviews {
-                (sub as? InteractPackage)?.clipRect = imageView.image!.size|->rotation.clipRect(clip)
-            }
+            interactContainer.clipRect = imageView.image!.size|->rotation.clipRect(clip)
         }else{
             let ratio = viewSize.width/imageSize.width
             let scale = CGAffineTransform(scaleX: ratio, y: ratio)
@@ -84,29 +77,25 @@ class ADEditContainerView: UIView {
 //            interactContainer.frame = imgClipView.convert(imageView.frame, to: self)
 //            interactContainer.center = CGPoint(x: viewSize.width/2, y: viewSize.height/2)
             scaleRatio = ratio
-            for sub in interactContainer.subviews {
-                (sub as? InteractPackage)?.clipRect = CGRect(origin: .zero, size: imageView.image!.size)
-            }
+            interactContainer.clipRect = CGRect(origin: .zero, size: imageView.image!.size)
         }
     }
     
     func setClipInfo(_ info: ADClipingInfo) {
-        for sub in interactContainer.subviews {
-            (sub as? InteractPackage)?.interactView.clipingScreenInfo = info
-        }
+        interactContainer.clipingScreenInfo = info
     }
     
     fileprivate func interactContainerImage() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, 1)
         if let ctx = UIGraphicsGetCurrentContext() {
-            interactContainer.subviews.forEach {
-                ($0 as! InteractPackage).clipBounds = false
-                ($0 as! InteractPackage).interactView.willBeginRenderImage()
+            interactContainer.allViews.forEach {
+                $0.clipBounds = false
+                $0.interactView.willBeginRenderImage()
             }
             interactContainer.layer.render(in: ctx)
-            interactContainer.subviews.forEach {
-                ($0 as! InteractPackage).clipBounds = true
-                ($0 as! InteractPackage).interactView.didEndRenderImage()
+            interactContainer.allViews.forEach {
+                $0.clipBounds = true
+                $0.interactView.didEndRenderImage()
             }
         }
         let result = UIGraphicsGetImageFromCurrentImageContext()
@@ -114,42 +103,9 @@ class ADEditContainerView: UIView {
         return result
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    class InteractPackage: UIView {
-        
-        var interactView: (UIView & ADToolInteractable)
-        
-        var clipRect: CGRect = .zero {
-            didSet {
-                mask?.frame = clipRect
-            }
-        }
-        
-        var clipBounds: Bool = true {
-            didSet {
-                self.mask = clipBounds ? maskV : nil
-            }
-        }
-        
-        private let maskV = UIView()
-        
-        init(view: (UIView & ADToolInteractable)) {
-            self.interactView = view
-            super.init(frame: .zero)
-            addSubview(interactView)
-            interactView.snp.makeConstraints { make in
-                make.edges.equalToSuperview()
-            }
-            maskV.backgroundColor = UIColor.black
-            self.mask = maskV
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
     }
     
 }
@@ -262,7 +218,7 @@ class ADImageEditContentView: UIView {
                 switch state {
                 case .ended,.failed,.cancelled:
                     if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
-                        if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
+                        if let package = tool.toolInteractView?.superview as? ADInteractMaskView {
                             if let ti = delay, ti > 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now()+ti) {
                                     package.clipBounds = true
@@ -275,7 +231,7 @@ class ADImageEditContentView: UIView {
                     target = nil
                 case .began:
                     if let clipBounds = tool.toolInteractView?.interactClipBounds, !clipBounds {
-                        if let package = tool.toolInteractView?.superview as? ADEditContainerView.InteractPackage {
+                        if let package = tool.toolInteractView?.superview as? ADInteractMaskView {
                             package.clipBounds = false
                         }
                     }
@@ -296,6 +252,7 @@ class ADImageEditContentView: UIView {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

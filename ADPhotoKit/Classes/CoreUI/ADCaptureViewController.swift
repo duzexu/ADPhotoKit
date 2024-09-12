@@ -60,6 +60,7 @@ class ADCaptureViewController: UIViewController, ADAssetCaptureConfigurable {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -934,7 +935,7 @@ private extension ADCaptureViewController {
         exportSession.exportAsynchronously(completionHandler: {
             let suc = exportSession.status == .completed
             if exportSession.status == .failed {
-                print("ZLPhotoBrowser: video merge failed:  \(exportSession.error?.localizedDescription ?? "")")
+                print("video merge failed:  \(exportSession.error?.localizedDescription ?? "")")
             }
             DispatchQueue.main.async {
                 completion(suc ? URL(fileURLWithPath: path) : nil)

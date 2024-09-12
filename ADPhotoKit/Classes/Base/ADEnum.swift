@@ -7,6 +7,11 @@
 
 import Foundation
 
+/// Error throw by framework.
+public enum ADError: Error {
+    case noAuthorization
+}
+
 /// Capture resolution.
 public enum ADCapturePreset {
     case cif352x288

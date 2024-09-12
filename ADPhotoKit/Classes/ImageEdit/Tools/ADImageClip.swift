@@ -56,7 +56,7 @@ class ADImageClip: ADImageEditTool {
         if let sourceInfo = source?.clipSource() {
             let info = ADClipInfo(image: sourceInfo.image, clipRect: clipInfo.clipRect, rotation: clipInfo.rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
             let clip = ADImageEditConfigure.imageClipVC(clipInfo: info)
-            clip.clipInfoConfirmBlock = { [weak self] clipRect,rotation in
+            clip.clipInfoConfirm = { [weak self] clipRect,rotation in
                 let new = ClipInfo(clipRect: clipRect, rotation: rotation)
                 self?.source?.clipInfoDidConfirmed(clipRect, rotation: rotation)
                 self?.undoManager.push(action: ADClipAction(data: .update(old: self!.clipInfo, new: new), identifier: self!.identifier))

@@ -4,7 +4,7 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'ADPhotoKit_Example' do
-  pod 'ADPhotoKit', :path => '../', :subspecs => ['CoreUI','ImageEdit']
+  pod 'ADPhotoKit', :path => '../', :subspecs => ['CoreUI','VideoEdit','ImageEdit']
   
   pod 'ProgressHUD'
 end

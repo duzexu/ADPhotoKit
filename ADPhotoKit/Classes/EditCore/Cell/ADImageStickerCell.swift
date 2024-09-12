@@ -29,6 +29,7 @@ class ADImageStickerSectionSelectCell: UICollectionViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -66,6 +67,7 @@ class ADImageStickerSectionCell: UICollectionViewCell {
         collectionView.regisiterHeader(cell: ADImageStickerSectionHeader.self)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -129,6 +131,7 @@ class ADImageStickerSectionHeader: UICollectionReusableView {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -158,6 +161,7 @@ class ADImageStickerItemCell: UICollectionViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

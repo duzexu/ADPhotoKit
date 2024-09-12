@@ -32,6 +32,7 @@ class ADMosaicDrawView: UIView, ADToolConfigable {
         return eraserBtn.frame.contains(point)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

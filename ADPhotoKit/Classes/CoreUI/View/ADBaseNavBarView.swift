@@ -33,6 +33,7 @@ class ADBaseNavBarView: UIView {
         setupUI(leftItem: leftItem, rightItem: rightItem)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

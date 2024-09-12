@@ -16,8 +16,9 @@ struct NetImage: ADAssetBrowsable {
     var browseAsset: ADAsset {
         return .image(.network(URL(string: url)!))
     }
-    
+    #if Module_ImageEdit
     var imageEditInfo: ADImageEditInfo?
+    #endif
     
     let url: String
 }
@@ -26,8 +27,9 @@ struct NetVideo: ADAssetBrowsable {
     var browseAsset: ADAsset {
         return .video(.network(URL(string: url)!))
     }
-    
+    #if Module_ImageEdit
     var imageEditInfo: ADImageEditInfo?
+    #endif
     
     let url: String
 }
@@ -51,6 +53,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Configurations"
+        #if Module_ImageEdit || Module_VideoEdit
         // image sticker
         var sections: [ADImageStickerDataSource.StickerSection] = []
         do {
@@ -86,6 +89,7 @@ class ViewController: UIViewController {
             sections.append(section)
         }
         ADPhotoKitConfiguration.default.imageStickerDataSource = ADImageStickerDataSource(sections: sections)
+        #endif
         
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -509,7 +513,7 @@ class ViewController: UIViewController {
         var paramsModels: [ConfigModel] = []
         
         let maxCount = ConfigModel(title: "MaxCount", mode: .stepper(0)) { [weak self] (value) in
-            if let count = value as? Int {
+            if let count = value as? UInt {
                 self?.configs.params.update(with: .maxCount(max: count))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -517,7 +521,7 @@ class ViewController: UIViewController {
         paramsModels.append(maxCount)
         
         let imageCount = ConfigModel(title: "ImageCount", mode: .range(0, 0)) { [weak self] (value) in
-            if let trup = value as? (Int,Int) {
+            if let trup = value as? (UInt,UInt) {
                 self?.configs.params.update(with: .imageCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -525,7 +529,7 @@ class ViewController: UIViewController {
         paramsModels.append(imageCount)
         
         let videoCount = ConfigModel(title: "VideoCount", mode: .range(0, 0)) { [weak self] (value) in
-            if let trup = value as? (Int,Int) {
+            if let trup = value as? (UInt,UInt) {
                 self?.configs.params.update(with: .videoCount(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -533,7 +537,7 @@ class ViewController: UIViewController {
         paramsModels.append(videoCount)
         
         let videoSize = ConfigModel(title: "VideoSize", mode: .range(0, 0)) { [weak self] (value) in
-            if let trup = value as? (Int,Int) {
+            if let trup = value as? (UInt,UInt) {
                 self?.configs.params.update(with: .videoSize(min: CGFloat(trup.0), max: CGFloat(trup.1)))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -541,7 +545,7 @@ class ViewController: UIViewController {
         paramsModels.append(videoSize)
         
         let videoTime = ConfigModel(title: "VideoTime", mode: .range(0, 0)) { [weak self] (value) in
-            if let trup = value as? (Int,Int) {
+            if let trup = value as? (UInt,UInt) {
                 self?.configs.params.update(with: .videoTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -549,7 +553,7 @@ class ViewController: UIViewController {
         paramsModels.append(videoTime)
         
         let recordTime = ConfigModel(title: "RecordTime", mode: .range(0, 0)) { [weak self] (value) in
-            if let trup = value as? (Int,Int) {
+            if let trup = value as? (UInt,UInt) {
                 self?.configs.params.update(with: .recordTime(min: trup.0, max: trup.1))
                 ProgressHUD.showSuccess("Update Success!")
             }
@@ -959,7 +963,8 @@ class ViewController: UIViewController {
         dataSource.append(customConfig)
         
         var imageEditModels: [ConfigModel] = []
-        
+      
+#if Module_ImageEdit
         let systenTools = ConfigModel(title: "System Tools", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
@@ -1013,7 +1018,9 @@ class ViewController: UIViewController {
             }
         }
         imageEditModels.append(mosaicWidth)
+#endif
         
+#if Module_ImageEdit || Module_VideoEdit
         let textColors = ConfigModel(title: "Text Colors", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
@@ -1025,6 +1032,7 @@ class ViewController: UIViewController {
             }
         }
         imageEditModels.append(textColors)
+#endif
         
         let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
         dataSource.append(imageEditConfig)

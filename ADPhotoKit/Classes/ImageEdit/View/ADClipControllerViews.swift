@@ -95,6 +95,7 @@ class ADClipToolBarView: UIView {
         return rotateBtn.frame.contains(point) || bounds.contains(point)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -131,6 +132,7 @@ class ADClipDarkView: UIView {
         isUserInteractionEnabled = false
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -218,6 +220,7 @@ class ADClipGrideView: UIView {
         contentV.frame = clipRect
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -441,6 +444,7 @@ class ADClipGrideView: UIView {
             isOpaque = false
         }
         
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }

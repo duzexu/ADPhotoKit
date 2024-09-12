@@ -44,6 +44,7 @@ public class ADAssetBrowserController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -108,7 +109,7 @@ public class ADAssetBrowserController: UIViewController {
     /// - Returns: If `true`, means you can select. Otherwise can't.
     open func canSelectWithCurrentIndex() -> Bool {
         let selected = dataSource.selects.count
-        let max = config.params.maxCount ?? Int.max
+        let max = config.params.maxCount ?? UInt.max
         guard let item = dataSource.current else {
             return false
         }
@@ -116,8 +117,8 @@ public class ADAssetBrowserController: UIViewController {
             let itemIsImage = item.browseAsset.isImage
             if config.assetOpts.contains(.mixSelect) {
                 let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                let maxImageCount = config.params.maxImageCount ?? Int.max
+                let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                let maxImageCount = config.params.maxImageCount ?? UInt.max
                 if videoCount >= maxVideoCount, !itemIsImage {
                     let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
                     ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
@@ -137,8 +138,8 @@ public class ADAssetBrowserController: UIViewController {
                     return false
                 }else{
                     let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                    let maxVideoCount = config.params.maxVideoCount ?? Int.max
-                    let maxImageCount = config.params.maxImageCount ?? Int.max
+                    let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+                    let maxImageCount = config.params.maxImageCount ?? UInt.max
                     if videoCount >= maxVideoCount, !itemIsImage {
                         let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
                         ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
@@ -269,19 +270,59 @@ private extension ADAssetBrowserController {
         case let .image(imageSource):
             switch imageSource {
             case let .network(url):
-                KingfisherManager.shared.retrieveImage(with: url) { [weak self] result in
+                var task: DownloadTask?
+                let hud = ADProgress.progressHUD()
+                hud.timeoutBlock = {
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                    if let task = task {
+                        task.cancel()
+                    }
+                }
+                hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+                task = KingfisherManager.shared.retrieveImage(with: url) { [weak self] result in
                     let img = try? result.get().image
                     self?.editImage(img?.resize(to: maxSize, mode: .scaleAspectFit))
+                    hud.hide()
                 }
             case let .album(asset):
-                ADPhotoManager.fetchImage(for: asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
+                var requestId: PHImageRequestID?
+                let hud = ADProgress.progressHUD()
+                hud.timeoutBlock = {
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                    if let requestId = requestId {
+                        PHImageManager.default().cancelImageRequest(requestId)
+                    }
+                }
+                hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+                requestId = ADPhotoManager.fetchImage(for: asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
                     self?.editImage(img)
+                    hud.hide()
                 }
             case let .local(img, _):
                 editImage(img.resize(to: maxSize, mode: .scaleAspectFit))
             }
             break
-        case .video(_):
+        case let .video(videoSource):
+            switch videoSource {
+            case let .network(url):
+                editVideo(AVAsset(url: url))
+            case let .album(asset):
+                var requestId: PHImageRequestID?
+                let hud = ADProgress.progressHUD()
+                hud.timeoutBlock = {
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                    if let requestId = requestId {
+                        PHImageManager.default().cancelImageRequest(requestId)
+                    }
+                }
+                hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+                requestId = ADPhotoManager.fetchAVAsset(for: asset, completion: { [weak self] asset, _, _ in
+                    self?.editVideo(asset)
+                    hud.hide()
+                })
+            case let .local(url):
+                editVideo(AVAsset(url: url))
+            }
             break
         }
     }
@@ -292,6 +333,25 @@ private extension ADAssetBrowserController {
             let vc = ADImageEditConfigure.imageEditVC(image: image, editInfo: dataSource.current!.imageEditInfo)
             vc.imageDidEdit = { [weak self] editInfo in
                 self?.didImageEditInfoUpdate(editInfo)
+            }
+            navigationController?.pushViewController(vc, animated: false)
+        }
+        #endif
+    }
+    
+    func editVideo(_ asset: AVAsset?) {
+        #if Module_VideoEdit
+        if let asset = asset {
+            var options: ADVideoEditOptions = ADVideoEditOptions()
+            if let min = config.params.minVideoTime {
+                options.append(.minTime(CGFloat(min)))
+            }
+            if let max = config.params.maxVideoTime {
+                options.append(.maxTime(CGFloat(max)))
+            }
+            let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: nil, options: options)
+            vc.videoDidEdit = { [weak self] editInfo in
+               
             }
             navigationController?.pushViewController(vc, animated: false)
         }

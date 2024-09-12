@@ -9,6 +9,7 @@
 import UIKit
 import ADPhotoKit
 
+#if Module_ImageEdit
 class ImageFilterSelectView: UIView, ADToolConfigable {
 
     weak var dataSource: (UICollectionViewDataSource & UICollectionViewDelegate)?
@@ -39,6 +40,7 @@ class ImageFilterSelectView: UIView, ADToolConfigable {
         collectionView.register(FilterCell.self, forCellWithReuseIdentifier: "FilterCell")
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -74,8 +76,10 @@ class FilterCell: UICollectionViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
 }
+#endif

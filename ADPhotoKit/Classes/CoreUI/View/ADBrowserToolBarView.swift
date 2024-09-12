@@ -59,6 +59,7 @@ class ADBrowserToolBarView: UIView, ADBrowserToolBarConfigurable {
         reloadCount(dataSource.selects.count)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -96,7 +97,7 @@ private extension ADBrowserToolBarView {
             make.height.equalTo(55)
         }
         
-        #if Module_ImageEdit
+        #if Module_ImageEdit || Module_VideoEdit
         editBtn = createBtn(ADLocale.LocaleKey.edit.localeTextValue, #selector(editAction))
         btnsView.addSubview(editBtn!)
         editBtn!.snp.makeConstraints { (make) in
@@ -192,33 +193,31 @@ private extension ADBrowserToolBarView {
         case let .image(source):
             switch source {
             case .network(_):
-                editBtn?.isHidden = true
                 originalBtn.alpha = 0
                 #if Module_ImageEdit
                 editBtn?.isHidden = false
                 #endif
             case let .album(ass):
                 if ass.isGif || ass.isLivePhoto {
-                    editBtn?.isHidden = true
                     originalBtn.alpha = 0
                 }else{
-                    editBtn?.isHidden = false
                     originalBtn.alpha = 1
+                    #if Module_ImageEdit
+                    if ass.mediaType == .image {
+                        editBtn?.isHidden = false
+                    }
+                    #endif
                 }
-                #if Module_ImageEdit
-                if ass.mediaType == .image {
-                    editBtn?.isHidden = false
-                }
-                #endif
             case .local:
-                editBtn?.isHidden = true
                 originalBtn.alpha = 0
                 #if Module_ImageEdit
                 editBtn?.isHidden = false
                 #endif
             }
         case .video(_):
-            editBtn?.isHidden = true
+            #if Module_VideoEdit
+            editBtn?.isHidden = false
+            #endif
             originalBtn.alpha = 0
         }
     }

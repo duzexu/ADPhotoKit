@@ -80,6 +80,7 @@ class ADImageBrowserCell: ADBrowserBaseCell, ADImageBrowserCellConfigurable {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -138,6 +139,7 @@ class ADImageBrowserView: UIView {
         setupUI()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -366,6 +368,7 @@ class ADLivePhotoBrowserView: UIView {
         setupUI()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

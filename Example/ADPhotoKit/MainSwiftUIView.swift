@@ -88,7 +88,9 @@ struct MainSwiftUIView: View {
                      modelsSel: keepSelected ? selected.compactMap({ asset in
             if let asset = asset as? PHAsset {
                 let model = ADSelectAssetModel(asset: asset)
+                #if Module_ImageEdit
                 model.imageEditInfo = asset.imageEditInfo
+                #endif
                 return model
             }
             return nil
@@ -99,7 +101,9 @@ struct MainSwiftUIView: View {
                      params: configs.params,
                      selected: { (assets, value) in
             selected = assets.map({ asset,result,err in
+                #if Module_ImageEdit
                 asset.imageEditInfo = result?.imageEditInfo
+                #endif
                 return asset
             })
             print(assets)
@@ -132,7 +136,9 @@ struct MainSwiftUIView: View {
             let s: [ADSelectAssetModel] = keepSelected ? selected.compactMap({ asset in
                 if let asset = asset as? PHAsset {
                     let model = ADSelectAssetModel(asset: asset)
+                    #if Module_ImageEdit
                     model.imageEditInfo = asset.imageEditInfo
+                    #endif
                     return model
                 }
                 return nil
@@ -146,7 +152,9 @@ struct MainSwiftUIView: View {
                                      params: configs.params,
                                      selected: { (assets, value) in
                 selected = assets.map({ asset,result,err in
+                    #if Module_ImageEdit
                     asset.imageEditInfo = result?.imageEditInfo
+                    #endif
                     return asset
                 })
                 print(assets)

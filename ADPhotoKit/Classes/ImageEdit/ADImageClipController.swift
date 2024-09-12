@@ -38,7 +38,7 @@ class ADImageClipController: UIViewController, ADImageClipConfigurable {
     
     var clipInfo: ADClipInfo
     
-    var clipInfoConfirmBlock: ((CGRect?,ADRotation) -> Void)?
+    var clipInfoConfirm: ((CGRect?,ADRotation) -> Void)?
     
     private var scrollView: UIScrollView!
     private var contentView: UIView!
@@ -67,6 +67,7 @@ class ADImageClipController: UIViewController, ADImageClipConfigurable {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -400,7 +401,7 @@ private extension ADImageClipController {
             cancelRevert()
             dismiss(animated: true, completion: nil)
         case .confirm:
-            clipInfoConfirmBlock?(newClipRect(),clipInfo.rotation)
+            clipInfoConfirm?(newClipRect(),clipInfo.rotation)
             dismiss(animated: true, completion: nil)
         case .revert:
             originalRevert()

@@ -715,7 +715,10 @@ extension ADPhotoManager {
     ///   - image: Image to save.
     ///   - completion: Called after image saved.
     public class func saveImageToAlbum(image: UIImage, completion: ( (Bool, PHAsset?) -> Void )? ) {
-        let status = PHPhotoLibrary.authorizationStatus()
+        var status = PHPhotoLibrary.authorizationStatus()
+        if #available(iOS 14.0, *) {
+            status = photoAddOnlyAuthority()
+        }
         
         if status == .denied || status == .restricted {
             completion?(false, nil)
@@ -756,6 +759,14 @@ extension ADPhotoManager {
     ///   - image: Image to save.
     @available(iOS 13.0.0, *)
     public class func saveImageToAlbum(image: UIImage) async throws -> PHAsset? {
+        var status = PHPhotoLibrary.authorizationStatus()
+        if #available(iOS 14.0, *) {
+            status = photoAddOnlyAuthority()
+        }
+        
+        if status == .denied || status == .restricted {
+            throw ADError.noAuthorization
+        }
         var placeholderAsset: PHObjectPlaceholder? = nil
         if image.hasAlphaChannel(), let data = image.pngData() {
             try await PHPhotoLibrary.shared().performChanges{
@@ -778,7 +789,10 @@ extension ADPhotoManager {
     ///   - url: Video asset's path.
     ///   - completion: Called after video saved.
     public class func saveVideoToAlbum(url: URL, completion: ( (Bool, PHAsset?) -> Void )? ) {
-        let status = PHPhotoLibrary.authorizationStatus()
+        var status = PHPhotoLibrary.authorizationStatus()
+        if #available(iOS 14.0, *) {
+            status = photoAddOnlyAuthority()
+        }
         
         if status == .denied || status == .restricted {
             completion?(false, nil)
@@ -807,6 +821,14 @@ extension ADPhotoManager {
     ///   - image: Image to save.
     @available(iOS 13.0.0, *)
     public class func saveVideoToAlbum(url: URL) async throws -> PHAsset? {
+        var status = PHPhotoLibrary.authorizationStatus()
+        if #available(iOS 14.0, *) {
+            status = photoAddOnlyAuthority()
+        }
+        
+        if status == .denied || status == .restricted {
+            throw ADError.noAuthorization
+        }
         var placeholderAsset: PHObjectPlaceholder? = nil
         try await PHPhotoLibrary.shared().performChanges {
             let newAssetRequest = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
@@ -834,7 +856,24 @@ extension ADPhotoManager {
     /// Check authority access to system album.
     /// - Returns: If have authority.
     public class func photoAuthority() -> Bool {
+        if #available(iOS 14.0, *) {
+            return photoReadWriteAuthority() == .authorized
+        }
         return PHPhotoLibrary.authorizationStatus() == .authorized
+    }
+    
+    /// Check add authority access to system album.
+    /// - Returns: Authority status.
+    @available(iOS 14.0, *)
+    public class func photoAddOnlyAuthority() -> PHAuthorizationStatus {
+        return PHPhotoLibrary.authorizationStatus(for: .addOnly)
+    }
+    
+    /// Check readwrite authority access to system album.
+    /// - Returns: Authority status.
+    @available(iOS 14.0, *)
+    public class func photoReadWriteAuthority() -> PHAuthorizationStatus {
+        return PHPhotoLibrary.authorizationStatus(for: .readWrite)
     }
     
     /// Check authority access to camera.

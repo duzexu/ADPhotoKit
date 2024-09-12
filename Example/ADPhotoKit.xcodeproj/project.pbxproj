@@ -17,6 +17,7 @@
 		81D9AA9D2B6A44C700CE472F /* MainSwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */; };
 		81D9AA9F2B6A45CC00CE472F /* DemosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */; };
 		81D9AAA12B6A502D00CE472F /* ConfigCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 81D9AAA02B6A502D00CE472F /* ConfigCell.xib */; };
+		81DE606B2C8EFCB60023A2B2 /* music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 81DE606A2C8EFCB60023A2B2 /* music.mp3 */; };
 		9522FB332655133D00A0D360 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB322655133D00A0D360 /* ProgressHUD.swift */; };
 		9522FB3826551A4400A0D360 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB3726551A4400A0D360 /* Progress.swift */; };
 		9551F0A7263A98D80089C8DE /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0A6263A98D80089C8DE /* LanguageViewController.swift */; };
@@ -117,6 +118,7 @@
 		81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSwiftUIView.swift; sourceTree = "<group>"; };
 		81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemosViewController.swift; sourceTree = "<group>"; };
 		81D9AAA02B6A502D00CE472F /* ConfigCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigCell.xib; sourceTree = "<group>"; };
+		81DE606A2C8EFCB60023A2B2 /* music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = music.mp3; sourceTree = "<group>"; };
 		9522FB322655133D00A0D360 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		9522FB3726551A4400A0D360 /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		9551F0A6263A98D80089C8DE /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				9555816B26BA465E007AA13C /* image_sticker */,
+				81DE60692C8EFCA60023A2B2 /* bgms */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
@@ -295,6 +298,14 @@
 				81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */,
 			);
 			name = SwiftUIViews;
+			sourceTree = "<group>";
+		};
+		81DE60692C8EFCA60023A2B2 /* bgms */ = {
+			isa = PBXGroup;
+			children = (
+				81DE606A2C8EFCB60023A2B2 /* music.mp3 */,
+			);
+			path = bgms;
 			sourceTree = "<group>";
 		};
 		9522FB312655130E00A0D360 /* Custom */ = {
@@ -469,7 +480,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = DCWWYXN3CF;
+						DevelopmentTeam = 5P2WJKCB4Z;
 						LastSwiftMigration = 0900;
 					};
 				};
@@ -529,6 +540,7 @@
 				9555816426BA4657007AA13C /* pig_15.png in Resources */,
 				9555816226BA4657007AA13C /* pig_3.png in Resources */,
 				9555815F26BA4657007AA13C /* pig_2.png in Resources */,
+				81DE606B2C8EFCB60023A2B2 /* music.mp3 in Resources */,
 				9555815326BA4657007AA13C /* pig_8.png in Resources */,
 				9555814226BA4657007AA13C /* agg_cover.png in Resources */,
 				9555813A26BA4657007AA13C /* agg_6.png in Resources */,
@@ -774,13 +786,14 @@
 			baseConfigurationReference = 3CB39CA1E981703801E81343 /* Pods-ADPhotoKit_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = DCWWYXN3CF;
+				DEVELOPMENT_TEAM = 5P2WJKCB4Z;
 				INFOPLIST_FILE = ADPhotoKit/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "Module_VideoEdit Module_ImageEdit";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
 			};
@@ -791,13 +804,14 @@
 			baseConfigurationReference = 08395E3DCFD85DA8A140A2E4 /* Pods-ADPhotoKit_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = DCWWYXN3CF;
+				DEVELOPMENT_TEAM = 5P2WJKCB4Z;
 				INFOPLIST_FILE = ADPhotoKit/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "Module_VideoEdit Module_ImageEdit";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
 			};

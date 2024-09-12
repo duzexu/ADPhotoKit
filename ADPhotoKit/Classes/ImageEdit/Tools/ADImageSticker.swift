@@ -41,7 +41,7 @@ class ADImageSticker: ADImageEditTool {
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         switch style {
         case .text:
-            let sticker = ADImageEditConfigure.textStickerEditVC(sticker: nil)
+            let sticker = ADEditConfigure.textStickerEditVC(sticker: nil)
             sticker.textDidEdit = { [weak self] image, sticker in
                 let content = ADTextStickerContentView(image: image, sticker: sticker)
                 self?.stkrs.append(ADWeakRef(value: content))
@@ -52,7 +52,7 @@ class ADImageSticker: ADImageEditTool {
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
             ctx?.present(sticker, animated: true, completion: nil)
         case .image:
-            let sticker = ADImageEditConfigure.imageStickerSelectVC()
+            let sticker = ADEditConfigure.imageStickerSelectVC()
             sticker.imageDidSelect = { [weak self] image in
                 let content = ADImageStickerContentView(image: image)
                 self?.stkrs.append(ADWeakRef(value: content))

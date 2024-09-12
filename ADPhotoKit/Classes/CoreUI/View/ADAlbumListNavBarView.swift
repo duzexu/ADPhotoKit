@@ -13,6 +13,7 @@ class ADAlbumListNavBarView: ADBaseNavBarView, ADAlbumListNavBarConfigurable {
         super.init(leftItem: nil, rightItem: (nil,nil,ADLocale.LocaleKey.cancel.localeTextValue))
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

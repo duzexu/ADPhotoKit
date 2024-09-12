@@ -26,6 +26,7 @@ class DemosViewController: UIViewController {
         self.configs = conifgs
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -94,7 +95,9 @@ class DemosViewController: UIViewController {
         let s: [ADSelectAssetModel] = keepSelect ? selected.compactMap({ asset in
             if let asset = asset as? PHAsset {
                 let model = ADSelectAssetModel(asset: asset)
+                #if Module_ImageEdit
                 model.imageEditInfo = asset.imageEditInfo
+                #endif
                 return model
             }
             return nil
@@ -108,7 +111,9 @@ class DemosViewController: UIViewController {
                                  params: configs.params,
                                  selected: { [weak self] (assets, value) in
             self?.selected = assets.map({ asset,result,err in
+                #if Module_ImageEdit
                 asset.imageEditInfo = result?.imageEditInfo
+                #endif
                 return asset
             })
             print(assets)
