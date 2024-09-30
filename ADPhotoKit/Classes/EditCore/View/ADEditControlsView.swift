@@ -113,6 +113,7 @@ private extension ADEditControlsView {
         let leftBtnItem = UIButton(type: .custom)
         leftBtnItem.adjustsImageWhenHighlighted = false
         leftBtnItem.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)
+        leftBtnItem.setTitleColor(.white, for: .normal)
         leftBtnItem.addTarget(self, action: #selector(leftBtnItemAction(_:)), for: .touchUpInside)
         addSubview(leftBtnItem)
         leftBtnItem.snp.makeConstraints { (make) in

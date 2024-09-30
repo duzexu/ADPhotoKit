@@ -18,6 +18,10 @@ public protocol ADVideoEditTool: ADEditTool {
 
 public protocol ADVideoPlayable where Self: UIView {
     
+    var clipRange: CMTimeRange? { set get }
+    
+    var videoSound: ADVideoSound { set get }
+    
     init(asset: AVAsset)
     
     func seek(to: CMTime, pause: Bool)
@@ -27,10 +31,6 @@ public protocol ADVideoPlayable where Self: UIView {
     func addOrUpdateSticker(_ stk: ADVideoStcker)
     
     func removeSticker(_ id: String)
-    
-    func setClipRange(_ range: CMTimeRange?)
-    
-    func setVideoSound(_ sound: ADVideoSound)
     
     func exportVideo(completionHandler handler: @escaping () -> Void)
     

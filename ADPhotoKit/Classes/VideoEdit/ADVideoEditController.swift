@@ -152,7 +152,14 @@ extension ADVideoEditController {
             if max != nil {
                 max = max!/asset.duration.seconds
             }
-            tools.append(ADVideoClip(asset: asset, min: min, max: max))
+            let clip = ADVideoClip(asset: asset, min: min, max: max)
+            clip.beginClip = { [weak self] in
+                self?.beginClip()
+            }
+            clip.endClip = { [weak self] in
+                self?.endClip()
+            }
+            tools.append(clip)
         }
         if let custom = ADPhotoKitConfiguration.default.customVideoEditToolsBlock?() {
             tools.append(contentsOf: custom)
@@ -302,6 +309,23 @@ extension ADVideoEditController {
 //        }
 //        imageDidEdit?(editInfo)
 //        navigationController?.popViewController(animated: false)
+    }
+    
+    func beginClip() {
+        controlsView.alpha = 0
+        let new = view.frame.inset(by: UIEdgeInsets(top: 0, left: 25, bottom: 80+safeAreaInsets.bottom, right: 25))
+        let scale = CGAffineTransform(scaleX: new.width/view.frame.width, y: new.height/view.frame.height)
+        let trans = CGAffineTransform(translationX: 0, y: new.midY-view.frame.midY)
+        UIView.animate(withDuration: 0.5) {
+            self.contentView.transform = trans.concatenating(scale)
+        }
+    }
+    
+    func endClip() {
+        controlsView.alpha = 1
+        UIView.animate(withDuration: 0.5) {
+            self.contentView.transform = .identity
+        }
     }
     
 }

@@ -219,7 +219,7 @@ public class ADPhotoKitConfiguration {
     /* =============== clip =============== */
     
     /// Custom image clip controller.
-    public var customImageClipVCBlock: ((ADClipInfo) -> ADImageClipConfigurable)?
+    public var customImageClipVCBlock: ((ADImageClipInfo) -> ADImageClipConfigurable)?
     
     #endif
     

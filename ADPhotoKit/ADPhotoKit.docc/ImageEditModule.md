@@ -22,7 +22,7 @@ Provide image editing capabilities.
 
 ### Clip
 
-- ``ADClipInfo``
+- ``ADImageClipInfo``
 - ``ADRotation``
 - ``ADImageClipConfigurable``
 

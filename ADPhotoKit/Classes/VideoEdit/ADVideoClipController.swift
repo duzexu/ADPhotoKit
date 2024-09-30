@@ -11,17 +11,23 @@ import AVFoundation
 class ADVideoClipController: UIViewController {
     
     let asset: AVAsset
-    weak var videoPlayer: ADVideoPlayable?
     let minValue: CGFloat?
     let maxValue: CGFloat?
+    let clipRange: CMTimeRange?
     
-    private var progressBar: ADVideoClipProgressBar!
+    var clipCancel: (() -> Void)?
+    var clipRangeChange: ((CMTimeRange) -> Void)?
+    var clipRangeConfirm: (() -> Void)?
     
-    init(asset: AVAsset, videoPlayer: ADVideoPlayable?, min: CGFloat? = nil, max: CGFloat? = nil) {
+    var seekReview: ((CMTime) -> Void)?
+    
+    private var clipProgressBar: ADVideoClipProgressBar?
+    
+    init(asset: AVAsset, videoPlayer: ADVideoPlayable?, min: CGFloat? = nil, max: CGFloat? = nil, clipRange: CMTimeRange? = nil) {
         self.asset = asset
-        self.videoPlayer = videoPlayer
         self.minValue = min
         self.maxValue = max
+        self.clipRange = clipRange
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,15 +38,26 @@ class ADVideoClipController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .clear
         setupUI()
     }
     
-
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.view.alpha = 0
+        UIView.animate(withDuration: 0.3) {
+            self.view.alpha = 1
+        }
+    }
+    
+    func updateProgress(_ progress: CGFloat) {
+        clipProgressBar?.progerss = progress
+    }
+    
 }
 
 extension ADVideoClipController {
     func setupUI() {
-        view.backgroundColor = .black
         let cancelBtn = UIButton(type: .custom)
         cancelBtn.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)
         cancelBtn.addTarget(self, action: #selector(cancelBtnAction), for: .touchUpInside)
@@ -69,19 +86,12 @@ extension ADVideoClipController {
             make.bottom.equalToSuperview().offset(-safeAreaInsets.bottom-24)
         }
         
-        if let player = videoPlayer {
-            view.addSubview(player)
-            player.snp.makeConstraints({ make in
-                make.edges.equalToSuperview().inset(UIEdgeInsets(top: 0, left: 25, bottom: 80+safeAreaInsets.bottom, right: 25))
-            })
-        }
-        
-        progressBar = ADVideoClipProgressBar(asset: asset, min: minValue, max: maxValue)
+        let progressBar = ADVideoClipProgressBar(asset: asset, min: minValue, max: maxValue, clipRange: clipRange)
         progressBar.timeRangeChanged = { [weak self] range in
-            self?.videoPlayer?.setClipRange(range)
+            self?.clipRangeChange?(range)
         }
         progressBar.seekTimeReview = { [weak self] time in
-            self?.videoPlayer?.seek(to: time, pause: true)
+            self?.seekReview?(time)
         }
         view.addSubview(progressBar)
         progressBar.snp.makeConstraints { make in
@@ -90,19 +100,21 @@ extension ADVideoClipController {
             make.height.equalTo(50)
             make.bottom.equalToSuperview().offset(-78-safeAreaInsets.bottom)
         }
-        
-        videoPlayer?.addProgressObserver { [weak self] progress in
-            self?.progressBar.progerss = progress
-        }
+        clipProgressBar = progressBar
     }
     
+}
+
+extension ADVideoClipController {
     @objc
     func cancelBtnAction() {
-        dismiss(animated: true, completion: nil)
+        clipCancel?()
+        dismiss(animated: false, completion: nil)
     }
     
     @objc
     func doneBtnAction() {
-        dismiss(animated: true, completion: nil)
+        clipRangeConfirm?()
+        dismiss(animated: false, completion: nil)
     }
 }

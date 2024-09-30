@@ -10,7 +10,11 @@ import Foundation
 class ADVideoBGM: ADVideoEditTool {
     
     var image: UIImage {
-        return Bundle.image(name: "icons_video_clip", module: .videoEdit) ?? UIImage()
+        return Bundle.image(name: "icons_filled_bgm", module: .videoEdit) ?? UIImage()
+    }
+    
+    var selectImage: UIImage? {
+        return Bundle.image(name: "icons_filled_bgm_on", module: .videoEdit) ?? UIImage()
     }
     
     var isSelected: Bool = false

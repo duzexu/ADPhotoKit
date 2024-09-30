@@ -23,6 +23,8 @@ public struct ADVideoSound {
     public let originalSound: Bool
     public let bgmAsset: AVAsset?
     public let bgmLoop: Bool
+    
+    public static let `default` = ADVideoSound(originalSound: true, bgmAsset: nil, bgmLoop: true)
 }
 
 class Observer {
@@ -36,10 +38,18 @@ class Observer {
 class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     let asset: AVAsset
+    var clipRange: CMTimeRange? {
+        didSet {
+            updateEdit()
+        }
+    }
+    var videoSound: ADVideoSound = .default {
+        didSet {
+            updateEdit()
+        }
+    }
     
     private var stkrs: [ADVideoStcker] = []
-    private var clipRange: CMTimeRange?
-    private var videoSound: ADVideoSound = ADVideoSound(originalSound: true, bgmAsset: nil, bgmLoop: true)
     private var composition: AVMutableComposition!
     private var playerItem: AVPlayerItem!
     
@@ -47,17 +57,17 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     private var videoSize: CGSize = .zero
     private var player: AVPlayer!
-    private var playerLayer: AVPlayerLayer!
+    private var videoPlayerLayer: AVPlayerLayer!
 
     required init(asset: AVAsset) {
         self.asset = asset
+        videoPlayerLayer = AVPlayerLayer()
         super.init(frame: .zero)
         videoSize = ADVideoUitls.getNaturalSize(asset: asset)
         player = AVPlayer()
-        playerLayer = AVPlayerLayer()
-        playerLayer.contentsGravity = .resizeAspect
-        layer.insertSublayer(playerLayer, at: 0)
-        playerLayer.player = player
+        videoPlayerLayer.contentsGravity = .resizeAspect
+        layer.insertSublayer(videoPlayerLayer, at: 0)
+        videoPlayerLayer.player = player
         player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 60), queue: DispatchQueue.main) { [weak self] time in
             self?.playTimeChange(time)
         }
@@ -76,8 +86,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        print("###bounds\(bounds)")
-        playerLayer.frame = bounds
+        videoPlayerLayer.frame = bounds
     }
     
     func pause(seekToZero: Bool = false) {
@@ -116,8 +125,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     }
     
     func setClipRange(_ range: CMTimeRange?) {
-        clipRange = range
-        updateEdit()
+        
     }
     
     func setVideoSound(_ sound: ADVideoSound) {

@@ -13,6 +13,7 @@ class ADVideoClipProgressBar: UIView {
     let asset: AVAsset
     let minValue: CGFloat?
     let maxValue: CGFloat?
+    let clipRange: CMTimeRange?
     var seekTimeReview: ((CMTime) -> Void)?
     var timeRangeChanged: ((CMTimeRange) -> Void)?
     var progerss: CGFloat = 0 {
@@ -43,10 +44,11 @@ class ADVideoClipProgressBar: UIView {
         return g
     }()
     
-    init(asset: AVAsset, min: CGFloat?, max: CGFloat?) {
+    init(asset: AVAsset, min: CGFloat?, max: CGFloat?, clipRange: CMTimeRange?) {
         self.asset = asset
         self.minValue = min
         self.maxValue = max
+        self.clipRange = clipRange
         self.interval = asset.duration.seconds/10
         super.init(frame: .zero)
         setupUI()
@@ -95,8 +97,18 @@ extension ADVideoClipProgressBar {
         borderView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        if maxValue != nil {
-            borderView.right = maxValue!
+        if let clipRange = clipRange {
+            let duration = asset.duration.seconds
+            borderView.left = clipRange.start.seconds/duration
+            let right = (clipRange.start.seconds+clipRange.duration.seconds)/duration
+            borderView.right = min(1, right)
+        }else{
+            if maxValue != nil {
+                borderView.right = maxValue!
+                let start = CMTime(seconds: asset.duration.seconds*borderView.left, preferredTimescale: asset.duration.timescale)
+                let end = CMTime(seconds: asset.duration.seconds*borderView.right, preferredTimescale: asset.duration.timescale)
+                timeRangeChanged?(CMTimeRange(start: start, end: end))
+            }
         }
         let panGes = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
         panGes.delegate = self

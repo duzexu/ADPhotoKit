@@ -72,12 +72,12 @@ Pod::Spec.new do |s|
     }
   end
   
-  s.subspec "VideoEdit" do |img|
-    img.dependency 'ADPhotoKit/Base'
-    img.dependency 'SnapKit'
-    img.source_files  = ["ADPhotoKit/Classes/VideoEdit/**/*.swift","ADPhotoKit/Classes/EditCore/**/*.swift"]
-    img.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_VideoEdit'}
-    img.resource_bundles = {
+  s.subspec "VideoEdit" do |video|
+    video.dependency 'ADPhotoKit/Base'
+    video.dependency 'SnapKit'
+    video.source_files  = ["ADPhotoKit/Classes/VideoEdit/**/*.swift","ADPhotoKit/Classes/EditCore/**/*.swift"]
+    video.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_VideoEdit'}
+    video.resource_bundles = {
       'ADPhotoKitVideoEdit' => ['ADPhotoKit/Assets/VideoEdit/**/*']
     }
   end

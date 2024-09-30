@@ -54,7 +54,7 @@ class ADImageClip: ADImageEditTool {
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         if let sourceInfo = source?.clipSource() {
-            let info = ADClipInfo(image: sourceInfo.image, clipRect: clipInfo.clipRect, rotation: clipInfo.rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
+            let info = ADImageClipInfo(image: sourceInfo.image, clipRect: clipInfo.clipRect, rotation: clipInfo.rotation, clipImage: sourceInfo.clipImage, clipFrom: sourceInfo.clipFrom)
             let clip = ADImageEditConfigure.imageClipVC(clipInfo: info)
             clip.clipInfoConfirm = { [weak self] clipRect,rotation in
                 let new = ClipInfo(clipRect: clipRect, rotation: rotation)

@@ -8,7 +8,7 @@
 import UIKit
 
 /// Image clip info.
-public struct ADClipInfo {
+public struct ADImageClipInfo {
     /// Origin image whithout clip but with other edit tool.
     public let image: UIImage
     /// Normalized clip rect. If `nil`, means image is not clip.
@@ -36,7 +36,7 @@ public struct ADClipInfo {
 
 class ADImageClipController: UIViewController, ADImageClipConfigurable {
     
-    var clipInfo: ADClipInfo
+    var clipInfo: ADImageClipInfo
     
     var clipInfoConfirm: ((CGRect?,ADRotation) -> Void)?
     
@@ -56,11 +56,11 @@ class ADImageClipController: UIViewController, ADImageClipConfigurable {
         }
     }
     
-    private let originalClipInfo: ADClipInfo
+    private let originalClipInfo: ADImageClipInfo
     
     private var rotationInfo: (UIView,CGFloat)?
         
-    required init(clipInfo: ADClipInfo) {
+    required init(clipInfo: ADImageClipInfo) {
         self.clipInfo = clipInfo
         self.originalClipInfo = clipInfo
         self.editedImage = clipInfo.image.image(with: clipInfo.rotation.rawValue/180.0*CGFloat.pi)

@@ -98,7 +98,7 @@ public protocol ADImageClipConfigurable where Self: UIViewController {
     
     /// Create with clip info.
     /// - Parameter clipInfo: Image clip info.
-    init(clipInfo: ADClipInfo)
+    init(clipInfo: ADImageClipInfo)
     
 }
 
@@ -108,7 +108,7 @@ class ADImageEditConfigure {
         return ADPhotoKitConfiguration.default.customImageEditVCBlock?(image, editInfo) ?? ADImageEditController(image: image, editInfo: editInfo)
     }
     
-    static func imageClipVC(clipInfo: ADClipInfo) -> ADImageClipConfigurable {
+    static func imageClipVC(clipInfo: ADImageClipInfo) -> ADImageClipConfigurable {
         return ADPhotoKitConfiguration.default.customImageClipVCBlock?(clipInfo) ?? ADImageClipController(clipInfo: clipInfo)
     }
     
