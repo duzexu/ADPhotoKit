@@ -23,6 +23,8 @@ class ADVideoSticker: ADVideoEditTool {
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
     
+    var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
+    
     private var stkrs: [ADWeakRef<ADStickerContentView>] = []
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {

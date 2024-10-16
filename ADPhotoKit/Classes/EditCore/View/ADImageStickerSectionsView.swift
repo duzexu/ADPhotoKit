@@ -39,8 +39,8 @@ class ADImageStickerSectionsView: UIView {
         collectionView.dataSource = self
         addSubview(collectionView)
         collectionView.snp.makeConstraints { (make) in
-            make.left.top.bottom.equalToSuperview()
-            make.right.equalToSuperview().offset(-60)
+            make.leading.top.bottom.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-60)
         }
         collectionView.regisiter(cell: ADImageStickerSectionSelectCell.self)
         
@@ -50,7 +50,7 @@ class ADImageStickerSectionsView: UIView {
         addSubview(closeBtn)
         closeBtn.snp.makeConstraints { make in
             make.size.equalTo(CGSize(width: 60, height: 60))
-            make.right.equalToSuperview()
+            make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
     }

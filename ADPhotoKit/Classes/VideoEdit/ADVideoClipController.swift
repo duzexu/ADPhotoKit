@@ -8,26 +8,28 @@
 import UIKit
 import AVFoundation
 
-class ADVideoClipController: UIViewController {
+/// Video clip info.
+public struct ADVideoClipInfo {
+    public let asset: AVAsset
+    public let normalizeMinTime: CGFloat?
+    public let normalizeMaxTime: CGFloat?
     
-    let asset: AVAsset
-    let minValue: CGFloat?
-    let maxValue: CGFloat?
-    let clipRange: CMTimeRange?
+    public var clipRange: CMTimeRange?
+}
+
+class ADVideoClipController: UIViewController, ADVideoClipConfigurable {
+    
+    let clipInfo: ADVideoClipInfo
     
     var clipCancel: (() -> Void)?
     var clipRangeChange: ((CMTimeRange) -> Void)?
     var clipRangeConfirm: (() -> Void)?
-    
     var seekReview: ((CMTime) -> Void)?
     
     private var clipProgressBar: ADVideoClipProgressBar?
     
-    init(asset: AVAsset, videoPlayer: ADVideoPlayable?, min: CGFloat? = nil, max: CGFloat? = nil, clipRange: CMTimeRange? = nil) {
-        self.asset = asset
-        self.minValue = min
-        self.maxValue = max
-        self.clipRange = clipRange
+    required init(clipInfo: ADVideoClipInfo) {
+        self.clipInfo = clipInfo
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -86,7 +88,7 @@ extension ADVideoClipController {
             make.bottom.equalToSuperview().offset(-safeAreaInsets.bottom-24)
         }
         
-        let progressBar = ADVideoClipProgressBar(asset: asset, min: minValue, max: maxValue, clipRange: clipRange)
+        let progressBar = ADVideoClipProgressBar(clipInfo: clipInfo)
         progressBar.timeRangeChanged = { [weak self] range in
             self?.clipRangeChange?(range)
         }

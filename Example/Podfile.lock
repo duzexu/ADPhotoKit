@@ -17,18 +17,21 @@ PODS:
   - Kingfisher (6.3.1)
   - ProgressHUD (2.70)
   - SnapKit (5.6.0)
+  - SpotlightLyrics (0.1.5)
 
 DEPENDENCIES:
   - ADPhotoKit/CoreUI (from `../`)
   - ADPhotoKit/ImageEdit (from `../`)
   - ADPhotoKit/VideoEdit (from `../`)
   - ProgressHUD
+  - SpotlightLyrics
 
 SPEC REPOS:
   trunk:
     - Kingfisher
     - ProgressHUD
     - SnapKit
+    - SpotlightLyrics
 
 EXTERNAL SOURCES:
   ADPhotoKit:
@@ -39,7 +42,8 @@ SPEC CHECKSUMS:
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
   ProgressHUD: e603e8b8622c47d8818b9fb38b3cfe9d3e7ca421
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  SpotlightLyrics: dd24e435678db20b476b454447e767f3f88f2b6e
 
-PODFILE CHECKSUM: b0b02a8c6780df54bac1c644edd729719b3a47ed
+PODFILE CHECKSUM: 3dca78543fa9eeba6b12a7c1d616b6a2bb47dac9
 
 COCOAPODS: 1.15.2

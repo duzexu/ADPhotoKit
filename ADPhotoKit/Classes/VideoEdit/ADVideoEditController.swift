@@ -54,6 +54,7 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
     let asset: AVAsset
     var editInfo: ADVideoEditInfo
     let options: ADVideoEditOptions
+    let videoSize: CGSize
     
     private var videoPlayerView: ADVideoPlayerView!
     
@@ -80,6 +81,7 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
         self.asset = asset
         self.editInfo = editInfo ?? ADVideoEditInfo()
         self.options = options
+        self.videoSize = ADVideoUitls.getNaturalSize(asset: asset)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -96,7 +98,6 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
         try? AVAudioSession.sharedInstance().setCategory(.playback)
         try? AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
         
-        ADUndoManager.shared.clear()
         ADStickerInteractView.shared.ctx = self
         setupUI()
     }
@@ -127,8 +128,8 @@ extension ADVideoEditController {
         }
         
         videoPlayerView = ADVideoPlayerView(asset: asset)
-        if max != nil && asset.duration.seconds > max! {
-            videoPlayerView.setClipRange(CMTimeRange(start: .zero, duration: CMTime(seconds: max!, preferredTimescale: asset.duration.timescale)))
+        videoPlayerView.addProgressObserver { _, time in
+            ADStickerInteractView.shared.updatePlayerTime(time)
         }
         
         var tools: [ADVideoEditTool] = []
@@ -143,6 +144,9 @@ extension ADVideoEditController {
             tools.append(ADVideoSticker(style: .text))
         }
         if tool.contains(.bgMusic) {
+            if ADPhotoKitConfiguration.default.customVideoMusicSelectVCBlock == nil && ADPhotoKitConfiguration.default.videoMusicDataSource == nil {
+                fatalError("`videoMusicDataSource` must not be `nil`")
+            }
             tools.append(ADVideoBGM())
         }
         if tool.contains(.clip) {
@@ -153,12 +157,6 @@ extension ADVideoEditController {
                 max = max!/asset.duration.seconds
             }
             let clip = ADVideoClip(asset: asset, min: min, max: max)
-            clip.beginClip = { [weak self] in
-                self?.beginClip()
-            }
-            clip.endClip = { [weak self] in
-                self?.endClip()
-            }
             tools.append(clip)
         }
         if let custom = ADPhotoKitConfiguration.default.customVideoEditToolsBlock?() {
@@ -166,6 +164,9 @@ extension ADVideoEditController {
         }
         
         for tool in tools {
+            tool.playableRectUpdate = { [weak self] bottom, top, animated in
+                self?.updatePlayableRect(bottom: bottom, top: top, animated: animated)
+            }
             tool.setVideoPlayer(ADWeakRef(value: videoPlayerView))
         }
         
@@ -311,20 +312,39 @@ extension ADVideoEditController {
 //        navigationController?.popViewController(animated: false)
     }
     
-    func beginClip() {
-        controlsView.alpha = 0
-        let new = view.frame.inset(by: UIEdgeInsets(top: 0, left: 25, bottom: 80+safeAreaInsets.bottom, right: 25))
-        let scale = CGAffineTransform(scaleX: new.width/view.frame.width, y: new.height/view.frame.height)
-        let trans = CGAffineTransform(translationX: 0, y: new.midY-view.frame.midY)
-        UIView.animate(withDuration: 0.5) {
-            self.contentView.transform = trans.concatenating(scale)
-        }
-    }
-    
-    func endClip() {
-        controlsView.alpha = 1
-        UIView.animate(withDuration: 0.5) {
-            self.contentView.transform = .identity
+    func updatePlayableRect(bottom: CGFloat, top: CGFloat, animated: Bool) {
+        if bottom == 0 && top == 0 {
+            controlsView.alpha = 1
+            if animated {
+                UIView.animate(withDuration: 0.3) {
+                    self.contentView.transform = .identity
+                }
+            }else{
+                self.contentView.transform = .identity
+            }
+        }else{
+            controlsView.alpha = 0
+            let videoHWRatio = videoSize.height / videoSize.width
+            let viewHWRatio = view.frame.height / view.frame.width
+            var size: CGSize = .zero
+            if videoHWRatio < viewHWRatio {
+                size.width = view.frame.width
+                size.height = view.frame.width * videoHWRatio
+            } else {
+                size.width = view.frame.height / videoHWRatio
+                size.height = view.frame.height
+            }
+            let scale = size.height <= (view.frame.height - bottom - top) ? 1 : (view.frame.height - bottom - top)/size.height
+            let newMidY = size.height * scale / 2 - view.frame.midY + top
+            let scaleTf = CGAffineTransform(scaleX: scale, y: scale)
+            let transTf = CGAffineTransform(translationX: 0, y: scale == 1 ? -bottom/2 : newMidY)
+            if animated {
+                UIView.animate(withDuration: 0.3) {
+                    self.contentView.transform = scaleTf.concatenating(transTf)
+                }
+            }else{
+                self.contentView.transform = scaleTf.concatenating(transTf)
+            }
         }
     }
     

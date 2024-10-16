@@ -126,7 +126,7 @@ private extension ADImageStickerSelectController {
         collectionView.dataSource = self
         bottomView.addSubview(collectionView)
         collectionView.snp.makeConstraints { (make) in
-            make.left.right.bottom.equalToSuperview()
+            make.leading.trailing.bottom.equalToSuperview()
             make.top.equalToSuperview().offset(60)
         }
         collectionView.regisiter(cell: ADImageStickerSectionCell.self)

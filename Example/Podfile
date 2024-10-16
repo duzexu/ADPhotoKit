@@ -7,4 +7,5 @@ target 'ADPhotoKit_Example' do
   pod 'ADPhotoKit', :path => '../', :subspecs => ['CoreUI','VideoEdit','ImageEdit']
   
   pod 'ProgressHUD'
+  pod 'SpotlightLyrics'
 end

@@ -10,6 +10,8 @@ import UIKit
 import ADPhotoKit
 import Photos
 import ProgressHUD
+import SpotlightLyrics
+import Kingfisher
 
 struct NetImage: ADAssetBrowsable {
     
@@ -49,6 +51,7 @@ class ViewController: UIViewController {
     let configs = Configs()
     
     private var dataSource: [ConfigSection] = []
+    private var bgms: [ADMusicItem] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,6 +92,44 @@ class ViewController: UIViewController {
             sections.append(section)
         }
         ADPhotoKitConfiguration.default.imageStickerDataSource = ADImageStickerDataSource(sections: sections)
+        #endif
+        
+        #if Module_VideoEdit
+        let bgms_path = Bundle.main.bundlePath + "/bgms"
+        let fileManager = FileManager.default
+        if let enumerator = fileManager.enumerator(at: URL(fileURLWithPath: bgms_path), includingPropertiesForKeys: nil) {
+            for case let fileURL as URL in enumerator {
+                if fileURL.pathExtension == "mp3" {
+                    let fileName = fileURL.deletingPathExtension().lastPathComponent
+                    let infos = fileName.components(separatedBy: "-")
+                    let lyric_path = bgms_path + "/\(fileName).lrc"
+                    var lyrics: [ADMusicLyric]? = nil
+                    if fileManager.fileExists(atPath: lyric_path), let lyricsString = try? String(contentsOf: URL(fileURLWithPath: lyric_path), encoding: .utf8) {
+                        let parser = LyricsParser(lyrics: lyricsString)
+                        lyrics = []
+                        for lyric in parser.lyrics {
+                            let item = ADMusicLyric(text: lyric.text, offset: lyric.time)
+                            lyrics?.append(item)
+                        }
+                    }
+                    let cover_path = bgms_path + "/\(fileName).png"
+                    let bgm = ADMusicItem(id: UUID().uuidString, asset: AVAsset(url: fileURL), cover: .provider(LocalFileImageDataProvider(fileURL: URL(fileURLWithPath: cover_path), cacheKey: nil)), name: infos[0], singer: infos[1], lyric: lyrics)
+                    bgms.append(bgm)
+                }
+            }
+        }
+        
+        ADPhotoKitConfiguration.default.videoMusicDataSource = { [weak self] keyword, completion in
+            if keyword == nil {
+                completion(self?.bgms ?? [])
+            }else{
+                if let item = self?.bgms.randomElement() {
+                    completion([item])
+                }else{
+                    completion(self?.bgms ?? [])
+                }
+            }
+        }
         #endif
         
         let stack = UIStackView()

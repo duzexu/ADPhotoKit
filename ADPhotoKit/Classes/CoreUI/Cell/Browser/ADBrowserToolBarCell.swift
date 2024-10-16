@@ -21,6 +21,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         layer.borderColor = UIColor(hex: 0x10C060)?.cgColor
         
         imageView = UIImageView()
+        imageView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
@@ -31,7 +32,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         tagImageView = UIImageView()
         contentView.addSubview(tagImageView)
         tagImageView.snp.makeConstraints { (make) in
-            make.left.equalToSuperview().offset(5)
+            make.leading.equalToSuperview().offset(5)
             make.bottom.equalToSuperview().offset(-5)
         }
         
@@ -40,8 +41,8 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         tagLabel.textColor = .white
         contentView.addSubview(tagLabel)
         tagLabel.snp.makeConstraints { (make) in
-            make.left.equalToSuperview().offset(5)
-            make.right.equalToSuperview().offset(-5)
+            make.leading.equalToSuperview().offset(5)
+            make.trailing.equalToSuperview().offset(-5)
             make.bottom.equalToSuperview().offset(-5)
         }
     }

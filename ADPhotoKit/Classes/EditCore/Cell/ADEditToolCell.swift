@@ -14,6 +14,7 @@ class ADEditToolCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         iconImageView = UIImageView(frame: .zero)
+        iconImageView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         iconImageView.contentMode = .center
         contentView.addSubview(iconImageView)
         iconImageView.snp.makeConstraints { make in

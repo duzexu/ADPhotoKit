@@ -139,7 +139,7 @@ private extension ADEditControlsView {
         addSubview(confirmBtn)
         confirmBtn.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview().offset(-tabBarOffset-20)
-            make.right.equalToSuperview().offset(-20)
+            make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(34)
         }
         
@@ -158,8 +158,8 @@ private extension ADEditControlsView {
         addSubview(toolsCollectionView)
         toolsCollectionView.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-tabBarOffset-20)
-            make.left.equalToSuperview().offset(20)
-            make.right.equalTo(confirmBtn.snp.left).offset(-20)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalTo(confirmBtn.snp.leading).offset(-20)
             make.height.equalTo(30)
         }
         toolsCollectionView.regisiter(cell: ADEditToolCell.self)

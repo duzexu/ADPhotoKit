@@ -13,11 +13,11 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		810C016E2C522C6E0051AE90 /* CustomAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810C016D2C522C6E0051AE90 /* CustomAlertViewController.swift */; };
+		816183C52CBD0A3D00FE3D2D /* bgms in Resources */ = {isa = PBXBuildFile; fileRef = 816183C42CBD0A3D00FE3D2D /* bgms */; };
 		81D9AA9A2B6A433000CE472F /* SwiftUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA992B6A433000CE472F /* SwiftUIViewController.swift */; };
 		81D9AA9D2B6A44C700CE472F /* MainSwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */; };
 		81D9AA9F2B6A45CC00CE472F /* DemosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */; };
 		81D9AAA12B6A502D00CE472F /* ConfigCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 81D9AAA02B6A502D00CE472F /* ConfigCell.xib */; };
-		81DE606B2C8EFCB60023A2B2 /* music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 81DE606A2C8EFCB60023A2B2 /* music.mp3 */; };
 		9522FB332655133D00A0D360 /* ProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB322655133D00A0D360 /* ProgressHUD.swift */; };
 		9522FB3826551A4400A0D360 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9522FB3726551A4400A0D360 /* Progress.swift */; };
 		9551F0A7263A98D80089C8DE /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9551F0A6263A98D80089C8DE /* LanguageViewController.swift */; };
@@ -114,11 +114,11 @@
 		6F6E6C84A9FE07B23F93C7EB /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		781C69769B128467B470C297 /* ADPhotoKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ADPhotoKit.podspec; path = ../ADPhotoKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		810C016D2C522C6E0051AE90 /* CustomAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlertViewController.swift; sourceTree = "<group>"; };
+		816183C42CBD0A3D00FE3D2D /* bgms */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bgms; sourceTree = "<group>"; };
 		81D9AA992B6A433000CE472F /* SwiftUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIViewController.swift; sourceTree = "<group>"; };
 		81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSwiftUIView.swift; sourceTree = "<group>"; };
 		81D9AA9E2B6A45CC00CE472F /* DemosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemosViewController.swift; sourceTree = "<group>"; };
 		81D9AAA02B6A502D00CE472F /* ConfigCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigCell.xib; sourceTree = "<group>"; };
-		81DE606A2C8EFCB60023A2B2 /* music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = music.mp3; sourceTree = "<group>"; };
 		9522FB322655133D00A0D360 /* ProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
 		9522FB3726551A4400A0D360 /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		9551F0A6263A98D80089C8DE /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
@@ -265,7 +265,7 @@
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				9555816B26BA465E007AA13C /* image_sticker */,
-				81DE60692C8EFCA60023A2B2 /* bgms */,
+				816183C42CBD0A3D00FE3D2D /* bgms */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 			);
@@ -298,14 +298,6 @@
 				81D9AA9C2B6A44C700CE472F /* MainSwiftUIView.swift */,
 			);
 			name = SwiftUIViews;
-			sourceTree = "<group>";
-		};
-		81DE60692C8EFCA60023A2B2 /* bgms */ = {
-			isa = PBXGroup;
-			children = (
-				81DE606A2C8EFCB60023A2B2 /* music.mp3 */,
-			);
-			path = bgms;
 			sourceTree = "<group>";
 		};
 		9522FB312655130E00A0D360 /* Custom */ = {
@@ -540,12 +532,12 @@
 				9555816426BA4657007AA13C /* pig_15.png in Resources */,
 				9555816226BA4657007AA13C /* pig_3.png in Resources */,
 				9555815F26BA4657007AA13C /* pig_2.png in Resources */,
-				81DE606B2C8EFCB60023A2B2 /* music.mp3 in Resources */,
 				9555815326BA4657007AA13C /* pig_8.png in Resources */,
 				9555814226BA4657007AA13C /* agg_cover.png in Resources */,
 				9555813A26BA4657007AA13C /* agg_6.png in Resources */,
 				9555815526BA4657007AA13C /* pig_19.png in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
+				816183C52CBD0A3D00FE3D2D /* bgms in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 				9555816026BA4657007AA13C /* pig_10.png in Resources */,
 				9555814B26BA4657007AA13C /* dog_6.png in Resources */,
@@ -613,6 +605,7 @@
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/ProgressHUD/ProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+				"${BUILT_PRODUCTS_DIR}/SpotlightLyrics/SpotlightLyrics.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -620,6 +613,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SpotlightLyrics.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

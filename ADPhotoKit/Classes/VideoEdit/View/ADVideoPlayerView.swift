@@ -19,18 +19,10 @@ public struct ADVideoStcker {
     public let image: UIImage
 }
 
-public struct ADVideoSound {
-    public let originalSound: Bool
-    public let bgmAsset: AVAsset?
-    public let bgmLoop: Bool
-    
-    public static let `default` = ADVideoSound(originalSound: true, bgmAsset: nil, bgmLoop: true)
-}
-
 class Observer {
-    var target: ((CGFloat)->Void)
+    var target: ((CGFloat, CMTime)->Void)
     
-    init(target: @escaping (CGFloat) -> Void) {
+    init(target: @escaping (CGFloat, CMTime) -> Void) {
         self.target = target
     }
 }
@@ -69,7 +61,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         layer.insertSublayer(videoPlayerLayer, at: 0)
         videoPlayerLayer.player = player
         player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 60), queue: DispatchQueue.main) { [weak self] time in
-            self?.playTimeChange(time)
+            self?.playerTimeUpdate(time)
         }
         updateEdit()
         NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
@@ -108,7 +100,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         }
     }
     
-    func addProgressObserver(_ observer: @escaping (CGFloat) -> Void) {
+    func addProgressObserver(_ observer: @escaping (_ progress: CGFloat, _ time: CMTime) -> Void) {
         progressObservers.append(Observer(target: observer))
     }
     
@@ -189,7 +181,7 @@ extension ADVideoPlayerView {
         }
         
         var audioTrack: AVMutableCompositionTrack?
-        if videoSound.originalSound {
+        if videoSound.ostOn {
             audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
             if let audio = asset.tracks(withMediaType: .audio).first {
                 try? audioTrack?.insertTimeRange(timeRange, of: audio, at: .zero)
@@ -197,7 +189,7 @@ extension ADVideoPlayerView {
         }
         
         var bgmTrack: AVMutableCompositionTrack?
-        if let bgmAsset = videoSound.bgmAsset {
+        if let bgmAsset = videoSound.bgm?.asset {
             bgmTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
             if let bgm = bgmAsset.tracks(withMediaType: .audio).first {
                 if !videoSound.bgmLoop {
@@ -205,11 +197,13 @@ extension ADVideoPlayerView {
                     try? bgmTrack?.insertTimeRange(bgmRange, of: bgm, at: .zero)
                 }else{
                     var duration = min(timeRange.duration, bgmAsset.duration)
+                    var total = timeRange.duration
                     var start: CMTime = .zero
-                    while duration.seconds > 0 {
+                    while total.seconds > 0 {
                         try? bgmTrack?.insertTimeRange(CMTimeRange(start: .zero, duration: duration), of: bgm, at: start)
                         start = CMTimeAdd(start, duration)
-                        duration = timeRange.duration - start
+                        total = timeRange.duration - start
+                        duration = min(total, duration)
                     }
                 }
             }
@@ -234,11 +228,11 @@ extension ADVideoPlayerView {
         player.play()
     }
     
-    func playTimeChange(_ time: CMTime) {
+    func playerTimeUpdate(_ time: CMTime) {
         let duration = clipRange?.duration.seconds ?? asset.duration.seconds
         let progress = time.seconds / duration
         for item in progressObservers {
-            item.target(progress)
+            item.target(progress, time)
         }
     }
 }

@@ -230,6 +230,7 @@ public class ADPhotoKitConfiguration {
     
     /// System video edit tools. Default is ordered by `ADVideoEditTools.all` 's order. You can remove some tools or reorder as you wish.
     /// - Note: If contain `.imageStkr`, you must set `imageStickerDataSource` or `customImageStickerSelectVC`.
+    /// - Note: If contain `.bgMusic`, you must set `videoMusicDataSource` or `customVideoMusicSelectVC`.
     public var systemVideoEditTools: ADVideoEditTools = .all
     
     /// User custom video edit tools. Custom tools is default add after system tools.
@@ -239,7 +240,14 @@ public class ADPhotoKitConfiguration {
     
     /* =============== bgm =============== */
     
+    public var videoMusicDataSource: ADVideoMusicDataSource?
+    
+    public var customVideoMusicSelectVCBlock: ((ADVideoSound?) -> ADVideoMusicSelectConfigurable)?
+    
     /* =============== clip =============== */
+    
+    /// Custom video clip controller.
+    public var customVideoClipVCBlock: ((ADVideoClipInfo) -> ADVideoClipConfigurable)?
     
     #endif
 

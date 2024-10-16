@@ -22,6 +22,7 @@ class ADImageStickerSectionSelectCell: UICollectionViewCell {
         contentView.layer.cornerRadius = 8
         contentView.layer.masksToBounds = true
         imageView = UIImageView()
+        imageView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
@@ -56,6 +57,7 @@ class ADImageStickerSectionCell: UICollectionViewCell {
         layout.itemSize = CGSize(width: 64, height: 64)
         layout.headerReferenceSize = CGSize(width: screenWidth, height: 49)
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -126,7 +128,7 @@ class ADImageStickerSectionHeader: UICollectionReusableView {
         nameLabel.font = UIFont.systemFont(ofSize: 14)
         addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(16)
+            make.leading.equalToSuperview().offset(16)
             make.centerY.equalToSuperview()
         }
     }
@@ -145,6 +147,7 @@ class ADImageStickerItemCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         imageView = UIImageView()
+        imageView.transform = ADLocale.isRTL ? CGAffineTransform.identity.scaledBy(x: -1.0, y: 1) : CGAffineTransform.identity
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
@@ -156,7 +159,7 @@ class ADImageStickerItemCell: UICollectionViewCell {
         label.textColor = UIColor(hex: 0x7f7f7f)
         contentView.addSubview(label)
         label.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
             make.top.equalTo(imageView.snp.bottom).offset(7)
         }
     }

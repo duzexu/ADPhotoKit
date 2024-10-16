@@ -18,29 +18,28 @@ class ADVideoClip: ADVideoEditTool {
         
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
-    weak var clipVC: ADVideoClipController?
+    weak var clipVC: ADVideoClipConfigurable?
     
     let asset: AVAsset
     var videoPlayer: ADVideoPlayable?
     let minValue: CGFloat?
     let maxValue: CGFloat?
     
-    var beginClip: (()->Void)?
-    var endClip: (()->Void)?
+    var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
     
     var clipRange: CMTimeRange?
         
     func toolDidSelect(ctx: UIViewController?) -> Bool {
-        let clip = ADVideoClipController(asset: asset, videoPlayer: videoPlayer, min: minValue, max: maxValue, clipRange: clipRange)
+        let clip = ADVideoEditConfigure.videoClipVC(clipInfo: ADVideoClipInfo(asset: asset, normalizeMinTime: minValue, normalizeMaxTime: maxValue, clipRange: clipRange))
         clip.modalPresentationStyle = .overCurrentContext
         ctx?.present(clip, animated: false, completion: nil)
         clip.clipCancel = { [weak self] in
             self?.videoPlayer?.clipRange = self?.clipRange
-            self?.endClip?()
+            self?.playableRectUpdate(0, 0, true)
         }
         clip.clipRangeConfirm = { [weak self] in
             self?.clipRange = self?.videoPlayer?.clipRange
-            self?.endClip?()
+            self?.playableRectUpdate(0, 0, true)
         }
         clip.clipRangeChange = { [weak self] range in
             self?.videoPlayer?.clipRange = range
@@ -49,7 +48,7 @@ class ADVideoClip: ADVideoEditTool {
             self?.videoPlayer?.seek(to: time, pause: true)
         }
         clipVC = clip
-        beginClip?()
+        playableRectUpdate(128 + safeAreaInsets.bottom + 24, safeAreaInsets.top + 24, true)
         return false
     }
     
@@ -75,7 +74,7 @@ class ADVideoClip: ADVideoEditTool {
     
     func setVideoPlayer<T: ADVideoPlayable>(_ player: ADWeakRef<T>) {
         videoPlayer = player.value
-        videoPlayer?.addProgressObserver { [weak self] progress in
+        videoPlayer?.addProgressObserver { [weak self] progress, _ in
             self?.clipVC?.updateProgress(progress)
         }
     }

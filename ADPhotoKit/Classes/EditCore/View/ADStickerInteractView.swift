@@ -216,7 +216,7 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
     weak var ctx: UIViewController?
     
     private var clipView: UIView!
-    private var container: UIView!
+    internal var container: UIView!
     
     private lazy var trashView: TrashView = {
         let view = TrashView(frame: CGRect(x: 0, y: 0, width: 160, height: 80))
@@ -390,6 +390,18 @@ public class ADStickerInteractView: UIView, ADToolInteractable {
                 break
             }
         }
+    }
+    
+    /// Get sticker content with stickerID.
+    /// - Parameter stickerID: Sticker stickerID.
+    /// - Returns: Sticker content view.
+    public func contentWithId(_ stickerID: String) -> ADStickerContentView? {
+        for sub in container.subviews.reversed() {
+            if (sub as! ADStickerContentView).stickerID == stickerID {
+                return (sub as! ADStickerContentView)
+            }
+        }
+        return nil
     }
         
     func presentTrashView() {
@@ -582,6 +594,30 @@ public class ADStickerContentView: UIView {
         
     }
     
+    /// Called when translation the content view. Subclass can override and do some operation.
+    /// - Parameter trans: translate distance.
+    open func translation(by trans: CGPoint) {
+        center = CGPoint(x: center.x+trans.x, y: center.y+trans.y)
+    }
+    
+    /// Called when pinch the content view. Subclass can override and do some operation.
+    /// - Parameter scale: pinch scale.
+    open func pinch(by scale: CGFloat) {
+        if scale != 0 {
+            let scal = self.scale * scale
+            if scal <= maxScale/outerScale {
+                self.scale = scal
+                transform = transform.scaledBy(x: scale, y: scale)
+            }
+        }
+    }
+    
+    /// Called when rotate the content view. Subclass can override and do some operation.
+    /// - Parameter angle: rotate angle.
+    open func rotate(by angle: CGFloat) {
+        transform = transform.rotated(by: angle)
+    }
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -599,24 +635,6 @@ public class ADStickerContentView: UIView {
     @objc func resignActive() {
         isActive = false
         layer.borderColor = UIColor.clear.cgColor
-    }
-    
-    func translation(by trans: CGPoint) {
-        center = CGPoint(x: center.x+trans.x, y: center.y+trans.y)
-    }
-    
-    func pinch(by scale: CGFloat) {
-        if scale != 0 {
-            let scal = self.scale * scale
-            if scal <= maxScale/outerScale {
-                self.scale = scal
-                transform = transform.scaledBy(x: scale, y: scale)
-            }
-        }
-    }
-    
-    func rotate(by angle: CGFloat) {
-        transform = transform.rotated(by: angle)
     }
     
     private func updateBorderWidth() {

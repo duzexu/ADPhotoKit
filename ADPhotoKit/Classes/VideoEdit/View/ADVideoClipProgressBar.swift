@@ -10,10 +10,7 @@ import AVFoundation
 
 class ADVideoClipProgressBar: UIView {
     
-    let asset: AVAsset
-    let minValue: CGFloat?
-    let maxValue: CGFloat?
-    let clipRange: CMTimeRange?
+    let clipInfo: ADVideoClipInfo
     var seekTimeReview: ((CMTime) -> Void)?
     var timeRangeChanged: ((CMTimeRange) -> Void)?
     var progerss: CGFloat = 0 {
@@ -36,7 +33,7 @@ class ADVideoClipProgressBar: UIView {
     private var frameImageCache: [Int: UIImage] = [:]
     
     private lazy var generator: AVAssetImageGenerator = {
-        let g = AVAssetImageGenerator(asset: asset)
+        let g = AVAssetImageGenerator(asset: clipInfo.asset)
         g.appliesPreferredTrackTransform = true
         g.requestedTimeToleranceBefore = .zero
         g.requestedTimeToleranceAfter = .zero
@@ -44,12 +41,9 @@ class ADVideoClipProgressBar: UIView {
         return g
     }()
     
-    init(asset: AVAsset, min: CGFloat?, max: CGFloat?, clipRange: CMTimeRange?) {
-        self.asset = asset
-        self.minValue = min
-        self.maxValue = max
-        self.clipRange = clipRange
-        self.interval = asset.duration.seconds/10
+    init(clipInfo: ADVideoClipInfo) {
+        self.clipInfo = clipInfo
+        self.interval = clipInfo.asset.duration.seconds/10
         super.init(frame: .zero)
         setupUI()
     }
@@ -92,22 +86,25 @@ extension ADVideoClipProgressBar {
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        borderView = ADVideoClipProgressBorder(min: minValue, max: maxValue)
+        borderView = ADVideoClipProgressBorder(min: clipInfo.normalizeMinTime, max: clipInfo.normalizeMaxTime)
         addSubview(borderView)
         borderView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        if let clipRange = clipRange {
-            let duration = asset.duration.seconds
+        let asset = clipInfo.asset
+        if let clipRange = clipInfo.clipRange {
+            let duration = clipInfo.asset.duration.seconds
             borderView.left = clipRange.start.seconds/duration
             let right = (clipRange.start.seconds+clipRange.duration.seconds)/duration
             borderView.right = min(1, right)
         }else{
-            if maxValue != nil {
-                borderView.right = maxValue!
-                let start = CMTime(seconds: asset.duration.seconds*borderView.left, preferredTimescale: asset.duration.timescale)
-                let end = CMTime(seconds: asset.duration.seconds*borderView.right, preferredTimescale: asset.duration.timescale)
-                timeRangeChanged?(CMTimeRange(start: start, end: end))
+            if clipInfo.normalizeMaxTime != nil {
+                borderView.right = clipInfo.normalizeMaxTime!
+                if clipInfo.normalizeMaxTime! < 1 {
+                    let start = CMTime(seconds: asset.duration.seconds*borderView.left, preferredTimescale: asset.duration.timescale)
+                    let end = CMTime(seconds: asset.duration.seconds*borderView.right, preferredTimescale: asset.duration.timescale)
+                    timeRangeChanged?(CMTimeRange(start: start, end: end))
+                }
             }
         }
         let panGes = UIPanGestureRecognizer(target: self, action: #selector(panAction(_:)))
@@ -119,6 +116,7 @@ extension ADVideoClipProgressBar {
     func panAction(_ sender: UIPanGestureRecognizer) {
         let point = sender.location(in: self)
         let value = borderView.trySetValue(point.x / frame.width)
+        let asset = clipInfo.asset
         if sender.state == .began {
             borderView.highlight = true
             borderView.value = value
@@ -151,7 +149,7 @@ extension ADVideoClipProgressBar: UICollectionViewDataSource, UICollectionViewDe
         cell.imageView.image = image
         if image == nil {
             let mes = TimeInterval(indexPath.row) * interval
-            let time = CMTimeMakeWithSeconds(Float64(mes), preferredTimescale: asset.duration.timescale)
+            let time = CMTimeMakeWithSeconds(Float64(mes), preferredTimescale: clipInfo.asset.duration.timescale)
             let operation = ADVideoThumbnailOperation(generator: generator, time: time) { [weak self] image in
                 self?.frameImageCache[indexPath.row] = image
                 self?.collectionView.reloadItems(at: [IndexPath(row: indexPath.row, section: 0)])
