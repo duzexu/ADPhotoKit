@@ -22,6 +22,7 @@ class ADVideoSticker: ADVideoEditTool {
         
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
+    weak var videoPlayable: ADVideoPlayable?
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
     
@@ -92,10 +93,6 @@ class ADVideoSticker: ADVideoEditTool {
     }
     
     func decode(from: Any) {
-        
-    }
-    
-    func setVideoPlayer<T: ADVideoPlayable>(_ player: ADWeakRef<T>) {
         
     }
     

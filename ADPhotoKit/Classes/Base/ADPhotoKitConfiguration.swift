@@ -233,6 +233,8 @@ public class ADPhotoKitConfiguration {
     /// - Note: If contain `.bgMusic`, you must set `videoMusicDataSource` or `customVideoMusicSelectVC`.
     public var systemVideoEditTools: ADVideoEditTools = .all
     
+    public var customVideoPlayableBlock: ((AVAsset) -> ADVideoPlayable)?
+    
     /// User custom video edit tools. Custom tools is default add after system tools.
     public var customVideoEditToolsBlock: (() -> [ADVideoEditTool])?
     

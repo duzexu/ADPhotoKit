@@ -8,13 +8,9 @@
 import Foundation
 
 class ADVideoBGM: ADVideoEditTool {
-    
+        
     var image: UIImage {
-        return Bundle.image(name: "icons_filled_bgm", module: .videoEdit) ?? UIImage()
-    }
-    
-    var selectImage: UIImage? {
-        return Bundle.image(name: "icons_filled_bgm_on", module: .videoEdit) ?? UIImage()
+        return videoSound.bgm == nil ? Bundle.image(name: "icons_filled_bgm", module: .videoEdit) ?? UIImage() : Bundle.image(name: "icons_filled_bgm_on", module: .videoEdit) ?? UIImage()
     }
     
     var isSelected: Bool = false
@@ -22,17 +18,17 @@ class ADVideoBGM: ADVideoEditTool {
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
     
-    var videoPlayer: ADVideoPlayable?
+    weak var videoPlayable: ADVideoPlayable?
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
     
-    var videoSound: ADVideoSound!
+    var videoSound: ADVideoSound = .default
      
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         let bgm = ADVideoEditConfigure.videoMusicSelectVC(sound: videoSound)
         bgm.soundDidChange = { [weak self] sound in
             self?.videoSound = sound
-            self?.videoPlayer?.videoSound = sound
+            self?.videoPlayable?.videoSound = sound
         }
         bgm.playableRectUpdate = playableRectUpdate
         bgm.modalPresentationStyle = .custom
@@ -54,10 +50,6 @@ class ADVideoBGM: ADVideoEditTool {
         if let json = from as? Dictionary<String,Any> {
             videoSound = json["videoSound"] as? ADVideoSound ?? .default
         }
-    }
-    
-    func setVideoPlayer<T: ADVideoPlayable>(_ player: ADWeakRef<T>) {
-        videoPlayer = player.value
     }
     
     init() {

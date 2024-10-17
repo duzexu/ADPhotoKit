@@ -64,7 +64,6 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
             self?.playerTimeUpdate(time)
         }
         updateEdit()
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
     }
     
     @available(*, unavailable)
@@ -89,10 +88,11 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         }
     }
     
+    func play() {
+        player.play()
+    }
+    
     func seek(to: CMTime, pause: Bool) {
-        if clipRange != nil && !clipRange!.containsTime(to) {
-            setClipRange(nil)
-        }
         player?.pause()
         player?.seek(to: to)
         if !pause {
@@ -114,10 +114,6 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     func removeSticker(_ id: String) {
         stkrs.removeAll { $0.id == id }
-    }
-    
-    func setClipRange(_ range: CMTimeRange?) {
-        
     }
     
     func setVideoSound(_ sound: ADVideoSound) {
@@ -238,12 +234,6 @@ extension ADVideoPlayerView {
 }
 
 extension ADVideoPlayerView {
-    @objc func appWillResignActive() {
-        if let play = player, play.rate != 0 {
-            pause()
-        }
-    }
-    
     @objc func playDidFinish() {
         pause(seekToZero: true)
     }

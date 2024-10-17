@@ -142,6 +142,8 @@ private extension ADMusicSelectController {
                 }
             }else{
                 let content = ADLyricsStickerContentView(music: music)
+                content.soundDidChange = soundDidChange
+                content.playableRectUpdate = playableRectUpdate
                 ADStickerInteractView.shared.addContent(content)
             }
         }else{

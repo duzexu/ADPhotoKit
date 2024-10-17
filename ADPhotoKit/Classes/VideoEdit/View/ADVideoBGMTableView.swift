@@ -46,11 +46,23 @@ class ADVideoBGMTableView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func reload(items: [ADMusicItem]) {
+    func reload(items: [ADMusicItem], selected: ADMusicItem? = nil) {
         musicItems = items
+        tableView.reloadData()
+        if let selected = selected {
+            if let index = items.firstIndex(where: { item in
+                return item.id == selected.id
+            }) {
+                tableView.reloadData()
+                selectRow(index)
+            }else{
+                musicItems.insert(selected, at: 0)
+                tableView.reloadData()
+                selectRow(0)
+            }
+        }
         emptyLabel.isHidden = musicItems.count != 0
         footerView.isHidden = musicItems.count == 0
-        tableView.reloadData()
     }
     
     func cancelSelect() {

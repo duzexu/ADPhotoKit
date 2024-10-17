@@ -13,8 +13,8 @@ import AVFoundation
 public protocol ADVideoEditTool: ADEditTool {
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)! { set get }
-        
-    func setVideoPlayer<T: ADVideoPlayable>(_ player: ADWeakRef<T>)
+    
+    var videoPlayable: ADVideoPlayable? { set get }
     
 }
 
@@ -25,6 +25,10 @@ public protocol ADVideoPlayable where Self: UIView {
     var videoSound: ADVideoSound { set get }
     
     init(asset: AVAsset)
+    
+    func pause(seekToZero: Bool)
+    
+    func play()
     
     func seek(to: CMTime, pause: Bool)
     
@@ -76,6 +80,10 @@ public protocol ADVideoMusicSelectConfigurable where Self: UIViewController {
 }
 
 class ADVideoEditConfigure {
+    
+    static func videoPlayable(asset: AVAsset) -> ADVideoPlayable {
+        return ADPhotoKitConfiguration.default.customVideoPlayableBlock?(asset) ?? ADVideoPlayerView(asset: asset)
+    }
     
     static func videoEditVC(asset: AVAsset, editInfo: ADVideoEditInfo?, options: ADVideoEditOptions) -> ADVideoEditConfigurable {
         return ADPhotoKitConfiguration.default.customVideoEditVCBlock?(asset, editInfo, options) ?? ADVideoEditController(asset: asset, editInfo: editInfo, options: options)

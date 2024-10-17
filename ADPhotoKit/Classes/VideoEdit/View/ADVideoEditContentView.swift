@@ -11,14 +11,14 @@ import AVFoundation
 class ADVideoEditContentView: UIView {
 
     let asset: AVAsset
-    weak var videoPlayerView: ADVideoPlayerView?
+    weak var videoPlayerView: ADVideoPlayable?
     
     private var interactContainer: ADInteractContainerView!
     
     private var interactTools: [ADVideoEditTool] = []
     private var target: ADVideoEditTool?
     
-    init(asset: AVAsset, videoPlayer: ADVideoPlayerView, tools: [ADVideoEditTool]) {
+    init(asset: AVAsset, videoPlayer: ADVideoPlayable, tools: [ADVideoEditTool]) {
         self.asset = asset
         self.videoPlayerView = videoPlayer
         super.init(frame: .zero)

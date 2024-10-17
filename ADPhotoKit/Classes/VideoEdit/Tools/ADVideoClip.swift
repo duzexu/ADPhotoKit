@@ -21,12 +21,18 @@ class ADVideoClip: ADVideoEditTool {
     weak var clipVC: ADVideoClipConfigurable?
     
     let asset: AVAsset
-    var videoPlayer: ADVideoPlayable?
     let minValue: CGFloat?
     let maxValue: CGFloat?
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
     
+    weak var videoPlayable: ADVideoPlayable? {
+        didSet {
+            videoPlayable?.addProgressObserver { [weak self] progress, _ in
+                self?.clipVC?.updateProgress(progress)
+            }
+        }
+    }
     var clipRange: CMTimeRange?
         
     func toolDidSelect(ctx: UIViewController?) -> Bool {
@@ -34,18 +40,18 @@ class ADVideoClip: ADVideoEditTool {
         clip.modalPresentationStyle = .overCurrentContext
         ctx?.present(clip, animated: false, completion: nil)
         clip.clipCancel = { [weak self] in
-            self?.videoPlayer?.clipRange = self?.clipRange
+            self?.videoPlayable?.clipRange = self?.clipRange
             self?.playableRectUpdate(0, 0, true)
         }
         clip.clipRangeConfirm = { [weak self] in
-            self?.clipRange = self?.videoPlayer?.clipRange
+            self?.clipRange = self?.videoPlayable?.clipRange
             self?.playableRectUpdate(0, 0, true)
         }
         clip.clipRangeChange = { [weak self] range in
-            self?.videoPlayer?.clipRange = range
+            self?.videoPlayable?.clipRange = range
         }
         clip.seekReview = { [weak self] time in
-            self?.videoPlayer?.seek(to: time, pause: true)
+            self?.videoPlayable?.seek(to: time, pause: true)
         }
         clipVC = clip
         playableRectUpdate(128 + safeAreaInsets.bottom + 24, safeAreaInsets.top + 24, true)
@@ -62,7 +68,7 @@ class ADVideoClip: ADVideoEditTool {
     
     func decode(from: Any) {
         if let json = from as? Dictionary<String,Any> {
-            videoPlayer?.clipRange = json["clipInfo"] as? CMTimeRange
+            videoPlayable?.clipRange = json["clipInfo"] as? CMTimeRange
         }
     }
     
@@ -72,10 +78,4 @@ class ADVideoClip: ADVideoEditTool {
         self.maxValue = max
     }
     
-    func setVideoPlayer<T: ADVideoPlayable>(_ player: ADWeakRef<T>) {
-        videoPlayer = player.value
-        videoPlayer?.addProgressObserver { [weak self] progress, _ in
-            self?.clipVC?.updateProgress(progress)
-        }
-    }
 }

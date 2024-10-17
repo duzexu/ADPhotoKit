@@ -79,7 +79,7 @@ class ADVideoBGMSelectView: UIView {
     }
     
     func reload(items: [ADMusicItem]) {
-        contentView.tableView.reload(items: items)
+        contentView.tableView.reload(items: items, selected: wrapper.bgm)
     }
     
     @available(*, unavailable)

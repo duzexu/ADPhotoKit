@@ -26,6 +26,9 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     var music: ADMusicItem
     var sound: ADVideoSound?
     
+    var soundDidChange: ((ADVideoSound) -> Void)?
+    var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)?
+    
     override var stickerInfo: ADLyricsStickerInfo {
         return ADLyricsStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, music: music)
     }
@@ -61,9 +64,12 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     
     override func doubleTapAction(ctx: UIViewController?) {
         let vc = ADVideoEditConfigure.videoMusicSelectVC(sound: sound)
+        vc.soundDidChange = soundDidChange
+        vc.playableRectUpdate = playableRectUpdate
         vc.modalPresentationStyle = .custom
         vc.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
         ctx?.present(vc, animated: true, completion: nil)
+        playableRectUpdate?(vc.bottomHeight, 0, true)
     }
     
     override func playerTimeUpdate(_ time: CMTime) {

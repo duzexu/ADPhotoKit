@@ -56,7 +56,7 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
     let options: ADVideoEditOptions
     let videoSize: CGSize
     
-    private var videoPlayerView: ADVideoPlayerView!
+    private var videoPlayerView: ADVideoPlayable!
     
     private var contentView: ADVideoEditContentView!
     private var controlsView: ADVideoEditControlsView!
@@ -100,6 +100,8 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
         
         ADStickerInteractView.shared.ctx = self
         setupUI()
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     deinit {
@@ -127,7 +129,7 @@ extension ADVideoEditController {
             }
         }
         
-        videoPlayerView = ADVideoPlayerView(asset: asset)
+        videoPlayerView = ADVideoEditConfigure.videoPlayable(asset: asset)
         videoPlayerView.addProgressObserver { _, time in
             ADStickerInteractView.shared.updatePlayerTime(time)
         }
@@ -167,7 +169,7 @@ extension ADVideoEditController {
             tool.playableRectUpdate = { [weak self] bottom, top, animated in
                 self?.updatePlayableRect(bottom: bottom, top: top, animated: animated)
             }
-            tool.setVideoPlayer(ADWeakRef(value: videoPlayerView))
+            tool.videoPlayable = videoPlayerView
         }
         
         contentView = ADVideoEditContentView(asset: asset, videoPlayer: videoPlayerView, tools: tools)
@@ -218,6 +220,14 @@ extension ADVideoEditController {
         let rotationGes = UIRotationGestureRecognizer(target: self, action: #selector(rotateAction(_:)))
         rotationGes.delegate = self
         view.addGestureRecognizer(rotationGes)
+    }
+    
+    @objc func appDidBecomeActive() {
+        videoPlayerView.seek(to: .zero, pause: false)
+    }
+    
+    @objc func appWillResignActive() {
+        videoPlayerView.pause(seekToZero: false)
     }
     
 }
