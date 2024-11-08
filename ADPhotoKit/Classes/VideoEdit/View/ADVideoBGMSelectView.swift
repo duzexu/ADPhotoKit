@@ -45,9 +45,11 @@ class ADVideoSoundWrapped {
 class ADVideoBGMSelectView: UIView {
     
     var wrapper: ADVideoSoundWrapped!
+    var searchMusic: ((String) -> Void)?
     
     private var contentView: ADVideoBGMContentView!
     private var bottomView: ADVideoBGMBottomView!
+    private var searchView: ADVideoBGMSearchView?
     private var selectIndex: Int = 0
 
     init(sound: ADVideoSound, change: @escaping (() -> Void)) {
@@ -67,6 +69,9 @@ class ADVideoBGMSelectView: UIView {
             make.bottom.equalToSuperview().offset(-64)
         }
         
+        let tapGes = UITapGestureRecognizer(target: self, action: #selector(searchAction))
+        contentView.searchBar.addGestureRecognizer(tapGes)
+        
         bottomView = ADVideoBGMBottomView(wrapper: wrapper)
         bottomView.musicSwitch = { [weak self] isOn in
             self?.music(isOn: isOn)
@@ -79,12 +84,36 @@ class ADVideoBGMSelectView: UIView {
     }
     
     func reload(items: [ADMusicItem]) {
-        contentView.tableView.reload(items: items, selected: wrapper.bgm)
+        if searchView != nil {
+            if wrapper.bgm != nil && items.contains(where: { item in
+                return item.id == wrapper.bgm!.id
+            }) {
+                searchView!.tableView.reload(items: items, selected: wrapper.bgm)
+            }else{
+                searchView!.tableView.reload(items: items, selected: nil)
+            }
+        }else{
+            contentView.tableView.reload(items: items, selected: wrapper.bgm)
+        }
     }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc func searchAction() {
+        let view = ADVideoBGMSearchView()
+        view.searchMusic = searchMusic
+        view.tableView.didSelectRow = { [weak self] index, item in
+            self?.wrapper.bgm = item
+            self?.contentView.tableView.selectItem(item)
+        }
+        addSubview(view)
+        view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        searchView = view
     }
     
     func music(isOn: Bool) {
@@ -104,10 +133,10 @@ class ADVideoBGMSelectView: UIView {
 class ADVideoBGMContentView: UIView {
     
     var tableView: ADVideoBGMTableView!
+    let searchBar = SearchBar()
     
     init() {
         super.init(frame: .zero)
-        let searchBar = SearchBar()
         addSubview(searchBar)
         searchBar.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(16)
@@ -163,6 +192,102 @@ class ADVideoBGMContentView: UIView {
             fatalError("init(coder:) has not been implemented")
         }
 
+    }
+    
+}
+
+class ADVideoBGMSearchView: UIView, UITextFieldDelegate {
+    
+    var tableView: ADVideoBGMTableView!
+    var searchMusic: ((String) -> Void)?
+    
+    private var inputField: UITextField!
+    private var clearBtn: UIButton!
+    
+    init() {
+        super.init(frame: .zero)
+        backgroundColor = .white
+        let searchBar = UIView()
+        searchBar.backgroundColor = UIColor(hex: 0xededed)
+        searchBar.layer.cornerRadius = 4
+        addSubview(searchBar)
+        searchBar.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(24)
+            make.right.equalToSuperview().offset(-67)
+            make.height.equalTo(36)
+            make.top.equalToSuperview().offset(10)
+        }
+        let icon = UIImageView(image: Bundle.image(name: "icons_bgm_search", module: .videoEdit))
+        searchBar.addSubview(icon)
+        icon.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(8)
+            make.size.equalTo(CGSize(width: 24, height: 24))
+            make.centerY.equalToSuperview()
+        }
+        inputField = UITextField()
+        inputField.tintColor = UIColor(hex: 0x07c160)
+        inputField.delegate = self
+        inputField.placeholder = "搜索歌名/歌手/歌词/情绪"
+        inputField.font = UIFont.systemFont(ofSize: 17)
+        inputField.textColor = UIColor.black.withAlphaComponent(0.9)
+        searchBar.addSubview(inputField)
+        inputField.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(36)
+            make.right.equalToSuperview().offset(-39)
+            make.height.equalTo(22)
+            make.centerY.equalToSuperview()
+        }
+        clearBtn = UIButton(type: .custom)
+        clearBtn.isHidden = true
+        clearBtn.setImage(Bundle.image(name: "icons_search_clear", module: .videoEdit), for: .normal)
+        clearBtn.addTarget(self, action: #selector(clearSearchAction(_:)), for: .touchUpInside)
+        searchBar.addSubview(clearBtn)
+        clearBtn.snp.makeConstraints { make in
+            make.size.equalTo(CGSize(width: 19, height: 22))
+            make.right.equalToSuperview().offset(-12)
+            make.centerY.equalToSuperview()
+        }
+        let cancelBtn = UIButton(type: .custom)
+        cancelBtn.setTitle(ADLocale.LocaleKey.cancel.localeTextValue, for: .normal)
+        cancelBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        cancelBtn.setTitleColor(UIColor(hex: 0x576b95), for: .normal)
+        cancelBtn.addTarget(self, action: #selector(removeFromSuperview), for: .touchUpInside)
+        addSubview(cancelBtn)
+        cancelBtn.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-16)
+            make.top.equalToSuperview().offset(10)
+            make.size.equalTo(CGSize(width: 35, height: 36))
+        }
+        tableView = ADVideoBGMTableView()
+        addSubview(tableView)
+        tableView.snp.makeConstraints { make in
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(56)
+        }
+        inputField.becomeFirstResponder()
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        clearBtn.isHidden = textField.text == nil || textField.text!.isEmpty
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        if textField.markedTextRange == nil {
+            self.perform(#selector(searchWithText(_:)), with: textField.text, afterDelay: 0.8)
+        }
+    }
+    
+    @objc func clearSearchAction(_ sender: UIButton) {
+        sender.isHidden = true
+        inputField.text = ""
+        searchMusic?("")
+    }
+    
+    @objc func searchWithText(_ text: String?) {
+        searchMusic?(text ?? "")
     }
     
 }

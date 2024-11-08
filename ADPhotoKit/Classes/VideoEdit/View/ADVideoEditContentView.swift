@@ -40,6 +40,16 @@ class ADVideoEditContentView: UIView {
         updateClipRect(imageSize: ADVideoUitls.getNaturalSize(asset: asset))
     }
     
+    func thumbnailImage() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(interactContainer.bounds.size, false, UIScreen.main.scale)
+        if let ctx = UIGraphicsGetCurrentContext() {
+            interactContainer.layer.render(in: ctx)
+        }
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result
+    }
+    
     func gestureShouldBegin(_ gestureRecognizer: UIGestureRecognizer, point: CGPoint) -> Bool {
         let isTap = gestureRecognizer.isKind(of: UITapGestureRecognizer.self)
         for tool in interactTools {

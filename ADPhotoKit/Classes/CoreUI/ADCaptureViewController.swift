@@ -665,6 +665,10 @@ private extension ADCaptureViewController {
             }
         }
     }
+    
+    func canEditImage() -> Bool {
+        return config.browserOpts.contains(.allowEditImage) && (config.assetOpts.contains(.editAfterSelectThumbnail) && config.params.maxCount == 1)
+    }
 }
 
 private extension ADCaptureViewController {
@@ -792,13 +796,14 @@ extension ADCaptureViewController: AVCapturePhotoCaptureDelegate {
                 self.takedImageView.image = image
                 self.takedImageView.isHidden = false
 #if Module_ImageEdit
-                if let image = image {
+                if let image = image, self.canEditImage() {
                     let vc = ADImageEditConfigure.imageEditVC(image: image, editInfo: nil)
                     vc.cancelEdit = { [weak self] in
                         self?.retakeBtnAction()
                     }
                     vc.imageDidEdit = { [weak self] editInfo in
                         self?.takedImageView.image = editInfo.editImg
+                        self?.assetCapture?(editInfo.editImg, nil)
                     }
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: false, completion: nil)

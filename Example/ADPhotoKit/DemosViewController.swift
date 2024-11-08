@@ -98,6 +98,9 @@ class DemosViewController: UIViewController {
                 #if Module_ImageEdit
                 model.imageEditInfo = asset.imageEditInfo
                 #endif
+                #if Module_VideoEdit
+                model.videoEditInfo = asset.videoEditInfo
+                #endif
                 return model
             }
             return nil
@@ -113,6 +116,9 @@ class DemosViewController: UIViewController {
             self?.selected = assets.map({ asset,result,err in
                 #if Module_ImageEdit
                 asset.imageEditInfo = result?.imageEditInfo
+                #endif
+                #if Module_VideoEdit
+                asset.videoEditInfo = asset.videoEditInfo
                 #endif
                 return asset
             })

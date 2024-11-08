@@ -99,6 +99,10 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
     
     var isSelected: Bool = false
     
+    var isEdited: Bool {
+        return selectIndex != -1
+    }
+    
     var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: ADToolConfigable?

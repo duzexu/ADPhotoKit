@@ -21,6 +21,9 @@ struct NetImage: ADAssetBrowsable {
     #if Module_ImageEdit
     var imageEditInfo: ADImageEditInfo?
     #endif
+    #if Module_VideoEdit
+    var videoEditInfo: ADVideoEditInfo?
+    #endif
     
     let url: String
 }
@@ -31,6 +34,9 @@ struct NetVideo: ADAssetBrowsable {
     }
     #if Module_ImageEdit
     var imageEditInfo: ADImageEditInfo?
+    #endif
+    #if Module_VideoEdit
+    var videoEditInfo: ADVideoEditInfo?
     #endif
     
     let url: String
@@ -103,17 +109,17 @@ class ViewController: UIViewController {
                     let fileName = fileURL.deletingPathExtension().lastPathComponent
                     let infos = fileName.components(separatedBy: "-")
                     let lyric_path = bgms_path + "/\(fileName).lrc"
-                    var lyrics: [ADMusicLyric]? = nil
+                    var lyrics: [ADLyricItem]? = nil
                     if fileManager.fileExists(atPath: lyric_path), let lyricsString = try? String(contentsOf: URL(fileURLWithPath: lyric_path), encoding: .utf8) {
                         let parser = LyricsParser(lyrics: lyricsString)
                         lyrics = []
                         for lyric in parser.lyrics {
-                            let item = ADMusicLyric(text: lyric.text, offset: lyric.time)
+                            let item = ADLyricItem(text: lyric.text, offset: lyric.time)
                             lyrics?.append(item)
                         }
                     }
                     let cover_path = bgms_path + "/\(fileName).png"
-                    let bgm = ADMusicItem(id: UUID().uuidString, asset: AVAsset(url: fileURL), cover: .provider(LocalFileImageDataProvider(fileURL: URL(fileURLWithPath: cover_path), cacheKey: nil)), name: infos[0], singer: infos[1], lyric: lyrics)
+                    let bgm = ADMusicItem(id: UUID().uuidString, asset: AVAsset(url: fileURL), cover: .provider(LocalFileImageDataProvider(fileURL: URL(fileURLWithPath: cover_path), cacheKey: nil)), name: infos[0], singer: infos[1], extra: lyrics == nil ? .text("此音乐暂无歌词") : .lyric(lyrics!))
                     bgms.append(bgm)
                 }
             }
@@ -123,10 +129,14 @@ class ViewController: UIViewController {
             if keyword == nil {
                 completion(self?.bgms ?? [])
             }else{
-                if let item = self?.bgms.randomElement() {
-                    completion([item])
+                if keyword!.count == 0 {
+                    completion([])
                 }else{
-                    completion(self?.bgms ?? [])
+                    if let item = self?.bgms.randomElement() {
+                        completion([item])
+                    }else{
+                        completion(self?.bgms ?? [])
+                    }
                 }
             }
         }
@@ -535,12 +545,12 @@ class ViewController: UIViewController {
             })
             browserModels.append(totalOriginalSize)
             
-            let saveAfterEdit = ConfigModel(title: "SaveAfterEdit", mode: .switch(true), action: { [weak self] (value) in
+            let saveAfterEdit = ConfigModel(title: "SaveImageAfterEdit", mode: .switch(true), action: { [weak self] (value) in
                 if let isOn = value as? Bool {
                     if isOn {
-                        self?.configs.browserOptions.insert(.saveAfterEdit)
+                        self?.configs.browserOptions.insert(.saveImageAfterEdit)
                     }else{
-                        self?.configs.browserOptions.remove(.saveAfterEdit)
+                        self?.configs.browserOptions.remove(.saveImageAfterEdit)
                     }
                     ProgressHUD.showSuccess("Update Success!")
                 }

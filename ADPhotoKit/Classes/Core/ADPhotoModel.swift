@@ -283,6 +283,11 @@ public class ADAssetModel: Equatable {
     public var imageEditInfo: ADImageEditInfo?
     #endif
     
+    #if Module_VideoEdit
+    /// The video edit info. If not 'nil', indicate asset have been edited.
+    public var videoEditInfo: ADVideoEditInfo?
+    #endif
+    
     /// Media type of asset.
     public var type: MediaType = .unknown
     
@@ -362,6 +367,10 @@ public class ADSelectAssetModel: Equatable {
     #if Module_ImageEdit
     /// Image edited info.
     public var imageEditInfo: ADImageEditInfo?
+    #endif
+    #if Module_VideoEdit
+    /// Video edited info.
+    public var videoEditInfo: ADVideoEditInfo?
     #endif
     
     /// Create wrap model with asset.

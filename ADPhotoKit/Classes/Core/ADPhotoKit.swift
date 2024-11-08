@@ -69,13 +69,17 @@ public struct ADAssetSelectOptions: OptionSet {
     public static let totalOriginalSize = ADAssetSelectOptions(rawValue: 1 << 15)
     /// Whether to use system image picker to take asset.
     public static let systemCapture = ADAssetSelectOptions(rawValue: 1 << 16)
+    /// After selecting a image/video in the thumbnail interface, enter the editing interface directly.
+    /// - discussion: Editing image is only valid when allowEditImage is true and maxCount is 1.
+    /// Editing video is only valid when allowEditVideo is true and maxCount is 1.
+    public static let editAfterSelectThumbnail = ADAssetSelectOptions(rawValue: 1 << 17)
     
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
     /// Default options.
-    public static let `default`: ADAssetSelectOptions = [.mixSelect,.slideSelect,.autoScroll,.allowTakePhotoAsset,.allowTakeVideoAsset,.thumbnailToolBar,.allowBrowser,.selectIndex,.totalOriginalSize,.selectCountOnDoneBtn]
+    public static let `default`: ADAssetSelectOptions = [.mixSelect,.slideSelect,.autoScroll,.allowTakePhotoAsset,.allowTakeVideoAsset,.thumbnailToolBar,.allowBrowser,.selectIndex,.totalOriginalSize,.selectCountOnDoneBtn, .editAfterSelectThumbnail]
     
     /// Options do not allow mix select.
     public static let exclusive: ADAssetSelectOptions = [.slideSelect,.autoScroll,.allowTakePhotoAsset,.allowTakeVideoAsset,.thumbnailToolBar,.allowBrowser,.selectIndex,.totalOriginalSize,.selectCountOnDoneBtn]
@@ -87,7 +91,6 @@ public struct ADAssetBrowserOptions: OptionSet {
     public let rawValue: Int
     
     /// Allow select full image.
-    ///
     /// Identify whether the user selects the original image. If contains `fetchImage`, will fetch orginal image, otherwise return the screen-fit-size image.
     public static let selectOriginal = ADAssetBrowserOptions(rawValue: 1 << 0)
     /// Display the selected photos at the bottom of the browse large photos interface.
@@ -104,10 +107,16 @@ public struct ADAssetBrowserOptions: OptionSet {
     /// - Note: The framework uses a conversion ratio of 1KB=1024Byte, while the system album uses 1KB=1000Byte, so the displayed photo size within the framework will be smaller than the size in the system album.
     public static let totalOriginalSize = ADAssetBrowserOptions(rawValue: 1 << 6)
     // Save the edited image to the album after editing.
-    public static let saveAfterEdit = ADAssetBrowserOptions(rawValue: 1 << 7)
+    public static let saveImageAfterEdit = ADAssetBrowserOptions(rawValue: 1 << 7)
+    // Save the edited video to the album after editing.
+    public static let saveVideoAfterEdit = ADAssetBrowserOptions(rawValue: 1 << 8)
+    // Allow edited image.
+    public static let allowEditImage = ADAssetBrowserOptions(rawValue: 1 << 9)
+    // Allow edited video.
+    public static let allowEditVideo = ADAssetBrowserOptions(rawValue: 1 << 10)
     
     /// Default options.
-    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage, .totalOriginalSize, .selectCountOnDoneBtn, .saveAfterEdit]
+    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage, .totalOriginalSize, .selectCountOnDoneBtn, .saveImageAfterEdit, .saveVideoAfterEdit, .allowEditImage, .allowEditVideo]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue

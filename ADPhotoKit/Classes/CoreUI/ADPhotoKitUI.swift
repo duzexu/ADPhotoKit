@@ -23,11 +23,15 @@ public enum ADPickerStyle {
 /// Asset fetch result.
 public struct ADAssetResult {
     /// Image fetch with asset. It's `nil` if `browserOpts` not contain `.fetchImage` or error occur when fetching.
-    public var image: UIImage?
+    public let image: UIImage?
     
     #if Module_ImageEdit
     /// Image edited info. It can be `nil` if image is not edit.
-    public var imageEditInfo: ADImageEditInfo?
+    public let imageEditInfo: ADImageEditInfo?
+    #endif
+    #if Module_VideoEdit
+    /// Video edited info. It can be `nil` if video is not edit.
+    public let videoEditInfo: ADVideoEditInfo?
     #endif
 }
 
@@ -65,8 +69,8 @@ public struct ADConstraintParams {
 
 extension ADSelectAssetModel {
     func result(with image: UIImage?) -> ADAssetResult? {
-        #if Module_ImageEdit
-        return ADAssetResult(image: image, imageEditInfo: imageEditInfo)
+        #if Module_ImageEdit || Module_VideoEdit
+        return ADAssetResult(image: image, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
         #else
         if let img = image {
             return ADAssetResult(image: img)
@@ -371,7 +375,7 @@ public class ADPhotoKitConfig {
 
 extension ADAssetListDataSource {
     
-    func fetchSelectImages(original: Bool, asGif: Bool, inQueue: OperationQueue, completion: @escaping (([ADPhotoKitUI.Asset])->Void)) {
+    func fetchSelectImages(config: ADAssetOperation.ImageOptConfig, inQueue: OperationQueue, completion: @escaping (([ADPhotoKitUI.Asset])->Void)) {
         let hud = ADProgress.progressHUD()
         
         var timeout: Bool = false
@@ -385,7 +389,7 @@ extension ADAssetListDataSource {
         var result: [ADPhotoKitUI.Asset?] = Array(repeating: nil, count: selects.count)
         var operations: [Operation] = []
         for (i,item) in selects.enumerated() {
-            let op = ADAssetOperation(model: item, isOriginal: original, selectAsGif: asGif, progress: nil) { (asset) in
+            let op = ADAssetOperation(model: item, imageConfig: config, progress: nil) { (asset) in
                 result[i] = asset
             }
             operations.append(op)

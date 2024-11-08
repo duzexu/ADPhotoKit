@@ -34,7 +34,10 @@ public struct ADVideoEditInfo {
     public var toolsJson: Dictionary<String,Any>?
     
     /// Edit result asset.
-    public var editAsset: AVAsset?
+    public var editUrl: URL?
+    
+    /// Edit result asset.
+    public var editThumbnail: UIImage?
     
 }
 
@@ -76,6 +79,9 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
             }
         }
     }
+    private var firstFrame: UIImage?
+    
+    private var exporter: ADVideoExporter?
     
     required init(asset: AVAsset, editInfo: ADVideoEditInfo?, options: ADVideoEditOptions = []) {
         self.asset = asset
@@ -83,6 +89,14 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
         self.options = options
         self.videoSize = ADVideoUitls.getNaturalSize(asset: asset)
         super.init(nibName: nil, bundle: nil)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.apertureMode = .encodedPixels
+        generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: .zero)]) { [weak self] (requestedTime, image, imageTime, result, error) in
+            if let cgImage = image {
+                self?.firstFrame = UIImage(cgImage: cgImage)
+            }
+        }
     }
     
     @available(*, unavailable)
@@ -297,29 +311,59 @@ extension ADVideoEditController {
     }
     
     func confirmAction() {
-//        var json = Dictionary<String,Any>()
-//        for tool in controlsView.tools {
-//            json[tool.identifier] = tool.encode()
-//        }
-//        editInfo.toolsJson = json
-//        if let editImage = contentView.editImage() {
-//            let ori = clipInfo.rotation.imageOrientation
-//            let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
-//            if clipInfo.clipRect == nil {
-//                editInfo.editImg = edit
-//            }else{
-//                let rotation = clipInfo.rotation
-//                let imageSize = rotation.imageSize(editImage.size)
-//                let clipRect = imageSize|->clipInfo.clipRect!
-//                UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
-//                edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
-//                let result = UIGraphicsGetImageFromCurrentImageContext()
-//                UIGraphicsEndImageContext()
-//                editInfo.editImg = result
-//            }
-//        }
-//        imageDidEdit?(editInfo)
-//        navigationController?.popViewController(animated: false)
+        var edited = false
+        var json = Dictionary<String,Any>()
+        for tool in controlsView.tools {
+            if tool.isEdited {
+                json[tool.identifier] = tool.encode()
+                edited = true
+            }
+        }
+        if edited {
+            editInfo.toolsJson = json
+            if let editImage = contentView.thumbnailImage() {
+                let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: .up)
+                UIGraphicsBeginImageContextWithOptions(edit.size, true, 1)
+                firstFrame?.draw(in: CGRect(origin: .zero, size: edit.size))
+                edit.draw(at: .zero)
+                let result = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                editInfo.editThumbnail = result
+            }
+            videoDidEdit?(editInfo)
+    //        if let _ = navigationController?.popViewController(animated: false) {
+    //        }else{
+    //            dismiss(animated: false, completion: nil)
+    //        }
+            let hud = ADProgress.progressHUD()
+            hud.show(timeout: 0)
+            let path = NSTemporaryDirectory().appending("/{\(UUID().uuidString)}.mp4")
+            let exporter = ADVideoExporter(asset: asset, editInfo: editInfo)
+            exporter.export(to: path) { [weak self] url, error in
+                hud.hide()
+                DispatchQueue.main.async {
+                    if let vc = self {
+                        if let url = url {
+                            vc.editInfo.editUrl = url
+                            vc.videoDidEdit?(vc.editInfo)
+                            if let _ = vc.navigationController?.popViewController(animated: false) {
+                            }else{
+                                vc.dismiss(animated: false, completion: nil)
+                            }
+                        }else{
+                            ADAlert.alert().alert(on: vc, title: nil, message: "视频导出失败\(String(describing: error))", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                        }
+                    }
+                }
+            }
+            self.exporter = exporter
+        }else{
+            cancelEdit?()
+            if let _ = navigationController?.popViewController(animated: false) {
+            }else{
+                dismiss(animated: false, completion: nil)
+            }
+        }
     }
     
     func updatePlayableRect(bottom: CGFloat, top: CGFloat, animated: Bool) {
@@ -396,6 +440,7 @@ extension ADVideoEditController: ADAppearanceDelegate {
     
     func presentationDismissalWillBegin() {
         isControlShow = true
+        controlsView.reloadData()
     }
     
     func presentationDismissalDidEnd() {

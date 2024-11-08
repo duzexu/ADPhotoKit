@@ -39,6 +39,9 @@ public protocol ADEditTool: ADEditToolCodable {
     /// Changed when tool selected or not.
     var isSelected: Bool { set get }
     
+    /// Indicates whether asset has been edited.
+    var isEdited: Bool { get }
+    
     /// View showed when tool is selected, use to change tool's setting. Return `nil` if no needed.
     var toolConfigView: ADToolConfigable? { set get }
     /// View interaction with user operations. Return `nil` if no needed.

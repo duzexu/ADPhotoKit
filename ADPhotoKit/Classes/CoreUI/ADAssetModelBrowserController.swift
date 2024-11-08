@@ -16,15 +16,16 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     init(config: ADPhotoKitConfig, dataSource: ADAssetListDataSource, index: Int? = nil) {
         self.listData = dataSource
         var selects: [PHAsset] = []
-        #if Module_ImageEdit
         for item in dataSource.selects {
             let asset = item.asset
+            #if Module_ImageEdit
             asset.imageEditInfo = item.imageEditInfo
+            #endif
+            #if Module_VideoEdit
+            asset.videoEditInfo = item.videoEditInfo
+            #endif
             selects.append(asset)
         }
-        #else
-        selects = dataSource.selects.map { $0.asset }
-        #endif
         super.init(config: config, assets: dataSource.list, selects: selects, index: index)
     }
     
@@ -41,7 +42,8 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     override func finishSelection() {
         didSelectsUpdate()
         if config.browserOpts.contains(.fetchImage) {
-            listData.fetchSelectImages(original: toolBarView.isOriginal, asGif: config.assetOpts.contains(.selectAsGif), inQueue: config.fetchImageQueue) { [weak self] selected in
+            let opt = ADAssetOperation.ImageOptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif))
+            listData.fetchSelectImages(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
                 self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
@@ -56,6 +58,13 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
     override func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
         super.didImageEditInfoUpdate(info)
         listData.reloadImageEditInfo(info, at: dataSource.index)
+    }
+    #endif
+    
+    #if Module_VideoEdit
+    override func didVideoEditInfoUpdate(_ info: ADVideoEditInfo) {
+        super.didVideoEditInfoUpdate(info)
+        listData.reloadVideoEditInfo(info, at: dataSource.index)
     }
     #endif
     

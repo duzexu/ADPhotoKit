@@ -189,13 +189,41 @@ private extension ADBrowserToolBarView {
     
     func reload(asset: ADAssetBrowsable) {
         editBtn?.isHidden = true
+        var selectEnable = false
+        if let source = dataSource {
+            let max = config.params.maxCount ?? UInt.max
+            let maxImageCount = config.params.maxImageCount ?? UInt.max
+            let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+            let imageCount = source.selects.filter { $0.browseAsset.isImage }.count
+            let videoCount = source.selects.count - imageCount
+            let itemIsImage = asset.browseAsset.isImage
+            if source.selects.count < max {
+                if config.assetOpts.contains(.mixSelect) {
+                    if videoCount < maxVideoCount, !itemIsImage {
+                        selectEnable = true
+                    }else if imageCount < maxImageCount, itemIsImage {
+                        selectEnable = true
+                    }
+                }else{
+                    if config.selectMediaImage == nil || itemIsImage == config.selectMediaImage {
+                        if videoCount < maxVideoCount, !itemIsImage {
+                            selectEnable = true
+                        }else if imageCount < maxImageCount, itemIsImage {
+                            selectEnable = true
+                        }
+                    }
+                }
+            }
+        }
         switch asset.browseAsset {
         case let .image(source):
             switch source {
             case .network(_):
                 originalBtn.alpha = 0
                 #if Module_ImageEdit
-                editBtn?.isHidden = false
+                if config.browserOpts.contains(.allowEditImage) {
+                    editBtn?.isHidden = !selectEnable
+                }
                 #endif
             case let .album(ass):
                 if ass.isGif || ass.isLivePhoto {
@@ -203,20 +231,24 @@ private extension ADBrowserToolBarView {
                 }else{
                     originalBtn.alpha = 1
                     #if Module_ImageEdit
-                    if ass.mediaType == .image {
-                        editBtn?.isHidden = false
+                    if ass.mediaType == .image && config.browserOpts.contains(.allowEditImage) {
+                        editBtn?.isHidden = !selectEnable
                     }
                     #endif
                 }
             case .local:
                 originalBtn.alpha = 0
                 #if Module_ImageEdit
-                editBtn?.isHidden = false
+                if config.browserOpts.contains(.allowEditImage) {
+                    editBtn?.isHidden = !selectEnable
+                }
                 #endif
             }
         case .video(_):
             #if Module_VideoEdit
-            editBtn?.isHidden = false
+            if config.browserOpts.contains(.allowEditVideo) {
+                editBtn?.isHidden = !selectEnable
+            }
             #endif
             originalBtn.alpha = 0
         }

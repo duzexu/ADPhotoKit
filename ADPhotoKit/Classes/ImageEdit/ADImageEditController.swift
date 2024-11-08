@@ -287,29 +287,40 @@ extension ADImageEditController {
     }
     
     func confirmAction() {
+        var edited = false
         var json = Dictionary<String,Any>()
         for tool in controlsView.tools {
-            json[tool.identifier] = tool.encode()
-        }
-        editInfo.toolsJson = json
-        if let editImage = contentView.editImage() {
-            let ori = clipInfo.rotation.imageOrientation
-            let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
-            if clipInfo.clipRect == nil {
-                editInfo.editImg = edit
-            }else{
-                let rotation = clipInfo.rotation
-                let imageSize = rotation.imageSize(editImage.size)
-                let clipRect = imageSize|->clipInfo.clipRect!
-                UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
-                edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
-                let result = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-                editInfo.editImg = result
+            if tool.isEdited {
+                json[tool.identifier] = tool.encode()
+                edited = true
             }
         }
-        imageDidEdit?(editInfo)
-        navigationController?.popViewController(animated: false)
+        if edited {
+            editInfo.toolsJson = json
+            if let editImage = contentView.editImage() {
+                let ori = clipInfo.rotation.imageOrientation
+                let edit = UIImage(cgImage: editImage.cgImage!, scale: editImage.scale, orientation: ori)
+                if clipInfo.clipRect == nil {
+                    editInfo.editImg = edit
+                }else{
+                    let rotation = clipInfo.rotation
+                    let imageSize = rotation.imageSize(editImage.size)
+                    let clipRect = imageSize|->clipInfo.clipRect!
+                    UIGraphicsBeginImageContextWithOptions(clipRect.size, true, 1)
+                    edit.draw(at: CGPoint(x: -clipRect.origin.x, y: -clipRect.origin.y))
+                    let result = UIGraphicsGetImageFromCurrentImageContext()
+                    UIGraphicsEndImageContext()
+                    editInfo.editImg = result
+                }
+            }
+            imageDidEdit?(editInfo)
+        }else{
+            cancelEdit?()
+        }
+        if let _ = navigationController?.popViewController(animated: false) {
+        }else{
+            dismiss(animated: false, completion: nil)
+        }
     }
     
 }
@@ -381,6 +392,7 @@ extension ADImageEditController: ADAppearanceDelegate {
     
     func presentationDismissalWillBegin() {
         isControlShow = true
+        controlsView.reloadData()
     }
     
     func presentationDismissalDidEnd() {

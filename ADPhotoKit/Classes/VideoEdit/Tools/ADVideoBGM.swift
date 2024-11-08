@@ -14,6 +14,10 @@ class ADVideoBGM: ADVideoEditTool {
     }
     
     var isSelected: Bool = false
+    
+    var isEdited: Bool {
+        return videoSound.lyricOn || !videoSound.ostOn || videoSound.bgm != nil || !videoSound.bgmLoop
+    }
         
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
@@ -21,15 +25,13 @@ class ADVideoBGM: ADVideoEditTool {
     weak var videoPlayable: ADVideoPlayable?
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
+    var soundDidChange: ((ADVideoSound) -> Void)!
     
-    var videoSound: ADVideoSound = .default
+    var videoSound: ADVideoSound = ADVideoSound()
      
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         let bgm = ADVideoEditConfigure.videoMusicSelectVC(sound: videoSound)
-        bgm.soundDidChange = { [weak self] sound in
-            self?.videoSound = sound
-            self?.videoPlayable?.videoSound = sound
-        }
+        bgm.soundDidChange = soundDidChange
         bgm.playableRectUpdate = playableRectUpdate
         bgm.modalPresentationStyle = .custom
         bgm.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
@@ -43,16 +45,26 @@ class ADVideoBGM: ADVideoEditTool {
     }
     
     func encode() -> Any? {
-        return ["videoSound":videoSound]
+        if let content = ADStickerInteractView.shared.contentWithId(ADLyricsStickerContentView.LyricsStickerId) as? ADLyricsStickerContentView {
+            return ["videoSound":videoSound,"stk":content.stickerInfo]
+        }else{
+            return ["videoSound":videoSound]
+        }
     }
     
     func decode(from: Any) {
         if let json = from as? Dictionary<String,Any> {
-            videoSound = json["videoSound"] as? ADVideoSound ?? .default
+            videoSound = json["videoSound"] as? ADVideoSound ?? ADVideoSound()
+            if let info = json["stk"] as? ADLyricsStickerInfo {
+                ADStickerInteractView.shared.addContentWithInfo(info)
+            }
         }
     }
     
     init() {
+        soundDidChange = { [weak self] sound in
+            self?.soundConfigChange(sound: sound)
+        }
         toolInteractView = ADStickerInteractView.shared
         let actionDataDidChange: (ADStickerActionData) -> Void = { [weak self] action in
             switch action {
@@ -67,5 +79,24 @@ class ADVideoBGM: ADVideoEditTool {
         ADStickerInteractView.shared.registHandle(ADStickerInteractHandle(actionDataDidChange: actionDataDidChange, contentViewWithInfo: { info in
             return ADLyricsStickerContentView(info: info)
         }), for: ADLyricsStickerInfo.self)
+    }
+    
+    func soundConfigChange(sound: ADVideoSound) {
+        videoSound = sound
+        videoPlayable?.videoSound = sound
+        if sound.lyricOn, let music = sound.bgm {
+            if let content = ADStickerInteractView.shared.contentWithId(ADLyricsStickerContentView.LyricsStickerId) as? ADLyricsStickerContentView {
+                if music.id != content.music.id {
+                    content.updateMusic(music)
+                }
+            }else{
+                let content = ADLyricsStickerContentView(music: music)
+                content.soundDidChange = soundDidChange
+                content.playableRectUpdate = playableRectUpdate
+                ADStickerInteractView.shared.addContent(content)
+            }
+        }else{
+            ADStickerInteractView.shared.removeContent(ADLyricsStickerContentView.LyricsStickerId)
+        }
     }
 }

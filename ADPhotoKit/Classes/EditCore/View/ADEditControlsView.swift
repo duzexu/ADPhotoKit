@@ -85,6 +85,10 @@ class ADEditControlsView: UIView {
         }
         return false
     }
+    
+    func reloadData() {
+        toolsCollectionView.reloadData()
+    }
 
 }
 
@@ -170,11 +174,10 @@ private extension ADEditControlsView {
 extension ADEditControlsView {
     @objc
     func leftBtnItemAction(_ sender: UIButton) {
-        if vc?.presentedViewController != nil {
-            vc?.dismiss(animated: false, completion: cancelActionBlock)
-        }else{
+        if let _ = vc?.navigationController?.popViewController(animated: false) {
             cancelActionBlock?()
-            vc?.navigationController?.popViewController(animated: false)
+        }else{
+            vc?.dismiss(animated: false, completion: cancelActionBlock)
         }
     }
     

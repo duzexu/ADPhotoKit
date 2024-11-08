@@ -94,13 +94,28 @@ public class ADAssetBrowserController: UIViewController {
     /// Called when image edit finished.
     open func didImageEditInfoUpdate(_ info: ADImageEditInfo) {
         dataSource.list[dataSource.index].imageEditInfo = info
-        collectionView.reloadData()
         if !dataSource.isSelected && canSelectWithCurrentIndex() {
             dataSource.appendSelect(dataSource.index)
         }
+        collectionView.reloadData()
         dataSource.selectView?.reloadData()
-        if config.browserOpts.contains(.saveAfterEdit), let img = info.editImg {
+        if config.browserOpts.contains(.saveImageAfterEdit), let img = info.editImg {
             ADPhotoManager.saveImageToAlbum(image: img, completion: nil)
+        }
+    }
+    #endif
+    
+    #if Module_VideoEdit
+    /// Called when video edit finished.
+    open func didVideoEditInfoUpdate(_ info: ADVideoEditInfo) {
+        dataSource.list[dataSource.index].videoEditInfo = info
+        if !dataSource.isSelected && canSelectWithCurrentIndex() {
+            dataSource.appendSelect(dataSource.index)
+        }
+        collectionView.reloadData()
+        dataSource.selectView?.reloadData()
+        if config.browserOpts.contains(.saveVideoAfterEdit), let url = info.editUrl {
+            ADPhotoManager.saveVideoToAlbum(url: url, completion: nil)
         }
     }
     #endif
@@ -113,20 +128,28 @@ public class ADAssetBrowserController: UIViewController {
         guard let item = dataSource.current else {
             return false
         }
+        let itemIsImage = item.browseAsset.isImage
+
+        func canSelect() -> Bool? {
+            let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
+            let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+            let maxImageCount = config.params.maxImageCount ?? UInt.max
+            if videoCount >= maxVideoCount, !itemIsImage {
+                let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
+                ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                return false
+            }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
+                ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                return false
+            }
+            return nil
+        }
+        
         if selected < max {
-            let itemIsImage = item.browseAsset.isImage
             if config.assetOpts.contains(.mixSelect) {
-                let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                let maxVideoCount = config.params.maxVideoCount ?? UInt.max
-                let maxImageCount = config.params.maxImageCount ?? UInt.max
-                if videoCount >= maxVideoCount, !itemIsImage {
-                    let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                    ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-                    return false
-                }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                    let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
-                    ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-                    return false
+                if let value = canSelect() {
+                    return value
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
@@ -137,17 +160,8 @@ public class ADAssetBrowserController: UIViewController {
                     }
                     return false
                 }else{
-                    let videoCount = dataSource.selects.filter { !$0.browseAsset.isImage }.count
-                    let maxVideoCount = config.params.maxVideoCount ?? UInt.max
-                    let maxImageCount = config.params.maxImageCount ?? UInt.max
-                    if videoCount >= maxVideoCount, !itemIsImage {
-                        let message = String(format: ADLocale.LocaleKey.exceededMaxVideoSelectCount.localeTextValue, maxVideoCount)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-                        return false
-                    }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                        let message = String(format: ADLocale.LocaleKey.exceededMaxImageSelectCount.localeTextValue, maxImageCount)
-                        ADAlert.alert().alert(on: self, title: nil, message: message, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-                        return false
+                    if let value = canSelect() {
+                        return value
                     }
                 }
             }
@@ -349,9 +363,9 @@ private extension ADAssetBrowserController {
             if let max = config.params.maxVideoTime {
                 options.append(.maxTime(CGFloat(max)))
             }
-            let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: nil, options: options)
+            let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: dataSource.current!.videoEditInfo, options: options)
             vc.videoDidEdit = { [weak self] editInfo in
-               
+                self?.didVideoEditInfoUpdate(editInfo)
             }
             navigationController?.pushViewController(vc, animated: false)
         }
@@ -407,7 +421,16 @@ extension ADAssetBrowserController: UICollectionViewDataSource, UICollectionView
             }
         case let .video(source):
             if let videoCell = cell as? ADVideoBrowserCellConfigurable {
+                #if Module_VideoEdit
+                if let url = model.videoEditInfo?.editUrl {
+                    videoCell.configure(with: .local(url))
+                }else{
+                    videoCell.configure(with: source)
+                }
+                #else
                 videoCell.configure(with: source)
+                #endif
+                
             }
         }
         (cell as? ADBrowserCellConfigurable)?.cellWillDisplay()

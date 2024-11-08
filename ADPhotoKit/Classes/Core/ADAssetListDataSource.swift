@@ -147,6 +147,9 @@ public class ADAssetListDataSource: NSObject {
                     #if Module_ImageEdit
                     strong.list[index].imageEditInfo = item.imageEditInfo
                     #endif
+                    #if Module_VideoEdit
+                    strong.list[index].videoEditInfo = item.videoEditInfo
+                    #endif
                 }else{
                     item.index = nil
                 }
@@ -157,6 +160,23 @@ public class ADAssetListDataSource: NSObject {
                 completion?()
             }
         }
+    }
+    
+    /// Append new saved capture asset to list.
+    /// - Parameter asset: Saved asset.
+    /// - Returns: Insert index.
+    @discardableResult
+    public func appendCaptureAsset(_ asset: PHAsset) -> Int {
+        let model = ADAssetModel(asset: asset)
+        if albumOpts.contains(.ascending) {
+            list.append(model)
+        }else{
+            list.insert(model, at: 0)
+        }
+        DispatchQueue.main.async {
+            self.reloadable?.reloadData()
+        }
+        return albumOpts.contains(.ascending) ? list.count - 1 : 0
     }
     
     /// Return modify indexPath when camera cell or add asset cell is enable.
@@ -178,6 +198,9 @@ public class ADAssetListDataSource: NSObject {
                 selected.index = index
                 #if Module_ImageEdit
                 selected.imageEditInfo = item.imageEditInfo
+                #endif
+                #if Module_VideoEdit
+                selected.videoEditInfo = item.videoEditInfo
                 #endif
                 selects.append(selected)
                 item.selectStatus = .select(index: selects.count)
@@ -227,6 +250,9 @@ public class ADAssetListDataSource: NSObject {
             #if Module_ImageEdit
             model.imageEditInfo = item.imageEditInfo
             #endif
+            #if Module_VideoEdit
+            model.videoEditInfo = item.videoEditInfo
+            #endif
             if let index = new.firstIndex(of: nil) {
                 new.replaceSubrange(index..<index+1, with: [model])
             }else{
@@ -252,10 +278,23 @@ public class ADAssetListDataSource: NSObject {
     /// - Parameters:
     ///   - info: Info contains image edit data.
     ///   - index: Index whitch asset is update.
-    func reloadImageEditInfo(_ info: ADImageEditInfo, at index: Int) {
+    public func reloadImageEditInfo(_ info: ADImageEditInfo, at index: Int) {
         if index < list.count {
             let item = list[index]
             item.imageEditInfo = info
+        }
+    }
+    #endif
+    
+    #if Module_VideoEdit
+    /// Reload asset `videoEditInfo` when edit ended.
+    /// - Parameters:
+    ///   - info: Info contains video edit data.
+    ///   - index: Index whitch asset is update.
+    public func reloadVideoEditInfo(_ info: ADVideoEditInfo, at index: Int) {
+        if index < list.count {
+            let item = list[index]
+            item.videoEditInfo = info
         }
     }
     #endif

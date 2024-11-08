@@ -34,11 +34,11 @@ public protocol ADVideoPlayable where Self: UIView {
     
     func addProgressObserver(_ observer: @escaping (_ progress: CGFloat, _ time: CMTime) -> Void)
     
-    func addOrUpdateSticker(_ stk: ADVideoStcker)
+}
+
+public protocol ADContentChangable where Self: UIView {
     
-    func removeSticker(_ id: String)
-    
-    func exportVideo(completionHandler handler: @escaping () -> Void)
+    func changeWithProgress(_ progress: CGFloat)
     
 }
 
@@ -77,6 +77,14 @@ public protocol ADVideoMusicSelectConfigurable where Self: UIViewController {
     
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)? { get set }
     
+}
+
+public protocol ADVideoExporterable {
+    init(asset: AVAsset, editInfo: ADVideoEditInfo)
+    
+    func export(to path: String, completionHandler handler: @escaping (URL?, Error?) -> Void)
+    
+    func cancelExport()
 }
 
 class ADVideoEditConfigure {

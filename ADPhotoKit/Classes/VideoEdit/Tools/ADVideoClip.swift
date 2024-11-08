@@ -15,6 +15,10 @@ class ADVideoClip: ADVideoEditTool {
     }
     
     var isSelected: Bool = false
+    
+    var isEdited: Bool {
+        return clipRange != nil
+    }
         
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?

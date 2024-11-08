@@ -17,6 +17,9 @@ public protocol ADAssetBrowsable {
     #if Module_ImageEdit
     var imageEditInfo: ADImageEditInfo? { set get }
     #endif
+    #if Module_VideoEdit
+    var videoEditInfo: ADVideoEditInfo? { set get }
+    #endif
 }
 
 /// Image asset support browser.
@@ -132,6 +135,7 @@ extension ADAssetModel: ADAssetBrowsable {
 
 struct ADAssetBrowsableRuntimeKey {
     static let ImageEditInfo : UnsafeRawPointer! = UnsafeRawPointer.init(bitPattern: "ImageEditInfo:".hashValue)
+    static let VideoEditInfo : UnsafeRawPointer! = UnsafeRawPointer.init(bitPattern: "VideoEditInfo:".hashValue)
 }
 
 /// PHAsset conforms to `ADAssetBrowsable` in ADPhotoKit.
@@ -158,6 +162,16 @@ extension PHAsset: ADAssetBrowsable {
         }
     }
     #endif
+    #if Module_VideoEdit
+    public var videoEditInfo: ADVideoEditInfo? {
+        set {
+            objc_setAssociatedObject(self, ADAssetBrowsableRuntimeKey.VideoEditInfo, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+        get {
+            return objc_getAssociatedObject(self, ADAssetBrowsableRuntimeKey.VideoEditInfo) as? ADVideoEditInfo
+        }
+    }
+    #endif
     
 }
 
@@ -175,6 +189,16 @@ extension UIImage: ADAssetBrowsable {
         }
         get {
             return objc_getAssociatedObject(self, ADAssetBrowsableRuntimeKey.ImageEditInfo) as? ADImageEditInfo
+        }
+    }
+    #endif
+    #if Module_VideoEdit
+    public var videoEditInfo: ADVideoEditInfo? {
+        set {
+            
+        }
+        get {
+            return nil
         }
     }
     #endif

@@ -19,6 +19,11 @@ class ADVideoSticker: ADVideoEditTool {
     }
     
     var isSelected: Bool = false
+    
+    var isEdited: Bool {
+        let stkrs = stkrs.compactMap { $0.value }
+        return stkrs.count > 0
+    }
         
     var toolConfigView: ADToolConfigable?
     var toolInteractView: ADToolInteractable?
@@ -34,8 +39,7 @@ class ADVideoSticker: ADVideoEditTool {
             let sticker = ADEditConfigure.textStickerEditVC(sticker: nil)
             sticker.textDidEdit = { [weak self] image, sticker in
                 let content = ADTextStickerContentView(image: image, sticker: sticker)
-                self?.stkrs.append(ADWeakRef(value: content))
-                (self?.toolInteractView as? ADStickerInteractView)?.addContent(content)
+                self?.addContentView(.view(content))
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
@@ -44,8 +48,7 @@ class ADVideoSticker: ADVideoEditTool {
             let sticker = ADEditConfigure.imageStickerSelectVC()
             sticker.imageDidSelect = { [weak self] image in
                 let content = ADImageStickerContentView(image: image)
-                self?.stkrs.append(ADWeakRef(value: content))
-                (self?.toolInteractView as? ADStickerInteractView)?.addContent(content)
+                self?.addContentView(.view(content))
             }
             sticker.modalPresentationStyle = .custom
             sticker.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
@@ -64,8 +67,7 @@ class ADVideoSticker: ADVideoEditTool {
     init(style: Style) {
         self.style = style
         toolInteractView = ADStickerInteractView.shared
-        let actionDataDidChange: (ADStickerActionData) -> Void = { action in
-            
+        let actionDataDidChange: (ADStickerActionData) -> Void = { _ in
         }
         switch style {
         case .text:
@@ -89,11 +91,38 @@ class ADVideoSticker: ADVideoEditTool {
     }
     
     func encode() -> Any? {
-        return nil
+        let stkrs: [ADStickerInfo] = stkrs.compactMap { $0.value }.map { obj in
+            return obj.stickerInfo
+        }
+        return ["stkrs":stkrs]
     }
     
     func decode(from: Any) {
-        
+        if let json = from as? Dictionary<String,Any> {
+            if let stkrs = json["stkrs"] as? [ADImageStickerInfo] {
+                for item in stkrs {
+                    addContentView(.info(item))
+                }
+            }
+        }
+    }
+    
+    enum ContentSource {
+        case info(ADImageStickerInfo)
+        case view(ADStickerContentView)
+    }
+    
+    func addContentView(_ source: ContentSource) {
+        let view = (toolInteractView as? ADStickerInteractView)
+        switch source {
+        case let .info(info):
+            if let content = view?.addContentWithInfo(info) {
+                stkrs.append(ADWeakRef(value: content))
+            }
+        case let .view(content):
+            stkrs.append(ADWeakRef(value: content))
+            view?.addContent(content)
+        }
     }
     
 }

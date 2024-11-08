@@ -31,6 +31,11 @@ class ADImageSticker: ADImageEditTool {
     
     var isSelected: Bool = false
     
+    var isEdited: Bool {
+        let stkrs = stkrs.compactMap { $0.value }
+        return stkrs.count > 0
+    }
+    
     var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: ADToolConfigable?

@@ -32,8 +32,8 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         tagImageView = UIImageView()
         contentView.addSubview(tagImageView)
         tagImageView.snp.makeConstraints { (make) in
-            make.leading.equalToSuperview().offset(5)
-            make.bottom.equalToSuperview().offset(-5)
+            make.trailing.equalToSuperview().offset(-8)
+            make.bottom.equalToSuperview().offset(-4)
         }
         
         tagLabel = UILabel()
@@ -60,6 +60,14 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
             imageView.image = model.imageEditInfo?.editImg
             tagImageView.isHidden = false
             tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+            return
+        }
+        #endif
+        #if Module_VideoEdit
+        if model.videoEditInfo != nil {
+            imageView.image = model.videoEditInfo?.editThumbnail
+            tagImageView.isHidden = false
+            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .videoEdit)
             return
         }
         #endif

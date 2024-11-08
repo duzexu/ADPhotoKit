@@ -17,17 +17,17 @@ public class ADStickerInfo {
     public let id: String
     /// Transform of content view.
     public let transform: CGAffineTransform
-    /// Scale of content view.
-    public let scale: CGFloat
     /// Center of content view.
     public let center: CGPoint
+    /// Normalize center of content view.
+    public let normalizeCenter: CGPoint
     
     /// Default Initialization Method.
-    public init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint) {
+    public init(id: String, transform: CGAffineTransform, center: CGPoint, normalizeCenter: CGPoint) {
         self.id = id
         self.transform = transform
-        self.scale = scale
         self.center = center
+        self.normalizeCenter = normalizeCenter
     }
 }
 
@@ -38,18 +38,18 @@ public class ADImageStickerInfo: ADStickerInfo {
     public let image: UIImage
     
     /// Default Initialization Method.
-    public init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint, image: UIImage) {
+    public init(id: String, transform: CGAffineTransform, center: CGPoint, normalizeCenter: CGPoint, image: UIImage) {
         self.image = image
-        super.init(id: id, transform: transform, scale: scale, center: center)
+        super.init(id: id, transform: transform, center: center, normalizeCenter: normalizeCenter)
     }
 }
 
 class ADTextStickerInfo: ADImageStickerInfo {
     let sticker: ADTextSticker
     
-    init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint, image: UIImage, sticker: ADTextSticker) {
+    init(id: String, transform: CGAffineTransform, center: CGPoint, normalizeCenter: CGPoint, image: UIImage, sticker: ADTextSticker) {
         self.sticker = sticker
-        super.init(id: id, transform: transform, scale: scale, center: center, image: image)
+        super.init(id: id, transform: transform, center: center, normalizeCenter: normalizeCenter, image: image)
     }
 }
 
@@ -522,14 +522,16 @@ public class ADStickerContentView: UIView {
     
     /// Sticker info from current view state.
     public var stickerInfo: ADStickerInfo {
-        return ADStickerInfo(id: stickerID, transform: transform, scale: scale, center: center)
+        return ADStickerInfo(id: stickerID, transform: transform, center: center, normalizeCenter: normalizeCenter)
     }
     
-    /// View's scale.
-    public var scale: CGFloat = 1 {
-        didSet {
-            updateBorderWidth()
+    /// Normalize center of content view.
+    public var normalizeCenter: CGPoint {
+        if let clip = superview?.superview {
+            let convert = superview!.convert(center, to: clip)
+            return CGPoint(x: convert.x/superview!.superview!.frame.width, y: convert.y/superview!.superview!.frame.height)
         }
+        return .zero
     }
     
     var actionDataDidChange: ((AnyClass,ADStickerActionData) -> Void)?
@@ -537,6 +539,12 @@ public class ADStickerContentView: UIView {
     var isActive: Bool = false
     
     let maxScale: CGFloat = 10
+    
+    fileprivate var scale: CGFloat = 1 {
+        didSet {
+            updateBorderWidth()
+        }
+    }
     
     fileprivate var outerScale: CGFloat = 1 {
         didSet {
@@ -563,7 +571,7 @@ public class ADStickerContentView: UIView {
         layer.borderColor = UIColor.clear.cgColor
         transform = info.transform
         center = info.center
-        scale = info.scale
+        scale = getScale(from: info.transform).scaleX
     }
     
     /// Update view whith sticker info.
@@ -574,7 +582,7 @@ public class ADStickerContentView: UIView {
         }
         transform = info.transform
         center = info.center
-        scale = info.scale
+        scale = getScale(from: info.transform).scaleX
     }
     
     /// Call this method when sticker size changed.
@@ -641,6 +649,12 @@ public class ADStickerContentView: UIView {
         layer.borderWidth = 0.5 / (outerScale * scale)
     }
     
+    private func getScale(from transform: CGAffineTransform) -> (scaleX: CGFloat, scaleY: CGFloat) {
+        let scaleX = sqrt(transform.a * transform.a + transform.c * transform.c)
+        let scaleY = sqrt(transform.b * transform.b + transform.d * transform.d)
+        return (scaleX, scaleY)
+    }
+    
 }
 
 /// Subclass of `ADStickerContentView`, Used to display image sticker.
@@ -651,7 +665,7 @@ public class ADImageStickerContentView: ADStickerContentView {
     var imageView: UIImageView!
     
     public override var stickerInfo: ADImageStickerInfo {
-        return ADImageStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, image: image)
+        return ADImageStickerInfo(id: stickerID, transform: transform, center: center, normalizeCenter: normalizeCenter, image: image)
     }
     
     /// Create content view with image.
@@ -680,7 +694,6 @@ public class ADImageStickerContentView: ADStickerContentView {
         updateImage(image)
         transform = info.transform
         center = info.center
-        scale = info.scale
     }
     
     public func update(info: ADImageStickerInfo) {
@@ -707,7 +720,7 @@ class ADTextStickerContentView: ADImageStickerContentView {
     var sticker: ADTextSticker
     
     override var stickerInfo: ADTextStickerInfo {
-        return ADTextStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, image: image, sticker: sticker)
+        return ADTextStickerInfo(id: stickerID, transform: transform, center: center, normalizeCenter: normalizeCenter, image: image, sticker: sticker)
     }
     
     init(image: UIImage, sticker: ADTextSticker) {

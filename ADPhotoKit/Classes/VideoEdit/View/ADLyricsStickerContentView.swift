@@ -13,9 +13,9 @@ class ADLyricsStickerInfo: ADStickerInfo {
     
     let music: ADMusicItem
     
-    init(id: String, transform: CGAffineTransform, scale: CGFloat, center: CGPoint, music: ADMusicItem) {
+    init(id: String, transform: CGAffineTransform, center: CGPoint, normalizeCenter: CGPoint, music: ADMusicItem) {
         self.music = music
-        super.init(id: id, transform: transform, scale: scale, center: center)
+        super.init(id: id, transform: transform, center: center, normalizeCenter: normalizeCenter)
     }
 }
 
@@ -30,7 +30,7 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)?
     
     override var stickerInfo: ADLyricsStickerInfo {
-        return ADLyricsStickerInfo(id: stickerID, transform: transform, scale: scale, center: center, music: music)
+        return ADLyricsStickerInfo(id: stickerID, transform: transform, center: center, normalizeCenter: normalizeCenter, music: music)
     }
     
     init(music: ADMusicItem) {
@@ -42,6 +42,7 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     init(info: ADLyricsStickerInfo) {
         music = info.music
         super.init(info: info)
+        sizeDidChange(CGSize(width: screenWidth-64, height: 137))
         setupUI()
     }
     
@@ -52,8 +53,16 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     
     func updateMusic(_ new: ADMusicItem) {
         music = new
-        if music.lyric == nil {
-            lyricView.text = "此音乐暂无歌词"
+        switch new.extra {
+        case let .text(content):
+            lyrics = nil
+            lyricView.attributedText = NSAttributedString(string: content, attributes: attributes)
+        case let .lyric(items):
+            lyricView.text = ""
+            lyrics = items
+        case .none:
+            lyrics = nil
+            lyricView.text = ""
         }
     }
     
@@ -73,7 +82,7 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     }
     
     override func playerTimeUpdate(_ time: CMTime) {
-        guard let lyrics = music.lyric else {
+        guard let lyrics = lyrics else {
             return
         }
         var index = -1
@@ -97,11 +106,12 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     }
     
     private var lyricView: UITextView!
+    private var lyrics: [ADLyricItem]?
     private lazy var attributes = {
         let shadow = NSShadow()
         shadow.shadowColor = UIColor.black.withAlphaComponent(0.5)
-        shadow.shadowOffset = CGSize(width: 0, height: 1)
-        shadow.shadowBlurRadius = 6
+        shadow.shadowOffset = CGSize(width: 0, height: 0)
+        shadow.shadowBlurRadius = 4
         let attributes: [NSAttributedString.Key : Any] = [.font:UIFont.systemFont(ofSize: 32, weight: .bold),.foregroundColor:UIColor.white.withAlphaComponent(0.8),.shadow: shadow]
         return attributes
     }()
@@ -109,7 +119,7 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
         didSet {
             if lyricIndex >= 0 {
                 if lyricIndex != oldValue {
-                    if let lyrics = music.lyric {
+                    if let lyrics = lyrics, lyricIndex < lyrics.count {
                         lyricView.attributedText = NSAttributedString(string: lyrics[lyricIndex].text, attributes: attributes)
                     }
                 }
@@ -120,7 +130,7 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
     }
     
     func setupUI() {
-        let icon = UIImageView(frame: CGRect(x: 6, y: 4, width: 13, height: 9))
+        let icon = AnimatedImageView(frame: CGRect(x: 6, y: 4, width: 13, height: 9))
         let path = Bundle.videoEditBundle?.bundlePath.appending("/live_lyric.gif") ?? ""
         icon.kf.setImage(with: .provider(LocalFileImageDataProvider(fileURL: URL(fileURLWithPath: path))))
         addSubview(icon)
@@ -129,8 +139,16 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
         lyricView.textContainerInset = .zero
         lyricView.isUserInteractionEnabled = false
         addSubview(lyricView)
-        if music.lyric == nil {
-            lyricView.attributedText = NSAttributedString(string: "此音乐暂无歌词", attributes: attributes)
+        switch music.extra {
+        case let .text(content):
+            lyrics = nil
+            lyricView.attributedText = NSAttributedString(string: content, attributes: attributes)
+        case let .lyric(items):
+            lyricView.text = ""
+            lyrics = items
+        case .none:
+            lyrics = nil
+            lyricView.text = ""
         }
     }
 

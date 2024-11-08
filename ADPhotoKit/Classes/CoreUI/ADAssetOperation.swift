@@ -11,10 +11,17 @@ import Kingfisher
 
 class ADAssetOperation: Operation {
     
-    let model: ADSelectAssetModel
-    let isOriginal: Bool
-    let selectAsGif: Bool
+    struct ImageOptConfig {
+        let isOriginal: Bool
+        let selectAsGif: Bool
+    }
     
+    struct VideoOptConfig {
+    }
+    
+    let model: ADSelectAssetModel
+    let imageConfig: ImageOptConfig?
+    let videoConfig: VideoOptConfig?
     let progress: ADPhotoManager.ADAssetProgressHandler?
     let completion: ((ADPhotoKitUI.Asset) -> Void)
     
@@ -31,13 +38,13 @@ class ADAssetOperation: Operation {
     }
     
     init(model: ADSelectAssetModel,
-         isOriginal: Bool = false,
-         selectAsGif: Bool = true,
+         imageConfig: ImageOptConfig? = nil,
+         videoConfig: VideoOptConfig? = nil,
          progress: ADPhotoManager.ADAssetProgressHandler? = nil,
          completion: @escaping ((ADPhotoKitUI.Asset) -> Void)) {
         self.model = model
-        self.isOriginal = isOriginal
-        self.selectAsGif = selectAsGif
+        self.imageConfig = imageConfig
+        self.videoConfig = videoConfig
         self.progress = progress
         self.completion = completion
         super.init()
@@ -51,25 +58,29 @@ class ADAssetOperation: Operation {
         
         _isExecuting = true
         
-        if model.asset.isGif && selectAsGif {
-            requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
-                guard let strong = self else { return }
-                if let d = data as? Data {
-                    self?.completion((strong.model.asset,strong.model.result(with: KingfisherWrapper.image(data: d, options: .init())),nil))
-                }else{
-                    let error = info?[PHImageErrorKey] as? NSError
-                    self?.completion((strong.model.asset,strong.model.result(with: nil),error))
-                }
-                self?.done()
-            })
+        if model.asset.mediaType == .video {
+            
         }else{
-            let size: CGSize? = isOriginal ? nil : model.asset.browserSize
-            requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
-                guard let strong = self else { return }
-                let error = info?[PHImageErrorKey] as? NSError
-                self?.completion((strong.model.asset,strong.model.result(with: image as? UIImage),error))
-                self?.done()
-            })
+            if model.asset.isGif && imageConfig?.selectAsGif == true {
+                requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
+                    guard let strong = self else { return }
+                    if let d = data as? Data {
+                        self?.completion((strong.model.asset,strong.model.result(with: KingfisherWrapper.image(data: d, options: .init())),nil))
+                    }else{
+                        let error = info?[PHImageErrorKey] as? NSError
+                        self?.completion((strong.model.asset,strong.model.result(with: nil),error))
+                    }
+                    self?.done()
+                })
+            }else{
+                let size: CGSize? = imageConfig?.isOriginal == true ? nil : model.asset.browserSize
+                requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
+                    guard let strong = self else { return }
+                    let error = info?[PHImageErrorKey] as? NSError
+                    self?.completion((strong.model.asset,strong.model.result(with: image as? UIImage),error))
+                    self?.done()
+                })
+            }
         }
     }
     

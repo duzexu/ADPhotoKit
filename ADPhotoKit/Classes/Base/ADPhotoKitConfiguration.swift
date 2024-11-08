@@ -50,7 +50,7 @@ public class ADPhotoKitConfiguration {
     /// Set status bar style, Default is .lightContent.
     public var statusBarStyle: UIStatusBarStyle?
     
-    /// Timeout for request images from select assets. Defaults is 20.
+    /// Timeout for request assets from select assets. Defaults is 20.
     public var fetchTimeout: TimeInterval = 20
     
     /* ================= album ================= */

@@ -9,7 +9,7 @@ import UIKit
 import AVFoundation
 import Kingfisher
 
-public struct ADMusicLyric {
+public struct ADLyricItem {
     public let text: String
     public let offset: CGFloat
     
@@ -19,21 +19,31 @@ public struct ADMusicLyric {
     }
 }
 
-public struct ADMusicItem {
+public struct ADMusicItem: Equatable {    
+    public enum Extra {
+        case none
+        case lyric([ADLyricItem])
+        case text(String)
+    }
+    
     public let id: String
     public let asset: AVAsset
     public let cover: Kingfisher.Source?
     public let name: String
     public let singer: String
-    public let lyric: [ADMusicLyric]?
+    public let extra: Extra
     
-    public init(id: String, asset: AVAsset, cover: Kingfisher.Source?, name: String, singer: String, lyric: [ADMusicLyric]? = nil) {
+    public init(id: String, asset: AVAsset, cover: Kingfisher.Source?, name: String, singer: String, extra: Extra = .none) {
         self.id = id
         self.asset = asset
         self.cover = cover
         self.name = name
         self.singer = singer
-        self.lyric = lyric
+        self.extra = extra
+    }
+    
+    public static func == (lhs: ADMusicItem, rhs: ADMusicItem) -> Bool {
+        return lhs.id == rhs.id
     }
 }
 
@@ -42,8 +52,6 @@ public class ADVideoSound {
     public var ostOn: Bool = true
     public var bgm: ADMusicItem? = nil
     public var bgmLoop: Bool = true
-    
-    public static let `default` = ADVideoSound()
 }
 
 public typealias ADVideoMusicDataSource = ((_ keyword: String?, _ completion: (([ADMusicItem]) -> Void)) -> Void)
@@ -62,7 +70,7 @@ class ADMusicSelectController: UIViewController, ADVideoMusicSelectConfigurable 
     
     required init(dataSource: @escaping ADVideoMusicDataSource, sound: ADVideoSound?) {
         self.dataSource = dataSource
-        self.sound = sound ?? .default
+        self.sound = sound ?? ADVideoSound()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -105,6 +113,9 @@ private extension ADMusicSelectController {
         bgmSelectView = ADVideoBGMSelectView(sound: sound, change: { [weak self] in
             self?.soundConfigChange()
         })
+        bgmSelectView.searchMusic = { [weak self] keyword in
+            self?.searchWith(keyword: keyword)
+        }
         bottomView.addSubview(bgmSelectView)
         bgmSelectView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
@@ -135,20 +146,6 @@ private extension ADMusicSelectController {
     
     func soundConfigChange() {
         soundDidChange?(sound)
-        if sound.lyricOn, let music = sound.bgm {
-            if let content = ADStickerInteractView.shared.contentWithId(ADLyricsStickerContentView.LyricsStickerId) as? ADLyricsStickerContentView {
-                if music.id != content.music.id {
-                    content.updateMusic(music)
-                }
-            }else{
-                let content = ADLyricsStickerContentView(music: music)
-                content.soundDidChange = soundDidChange
-                content.playableRectUpdate = playableRectUpdate
-                ADStickerInteractView.shared.addContent(content)
-            }
-        }else{
-            ADStickerInteractView.shared.removeContent(ADLyricsStickerContentView.LyricsStickerId)
-        }
     }
 }
 

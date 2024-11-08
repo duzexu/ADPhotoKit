@@ -714,27 +714,27 @@ extension ADPhotoManager {
     /// - Parameters:
     ///   - image: Image to save.
     ///   - completion: Called after image saved.
-    public class func saveImageToAlbum(image: UIImage, completion: ( (Bool, PHAsset?) -> Void )? ) {
+    public class func saveImageToAlbum(image: UIImage, completion: ( (PHAsset?, Error?) -> Void )? ) {
         var status = PHPhotoLibrary.authorizationStatus()
         if #available(iOS 14.0, *) {
             status = photoAddOnlyAuthority()
         }
         
         if status == .denied || status == .restricted {
-            completion?(false, nil)
+            completion?(nil, ADError.noAuthorization)
             return
         }
         
         var placeholderAsset: PHObjectPlaceholder? = nil
-        let completionHandler: ((Bool, Error?) -> Void) = { suc, _ in
+        let completionHandler: ((Bool, Error?) -> Void) = { suc, error in
             if suc {
                 let asset = self.getAsset(from: placeholderAsset?.localIdentifier)
                 DispatchQueue.main.async {
-                    completion?(suc, asset)
+                    completion?(asset, nil)
                 }
             } else {
                 DispatchQueue.main.async {
-                    completion?(false, nil)
+                    completion?(nil, error)
                 }
             }
         }
@@ -788,14 +788,14 @@ extension ADPhotoManager {
     /// - Parameters:
     ///   - url: Video asset's path.
     ///   - completion: Called after video saved.
-    public class func saveVideoToAlbum(url: URL, completion: ( (Bool, PHAsset?) -> Void )? ) {
+    public class func saveVideoToAlbum(url: URL, completion: ( (PHAsset?, Error?) -> Void )? ) {
         var status = PHPhotoLibrary.authorizationStatus()
         if #available(iOS 14.0, *) {
             status = photoAddOnlyAuthority()
         }
         
         if status == .denied || status == .restricted {
-            completion?(false, nil)
+            completion?(nil, ADError.noAuthorization)
             return
         }
         
@@ -807,9 +807,9 @@ extension ADPhotoManager {
             DispatchQueue.main.async {
                 if suc {
                     let asset = self.getAsset(from: placeholderAsset?.localIdentifier)
-                    completion?(suc, asset)
+                    completion?(asset, nil)
                 } else {
-                    completion?(false, nil)
+                    completion?(nil, error)
                 }
             }
         }

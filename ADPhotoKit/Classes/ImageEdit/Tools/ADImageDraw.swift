@@ -34,6 +34,13 @@ class ADImageDraw: ADImageEditTool {
         }
     }
     
+    var isEdited: Bool {
+        if let interact = toolInteractView as? ADDrawInteractView {
+            return interact.paths.count > 0
+        }
+        return false
+    }
+    
     var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: ADToolConfigable?

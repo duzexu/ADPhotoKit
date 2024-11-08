@@ -47,6 +47,10 @@ class ADImageClip: ADImageEditTool {
     
     var isSelected: Bool = false
     
+    var isEdited: Bool {
+        return clipInfo.clipRect == nil && clipInfo.rotation == .idle
+    }
+    
     var contentLockStatus: ((Bool) -> Void)?
     
     var toolConfigView: ADToolConfigable?
@@ -72,10 +76,6 @@ class ADImageClip: ADImageEditTool {
     
     var clipInfo = ClipInfo()
     
-    var isOrigin: Bool {
-        return clipInfo.clipRect == nil && clipInfo.rotation == .idle
-    }
-    
     init(source: ADImageClipSource) {
         self.source = source
     }
@@ -85,7 +85,7 @@ class ADImageClip: ADImageEditTool {
     }
     
     func encode() -> Any? {
-        if !isOrigin {
+        if !isEdited {
             if clipInfo.clipRect == nil {
                 return ["rotation":clipInfo.rotation]
             }else{

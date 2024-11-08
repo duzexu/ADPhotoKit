@@ -91,6 +91,9 @@ struct MainSwiftUIView: View {
                 #if Module_ImageEdit
                 model.imageEditInfo = asset.imageEditInfo
                 #endif
+                #if Module_VideoEdit
+                asset.videoEditInfo = asset.videoEditInfo
+                #endif
                 return model
             }
             return nil
@@ -103,6 +106,9 @@ struct MainSwiftUIView: View {
             selected = assets.map({ asset,result,err in
                 #if Module_ImageEdit
                 asset.imageEditInfo = result?.imageEditInfo
+                #endif
+                #if Module_VideoEdit
+                asset.videoEditInfo = result?.videoEditInfo
                 #endif
                 return asset
             })
@@ -139,6 +145,9 @@ struct MainSwiftUIView: View {
                     #if Module_ImageEdit
                     model.imageEditInfo = asset.imageEditInfo
                     #endif
+                    #if Module_VideoEdit
+                    model.videoEditInfo = asset.videoEditInfo
+                    #endif
                     return model
                 }
                 return nil
@@ -154,6 +163,9 @@ struct MainSwiftUIView: View {
                 selected = assets.map({ asset,result,err in
                     #if Module_ImageEdit
                     asset.imageEditInfo = result?.imageEditInfo
+                    #endif
+                    #if Module_VideoEdit
+                    asset.videoEditInfo = result?.videoEditInfo
                     #endif
                     return asset
                 })

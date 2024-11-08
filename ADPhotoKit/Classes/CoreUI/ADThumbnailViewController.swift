@@ -44,6 +44,7 @@ public class ADThumbnailViewController: UIViewController {
     
     /// 滑动选择
     private var panGesture: UIPanGestureRecognizer?
+    private var selectionBegin: Bool = false
     private var selectionInfo: SlideSelectionInfo?
     private var selectionRange: SlideSelectionRange?
     
@@ -160,17 +161,7 @@ extension ADThumbnailViewController {
             strong.navigationController?.pushViewController(browser, animated: true)
         }
         toolBarView.doneActionBlock = { [weak self] in
-            guard let strong = self else { return }
-            if strong.config.browserOpts.contains(.fetchImage) {
-                self?.dataSource.fetchSelectImages(original: strong.toolBarView.isOriginal, asGif: strong.config.assetOpts.contains(.selectAsGif), inQueue: strong.config.fetchImageQueue) { [weak self] selected in
-                    self?.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
-                    self?.navigationController?.dismiss(animated: true, completion: nil)
-                }
-            }else{
-                let selected = strong.dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
-                strong.config.pickerSelect?(selected, strong.toolBarView.isOriginal)
-                strong.navigationController?.dismiss(animated: true, completion: nil)
-            }
+            self?.doneBtnAction()
         }
         
         let navBarView = ADPhotoUIConfigurable.thumbnailNavBar(style: style, config: config)
@@ -201,32 +192,49 @@ extension ADThumbnailViewController {
         collectionView.contentInset = UIEdgeInsets(top: navBarView.height, left: 0, bottom: toolBarView.height, right: 0)
     }
     
+    func doneBtnAction() {
+        if config.browserOpts.contains(.fetchImage) {
+            let opt = ADAssetOperation.ImageOptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif))
+            dataSource.fetchSelectImages(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
+                self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
+                self?.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }else{
+            let selected = dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
+            config.pickerSelect?(selected, toolBarView.isOriginal)
+            navigationController?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
     func canSelectWithIndex(_ index: Int) -> Bool {
         let selected = dataSource.selects.count
         let max = config.params.maxCount ?? UInt.max
         let item = dataSource.list[index]
+        let itemIsImage = item.type.isImage
+
+        func canSelect() -> Bool? {
+            let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
+            let maxVideoCount = config.params.maxVideoCount ?? UInt.max
+            let maxImageCount = config.params.maxImageCount ?? UInt.max
+            if videoCount >= maxVideoCount, !itemIsImage {
+                return false
+            }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
+                return false
+            }
+            return nil
+        }
+        
         if selected < max {
-            let itemIsImage = item.type.isImage
             if config.assetOpts.contains(.mixSelect) {
-                let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
-                let maxVideoCount = config.params.maxVideoCount ?? UInt.max
-                let maxImageCount = config.params.maxImageCount ?? UInt.max
-                if videoCount >= maxVideoCount, !itemIsImage {
-                    return false
-                }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                    return false
+                if let value = canSelect() {
+                    return value
                 }
             }else{
                 if let selectMediaImage = config.selectMediaImage, item.browseAsset.isImage != selectMediaImage {
                     return false
                 }else{
-                    let videoCount = dataSource.selects.filter { $0.asset.mediaType != .image }.count
-                    let maxVideoCount = config.params.maxVideoCount ?? UInt.max
-                    let maxImageCount = config.params.maxImageCount ?? UInt.max
-                    if videoCount >= maxVideoCount, !itemIsImage {
-                        return false
-                    }else if (dataSource.selects.count - videoCount) >= maxImageCount, itemIsImage {
-                        return false
+                    if let value = canSelect() {
+                        return value
                     }
                 }
             }
@@ -252,6 +260,115 @@ extension ADThumbnailViewController {
         }
         return true
     }
+    
+    func directEdit(index: Int) -> Bool {
+        if config.assetOpts.contains(.editAfterSelectThumbnail) && config.params.maxCount == 1 {
+            let model = dataSource.list[index]
+            if config.browserOpts.contains(.allowEditImage) && model.type.isImage {
+                #if Module_ImageEdit
+                editImage(index: index)
+                return true
+                #endif
+            }
+            if config.browserOpts.contains(.allowEditVideo) && !model.type.isImage {
+                #if Module_VideoEdit
+                editVideo(index: index)
+                return true
+                #endif
+            }
+        }
+        return false
+    }
+    
+    #if Module_ImageEdit
+    func editImage(index: Int) {
+        var requestId: PHImageRequestID?
+        let hud = ADProgress.progressHUD()
+        hud.timeoutBlock = {
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+            if let requestId = requestId {
+                PHImageManager.default().cancelImageRequest(requestId)
+            }
+        }
+        hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+        let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
+        let model = dataSource.list[index]
+        requestId = ADPhotoManager.fetchImage(for: model.asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
+            if let img = img {
+                let vc = ADImageEditConfigure.imageEditVC(image: img, editInfo: model.imageEditInfo)
+                vc.imageDidEdit = { [weak self] editInfo in
+                    self?.didImageEditInfoUpdate(editInfo, at: index)
+                }
+                vc.modalPresentationStyle = .fullScreen
+                self?.present(vc, animated: false, completion: nil)
+            }else{
+                print("fetch image error")
+            }
+            hud.hide()
+        }
+    }
+    
+    func didImageEditInfoUpdate(_ info: ADImageEditInfo, at: Int) {
+        dataSource.reloadImageEditInfo(info, at: at)
+        if config.browserOpts.contains(.saveImageAfterEdit), let img = info.editImg {
+            ADPhotoManager.saveImageToAlbum(image: img, completion: nil)
+        }
+        if canSelectWithIndex(at) {
+            dataSource.selectAssetAt(index: at)
+            collectionView.reloadData()
+            doneBtnAction()
+        }
+    }
+    #endif
+
+    #if Module_VideoEdit
+    func editVideo(index: Int) {
+        var requestId: PHImageRequestID?
+        let hud = ADProgress.progressHUD()
+        hud.timeoutBlock = {
+            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+            if let requestId = requestId {
+                PHImageManager.default().cancelImageRequest(requestId)
+            }
+        }
+        hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+        let model = dataSource.list[index]
+        requestId = ADPhotoManager.fetchAVAsset(for: model.asset, completion: { [weak self] asset, _, _ in
+            if let asset = asset {
+                var options: ADVideoEditOptions = ADVideoEditOptions()
+                if let min = self?.config.params.minVideoTime {
+                    options.append(.minTime(CGFloat(min)))
+                }
+                if let max = self?.config.params.maxVideoTime {
+                    options.append(.maxTime(CGFloat(max)))
+                }
+                let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: nil, options: options)
+                vc.videoDidEdit = { [weak self] editInfo in
+                    self?.didVideoEditInfoUpdate(editInfo, at: index)
+                }
+                vc.modalPresentationStyle = .fullScreen
+                self?.present(vc, animated: false, completion: nil)
+            }else{
+                print("fetch video error")
+            }
+            hud.hide()
+        })
+        
+    }
+    
+    func didVideoEditInfoUpdate(_ info: ADVideoEditInfo, at: Int) {
+        dataSource.reloadVideoEditInfo(info, at: at)
+        if config.browserOpts.contains(.saveVideoAfterEdit), let url = info.editUrl {
+            ADPhotoManager.saveVideoToAlbum(url: url, completion: nil)
+        }
+        if canSelectWithIndex(at) {
+            dataSource.selectAssetAt(index: at)
+            collectionView.reloadData()
+            doneBtnAction()
+        }
+    }
+    #endif
+    
 }
 
 extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -310,7 +427,9 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
             let index = strong.config.albumOpts.contains(.ascending) ? cell.indexPath.row : indexPath.row-strong.dataSource.appendCellCount
             
             if sel { //取消选择
-                self?.dataSource.selectAssetAt(index: index)
+                if !strong.directEdit(index: index) {
+                    self?.dataSource.selectAssetAt(index: index)
+                }
             }else{
                 self?.dataSource.deselectAssetAt(index: index)
             }
@@ -411,10 +530,13 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
         }else if let c = cell as? ADThumbnailCellConfigurable {
+            let modify = dataSource.modifyIndexPath(indexPath)
+            if directEdit(index: modify.row) {
+                return
+            }
             if !config.assetOpts.contains(.allowBrowser) {
                 c.cellSelectAction()
             }else if c.selectStatus.isEnable {
-                let modify = dataSource.modifyIndexPath(indexPath)
                 let browser = ADAssetModelBrowserController(config: config, dataSource: dataSource, index: modify.row)
                 navigationController?.pushViewController(browser, animated: true)
             }
@@ -437,17 +559,24 @@ private extension ADThumbnailViewController {
         let cell = collectionView.cellForItem(at: indexPath) as? ADThumbnailCellConfigurable
         if pan.state == .began {
             if cell != nil {
-                slideRangeDidChange(indexPath: indexPath, cell: cell!)
+                let index = dataSource.modifyIndexPath(indexPath).row
+                if !directEdit(index: index) {
+                    selectionBegin = true
+                    slideRangeDidChange(indexPath: indexPath, cell: cell!)
+                }
             }
         }else if pan.state == .changed {
-            autoScrollWhenSlideSelect(pan)
-            if cell != nil {
-                slideRangeDidChange(indexPath: indexPath, cell: cell!)
+            if selectionBegin {
+                autoScrollWhenSlideSelect(pan)
+                if cell != nil {
+                    slideRangeDidChange(indexPath: indexPath, cell: cell!)
+                }
             }
         }else{
             cleanTimer()
             selectionInfo = nil
             selectionRange = nil
+            selectionBegin = false
         }
     }
     
@@ -644,11 +773,12 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
         if let image = image {
             let hud = ADProgress.progressHUD()
             hud.show(timeout: 0)
-            ADPhotoManager.saveImageToAlbum(image: image) { (suc, _) in
-                if suc {
-                    self.dataSource.reloadData()
+            ADPhotoManager.saveImageToAlbum(image: image) { (asset, _) in
+                if let asset = asset {
+                    let index = self.dataSource.appendCaptureAsset(asset)
+                    self.dataSource.selectAssetAt(index: index)
                 } else {
-                    print("save image error")
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.saveImageError.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                 }
                 hud.hide()
             }
@@ -663,11 +793,12 @@ extension ADThumbnailViewController: UIImagePickerControllerDelegate, UINavigati
             }
             let hud = ADProgress.progressHUD()
             hud.show(timeout: 0)
-            ADPhotoManager.saveVideoToAlbum(url: url) { (suc, _) in
-                if suc {
-                    self.dataSource.reloadData()
+            ADPhotoManager.saveVideoToAlbum(url: url) { (asset, _) in
+                if let asset = asset {
+                    let index = self.dataSource.appendCaptureAsset(asset)
+                    self.dataSource.selectAssetAt(index: index)
                 } else {
-                    print("save video error")
+                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.saveVideoError.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                 }
                 hud.hide()
             }

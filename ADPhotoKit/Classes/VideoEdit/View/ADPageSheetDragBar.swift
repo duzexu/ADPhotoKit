@@ -47,7 +47,7 @@ class ADPageSheetDragBar: UIView {
     }
     
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        return bounds.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: -28, right: 0)).contains(point)
+        return bounds.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: -10, right: 0)).contains(point)
     }
     
 }

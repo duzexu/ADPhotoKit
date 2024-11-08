@@ -8,17 +8,6 @@
 import UIKit
 import AVFoundation
 
-public struct ADVideoStcker {
-    /// Identifier of content view.
-    public let id: String
-    /// Transform of content view.
-    public let transform: CGAffineTransform
-    /// Normalize sticker center.
-    public let center: CGPoint
-    /// Stciker image.
-    public let image: UIImage
-}
-
 class Observer {
     var target: ((CGFloat, CMTime)->Void)
     
@@ -32,18 +21,23 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     let asset: AVAsset
     var clipRange: CMTimeRange? {
         didSet {
-            updateEdit()
+            resetEdit()
         }
     }
-    var videoSound: ADVideoSound = .default {
+    var videoSound: ADVideoSound = ADVideoSound() {
         didSet {
-            updateEdit()
+            if videoSound.bgm?.id != lastBgm && videoSound.bgm != nil {
+                resetEdit()
+            }else{
+                updateEdit()
+            }
         }
     }
     
-    private var stkrs: [ADVideoStcker] = []
     private var composition: AVMutableComposition!
+    private var videoComposition: AVMutableVideoComposition!
     private var playerItem: AVPlayerItem!
+    private var lastBgm: String?
     
     private var progressObservers: [Observer] = []
     
@@ -63,7 +57,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 60), queue: DispatchQueue.main) { [weak self] time in
             self?.playerTimeUpdate(time)
         }
-        updateEdit()
+        resetEdit()
     }
     
     @available(*, unavailable)
@@ -104,60 +98,13 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         progressObservers.append(Observer(target: observer))
     }
     
-    func addOrUpdateSticker(_ stk: ADVideoStcker) {
-        if let idx = stkrs.firstIndex(where: { $0.id == stk.id }) {
-            stkrs[idx] = stk
-        }else{
-            stkrs.append(stk)
-        }
-    }
-    
-    func removeSticker(_ id: String) {
-        stkrs.removeAll { $0.id == id }
-    }
-    
-    func setVideoSound(_ sound: ADVideoSound) {
-        videoSound = sound
-        updateEdit()
-    }
-    
-    func exportVideo(completionHandler handler: @escaping () -> Void) {
-        let parentLayer = CALayer()
-        let videoLayer = CALayer()
-        parentLayer.frame = CGRect(origin: .zero, size: videoSize)
-        videoLayer.frame = CGRect(origin: .zero, size: videoSize)
-        parentLayer.addSublayer(videoLayer)
-        for item in stkrs {
-            let layer = CALayer()
-            layer.frame = CGRect(origin: .zero, size: item.image.size)
-            layer.contents = item.image.cgImage
-            layer.transform = CATransform3DMakeAffineTransform(item.transform)
-            layer.position = CGPoint(x: videoSize.width*item.center.x, y: videoSize.height*item.center.y)
-            parentLayer.addSublayer(layer)
-        }
-        let videoComposition = playerItem.videoComposition as? AVMutableVideoComposition
-        let tool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parentLayer)
-        videoComposition?.animationTool = tool
-        let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality)
-        let exportURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("output.mp4")
-        exportSession?.audioMix = playerItem.audioMix
-        exportSession?.videoComposition = videoComposition
-        exportSession?.outputURL = exportURL
-        exportSession?.outputFileType = .mp4
-
-        exportSession?.exportAsynchronously {
-            // 导出完成的处理
-            print("导出完成\(exportURL)")
-        }
-    }
-    
 }
 
 extension ADVideoPlayerView {
     
-    func updateEdit() {
+    func resetEdit() {
         composition = AVMutableComposition()
-        let videoComposition = AVMutableVideoComposition.init(propertiesOf: composition)
+        videoComposition = AVMutableVideoComposition.init(propertiesOf: composition)
 
         let timeRange = clipRange ?? CMTimeRange(start: .zero, duration: asset.duration)
         
@@ -176,17 +123,14 @@ extension ADVideoPlayerView {
             videoComposition.instructions = instructions
         }
         
-        var audioTrack: AVMutableCompositionTrack?
-        if videoSound.ostOn {
-            audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
-            if let audio = asset.tracks(withMediaType: .audio).first {
-                try? audioTrack?.insertTimeRange(timeRange, of: audio, at: .zero)
-            }
+        let audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        if let audio = asset.tracks(withMediaType: .audio).first {
+            try? audioTrack?.insertTimeRange(timeRange, of: audio, at: .zero)
         }
         
-        var bgmTrack: AVMutableCompositionTrack?
+        let bgmTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
         if let bgmAsset = videoSound.bgm?.asset {
-            bgmTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+            lastBgm = videoSound.bgm?.id
             if let bgm = bgmAsset.tracks(withMediaType: .audio).first {
                 if !videoSound.bgmLoop {
                     let bgmRange = CMTimeRange(start: .zero, duration: min(timeRange.duration, bgmAsset.duration))
@@ -205,23 +149,41 @@ extension ADVideoPlayerView {
             }
         }
         
-        let playerItem = AVPlayerItem(asset: composition)
+        playerItem = AVPlayerItem(asset: composition)
         playerItem.videoComposition = videoComposition;
-        if audioTrack != nil && bgmTrack != nil {
-            let audioMix = AVMutableAudioMix()
-            let audioParameters = AVMutableAudioMixInputParameters(track: audioTrack!)
-            audioParameters.setVolume(1, at: .zero)
-            let bgmParameters = AVMutableAudioMixInputParameters(track: bgmTrack!)
-            bgmParameters.setVolume(1, at: .zero)
-            audioMix.inputParameters = [audioParameters, bgmParameters]
-            playerItem.audioMix = audioMix;
-        }
+        let audioMix = AVMutableAudioMix()
+        let audioParameters = AVMutableAudioMixInputParameters(track: audioTrack!)
+        audioParameters.setVolume(videoSound.ostOn ? 1 : 0, at: .zero)
+        let bgmParameters = AVMutableAudioMixInputParameters(track: bgmTrack!)
+        bgmParameters.setVolume(1, at: .zero)
+        audioMix.inputParameters = [audioParameters, bgmParameters]
+        playerItem.audioMix = audioMix
         
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(playDidFinish), name: .AVPlayerItemDidPlayToEndTime, object: playerItem)
         
         player.replaceCurrentItem(with: playerItem)
         player.play()
+    }
+    
+    func updateEdit() {
+        let audioTracks = composition.tracks(withMediaType: .audio)
+        var audioMixInputParameters: [AVMutableAudioMixInputParameters] = []
+        for track in audioTracks {
+            if track.trackID == 2 {
+                let inputParameters = AVMutableAudioMixInputParameters(track: track)
+                inputParameters.setVolume(videoSound.ostOn ? 1 : 0, at: .zero)
+                audioMixInputParameters.append(inputParameters)
+            } 
+            if track.trackID == 3 {
+                let inputParameters = AVMutableAudioMixInputParameters(track: track)
+                inputParameters.setVolume(videoSound.bgm != nil ? 1 : 0, at: .zero)
+                audioMixInputParameters.append(inputParameters)
+            }
+        }
+        let audioMix = AVMutableAudioMix()
+        audioMix.inputParameters = audioMixInputParameters
+        playerItem.audioMix = audioMix
     }
     
     func playerTimeUpdate(_ time: CMTime) {

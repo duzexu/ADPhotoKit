@@ -22,6 +22,7 @@ class ADVideoBGMTableView: UIView {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .none
+        tableView.keyboardDismissMode = .onDrag
         tableView.regisiter(cell: ADVideoBGMCell.self)
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -63,6 +64,19 @@ class ADVideoBGMTableView: UIView {
         }
         emptyLabel.isHidden = musicItems.count != 0
         footerView.isHidden = musicItems.count == 0
+    }
+    
+    func selectItem(_ item: ADMusicItem) {
+        if let index = musicItems.firstIndex(where: { value in
+            return item.id == value.id
+        }) {
+            tableView.reloadData()
+            selectRow(index)
+        }else{
+            musicItems.insert(item, at: 0)
+            tableView.reloadData()
+            selectRow(0)
+        }
     }
     
     func cancelSelect() {
@@ -221,7 +235,14 @@ class ADVideoBGMCell: UITableViewCell {
     func configure(with item: ADMusicItem) {
         coverImageView.kf.setImage(with: item.cover)
         titleView.text = "\(item.name) - \(item.singer)"
-        lyricsView.text = (item.lyric == nil ? "此音乐暂无歌词" : item.lyric!.map { $0.text }.joined(separator: " "))
+        switch item.extra {
+        case let .text(content):
+            lyricsView.text = content
+        case let .lyric(items):
+            lyricsView.text = items.map { $0.text }.joined(separator: " ")
+        case .none:
+            lyricsView.text = ""
+        }
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -45,6 +45,8 @@ public class ADThumbnailListCell: UICollectionViewCell {
     var indexLabel: UILabel!
     var coverView: UIView!
     
+    var displaySelectBtn: Bool = true
+    
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
@@ -61,14 +63,6 @@ public class ADThumbnailListCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
-        coverView = UIView()
-        coverView.isUserInteractionEnabled = false
-        coverView.isHidden = true
-        contentView.addSubview(coverView)
-        coverView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         
@@ -122,15 +116,25 @@ public class ADThumbnailListCell: UICollectionViewCell {
             make.top.equalToSuperview().offset(1)
             make.right.equalToSuperview().offset(-5)
         }
+        
+        coverView = UIView()
+        coverView.isUserInteractionEnabled = false
+        coverView.isHidden = true
+        contentView.addSubview(coverView)
+        coverView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
     }
     
     func selectStatusDidChange() {
+        selectBtn.isHidden = !displaySelectBtn
         switch selectStatus {
         case let .select(index):
             selectBtn.isEnabled = true
             if let idx = index {
                 coverView.isHidden = false
                 coverView.backgroundColor = UIColor(white: 0, alpha: 0.2)
+                selectBtn.isHidden = false
                 selectBtn.isSelected = true
                 indexLabel.isHidden = false
                 indexLabel.text = "\(idx)"
@@ -167,7 +171,7 @@ public class ADThumbnailListCell: UICollectionViewCell {
             }
         case .deselect:
             coverView.isHidden = false
-            coverView.backgroundColor = UIColor(white: 1, alpha: 0.5)
+            coverView.backgroundColor = UIColor(white: 0, alpha: 0.8)
             indexLabel.isHidden = true
             selectBtn.isSelected = false
             selectBtn.isEnabled = false
@@ -202,9 +206,9 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
     /// Config cell with asset model.
     /// - Parameter model: Asset info.
     public func configure(with model: ADAssetModel, config: ADPhotoKitConfig) {
+        displaySelectBtn = config.displaySelectBtn(model: model)
         assetModel = model
         selectStatus = model.selectStatus
-        selectBtn.isHidden = !config.displaySelectBtn(model: model)
         indexLabel.alpha = config.assetOpts.contains(.selectIndex) ? 1 : 0
 
         switch model.type {
@@ -232,6 +236,14 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
             imageView.image = imageEdit
             bottomMaskView.isHidden = false
             tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+            return
+        }
+        #endif
+        #if Module_VideoEdit
+        if let videoEdit = model.videoEditInfo?.editThumbnail {
+            imageView.image = videoEdit
+            bottomMaskView.isHidden = false
+            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .videoEdit)
             return
         }
         #endif
