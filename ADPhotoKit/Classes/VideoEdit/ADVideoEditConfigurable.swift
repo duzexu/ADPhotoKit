@@ -34,11 +34,19 @@ public protocol ADVideoPlayable where Self: UIView {
     
     func addProgressObserver(_ observer: @escaping (_ progress: CGFloat, _ time: CMTime) -> Void)
     
+    static func exporter(from asset: AVAsset, editInfo: ADVideoEditInfo) -> ADVideoExporter
+    
 }
 
-public protocol ADContentChangable where Self: UIView {
+public extension ADVideoPlayable {
+    static func exporter(from asset: AVAsset, editInfo: ADVideoEditInfo) -> ADVideoExporter {
+        return ADDefaultVideoExporter(asset: asset, editInfo: editInfo)
+    }
+}
+
+public protocol ADContentChangable where Self: CALayer {
     
-    func changeWithProgress(_ progress: CGFloat)
+    func onUpdateContent()
     
 }
 
@@ -47,6 +55,8 @@ public protocol ADVideoEditConfigurable where Self: UIViewController {
     var videoDidEdit: ((ADVideoEditInfo) -> Void)? { set get }
     
     var cancelEdit: (() -> Void)? { set get }
+    
+    init(config: ADPhotoKitConfig, asset: AVAsset, editInfo: ADVideoEditInfo?)
     
 }
 
@@ -90,11 +100,12 @@ public protocol ADVideoExporterable {
 class ADVideoEditConfigure {
     
     static func videoPlayable(asset: AVAsset) -> ADVideoPlayable {
-        return ADPhotoKitConfiguration.default.customVideoPlayableBlock?(asset) ?? ADVideoPlayerView(asset: asset)
+        let type = ADPhotoKitConfiguration.default.customVideoPlayable ?? ADVideoPlayerView.self
+        return type.init(asset: asset)
     }
     
-    static func videoEditVC(asset: AVAsset, editInfo: ADVideoEditInfo?, options: ADVideoEditOptions) -> ADVideoEditConfigurable {
-        return ADPhotoKitConfiguration.default.customVideoEditVCBlock?(asset, editInfo, options) ?? ADVideoEditController(asset: asset, editInfo: editInfo, options: options)
+    static func videoEditVC(config: ADPhotoKitConfig, asset: AVAsset, editInfo: ADVideoEditInfo?) -> ADVideoEditConfigurable {
+        return ADPhotoKitConfiguration.default.customVideoEditVCBlock?(config, asset, editInfo) ?? ADVideoEditController(config: config, asset: asset, editInfo: editInfo)
     }
     
     static func videoClipVC(clipInfo: ADVideoClipInfo) -> ADVideoClipConfigurable {

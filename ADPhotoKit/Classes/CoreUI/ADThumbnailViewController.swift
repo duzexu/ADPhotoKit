@@ -193,14 +193,14 @@ extension ADThumbnailViewController {
     }
     
     func doneBtnAction() {
-        if config.browserOpts.contains(.fetchImage) {
-            let opt = ADAssetOperation.ImageOptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif))
-            dataSource.fetchSelectImages(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
+        if config.browserOpts.contains(.fetchResult) {
+            let opt = ADAssetOperation.OptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif), saveEditVideo: config.browserOpts.contains(.saveVideoAfterEdit))
+            dataSource.fetchSelectResults(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
                 self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }else{
-            let selected = dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(with: nil),nil) }
+            let selected = dataSource.selects.map { ADPhotoKitUI.Asset($0.asset,$0.result(image: nil),nil) }
             config.pickerSelect?(selected, toolBarView.isOriginal)
             navigationController?.dismiss(animated: true, completion: nil)
         }
@@ -282,29 +282,38 @@ extension ADThumbnailViewController {
     
     #if Module_ImageEdit
     func editImage(index: Int) {
-        var requestId: PHImageRequestID?
-        let hud = ADProgress.progressHUD()
-        hud.timeoutBlock = {
-            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-            if let requestId = requestId {
-                PHImageManager.default().cancelImageRequest(requestId)
-            }
-        }
-        hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
-        let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
         let model = dataSource.list[index]
-        requestId = ADPhotoManager.fetchImage(for: model.asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
-            if let img = img {
-                let vc = ADImageEditConfigure.imageEditVC(image: img, editInfo: model.imageEditInfo)
-                vc.imageDidEdit = { [weak self] editInfo in
-                    self?.didImageEditInfoUpdate(editInfo, at: index)
-                }
-                vc.modalPresentationStyle = .fullScreen
-                self?.present(vc, animated: false, completion: nil)
-            }else{
-                print("fetch image error")
+        if let img = model.imageEditInfo?.originImg {
+            let vc = ADImageEditConfigure.imageEditVC(image: img, editInfo: model.imageEditInfo)
+            vc.imageDidEdit = { [weak self] editInfo in
+                self?.didImageEditInfoUpdate(editInfo, at: index)
             }
-            hud.hide()
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: false, completion: nil)
+        }else{
+            var requestId: PHImageRequestID?
+            let hud = ADProgress.progressHUD()
+            hud.timeoutBlock = {
+                ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                if let requestId = requestId {
+                    PHImageManager.default().cancelImageRequest(requestId)
+                }
+            }
+            hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+            let maxSize = CGSize(width: screenHeight*UIScreen.main.scale, height: screenHeight*UIScreen.main.scale)
+            requestId = ADPhotoManager.fetchImage(for: model.asset, size: maxSize, synchronous: true) { [weak self] img, _, _ in
+                if let img = img {
+                    let vc = ADImageEditConfigure.imageEditVC(image: img, editInfo: model.imageEditInfo)
+                    vc.imageDidEdit = { [weak self] editInfo in
+                        self?.didImageEditInfoUpdate(editInfo, at: index)
+                    }
+                    vc.modalPresentationStyle = .fullScreen
+                    self?.present(vc, animated: false, completion: nil)
+                }else{
+                    print("fetch image error")
+                }
+                hud.hide()
+            }
         }
     }
     
@@ -323,37 +332,39 @@ extension ADThumbnailViewController {
 
     #if Module_VideoEdit
     func editVideo(index: Int) {
-        var requestId: PHImageRequestID?
-        let hud = ADProgress.progressHUD()
-        hud.timeoutBlock = {
-            ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
-            if let requestId = requestId {
-                PHImageManager.default().cancelImageRequest(requestId)
-            }
-        }
-        hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
         let model = dataSource.list[index]
-        requestId = ADPhotoManager.fetchAVAsset(for: model.asset, completion: { [weak self] asset, _, _ in
-            if let asset = asset {
-                var options: ADVideoEditOptions = ADVideoEditOptions()
-                if let min = self?.config.params.minVideoTime {
-                    options.append(.minTime(CGFloat(min)))
-                }
-                if let max = self?.config.params.maxVideoTime {
-                    options.append(.maxTime(CGFloat(max)))
-                }
-                let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: nil, options: options)
-                vc.videoDidEdit = { [weak self] editInfo in
-                    self?.didVideoEditInfoUpdate(editInfo, at: index)
-                }
-                vc.modalPresentationStyle = .fullScreen
-                self?.present(vc, animated: false, completion: nil)
-            }else{
-                print("fetch video error")
+        if let asset = model.videoEditInfo?.originAsset {
+            let vc = ADVideoEditConfigure.videoEditVC(config: config, asset: asset, editInfo: nil)
+            vc.videoDidEdit = { [weak self] editInfo in
+                self?.didVideoEditInfoUpdate(editInfo, at: index)
             }
-            hud.hide()
-        })
-        
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: false, completion: nil)
+        }else{
+            var requestId: PHImageRequestID?
+            let hud = ADProgress.progressHUD()
+            hud.timeoutBlock = {
+                ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.timeout.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                if let requestId = requestId {
+                    PHImageManager.default().cancelImageRequest(requestId)
+                }
+            }
+            hud.show(timeout: ADPhotoKitConfiguration.default.fetchTimeout)
+            requestId = ADPhotoManager.fetchAVAsset(for: model.asset, completion: { [weak self] asset, _, _ in
+                hud.hide()
+                guard let strong = self else { return }
+                if let asset = asset {
+                    let vc = ADVideoEditConfigure.videoEditVC(config: strong.config, asset: asset, editInfo: nil)
+                    vc.videoDidEdit = { [weak self] editInfo in
+                        self?.didVideoEditInfoUpdate(editInfo, at: index)
+                    }
+                    vc.modalPresentationStyle = .fullScreen
+                    self?.present(vc, animated: false, completion: nil)
+                }else{
+                    print("fetch video error")
+                }
+            })
+        }
     }
     
     func didVideoEditInfoUpdate(_ info: ADVideoEditInfo, at: Int) {

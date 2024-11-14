@@ -356,14 +356,7 @@ private extension ADAssetBrowserController {
     func editVideo(_ asset: AVAsset?) {
         #if Module_VideoEdit
         if let asset = asset {
-            var options: ADVideoEditOptions = ADVideoEditOptions()
-            if let min = config.params.minVideoTime {
-                options.append(.minTime(CGFloat(min)))
-            }
-            if let max = config.params.maxVideoTime {
-                options.append(.maxTime(CGFloat(max)))
-            }
-            let vc = ADVideoEditConfigure.videoEditVC(asset: asset, editInfo: dataSource.current!.videoEditInfo, options: options)
+            let vc = ADVideoEditConfigure.videoEditVC(config: config, asset: asset, editInfo: dataSource.current!.videoEditInfo)
             vc.videoDidEdit = { [weak self] editInfo in
                 self?.didVideoEditInfoUpdate(editInfo)
             }

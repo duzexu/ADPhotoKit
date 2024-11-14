@@ -97,8 +97,9 @@ public struct ADAssetBrowserOptions: OptionSet {
     public static let selectThumbnil = ADAssetBrowserOptions(rawValue: 1 << 1)
     /// Display the index of the selected photos at navbar.
     public static let selectIndex = ADAssetBrowserOptions(rawValue: 1 << 2)
-    /// Allow framework fetch image when callback.
-    public static let fetchImage = ADAssetBrowserOptions(rawValue: 1 << 3)
+    /// Allow framework fetch result when callback.
+    /// Media type image return `UIImage` and video return 'AVAsset'.
+    public static let fetchResult = ADAssetBrowserOptions(rawValue: 1 << 3)
     /// In single selection mode, whether to display the selection button.
     public static let selectBtnWhenSingleSelect = ADAssetBrowserOptions(rawValue: 1 << 4)
     /// Whether to display the selected count on the button.
@@ -114,9 +115,13 @@ public struct ADAssetBrowserOptions: OptionSet {
     public static let allowEditImage = ADAssetBrowserOptions(rawValue: 1 << 9)
     // Allow edited video.
     public static let allowEditVideo = ADAssetBrowserOptions(rawValue: 1 << 10)
+    // Export video after edited video.
+    /// Indicates whether to export the video immediately after editing. If not contains `exportVideoAfterEdit`, will be exported in the final callback.
+    /// - Note: This option only takes effect when contains `fetchResult`.
+    public static let exportVideoAfterEdit = ADAssetBrowserOptions(rawValue: 1 << 11)
     
     /// Default options.
-    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchImage, .totalOriginalSize, .selectCountOnDoneBtn, .saveImageAfterEdit, .saveVideoAfterEdit, .allowEditImage, .allowEditVideo]
+    public static let `default`: ADAssetBrowserOptions = [.selectOriginal, .selectThumbnil, .selectIndex, .fetchResult, .totalOriginalSize, .selectCountOnDoneBtn, .saveImageAfterEdit, .saveVideoAfterEdit, .allowEditImage, .allowEditVideo]
     
     public init(rawValue: Int) {
         self.rawValue = rawValue

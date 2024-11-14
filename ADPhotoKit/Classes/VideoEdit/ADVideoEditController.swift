@@ -33,6 +33,9 @@ public struct ADVideoEditInfo {
     /// Tools saved data. `Key` is tool's `identifier`.
     public var toolsJson: Dictionary<String,Any>?
     
+    /// Origin asset.
+    public var originAsset: AVAsset
+    
     /// Edit result asset.
     public var editUrl: URL?
     
@@ -41,22 +44,16 @@ public struct ADVideoEditInfo {
     
 }
 
-public typealias ADVideoEditOptions = [ADVideoEditOptionsItem]
-
-public enum ADVideoEditOptionsItem {
-    case minTime(CGFloat)
-    case maxTime(CGFloat)
-}
-
 class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
     
     var videoDidEdit: ((ADVideoEditInfo) -> Void)?
     
     var cancelEdit: (() -> Void)?
     
+    let config: ADPhotoKitConfig
     let asset: AVAsset
     var editInfo: ADVideoEditInfo
-    let options: ADVideoEditOptions
+    
     let videoSize: CGSize
     
     private var videoPlayerView: ADVideoPlayable!
@@ -83,10 +80,10 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
     
     private var exporter: ADVideoExporter?
     
-    required init(asset: AVAsset, editInfo: ADVideoEditInfo?, options: ADVideoEditOptions = []) {
+    required init(config: ADPhotoKitConfig, asset: AVAsset, editInfo: ADVideoEditInfo?) {
         self.asset = asset
-        self.editInfo = editInfo ?? ADVideoEditInfo()
-        self.options = options
+        self.editInfo = editInfo ?? ADVideoEditInfo(originAsset: asset)
+        self.config = config
         self.videoSize = ADVideoUitls.getNaturalSize(asset: asset)
         super.init(nibName: nil, bundle: nil)
         let generator = AVAssetImageGenerator(asset: asset)
@@ -134,13 +131,11 @@ extension ADVideoEditController {
     func setupUI() {
         var min: CGFloat? = nil
         var max: CGFloat? = nil
-        for item in options {
-            switch item {
-            case let .minTime(v):
-                min = v
-            case let .maxTime(v):
-                max = v
-            }
+        if let value = config.params.minVideoTime {
+            min = CGFloat(value)
+        }
+        if let value = config.params.maxVideoTime {
+            max = CGFloat(value)
         }
         
         videoPlayerView = ADVideoEditConfigure.videoPlayable(asset: asset)
@@ -330,33 +325,38 @@ extension ADVideoEditController {
                 UIGraphicsEndImageContext()
                 editInfo.editThumbnail = result
             }
-            videoDidEdit?(editInfo)
-    //        if let _ = navigationController?.popViewController(animated: false) {
-    //        }else{
-    //            dismiss(animated: false, completion: nil)
-    //        }
-            let hud = ADProgress.progressHUD()
-            hud.show(timeout: 0)
-            let path = NSTemporaryDirectory().appending("/{\(UUID().uuidString)}.mp4")
-            let exporter = ADVideoExporter(asset: asset, editInfo: editInfo)
-            exporter.export(to: path) { [weak self] url, error in
-                hud.hide()
-                DispatchQueue.main.async {
-                    if let vc = self {
-                        if let url = url {
-                            vc.editInfo.editUrl = url
-                            vc.videoDidEdit?(vc.editInfo)
-                            if let _ = vc.navigationController?.popViewController(animated: false) {
+            if config.browserOpts.contains(.fetchResult) &&
+                config.browserOpts.contains(.exportVideoAfterEdit) {
+                let hud = ADProgress.progressHUD()
+                hud.show(timeout: 0)
+                let path = NSTemporaryDirectory().appending("\(UUID().uuidString).mp4")
+                let type = ADPhotoKitConfiguration.default.customVideoPlayable ?? ADVideoPlayerView.self
+                let exporter = type.exporter(from: asset, editInfo: editInfo)
+                exporter.export(to: path) { [weak self] url, error in
+                    hud.hide()
+                    DispatchQueue.main.async {
+                        if let vc = self {
+                            if let url = url {
+                                vc.editInfo.editUrl = url
+                                vc.videoDidEdit?(vc.editInfo)
+                                if let _ = vc.navigationController?.popViewController(animated: false) {
+                                }else{
+                                    vc.dismiss(animated: false, completion: nil)
+                                }
                             }else{
-                                vc.dismiss(animated: false, completion: nil)
+                                ADAlert.alert().alert(on: vc, title: nil, message: "视频导出失败\(String(describing: error))", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                             }
-                        }else{
-                            ADAlert.alert().alert(on: vc, title: nil, message: "视频导出失败\(String(describing: error))", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                         }
                     }
                 }
+                self.exporter = exporter
+            }else{
+                videoDidEdit?(editInfo)
+                if let _ = navigationController?.popViewController(animated: false) {
+                }else{
+                    dismiss(animated: false, completion: nil)
+                }
             }
-            self.exporter = exporter
         }else{
             cancelEdit?()
             if let _ = navigationController?.popViewController(animated: false) {

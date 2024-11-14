@@ -497,12 +497,12 @@ class ViewController: UIViewController {
             })
             browserModels.append(selectIndex)
             
-            let fetchImage = ConfigModel(title: "FetchImage", mode: .switch(true), action: { [weak self] (value) in
+            let fetchImage = ConfigModel(title: "FetchResult", mode: .switch(true), action: { [weak self] (value) in
                 if let isOn = value as? Bool {
                     if isOn {
-                        self?.configs.browserOptions.insert(.fetchImage)
+                        self?.configs.browserOptions.insert(.fetchResult)
                     }else{
-                        self?.configs.browserOptions.remove(.fetchImage)
+                        self?.configs.browserOptions.remove(.fetchResult)
                     }
                     ProgressHUD.showSuccess("Update Success!")
                 }

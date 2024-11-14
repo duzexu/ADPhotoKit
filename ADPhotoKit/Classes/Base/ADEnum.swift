@@ -10,6 +10,7 @@ import Foundation
 /// Error throw by framework.
 public enum ADError: Error {
     case noAuthorization
+    case exportSessionCreateFailed
 }
 
 /// Capture resolution.

@@ -232,13 +232,13 @@ public class ADPhotoKitConfiguration {
     /// - Note: If contain `.imageStkr`, you must set `imageStickerDataSource` or `customImageStickerSelectVC`.
     /// - Note: If contain `.bgMusic`, you must set `videoMusicDataSource` or `customVideoMusicSelectVC`.
     public var systemVideoEditTools: ADVideoEditTools = .all
-    
-    public var customVideoPlayableBlock: ((AVAsset) -> ADVideoPlayable)?
+        
+    public var customVideoPlayable: ADVideoPlayable.Type?
     
     /// User custom video edit tools. Custom tools is default add after system tools.
     public var customVideoEditToolsBlock: (() -> [ADVideoEditTool])?
     
-    public var customVideoEditVCBlock: ((AVAsset, ADVideoEditInfo?, ADVideoEditOptions) -> ADVideoEditConfigurable)?
+    public var customVideoEditVCBlock: ((ADPhotoKitConfig, AVAsset, ADVideoEditInfo?) -> ADVideoEditConfigurable)?
     
     /* =============== bgm =============== */
     

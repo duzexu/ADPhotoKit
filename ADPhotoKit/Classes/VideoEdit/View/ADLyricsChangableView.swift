@@ -9,15 +9,16 @@ import UIKit
 import AVFoundation
 import CoreServices
 
-class ADLyricsChangableView: UIView, ADContentChangable {
+class ADLyricsChangableView: CALayer, ADContentChangable {
     
     let music: ADMusicItem
-    let duration: CGFloat
+    let length: CGFloat
     
-    init(music: ADMusicItem, duration: CGFloat) {
+    init(music: ADMusicItem, length: CGFloat) {
         self.music = music
-        self.duration = duration
-        super.init(frame: CGRect(origin: .zero, size: CGSize(width: screenWidth-64, height: 137)))
+        self.length = length
+        super.init()
+        frame = CGRect(origin: .zero, size: CGSize(width: screenWidth-64, height: 137))
         setupUI()
     }
     
@@ -56,14 +57,16 @@ class ADLyricsChangableView: UIView, ADContentChangable {
         }
         animatedView = UIImageView(frame: CGRect(x: 6, y: 4, width: 13, height: 9))
         animatedView.image = images.first
-        addSubview(animatedView)
+        addSublayer(animatedView.layer)
         switch music.extra {
         case let .text(content):
-            let lyricView = UILabel(frame: CGRect(x: 0, y: 17, width: screenWidth-64, height: 120))
-            lyricView.backgroundColor = .clear
-            lyricView.isUserInteractionEnabled = false
-            lyricView.attributedText = NSAttributedString(string: content, attributes: attributes)
-            addSubview(lyricView)
+            let lyricLayer = CATextLayer()
+            lyricLayer.contentsScale = UIScreen.main.scale
+            lyricLayer.string = NSAttributedString(string: content, attributes: attributes)
+            lyricLayer.isWrapped = true
+            lyricLayer.frame = CGRect(x: 0, y: 17, width: screenWidth-64, height: 120)
+            lyricLayer.transform = CATransform3DMakeScale(1, -1, 1)
+            addSublayer(lyricLayer)
         case let .lyric(items):
             var lastLayer: CALayer?
             for item in items {
@@ -76,6 +79,8 @@ class ADLyricsChangableView: UIView, ADContentChangable {
                 lyricLayer.alignmentMode = .left
                 lyricLayer.frame = CGRect(x: 0, y: 17, width: screenWidth-64, height: 120)
                 lyricLayer.opacity = 0
+                lyricLayer.isWrapped = true
+                lyricLayer.transform = CATransform3DMakeScale(1, -1, 1)
                 let fadeInAnimation = CABasicAnimation(keyPath: "opacity")
                 fadeInAnimation.fromValue = 0.0
                 fadeInAnimation.toValue = 1.0
@@ -84,8 +89,7 @@ class ADLyricsChangableView: UIView, ADContentChangable {
                 fadeInAnimation.fillMode = .forwards
                 fadeInAnimation.isRemovedOnCompletion = false
                 lyricLayer.add(fadeInAnimation, forKey: "fadeIn")
-                lyricLayer.transform = CATransform3DMakeScale(1, -1, 1)
-                layer.addSublayer(lyricLayer)
+                addSublayer(lyricLayer)
                 if let last = lastLayer {
                     let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
                     fadeOutAnimation.fromValue = 1.0
@@ -103,7 +107,7 @@ class ADLyricsChangableView: UIView, ADContentChangable {
         }
     }
     
-    func changeWithProgress(_ progress: CGFloat) {
+    func onUpdateContent() {
         if index >= images.count {
             index = 0
         }

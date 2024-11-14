@@ -36,6 +36,9 @@ public struct ADImageEditInfo {
     /// Tools saved data. `Key` is tool's `identifier`.
     public var toolsJson: Dictionary<String,Any>?
     
+    /// Origin image.
+    public var originImg: UIImage
+    
     /// Modifyed origin image.
     public var modifyImg: UIImage?
     
@@ -75,7 +78,7 @@ class ADImageEditController: UIViewController, ADImageEditConfigurable {
 
     required init(image: UIImage, editInfo: ADImageEditInfo?) {
         self.image = image
-        self.editInfo = editInfo ?? ADImageEditInfo()
+        self.editInfo = editInfo ?? ADImageEditInfo(originImg: image)
         super.init(nibName: nil, bundle: nil)
     }
     

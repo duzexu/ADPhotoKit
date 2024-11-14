@@ -59,6 +59,7 @@ class ADVideoBGM: ADVideoEditTool {
                 ADStickerInteractView.shared.addContentWithInfo(info)
             }
         }
+        videoPlayable?.videoSound = videoSound
     }
     
     init() {

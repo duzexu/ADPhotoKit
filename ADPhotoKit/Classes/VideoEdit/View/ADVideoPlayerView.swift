@@ -35,7 +35,6 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     }
     
     private var composition: AVMutableComposition!
-    private var videoComposition: AVMutableVideoComposition!
     private var playerItem: AVPlayerItem!
     private var lastBgm: String?
     
@@ -104,23 +103,13 @@ extension ADVideoPlayerView {
     
     func resetEdit() {
         composition = AVMutableComposition()
-        videoComposition = AVMutableVideoComposition.init(propertiesOf: composition)
 
         let timeRange = clipRange ?? CMTimeRange(start: .zero, duration: asset.duration)
         
         let videoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         if let video = asset.tracks(withMediaType: .video).first {
+            videoTrack?.preferredTransform = video.preferredTransform
             try? videoTrack?.insertTimeRange(timeRange, of: video, at: .zero)
-            videoComposition.frameDuration = video.minFrameDuration
-            videoComposition.renderSize = videoSize
-            var instructions: [AVMutableVideoCompositionInstruction] = []
-            let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: video)
-            layerInstruction.setTransform(video.preferredTransform, at: .zero)
-            let instruction = AVMutableVideoCompositionInstruction()
-            instruction.timeRange = CMTimeRangeMake(start: .zero, duration: timeRange.duration)
-            instruction.layerInstructions = [layerInstruction]
-            instructions.append(instruction)
-            videoComposition.instructions = instructions
         }
         
         let audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
@@ -150,7 +139,6 @@ extension ADVideoPlayerView {
         }
         
         playerItem = AVPlayerItem(asset: composition)
-        playerItem.videoComposition = videoComposition;
         let audioMix = AVMutableAudioMix()
         let audioParameters = AVMutableAudioMixInputParameters(track: audioTrack!)
         audioParameters.setVolume(videoSound.ostOn ? 1 : 0, at: .zero)

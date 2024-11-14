@@ -11,21 +11,18 @@ import Kingfisher
 
 class ADAssetOperation: Operation {
     
-    struct ImageOptConfig {
+    struct OptConfig {
         let isOriginal: Bool
         let selectAsGif: Bool
-    }
-    
-    struct VideoOptConfig {
+        let saveEditVideo: Bool
     }
     
     let model: ADSelectAssetModel
-    let imageConfig: ImageOptConfig?
-    let videoConfig: VideoOptConfig?
-    let progress: ADPhotoManager.ADAssetProgressHandler?
+    let config: OptConfig
     let completion: ((ADPhotoKitUI.Asset) -> Void)
     
     private var requestID: PHImageRequestID?
+    private var exporter: ADVideoExporter?
     
     private var _isFinished: Bool = false {
         willSet { willChangeValue(forKey: "isFinished") }
@@ -38,14 +35,10 @@ class ADAssetOperation: Operation {
     }
     
     init(model: ADSelectAssetModel,
-         imageConfig: ImageOptConfig? = nil,
-         videoConfig: VideoOptConfig? = nil,
-         progress: ADPhotoManager.ADAssetProgressHandler? = nil,
+         config: OptConfig,
          completion: @escaping ((ADPhotoKitUI.Asset) -> Void)) {
         self.model = model
-        self.imageConfig = imageConfig
-        self.videoConfig = videoConfig
-        self.progress = progress
+        self.config = config
         self.completion = completion
         super.init()
     }
@@ -59,25 +52,57 @@ class ADAssetOperation: Operation {
         _isExecuting = true
         
         if model.asset.mediaType == .video {
-            
+            #if Module_VideoEdit
+            if model.videoEditInfo != nil && model.videoEditInfo!.editUrl == nil {
+                let type = ADPhotoKitConfiguration.default.customVideoPlayable ?? ADVideoPlayerView.self
+                let exporter = type.exporter(from: model.videoEditInfo!.originAsset, editInfo: model.videoEditInfo!)
+                let path = NSTemporaryDirectory().appending("\(UUID().uuidString).mp4")
+                exporter.export(to: path) { [weak self] url, error in
+                    guard let strong = self else { return }
+                    if let url = url {
+                        strong.model.videoEditInfo!.editUrl = url
+                        if strong.config.saveEditVideo {
+                            ADPhotoManager.saveVideoToAlbum(url: url, completion: nil)
+                        }
+                    }
+                    self?.completion((strong.model.asset,strong.model.result(asset: strong.model.videoEditInfo!.originAsset),nil))
+                    self?.done()
+                }
+                self.exporter = exporter
+                return
+            }
+            #endif
+            requestID = ADPhotoManager.fetch(for: model.asset, type: .assert, progress: nil, completion: { [weak self] (data, info, _) in
+                guard let strong = self else { return }
+                let error = info?[PHImageErrorKey] as? NSError
+                self?.completion((strong.model.asset,strong.model.result(asset: data as? AVAsset),error))
+                self?.done()
+            })
         }else{
-            if model.asset.isGif && imageConfig?.selectAsGif == true {
-                requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: progress, completion: { [weak self] (data, info, _) in
+            if model.asset.isGif && config.selectAsGif {
+                requestID = ADPhotoManager.fetch(for: model.asset, type: .originImageData, progress: nil, completion: { [weak self] (data, info, _) in
                     guard let strong = self else { return }
                     if let d = data as? Data {
-                        self?.completion((strong.model.asset,strong.model.result(with: KingfisherWrapper.image(data: d, options: .init())),nil))
+                        self?.completion((strong.model.asset,strong.model.result(image: KingfisherWrapper.image(data: d, options: .init())),nil))
                     }else{
                         let error = info?[PHImageErrorKey] as? NSError
-                        self?.completion((strong.model.asset,strong.model.result(with: nil),error))
+                        self?.completion((strong.model.asset,strong.model.result(image: nil),error))
                     }
                     self?.done()
                 })
             }else{
-                let size: CGSize? = imageConfig?.isOriginal == true ? nil : model.asset.browserSize
-                requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: progress, completion: { [weak self] (image, info, _) in
+                #if Module_ImageEdit
+                if !config.isOriginal && model.imageEditInfo?.originImg != nil {
+                    completion((model.asset,model.result(image: model.imageEditInfo?.originImg),nil))
+                    done()
+                    return
+                }
+                #endif
+                let size: CGSize? = config.isOriginal ? nil : model.asset.browserSize
+                requestID = ADPhotoManager.fetch(for: model.asset, type: .image(size: size, synchronous: true), progress: nil, completion: { [weak self] (image, info, _) in
                     guard let strong = self else { return }
                     let error = info?[PHImageErrorKey] as? NSError
-                    self?.completion((strong.model.asset,strong.model.result(with: image as? UIImage),error))
+                    self?.completion((strong.model.asset,strong.model.result(image: image as? UIImage),error))
                     self?.done()
                 })
             }

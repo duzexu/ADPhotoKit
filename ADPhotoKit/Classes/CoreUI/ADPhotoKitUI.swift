@@ -22,8 +22,11 @@ public enum ADPickerStyle {
 
 /// Asset fetch result.
 public struct ADAssetResult {
-    /// Image fetch with asset. It's `nil` if `browserOpts` not contain `.fetchImage` or error occur when fetching.
+    /// Image fetch with asset. It's `nil` if media type is video or `browserOpts` not contain `.fetchResult` or error occur when fetching.
     public let image: UIImage?
+    
+    /// AVAsset fetch with asset. It's `nil` if media type is image or `browserOpts` not contain `.fetchResult` or error occur when fetching.
+    public let asset: AVAsset?
     
     #if Module_ImageEdit
     /// Image edited info. It can be `nil` if image is not edit.
@@ -68,12 +71,24 @@ public struct ADConstraintParams {
 }
 
 extension ADSelectAssetModel {
-    func result(with image: UIImage?) -> ADAssetResult? {
+    func result(image: UIImage?) -> ADAssetResult? {
         #if Module_ImageEdit || Module_VideoEdit
-        return ADAssetResult(image: image, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
+        return ADAssetResult(image: image, asset: nil, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
         #else
         if let img = image {
-            return ADAssetResult(image: img)
+            return ADAssetResult(image: img, asset: nil)
+        }else{
+            return nil
+        }
+        #endif
+    }
+    
+    func result(asset: AVAsset?) -> ADAssetResult? {
+        #if Module_ImageEdit || Module_VideoEdit
+        return ADAssetResult(image: nil, asset: asset, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
+        #else
+        if let asset = asset {
+            return ADAssetResult(image: nil, asset: asset)
         }else{
             return nil
         }
@@ -375,7 +390,7 @@ public class ADPhotoKitConfig {
 
 extension ADAssetListDataSource {
     
-    func fetchSelectImages(config: ADAssetOperation.ImageOptConfig, inQueue: OperationQueue, completion: @escaping (([ADPhotoKitUI.Asset])->Void)) {
+    func fetchSelectResults(config: ADAssetOperation.OptConfig, inQueue: OperationQueue, completion: @escaping (([ADPhotoKitUI.Asset])->Void)) {
         let hud = ADProgress.progressHUD()
         
         var timeout: Bool = false
@@ -389,20 +404,39 @@ extension ADAssetListDataSource {
         var result: [ADPhotoKitUI.Asset?] = Array(repeating: nil, count: selects.count)
         var operations: [Operation] = []
         for (i,item) in selects.enumerated() {
-            let op = ADAssetOperation(model: item, imageConfig: config, progress: nil) { (asset) in
+            let op = ADAssetOperation(model: item, config: config) { asset in
                 result[i] = asset
             }
             operations.append(op)
         }
-        
-        DispatchQueue.main.async {
-            inQueue.addOperations(operations, waitUntilFinished: true)
-            hud.hide()
-            if !timeout {
-                completion(result.compactMap { $0 })
-            }else{
-                completion([])
+        if #available(iOS 13, *) {
+            inQueue.addOperations(operations, waitUntilFinished: false)
+            inQueue.addBarrierBlock {
+                DispatchQueue.main.async {
+                    hud.hide()
+                    if !timeout {
+                        completion(result.compactMap { $0 })
+                    }else{
+                        completion([])
+                    }
+                }
             }
+        }else{
+            let finishOp = BlockOperation {
+                DispatchQueue.main.async {
+                    hud.hide()
+                    if !timeout {
+                        completion(result.compactMap { $0 })
+                    }else{
+                        completion([])
+                    }
+                }
+            }
+            for op in operations {
+                finishOp.addDependency(op)
+            }
+            operations.append(finishOp)
+            inQueue.addOperations(operations, waitUntilFinished: false)
         }
     }
     

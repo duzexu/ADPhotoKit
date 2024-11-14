@@ -142,6 +142,7 @@ private extension ADVideoBrowserCell {
     func configureCell(source: ADVideoSource) {
         imageView.image = nil
         imageView.isHidden = false
+        progressView.isHidden = true
         errorLabel.isHidden = true
         playBtn.isHidden = true
         playerLayer.player = nil

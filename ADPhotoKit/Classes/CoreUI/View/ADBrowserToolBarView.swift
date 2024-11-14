@@ -244,12 +244,23 @@ private extension ADBrowserToolBarView {
                 }
                 #endif
             }
-        case .video(_):
-            #if Module_VideoEdit
-            if config.browserOpts.contains(.allowEditVideo) {
-                editBtn?.isHidden = !selectEnable
+        case let .video(source):
+            switch source {
+            case .network(_):
+                break
+            case .album(_):
+                #if Module_VideoEdit
+                if config.browserOpts.contains(.allowEditVideo) {
+                    editBtn?.isHidden = !selectEnable
+                }
+                #endif
+            case .local(_):
+                #if Module_VideoEdit
+                if config.browserOpts.contains(.allowEditVideo) {
+                    editBtn?.isHidden = !selectEnable
+                }
+                #endif
             }
-            #endif
             originalBtn.alpha = 0
         }
     }
