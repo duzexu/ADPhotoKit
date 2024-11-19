@@ -1,19 +1,19 @@
 //
-//  ADVideoUitls.swift
+//  AVAsset+ADExtension.swift
 //  ADPhotoKit
 //
-//  Created by du on 2024/9/7.
+//  Created by du on 2024/11/14.
 //
 
 import Foundation
 import AVFoundation
 
-class ADVideoUitls {
+extension AVAsset {
     
-    static func getNaturalSize(asset: AVAsset) -> CGSize {
-        if let videoTrack = asset.tracks(withMediaType: .video).first {
+    var naturalSize: CGSize {
+        if let videoTrack = tracks(withMediaType: .video).first {
             var size = videoTrack.naturalSize
-            if isPortraitTrack(videoTrack) {
+            if AVAsset.isPortraitTrack(videoTrack) {
                 swap(&size.width, &size.height)
             }
             return size

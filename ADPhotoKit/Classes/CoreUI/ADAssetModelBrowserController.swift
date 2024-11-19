@@ -43,7 +43,7 @@ class ADAssetModelBrowserController: ADAssetBrowserController {
         didSelectsUpdate()
         if config.browserOpts.contains(.fetchResult) {
             let opt = ADAssetOperation.OptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif), saveEditVideo: config.browserOpts.contains(.saveVideoAfterEdit))
-            listData.fetchSelectResults(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
+            listData.fetchSelectResults(config: opt, inQueue: config.fetchResultQueue) { [weak self] selected in
                 self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }

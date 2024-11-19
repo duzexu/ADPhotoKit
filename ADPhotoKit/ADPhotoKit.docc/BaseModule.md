@@ -12,3 +12,7 @@ Modify configuration for ADPhotoKit.
 
 - <doc:CustomLocalization>
 - ``ADLocale``
+
+### Framework Errors
+
+- ``ADError``

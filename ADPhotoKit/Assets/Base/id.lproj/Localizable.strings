@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "Tidak dapat mengakses semua foto dalam album.\nIzinkan akses ke \"Semua Foto\" di \"Foto\".";
 "textStickerDeleteTips" = "Seret ke sini untuk menghapus";
 "textStickerReleaseToDelete" = "Lepaskan untuk menghapus";
+
+"exportFailed" = "Ekspor gagal";
+"noMusic" = "Belum ada musik";
+"music" = "soundtrack";
+"ost" = "suara asli";
+"lyrics" = "lirik";
+"musicSearch" = "Cari judul lagu/penyanyi/lirik/suasana hati";

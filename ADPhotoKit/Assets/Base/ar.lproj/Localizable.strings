@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "يتعذر الوصول إلى جميع الصور في الألبوم ، يرجى السماح بالوصول إلى كل الصور في الصور .";
 "textStickerDeleteTips" = "اسحب هنا للإزالة";
 "textStickerReleaseToDelete" = "الافراج عن الحذف";
+
+"exportFailed" = "فشل التصدير";
+"noMusic" = "لا توجد موسيقى بعد";
+"music" = "مقطع صوتي";
+"ost" = "الصوت الأصلي";
+"lyrics" = "كلمات";
+"musicSearch" = "البحث عن عنوان الأغنية / المغني / كلمات / المزاج";

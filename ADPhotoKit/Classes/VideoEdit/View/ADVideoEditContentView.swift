@@ -37,7 +37,7 @@ class ADVideoEditContentView: UIView {
         interactTools = interactTools.sorted(by: { t1, t2 in
             return t1.toolInteractView!.zIndex > t2.toolInteractView!.zIndex
         })
-        updateClipRect(imageSize: ADVideoUitls.getNaturalSize(asset: asset))
+        updateClipRect(imageSize: asset.naturalSize)
     }
     
     func thumbnailImage() -> UIImage? {

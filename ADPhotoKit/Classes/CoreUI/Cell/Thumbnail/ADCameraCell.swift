@@ -11,7 +11,17 @@ import AVFoundation
 /// Cell for take asset in thumbnail controller.
 public class ADCameraCell: UICollectionViewCell {
     
-    var imageView: UIImageView!
+    public var selectable: Bool {
+        set {
+            coverView.isHidden = newValue
+        }
+        get {
+            return coverView.isHidden
+        }
+    }
+    
+    private var imageView: UIImageView!
+    private var coverView: UIImageView!
     
     private var session: AVCaptureSession?
     private var deviceInput: AVCaptureDeviceInput?
@@ -27,7 +37,13 @@ public class ADCameraCell: UICollectionViewCell {
         imageView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
-        
+        coverView = UIImageView()
+        coverView.isHidden = true
+        coverView.backgroundColor = UIColor(white: 0, alpha: 0.8)
+        contentView.addSubview(coverView)
+        coverView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
     }
     
     @available(*, unavailable)

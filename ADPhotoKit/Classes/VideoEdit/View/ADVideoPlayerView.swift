@@ -48,7 +48,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         self.asset = asset
         videoPlayerLayer = AVPlayerLayer()
         super.init(frame: .zero)
-        videoSize = ADVideoUitls.getNaturalSize(asset: asset)
+        videoSize = asset.naturalSize
         player = AVPlayer()
         videoPlayerLayer.contentsGravity = .resizeAspect
         layer.insertSublayer(videoPlayerLayer, at: 0)

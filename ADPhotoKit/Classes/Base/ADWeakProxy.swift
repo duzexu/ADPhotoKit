@@ -30,7 +30,7 @@ class ADWeakProxy: NSObject {
     
 }
 
-public class ADWeakRef<T> where T: AnyObject {
+class ADWeakRef<T> where T: AnyObject {
 
     private(set) weak var value: T?
 

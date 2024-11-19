@@ -22,7 +22,7 @@ class ADDefaultVideoExporter: ADVideoExporter {
             handler(nil, ADError.exportSessionCreateFailed)
             return
         }
-        startUpdateContent()
+        startDisplayLink()
         let exportURL = URL(fileURLWithPath: path)
         if exportURL.pathExtension.lowercased() == "mp4" {
             exportSession?.outputFileType = .mp4

@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "No se puede acceder a todas las fotos del álbum.\nPermite el acceso a \"Todas las fotos\" en \"Fotos\".";
 "textStickerDeleteTips" = "Arrastra aquí para eliminar";
 "textStickerReleaseToDelete" = "Liberar para eliminar";
+
+"exportFailed" = "Exportación fallida";
+"noMusic" = "Aún no hay música";
+"music" = "música";
+"ost" = "sonido original";
+"lyrics" = "lírica";
+"musicSearch" = "Buscar título de canción/cantante/letra/estado de ánimo";

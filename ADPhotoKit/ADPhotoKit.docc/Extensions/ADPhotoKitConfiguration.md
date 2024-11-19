@@ -53,12 +53,32 @@
 - ``customBrowserCellRegistor``
 - ``customBrowserCellBlock``
 
+### Custom Capture
+
+- ``AssetCaptureConfig``
+- ``captureConfig``
+- ``customAssetCaptureVCBlock``
+
+### Image Sticker Config
+
+- ``imageStickerDataSource``
+- ``customImageStickerSelectVCBlock``
+
+### Text Sticker Config
+
+- ``customTextStickerEditVCBlock``
+- ``textStickerColors``
+- ``textStickerDefaultColorIndex``
+- ``textStickerDefaultFontSize``
+- ``textStickerDefaultStrokeWidth``
+
 ### ImageEdit Config
 
 - <doc:CustomImageIcons>
 - ``customImageEditBundle``
 - ``systemImageEditTools``
 - ``customImageEditToolsBlock``
+- ``customImageEditVCBlock``
 
 ### ImageEdit Draw Config
 
@@ -66,15 +86,28 @@
 - ``lineDrawDefaultColorIndex``
 - ``lineDrawWidth``
 - ``mosaicDrawWidth``
-
-### ImageEdit Sticker Config
-
-- ``imageStickerDataSource``
-- ``customImageStickerSelectVC``
-- ``customTextStickerEditVCBlock``
-- ``textStickerColors``
-- ``textStickerDefaultColorIndex``
+- ``eraseOutlineWidth``
 
 ### ImageEdit Clip Config
 
 - ``customImageClipVCBlock``
+
+### VideoEdit Config
+
+- <doc:CustomImageIcons>
+- ``customVideoEditBundle``
+- ``systemVideoEditTools``
+- ``customVideoEditToolsBlock``
+- ``customVideoPlayable``
+- ``customVideoEditVCBlock``
+
+### VideoEdit BGM Config
+
+- ``videoMusicDataSource``
+- ``customVideoMusicSelectVCBlock``
+
+### VideoEdit Clip Config
+
+- ``customVideoClipVCBlock``
+
+

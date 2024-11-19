@@ -119,7 +119,7 @@ extension ADImageEditController {
             tools.append(ADImageDraw(style: .line(ADPhotoKitConfiguration.default.lineDrawColors, ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex)))
         }
         if tool.contains(.imageStkr) {
-            if ADPhotoKitConfiguration.default.customImageStickerSelectVC == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
+            if ADPhotoKitConfiguration.default.customImageStickerSelectVCBlock == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
                 fatalError("`imageStickerDataSource` must not be `nil`")
             }
             tools.append(ADImageSticker(style: .image))

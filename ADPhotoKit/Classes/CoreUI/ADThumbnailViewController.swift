@@ -195,7 +195,7 @@ extension ADThumbnailViewController {
     func doneBtnAction() {
         if config.browserOpts.contains(.fetchResult) {
             let opt = ADAssetOperation.OptConfig(isOriginal: toolBarView.isOriginal, selectAsGif: config.assetOpts.contains(.selectAsGif), saveEditVideo: config.browserOpts.contains(.saveVideoAfterEdit))
-            dataSource.fetchSelectResults(config: opt, inQueue: config.fetchImageQueue) { [weak self] selected in
+            dataSource.fetchSelectResults(config: opt, inQueue: config.fetchResultQueue) { [weak self] selected in
                 self?.config.pickerSelect?(selected, self!.toolBarView.isOriginal)
                 self?.navigationController?.dismiss(animated: true, completion: nil)
             }
@@ -210,6 +210,11 @@ extension ADThumbnailViewController {
         let selected = dataSource.selects.count
         let max = config.params.maxCount ?? UInt.max
         let item = dataSource.list[index]
+        if dataSource.selects.firstIndex(where: { (model) -> Bool in
+            return model.identifier == item.identifier
+        }) != nil {
+            return true
+        }
         let itemIsImage = item.type.isImage
 
         func canSelect() -> Bool? {
@@ -326,6 +331,8 @@ extension ADThumbnailViewController {
             dataSource.selectAssetAt(index: at)
             collectionView.reloadData()
             doneBtnAction()
+        }else{
+            collectionView.reloadData()
         }
     }
     #endif
@@ -376,6 +383,8 @@ extension ADThumbnailViewController {
             dataSource.selectAssetAt(index: at)
             collectionView.reloadData()
             doneBtnAction()
+        }else{
+            collectionView.reloadData()
         }
     }
     #endif
@@ -457,6 +466,11 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     }
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let camera = cell as? ADCameraCell {
+            let max = config.params.maxCount ?? UInt.max
+            camera.selectable = dataSource.selects.count < max
+            return
+        }
         guard let c = cell as? ADThumbnailCellConfigurable else {
             return
         }
@@ -535,14 +549,16 @@ extension ADThumbnailViewController: UICollectionViewDataSource, UICollectionVie
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath)
         if cell is ADCameraCell {
-            presentCameraController()
+            if (cell as! ADCameraCell).selectable {
+                presentCameraController()
+            }
         }else if cell is ADAddPhotoCell {
             if #available(iOS 14, *) {
                 PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
             }
         }else if let c = cell as? ADThumbnailCellConfigurable {
             let modify = dataSource.modifyIndexPath(indexPath)
-            if directEdit(index: modify.row) {
+            if c.selectStatus.isEnable && directEdit(index: modify.row) {
                 return
             }
             if !config.assetOpts.contains(.allowBrowser) {

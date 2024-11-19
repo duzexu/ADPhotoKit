@@ -281,7 +281,7 @@ public protocol ADTextStickerEditConfigurable where Self: UIViewController {
 class ADEditConfigure {
     
     static func imageStickerSelectVC() -> ADImageStickerSelectConfigurable {
-        return ADPhotoKitConfiguration.default.customImageStickerSelectVC ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
+        return ADPhotoKitConfiguration.default.customImageStickerSelectVCBlock?() ?? ADImageStickerSelectController(dataSource: ADPhotoKitConfiguration.default.imageStickerDataSource!)
     }
     
     static func textStickerEditVC(sticker: ADTextSticker?) -> ADTextStickerEditConfigurable {

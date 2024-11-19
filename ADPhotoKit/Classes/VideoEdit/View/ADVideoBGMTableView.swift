@@ -35,7 +35,7 @@ class ADVideoBGMTableView: UIView {
         emptyLabel.isHidden = true
         emptyLabel.font = UIFont.systemFont(ofSize: 15)
         emptyLabel.backgroundColor = UIColor.black.withAlphaComponent(0.3)
-        emptyLabel.text = "暂无音乐"
+        emptyLabel.text = ADLocale.LocaleKey.noMusic.localeTextValue
         addSubview(emptyLabel)
         emptyLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -156,8 +156,8 @@ class ADVideoBGMCell: UITableViewCell {
     private var coverMaskView: UIImageView!
     private var checkImageView: UIImageView!
     private var playingView: UIImageView!
-    private var titleView: UILabel!
-    private var lyricsView: UILabel!
+    private var titleView: ADVideoBGMMarqueeTextView!
+    private var lyricsView: ADVideoBGMMarqueeTextView!
     private var gifUrl: URL!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -195,7 +195,7 @@ class ADVideoBGMCell: UITableViewCell {
             make.size.equalTo(CGSize(width: 24, height: 24))
             make.center.equalToSuperview()
         }
-        titleView = UILabel()
+        titleView = ADVideoBGMMarqueeTextView()
         titleView.font = UIFont.systemFont(ofSize: 14)
         titleView.textColor = UIColor.black.withAlphaComponent(0.9)
         contentView.addSubview(titleView)
@@ -204,7 +204,7 @@ class ADVideoBGMCell: UITableViewCell {
             make.trailing.equalToSuperview().offset(-24)
             make.top.equalToSuperview().offset(18)
         }
-        lyricsView = UILabel()
+        lyricsView = ADVideoBGMMarqueeTextView()
         lyricsView.font = UIFont.systemFont(ofSize: 14)
         lyricsView.textColor = UIColor.black.withAlphaComponent(0.3)
         contentView.addSubview(lyricsView)
@@ -245,8 +245,16 @@ class ADVideoBGMCell: UITableViewCell {
         }
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleView.isHighlight = false
+        lyricsView.isHighlight = false
+    }
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+        titleView.isHighlight = selected
+        lyricsView.isHighlight = selected
         if selected {
             playingView.kf.setImage(with: gifUrl)
         }

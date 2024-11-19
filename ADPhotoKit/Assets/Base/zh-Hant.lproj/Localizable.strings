@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "無法訪問相冊中所有照片，\n請允許訪問「照片」中的「所有照片」。";
 "textStickerDeleteTips" = "拖到此處刪除";
 "textStickerReleaseToDelete" = "鬆手即可刪除";
+
+"exportFailed" = "匯出失敗";
+"noMusic" = "暫無音樂";
+"music" = "配樂";
+"ost" = "視訊原聲";
+"lyrics" = "歌词";
+"musicSearch" = "搜尋歌名/歌手/歌詞/情緒";

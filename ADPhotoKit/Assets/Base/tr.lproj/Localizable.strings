@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "Albümdeki tüm fotoğraflara erişilemiyor.\n\"Fotoğraflar\"da \"Tüm Fotoğraflar\"a erişime izin verin.";
 "textStickerDeleteTips" = "Kaldırmak için buraya sürükleyin";
 "textStickerReleaseToDelete" = "Silmek için bırakın";
+
+"exportFailed" = "Dışa aktarma başarısız";
+"noMusic" = "Henüz müzik yok";
+"music" = "müzik";
+"ost" = "özgün ses";
+"lyrics" = "şarkı sözleri";
+"musicSearch" = "Şarkı adını/şarkıcıyı/şarkı sözlerini/ruh halini arayın";

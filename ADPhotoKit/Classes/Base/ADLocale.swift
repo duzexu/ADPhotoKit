@@ -153,6 +153,18 @@ public class ADLocale {
         case keepRecording
         /// Go to Settings (前往设置)
         case gotoSettings
+        /// Export failed (导出失败)
+        case exportFailed
+        /// No music (暂无音乐)
+        case noMusic
+        /// Music (配乐)
+        case music
+        /// OST (视频原声)
+        case ost
+        /// Lyrics (歌词)
+        case lyrics
+        /// Search by name/singer/lyrics/mood (搜索歌名/歌手/歌词/情绪)
+        case musicSearch
         
         /// Return key's localizable text.
         public var localeTextValue: String {

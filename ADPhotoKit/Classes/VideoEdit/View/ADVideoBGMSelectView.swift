@@ -176,7 +176,7 @@ class ADVideoBGMContentView: UIView {
                 make.centerY.equalToSuperview()
             }
             let label = UILabel()
-            label.text = "搜索歌名/歌手/歌词/情绪"
+            label.text = ADLocale.LocaleKey.musicSearch.localeTextValue
             label.font = UIFont.systemFont(ofSize: 17)
             label.textColor = UIColor.black.withAlphaComponent(0.3)
             view.addSubview(label)
@@ -227,7 +227,7 @@ class ADVideoBGMSearchView: UIView, UITextFieldDelegate {
         inputField = UITextField()
         inputField.tintColor = UIColor(hex: 0x07c160)
         inputField.delegate = self
-        inputField.placeholder = "搜索歌名/歌手/歌词/情绪"
+        inputField.placeholder = ADLocale.LocaleKey.musicSearch.localeTextValue
         inputField.font = UIFont.systemFont(ofSize: 17)
         inputField.textColor = UIColor.black.withAlphaComponent(0.9)
         searchBar.addSubview(inputField)
@@ -304,19 +304,19 @@ class ADVideoBGMBottomView: UIView {
     init(wrapper: ADVideoSoundWrapped) {
         self.wrapper = wrapper
         super.init(frame: .zero)
-        musicOnBtn = createBtn(title: "配乐", action: #selector(musicOnAction(_:)))
+        musicOnBtn = createBtn(title: ADLocale.LocaleKey.music.localeTextValue, action: #selector(musicOnAction(_:)))
         addSubview(musicOnBtn)
         musicOnBtn.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
             make.top.equalToSuperview().offset(16)
         }
-        ostOnBtn = createBtn(title: "视频原声", action: #selector(ostOnAction(_:)))
+        ostOnBtn = createBtn(title: ADLocale.LocaleKey.ost.localeTextValue, action: #selector(ostOnAction(_:)))
         addSubview(ostOnBtn)
         ostOnBtn.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-24)
             make.top.equalToSuperview().offset(16)
         }
-        lyricOnBtn = createBtn(title: "歌词", action: #selector(lyricOnAction(_:)))
+        lyricOnBtn = createBtn(title: ADLocale.LocaleKey.lyrics.localeTextValue, action: #selector(lyricOnAction(_:)))
         addSubview(lyricOnBtn)
         lyricOnBtn.snp.makeConstraints { make in
             make.leading.equalTo(musicOnBtn.snp.trailing).offset(24)

@@ -48,9 +48,10 @@ There are 4 subspecs available now:
 | Subspec | Description |
 |---|---|
 | Base | Required. This subspec provides base configuration and extensions. |
-| Core | Optional. This subspec provides raw data. |
-| CoreUI | Optional. The subspec provides ui for photo select. |
-| ImageEdit | Optional. The subspec provides image edit ability. |
+| Core | Optional. This subspec provides raw data. Depend on Base subspec. |
+| CoreUI | Optional. The subspec provides ui for photo select. Depend on Core subspec. |
+| ImageEdit | Optional. The subspec provides image edit ability. Depend on Base subspec. |
+| VideoEdit | Optional. The subspec provides video edit ability. Depend on Base subspec. |
 
 You can install only some of the ADPhotoKit modules. By default, you get `CoreUI` subspecs.
 

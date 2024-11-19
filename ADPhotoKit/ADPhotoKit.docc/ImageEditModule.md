@@ -6,52 +6,21 @@ Provide image editing capabilities.
 
 ### Essentials
 
+- <doc:EditCore>
 - ``ADImageEditConfigurable``
 - ``ADImageEditTools``
 - ``ADImageEditInfo``
 
-###  Edit Tool
+### Edit Tool
 
-- ``ADImageEditToolCodable``
 - ``ADImageEditTool``
-- ``ADToolConfigable``
-- ``ADToolInteractable``
-
 - ``ADSourceImageModify``
 - ``ADSourceImageEditable``
 
-### Clip
+### Image Clip
 
 - ``ADImageClipInfo``
-- ``ADRotation``
 - ``ADImageClipConfigurable``
-
-### Interact View
-
-- ``ADClipingInfo``
-- ``ADInteractStrategy``
-- ``ADInteractType``
-- ``ADInteractZIndex``
-
-### Sticker Interact
-
-- ``ADStickerInfo``
-- ``ADStickerInteractView``
-- ``ADStickerInteractHandle``
-- ``ADStickerContentView``
-- ``ADImageStickerContentView``
-
-### TextSticker
-
-- ``ADTextSticker``
-- ``ADTextStickerColor``
-- ``ADTextStickerEditConfigurable``
-
-### Image Sticker
-
-- ``ADImageStickerInfo``
-- ``ADImageStickerDataSource``
-- ``ADImageStickerSelectConfigurable``
 
 ### Undo & Redo
 

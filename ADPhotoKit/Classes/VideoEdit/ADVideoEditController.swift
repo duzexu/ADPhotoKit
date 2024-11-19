@@ -28,6 +28,7 @@ public struct ADVideoEditTools: OptionSet {
     }
 }
 
+/// Video edit info.
 public struct ADVideoEditInfo {
     
     /// Tools saved data. `Key` is tool's `identifier`.
@@ -84,7 +85,7 @@ class ADVideoEditController: UIViewController, ADVideoEditConfigurable {
         self.asset = asset
         self.editInfo = editInfo ?? ADVideoEditInfo(originAsset: asset)
         self.config = config
-        self.videoSize = ADVideoUitls.getNaturalSize(asset: asset)
+        self.videoSize = asset.naturalSize
         super.init(nibName: nil, bundle: nil)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
@@ -146,7 +147,7 @@ extension ADVideoEditController {
         var tools: [ADVideoEditTool] = []
         let tool = ADPhotoKitConfiguration.default.systemVideoEditTools
         if tool.contains(.imageStkr) {
-            if ADPhotoKitConfiguration.default.customImageStickerSelectVC == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
+            if ADPhotoKitConfiguration.default.customImageStickerSelectVCBlock == nil && ADPhotoKitConfiguration.default.imageStickerDataSource == nil {
                 fatalError("`imageStickerDataSource` must not be `nil`")
             }
             tools.append(ADVideoSticker(style: .image))
@@ -344,7 +345,7 @@ extension ADVideoEditController {
                                     vc.dismiss(animated: false, completion: nil)
                                 }
                             }else{
-                                ADAlert.alert().alert(on: vc, title: nil, message: "视频导出失败\(String(describing: error))", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                                ADAlert.alert().alert(on: vc, title: nil, message: ADLocale.LocaleKey.exportFailed.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                             }
                         }
                     }

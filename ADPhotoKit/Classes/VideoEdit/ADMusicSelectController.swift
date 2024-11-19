@@ -9,30 +9,45 @@ import UIKit
 import AVFoundation
 import Kingfisher
 
+/// Single line lyrics info.
 public struct ADLyricItem {
+    /// Lyric text.
     public let text: String
+    /// Start time.
     public let offset: CGFloat
-    
+    /// Create lyric item.
     public init(text: String, offset: CGFloat) {
         self.text = text
         self.offset = offset
     }
 }
 
-public struct ADMusicItem: Equatable {    
+/// Music info.
+public struct ADMusicItem: Equatable {
+    
+    /// Music extended info.
     public enum Extra {
         case none
+        /// Music lyric.
         case lyric([ADLyricItem])
+        /// Text info.
         case text(String)
     }
     
+    /// Music id.
     public let id: String
+    /// Music asset.
     public let asset: AVAsset
+    /// Music cover.
     public let cover: Kingfisher.Source?
+    /// Music name.
     public let name: String
+    /// Music singer.
     public let singer: String
+    /// Music extended info.
     public let extra: Extra
     
+    /// Create music item.
     public init(id: String, asset: AVAsset, cover: Kingfisher.Source?, name: String, singer: String, extra: Extra = .none) {
         self.id = id
         self.asset = asset
@@ -47,13 +62,20 @@ public struct ADMusicItem: Equatable {
     }
 }
 
+/// Video bgm setting.
 public class ADVideoSound {
+    
+    /// Whether to show lyrics.
     public var lyricOn: Bool = false
+    /// Whether to include the original sound of the video
     public var ostOn: Bool = true
+    /// Video bgm, `nil` means no bgm included.
     public var bgm: ADMusicItem? = nil
+    /// Whether bgm loop play.
     public var bgmLoop: Bool = true
 }
 
+/// Music select datasource.
 public typealias ADVideoMusicDataSource = ((_ keyword: String?, _ completion: (([ADMusicItem]) -> Void)) -> Void)
 
 class ADMusicSelectController: UIViewController, ADVideoMusicSelectConfigurable {
@@ -81,6 +103,8 @@ class ADMusicSelectController: UIViewController, ADVideoMusicSelectConfigurable 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        playableRectUpdate?(bottomHeight, 0, true)
+
         setupUI()
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(singleTapAction(_:)))

@@ -78,7 +78,6 @@ class ADLyricsStickerContentView: ADVideoStickerContentView {
         vc.modalPresentationStyle = .custom
         vc.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
         ctx?.present(vc, animated: true, completion: nil)
-        playableRectUpdate?(vc.bottomHeight, 0, true)
     }
     
     override func playerTimeUpdate(_ time: CMTime) {

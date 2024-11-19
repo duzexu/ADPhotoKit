@@ -102,9 +102,9 @@ public class ADPhotoKitUI {
     /// Wrap of select asset.
     /// - Parameters:
     ///     - asset: Asset select from system.
-    ///     - result: Result fetch with asset. It's `nil` if not contain `ImageEdit` subspec and `browserOpts` not contain `.fetchImage`.
+    ///     - result: Result fetch with asset. It wiil be `nil` if `browserOpts` not contain `.fetchResult` and asset is not edit.
     ///     - error: Error info when fetch error. It's not `nil` when error occur when fetching.
-    /// - Note: If `browserOpts` not contain `.fetchImage`, fetch will not perform and asset will return immediately, `result.image` and `error` will be `nil`.
+    /// - Note: If `browserOpts` not contain `.fetchResult`, fetch will not perform and asset will return immediately.
     public typealias Asset = (asset: PHAsset, result: ADAssetResult?, error: Error?)
     /// Return select assets and if original or not.
     public typealias AssetSelectHandler = (([Asset],Bool) -> Void)
@@ -314,7 +314,7 @@ public class ADPhotoKitConfig {
     
     var isOriginal: Bool = false
     
-    let fetchImageQueue: OperationQueue = OperationQueue()
+    let fetchResultQueue: OperationQueue = OperationQueue()
     
     init(albumOpts: ADAlbumSelectOptions = .default,
          assetOpts: ADAssetSelectOptions = .default,
@@ -384,7 +384,7 @@ public class ADPhotoKitConfig {
         }
         self.params = value
         
-        fetchImageQueue.maxConcurrentOperationCount = 3
+        fetchResultQueue.maxConcurrentOperationCount = 3
     }
 }
 

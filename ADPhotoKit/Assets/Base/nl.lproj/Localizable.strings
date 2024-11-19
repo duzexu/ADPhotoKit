@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "Geen toegang tot alle foto's in het album,\nGeef toegang tot 'Alle foto's' in 'Foto's'.";
 "textStickerDeleteTips" = "Sleep hier om te verwijderen";
 "textStickerReleaseToDelete" = "Laat los om te verwijderen";
+
+"exportFailed" = "Exporteren is mislukt";
+"noMusic" = "Nog geen muziek";
+"music" = "soundtrack";
+"ost" = "origineel geluid";
+"lyrics" = "songteksten";
+"musicSearch" = "Zoek titel van het nummer/zanger/tekst/stemming";

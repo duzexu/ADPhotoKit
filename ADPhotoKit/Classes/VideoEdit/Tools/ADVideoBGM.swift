@@ -36,7 +36,6 @@ class ADVideoBGM: ADVideoEditTool {
         bgm.modalPresentationStyle = .custom
         bgm.transitioningDelegate = ctx as? UIViewControllerTransitioningDelegate
         ctx?.present(bgm, animated: true, completion: nil)
-        playableRectUpdate(bgm.bottomHeight, 0, true)
         return false
     }
     

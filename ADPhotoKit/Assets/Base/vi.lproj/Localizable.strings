@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "Không thể truy cập tất cả ảnh trong album.\nCho phép truy cập vào \"Tất cả ảnh\" trong \"Ành\".";
 "textStickerDeleteTips" = "Kéo vào đây để xóa";
 "textStickerReleaseToDelete" = "Đi để xóa";
+
+"exportFailed" = "Xuất không thành công";
+"noMusic" = "Chưa có nhạc";
+"music" = "nhạc nền";
+"ost" = "âm thanh gốc";
+"lyrics" = "lời bài hát";
+"musicSearch" = "Tìm kiếm tên bài hát/ca sĩ/lời bài hát/tâm trạng";

@@ -8,7 +8,7 @@
 import UIKit
 import CoreMedia
 
-public class ADVideoStickerContentView: ADStickerContentView {
+class ADVideoStickerContentView: ADStickerContentView {
 
     open func playerTimeUpdate(_ time: CMTime) {
         

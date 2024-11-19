@@ -158,11 +158,11 @@ public class ADPhotoKitConfiguration {
     
     /* =============== image sticker =============== */
     
-    /// System image picker data source.
+    /// System image sticker data source.
     public var imageStickerDataSource: ADImageStickerDataSource?
     
     /// Custom image sticker select controller.
-    public var customImageStickerSelectVC: ADImageStickerSelectConfigurable?
+    public var customImageStickerSelectVCBlock: (() -> ADImageStickerSelectConfigurable)?
     
     /* =============== text sticker =============== */
     
@@ -196,7 +196,7 @@ public class ADPhotoKitConfiguration {
     /// - Parameter image: Original image.
     public var customImageEditToolsBlock: ((UIImage) -> [ADImageEditTool])?
     
-    /// Custom image edit edit controller.
+    /// Custom image edit controller.
     public var customImageEditVCBlock: ((UIImage,ADImageEditInfo?) -> ADImageEditConfigurable)?
     
     /* =============== draw =============== */
@@ -232,18 +232,22 @@ public class ADPhotoKitConfiguration {
     /// - Note: If contain `.imageStkr`, you must set `imageStickerDataSource` or `customImageStickerSelectVC`.
     /// - Note: If contain `.bgMusic`, you must set `videoMusicDataSource` or `customVideoMusicSelectVC`.
     public var systemVideoEditTools: ADVideoEditTools = .all
-        
-    public var customVideoPlayable: ADVideoPlayable.Type?
     
     /// User custom video edit tools. Custom tools is default add after system tools.
     public var customVideoEditToolsBlock: (() -> [ADVideoEditTool])?
     
+    /// Custom video edit controller.
     public var customVideoEditVCBlock: ((ADPhotoKitConfig, AVAsset, ADVideoEditInfo?) -> ADVideoEditConfigurable)?
+    
+    /// Custom video player.
+    public var customVideoPlayable: ADVideoPlayable.Type?
     
     /* =============== bgm =============== */
     
+    /// System video bgm data source.
     public var videoMusicDataSource: ADVideoMusicDataSource?
     
+    /// Custom video bgm select controller.
     public var customVideoMusicSelectVCBlock: ((ADVideoSound?) -> ADVideoMusicSelectConfigurable)?
     
     /* =============== clip =============== */

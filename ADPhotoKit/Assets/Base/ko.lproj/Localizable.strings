@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "앨범 사진에 접근할 수 없습니다.\n\"사진\"에서 \"모든 사진\"에 대한 접근을 허용합니다.";
 "textStickerDeleteTips" = "제거하려면 여기로 드래그하세요";
 "textStickerReleaseToDelete" = "삭제하러 가자";
+
+"exportFailed" = "내보내기 실패";
+"noMusic" = "아직 음악이 없습니다";
+"music" = "사운드 트랙";
+"ost" = "오리지널 사운드";
+"lyrics" = "가사";
+"musicSearch" = "노래제목/가수/가사/분위기 검색";

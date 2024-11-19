@@ -11,6 +11,7 @@ ADPhotoKit contains four moudles:
 * Core: Module provides method to get system album data.
 * CoreUI: Module provides ui for asset select.
 * ImageEdit: Module provides image edit ability.
+* VideoEdit: Module provides video edit ability.
 
 ## Features
 
@@ -23,6 +24,7 @@ ADPhotoKit contains four moudles:
 * [x] UIAppearance support.
 * [x] Supports batch export PHAsset to image.
 * [x] Image editor.
+* [x] Video editor.
 * [x] DocC support.
 * [x] SwiftUI support.
 * [x] Custom capture support.
@@ -46,3 +48,4 @@ ADPhotoKit is available under the MIT license. See the LICENSE file for more inf
 - <doc:CoreModule>
 - <doc:CoreUIModule>
 - <doc:ImageEditModule>
+- <doc:VideoEditModule>

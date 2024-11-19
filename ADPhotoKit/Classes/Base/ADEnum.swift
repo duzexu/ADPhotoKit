@@ -7,9 +7,11 @@
 
 import Foundation
 
-/// Error throw by framework.
+/// Errors throw by framework.
 public enum ADError: Error {
+    /// App have no permission to access photo album.
     case noAuthorization
+    /// AVAssetExportSession init failed when export video.
     case exportSessionCreateFailed
 }
 
@@ -23,7 +25,7 @@ public enum ADCapturePreset {
     case photo
 }
 
-// Camera focus mode.
+/// Camera focus mode.
 public enum ADFocusMode {
     case autoFocus
     case continuousAutoFocus

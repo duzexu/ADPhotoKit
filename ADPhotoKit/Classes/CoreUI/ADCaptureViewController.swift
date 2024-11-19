@@ -51,6 +51,10 @@ class ADCaptureViewController: UIViewController, ADAssetCaptureConfigurable {
     private var recordInfos: [(URL,Double)] = []
     private var videoURL: URL?
     
+    #if Module_VideoEdit
+    private var exporter: ADVideoExporter?
+    #endif
+    
     private let captureConfig = ADPhotoKitConfiguration.default.captureConfig
     
     /// Create capture asset controller.
@@ -513,18 +517,61 @@ private extension ADCaptureViewController {
                 self?.videoURL = url
                 if let url = url {
                     self?.playVideo(fileURL: url)
-                }else if let strong = self {
-                    ADAlert.alert().alert(on: strong, title: nil, message: "video merge failed", actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                }else{
+                    print("video merge failed!")
                 }
                 self?.recordInfos.forEach { try? FileManager.default.removeItem(at: $0.0) }
                 self?.recordInfos.removeAll()
+                self?.editVideo()
             }
         }else{
             videoURL = recordInfos[0].0
             playVideo(fileURL: videoURL!)
             recordInfos.removeAll()
+            editVideo()
         }
     }
+    
+    func editVideo() {
+        #if Module_VideoEdit
+        if let url = videoURL, canEditVideo() {
+            let vc = ADVideoEditConfigure.videoEditVC(config: config, asset: AVAsset(url: url), editInfo: nil)
+            vc.cancelEdit = { [weak self] in
+                self?.retakeBtnAction()
+            }
+            vc.videoDidEdit = { [weak self] editInfo in
+                if let edit = editInfo.editUrl {
+                    try? FileManager.default.removeItem(at: url)
+                    self?.videoURL = edit
+                    self?.perform(#selector(self!.doneBtnClick), with: nil, afterDelay: 0.1)
+                }else{
+                    self?.exportEditVideo(editInfo)
+                }
+            }
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: false, completion: nil)
+        }
+        #endif
+    }
+    
+    #if Module_VideoEdit
+    func exportEditVideo(_ info: ADVideoEditInfo) {
+        let hud = ADProgress.progressHUD()
+        hud.show(timeout: 0)
+        let type = ADPhotoKitConfiguration.default.customVideoPlayable ?? ADVideoPlayerView.self
+        exporter = type.exporter(from: info.originAsset, editInfo: info)
+        let path = NSTemporaryDirectory().appending("\(UUID().uuidString).mp4")
+        exporter?.export(to: path) { [weak self] url, error in
+            hud.hide()
+            if let url = url {
+                self?.videoURL = url
+            }
+            DispatchQueue.main.async {
+                self?.doneBtnClick()
+            }
+        }
+    }
+    #endif
     
     func playVideo(fileURL: URL) {
         videoPlayLayer?.isHidden = false
@@ -561,7 +608,7 @@ private extension ADCaptureViewController {
             
             device.unlockForConfiguration()
         } catch {
-            print("相机聚焦设置失败 \(error.localizedDescription)")
+            print("camera focus error: \(error.localizedDescription)")
         }
         focusView.layer.removeAllAnimations()
         focusView.center = point
@@ -607,7 +654,7 @@ private extension ADCaptureViewController {
             device.videoZoomFactor = zoom
             device.unlockForConfiguration()
         } catch {
-            print("调整焦距失败 \(error.localizedDescription)")
+            print("camera zoom error: \(error.localizedDescription)")
         }
     }
     
@@ -624,7 +671,7 @@ private extension ADCaptureViewController {
                 self?.captureDevice?.torchMode = .on
                 self?.captureDevice?.unlockForConfiguration()
             } catch {
-                print("打开手电筒失败 \(error.localizedDescription)")
+                print("open torch error: \(error.localizedDescription)")
             }
         }
     }
@@ -642,7 +689,7 @@ private extension ADCaptureViewController {
                 self?.captureDevice?.torchMode = .off
                 self?.captureDevice?.unlockForConfiguration()
             } catch {
-                print("关闭手电筒失败 \(error.localizedDescription)")
+                print("close torch error: \(error.localizedDescription)")
             }
         }
     }
@@ -668,6 +715,10 @@ private extension ADCaptureViewController {
     
     func canEditImage() -> Bool {
         return config.browserOpts.contains(.allowEditImage) && (config.assetOpts.contains(.editAfterSelectThumbnail) && config.params.maxCount == 1)
+    }
+    
+    func canEditVideo() -> Bool {
+        return config.browserOpts.contains(.allowEditVideo) && (config.assetOpts.contains(.editAfterSelectThumbnail) && config.params.maxCount == 1)
     }
 }
 
@@ -783,7 +834,7 @@ extension ADCaptureViewController: AVCapturePhotoCaptureDelegate {
             }
             
             if photoSampleBuffer == nil || error != nil {
-                print("拍照失败 \(error?.localizedDescription ?? "")")
+                print("take photo error: \(error?.localizedDescription ?? "")")
                 return
             }
             
@@ -803,14 +854,14 @@ extension ADCaptureViewController: AVCapturePhotoCaptureDelegate {
                     }
                     vc.imageDidEdit = { [weak self] editInfo in
                         self?.takedImageView.image = editInfo.editImg
-                        self?.assetCapture?(editInfo.editImg, nil)
+                        self?.perform(#selector(self!.doneBtnClick), with: nil, afterDelay: 0.1)
                     }
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: false, completion: nil)
                 }
 #endif
             } else {
-                print("拍照失败，data为空")
+                print("take photo error: data is nil")
             }
         }
     }
@@ -848,7 +899,7 @@ extension ADCaptureViewController: AVCaptureFileOutputRecordingDelegate {
                 recordInfos.removeAll()
                 DispatchQueue.main.async {
                     self.refreshUI()
-                    ADAlert.alert().alert(on: self, title: nil, message: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
+                    ADAlert.alert().alert(on: self, title: nil, message: String(format: ADLocale.LocaleKey.minRecordTimeTips.localeTextValue, self.config.params.minRecordTime), actions: [.default(ADLocale.LocaleKey.ok.localeTextValue)], completion: nil)
                 }
                 return
             }
@@ -902,7 +953,7 @@ private extension ADCaptureViewController {
         }
         
         var size = assetVideoTracks[0].naturalSize
-        if isPortraitVideoTrack(assetVideoTracks[0]) {
+        if AVAsset.isPortraitTrack(assetVideoTracks[0]) {
             swap(&size.width, &size.height)
         }
         
@@ -948,19 +999,4 @@ private extension ADCaptureViewController {
         })
     }
     
-    func isPortraitVideoTrack(_ track: AVAssetTrack) -> Bool {
-        let transform = track.preferredTransform
-        let tfA = transform.a
-        let tfB = transform.b
-        let tfC = transform.c
-        let tfD = transform.d
-        
-        if (tfA == 0 && tfB == 1 && tfC == -1 && tfD == 0) ||
-            (tfA == 0 && tfB == 1 && tfC == 1 && tfD == 0) ||
-            (tfA == 0 && tfB == -1 && tfC == 1 && tfD == 0) {
-            return true
-        } else {
-            return false
-        }
-    }
 }

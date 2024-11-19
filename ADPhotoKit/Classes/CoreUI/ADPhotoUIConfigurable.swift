@@ -48,6 +48,9 @@ public protocol ADThumbnailNavBarConfigurable where Self: UIView {
     /// Called when select album model changed.
     var reloadAlbumBlock: ((ADAlbumModel)->Void)? { set get }
     /// Create with the style of bar.
+    /// - Parameters:
+    ///   - style: Picker style.
+    ///   - config: The config pass through.
     init(style: ADPickerStyle, config: ADPhotoKitConfig)
     
 }

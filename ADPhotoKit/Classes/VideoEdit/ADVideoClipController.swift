@@ -10,10 +10,16 @@ import AVFoundation
 
 /// Video clip info.
 public struct ADVideoClipInfo {
+    
+    /// Origin video asset.
     public let asset: AVAsset
+    
+    /// Normalized min video edit time. `nil` means no limit.
     public let normalizeMinTime: CGFloat?
+    /// Normalized max video edit time. `nil` means no limit.
     public let normalizeMaxTime: CGFloat?
     
+    /// Video clip range.
     public var clipRange: CMTimeRange?
 }
 

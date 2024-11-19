@@ -75,3 +75,10 @@
 "unableToAccessAllPhotos" = "アルバム内のすべての写真にアクセスできません。\n「写真」内の「すべての写真」 へのアクセスを許可してください。";
 "textStickerDeleteTips" = "ここにドラッグして削除します";
 "textStickerReleaseToDelete" = "削除するために行こう";
+
+"exportFailed" = "エクスポート失敗";
+"noMusic" = "まだ音楽がありません";
+"music" = "サウンドトラック";
+"ost" = "オリジナルサウンド";
+"lyrics" = "歌詞";
+"musicSearch" = "曲名/歌手/歌詞/雰囲気を検索";
