@@ -218,6 +218,8 @@ public class ADAssetImageDataProvider: ImageDataProvider {
                     guard let strong = self else { return }
                     if let av = asset as? AVAsset {
                         let generator = AVAssetImageGenerator(asset: av)
+                        generator.appliesPreferredTrackTransform = true
+                        generator.apertureMode = .encodedPixels
                         generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: strong.time)]) {
                             (requestedTime, image, imageTime, result, error) in
                             if let error = error {

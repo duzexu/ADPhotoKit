@@ -207,6 +207,8 @@ extension ADEditControlsView: UICollectionViewDataSource, UICollectionViewDelega
             selectToolIndex = nil
         }else if tool.toolDidSelect(ctx: vc) {
             selectToolIndex = indexPath.row
+        }else{
+            selectToolIndex = nil
         }
     }
 }

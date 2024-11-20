@@ -1013,10 +1013,65 @@ class ViewController: UIViewController {
         let customConfig = ConfigSection(title: "CustomUIConfig", models: customModels)
         dataSource.append(customConfig)
         
-        var imageEditModels: [ConfigModel] = []
-      
+#if Module_ImageEdit || Module_VideoEdit
+        var editModels: [ConfigModel] = []
+        
+        let textColors = ConfigModel(title: "Text Colors", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.white,.black,.gray),(.black,.white,.gray)]
+                }else{
+                    ADPhotoKitConfiguration.default.textStickerColors = [(.systemBlue,.black,.gray),(.systemGray,.white,.gray)]
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        editModels.append(textColors)
+        
+        let colorIndex = ConfigModel(title: "Default Color Index", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex = 1
+                }else{
+                    ADPhotoKitConfiguration.default.lineDrawDefaultColorIndex = 0
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        editModels.append(colorIndex)
+        
+        let fontSize = ConfigModel(title: "Default Font Size", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.textStickerDefaultFontSize = 32
+                }else{
+                    ADPhotoKitConfiguration.default.textStickerDefaultFontSize = 40
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        editModels.append(fontSize)
+        
+        let strokeWidth = ConfigModel(title: "Default Stroke Width", mode: .switch(true)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.textStickerDefaultStrokeWidth = 6
+                }else{
+                    ADPhotoKitConfiguration.default.textStickerDefaultStrokeWidth = 10
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        editModels.append(strokeWidth)
+        
+        let editConfig = ConfigSection(title: "EditConfig", models: editModels)
+        dataSource.append(editConfig)
+#endif
+        
 #if Module_ImageEdit
-        let systenTools = ConfigModel(title: "System Tools", mode: .switch(true)) { (value) in
+        var imageEditModels: [ConfigModel] = []
+        
+        let imageTools = ConfigModel(title: "System Tools", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
                     ADPhotoKitConfiguration.default.systemImageEditTools = .all
@@ -1026,9 +1081,9 @@ class ViewController: UIViewController {
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
-        imageEditModels.append(systenTools)
+        imageEditModels.append(imageTools)
         
-        let filter = ConfigModel(title: "Image Filter", mode: .switch(false)) { (value) in
+        let imagefilter = ConfigModel(title: "Image Filter", mode: .switch(false)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
                     ADPhotoKitConfiguration.default.customImageEditToolsBlock = { image in
@@ -1040,7 +1095,7 @@ class ViewController: UIViewController {
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
-        imageEditModels.append(filter)
+        imageEditModels.append(imagefilter)
         
         let drawColors = ConfigModel(title: "Draw Colors", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
@@ -1069,24 +1124,54 @@ class ViewController: UIViewController {
             }
         }
         imageEditModels.append(mosaicWidth)
+        
+        let eraseOutlineWidth = ConfigModel(title: "Erase Outline Width", mode: .stepper(8)) { (value) in
+            if let count = value as? Int {
+                ADPhotoKitConfiguration.default.eraseOutlineWidth = CGFloat(count)
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        imageEditModels.append(eraseOutlineWidth)
+        
+        let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
+        dataSource.append(imageEditConfig)
 #endif
         
-#if Module_ImageEdit || Module_VideoEdit
-        let textColors = ConfigModel(title: "Text Colors", mode: .switch(true)) { (value) in
+#if Module_VideoEdit
+        var videoEditModels: [ConfigModel] = []
+        
+        let videoTools = ConfigModel(title: "System Tools", mode: .switch(true)) { (value) in
             if let isOn = value as? Bool {
                 if isOn {
-                    ADPhotoKitConfiguration.default.textStickerColors = [(.white,.black,.gray),(.black,.white,.gray)]
+                    ADPhotoKitConfiguration.default.systemVideoEditTools = .all
                 }else{
-                    ADPhotoKitConfiguration.default.textStickerColors = [(.systemBlue,.black,.gray),(.systemGray,.white,.gray)]
+                    ADPhotoKitConfiguration.default.systemVideoEditTools = [.clip, .textStkr]
                 }
                 ProgressHUD.showSuccess("Update Success!")
             }
         }
-        imageEditModels.append(textColors)
+        videoEditModels.append(videoTools)
+        
+        let videofilter = ConfigModel(title: "Video Filter", mode: .switch(false)) { (value) in
+            if let isOn = value as? Bool {
+                if isOn {
+                    ADPhotoKitConfiguration.default.customVideoEditToolsBlock = { asset in
+                        return [VideoFilterTool(asset: asset)]
+                    }
+                    ADPhotoKitConfiguration.default.customVideoPlayable = VideoPlayerView.self
+                }else{
+                    ADPhotoKitConfiguration.default.customVideoEditToolsBlock = nil
+                    ADPhotoKitConfiguration.default.customVideoPlayable = nil
+                }
+                ProgressHUD.showSuccess("Update Success!")
+            }
+        }
+        videoEditModels.append(videofilter)
+        
+        let videoEditConfig = ConfigSection(title: "VideoEditConfig", models: videoEditModels)
+        dataSource.append(videoEditConfig)
 #endif
         
-        let imageEditConfig = ConfigSection(title: "ImageEditConfig", models: imageEditModels)
-        dataSource.append(imageEditConfig)
     }
     
     @IBAction func pushDemos() {

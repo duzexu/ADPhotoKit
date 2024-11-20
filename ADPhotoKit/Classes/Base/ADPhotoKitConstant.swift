@@ -28,7 +28,7 @@ let screenBounds:CGRect = { return UIScreen.main.bounds }()
 let screenWidth:CGFloat = { return UIScreen.main.bounds.size.width }()
 let screenHeight:CGFloat = { return UIScreen.main.bounds.size.height }()
 
-///包含 iPhone12 mini
+/// 包含 iPhone12 mini
 let isPhoneXOrLater:Bool = { return isPhone && screenHeight >= 812.0 }()
 
 let statusBarHeight: CGFloat = UIApplication.shared.statusBarFrame.height

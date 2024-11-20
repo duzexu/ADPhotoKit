@@ -235,7 +235,7 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
             descLabel.text = ""
             imageView.image = imageEdit
             bottomMaskView.isHidden = false
-            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+            tagImageView.image = Bundle.image(name: "ImageEditedIcon", module: .imageEdit)
             return
         }
         #endif
@@ -243,7 +243,7 @@ extension ADThumbnailListCell: ADThumbnailCellConfigurable {
         if let videoEdit = model.videoEditInfo?.editThumbnail {
             imageView.image = videoEdit
             bottomMaskView.isHidden = false
-            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .videoEdit)
+            tagImageView.image = Bundle.image(name: "VideoEditedIcon", module: .videoEdit)
             return
         }
         #endif

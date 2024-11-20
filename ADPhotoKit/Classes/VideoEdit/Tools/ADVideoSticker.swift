@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import UIKit
 
 class ADVideoSticker: ADVideoEditTool {
     
     var image: UIImage {
         switch style {
         case .text:
-            return Bundle.image(name: "icons_filled_text", module: .videoEdit) ?? UIImage()
+            return Bundle.image(name: "video_filled_text", module: .videoEdit) ?? UIImage()
         case .image:
-            return Bundle.image(name: "icons_filled_sticker", module: .videoEdit) ?? UIImage()
+            return Bundle.image(name: "video_filled_sticker", module: .videoEdit) ?? UIImage()
         }
     }
     

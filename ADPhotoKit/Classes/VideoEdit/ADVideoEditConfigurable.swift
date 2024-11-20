@@ -16,6 +16,7 @@ public protocol ADVideoEditTool: ADEditTool {
     var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)! { set get }
     
     /// View to preview edit video.
+    /// - Note: This property is initialized and set by the system. Classes that implement this protocol should declare this property as weak.
     var videoPlayable: ADVideoPlayable? { set get }
     
 }

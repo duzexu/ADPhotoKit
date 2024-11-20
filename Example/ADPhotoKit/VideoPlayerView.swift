@@ -1,22 +1,37 @@
 //
-//  ADVideoPlayerView.swift
-//  ADPhotoKit
+//  VideoPlayerView.swift
+//  ADPhotoKit_Example
 //
-//  Created by du on 2024/9/7.
+//  Created by du on 2024/11/19.
+//  Copyright © 2024 CocoaPods. All rights reserved.
 //
 
 import UIKit
+import ADPhotoKit
 import AVFoundation
 
-class Observer {
-    var target: ((CGFloat, CMTime)->Void)
+#if Module_VideoEdit
+class VideoPlayerView: UIView, ADVideoPlayable {
     
-    init(target: @escaping (CGFloat, CMTime) -> Void) {
-        self.target = target
+    class Observer {
+        var target: ((CGFloat, CMTime)->Void)
+        
+        init(target: @escaping (CGFloat, CMTime) -> Void) {
+            self.target = target
+        }
     }
-}
-
-class ADVideoPlayerView: UIView, ADVideoPlayable {
+    
+    class TargetProxy {
+        private weak var target: VideoPlayerView?
+        
+        init(target: VideoPlayerView) {
+            self.target = target
+        }
+        
+        @objc func onScreenUpdate() {
+            target?.onRenderFrame()
+        }
+    }
     
     let asset: AVAsset
     var clipRange: CMTimeRange? {
@@ -34,6 +49,27 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         }
     }
     
+    var filterIndex: Int = -1 {
+        didSet {
+            if filterIndex >= 0 {
+                filter = CIFilter(name: VideoFilter.allCases[filterIndex].filterName)
+                if displayLink == nil {
+                    let _displayLink = CADisplayLink(target: TargetProxy(target: self), selector: #selector(TargetProxy.onScreenUpdate))
+                    _displayLink.add(to: .main, forMode: .default)
+                    displayLink = _displayLink
+                }
+            }else{
+                filter = nil
+                displayLink?.invalidate()
+                displayLink = nil
+            }
+        }
+    }
+    
+    static func exporter(from asset: AVAsset, editInfo: ADVideoEditInfo) -> ADVideoExporter {
+        return VideoExporter(asset: asset, editInfo: editInfo)
+    }
+    
     private var composition: AVMutableComposition!
     private var playerItem: AVPlayerItem!
     private var lastBgm: String?
@@ -42,6 +78,13 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     private var player: AVPlayer!
     private var videoPlayerLayer: AVPlayerLayer!
+    
+    private var videoOutput: AVPlayerItemVideoOutput!
+    private var displayLink: CADisplayLink?
+    private var ciContext: CIContext = CIContext()
+    private var filter: CIFilter?
+    private var renderImageView: UIImageView!
+    private var videoTransform: CGAffineTransform = .identity
 
     required init(asset: AVAsset) {
         self.asset = asset
@@ -54,6 +97,12 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
         player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 60), queue: DispatchQueue.main) { [weak self] time in
             self?.playerTimeUpdate(time)
         }
+        renderImageView = UIImageView()
+        renderImageView.contentMode = .scaleAspectFit
+        addSubview(renderImageView)
+        renderImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         resetEdit()
     }
     
@@ -64,6 +113,7 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        displayLink?.invalidate()
     }
     
     override func layoutSubviews() {
@@ -97,17 +147,18 @@ class ADVideoPlayerView: UIView, ADVideoPlayable {
     
 }
 
-extension ADVideoPlayerView {
+extension VideoPlayerView {
     
     func resetEdit() {
         composition = AVMutableComposition()
-
+        
         let timeRange = clipRange ?? CMTimeRange(start: .zero, duration: asset.duration)
         
         let videoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         if let video = asset.tracks(withMediaType: .video).first {
             videoTrack?.preferredTransform = video.preferredTransform
             try? videoTrack?.insertTimeRange(timeRange, of: video, at: .zero)
+            videoTransform = video.preferredTransform
         }
         
         let audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
@@ -137,6 +188,11 @@ extension ADVideoPlayerView {
         }
         
         playerItem = AVPlayerItem(asset: composition)
+        let outputSettings: [String: Any] = [
+                    (kCVPixelBufferPixelFormatTypeKey as String): kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+                ]
+        videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: outputSettings)
+        playerItem.add(videoOutput)
         let audioMix = AVMutableAudioMix()
         let audioParameters = AVMutableAudioMixInputParameters(track: audioTrack!)
         audioParameters.setVolume(videoSound.ostOn ? 1 : 0, at: .zero)
@@ -160,7 +216,7 @@ extension ADVideoPlayerView {
                 let inputParameters = AVMutableAudioMixInputParameters(track: track)
                 inputParameters.setVolume(videoSound.ostOn ? 1 : 0, at: .zero)
                 audioMixInputParameters.append(inputParameters)
-            } 
+            }
             if track.trackID == 3 {
                 let inputParameters = AVMutableAudioMixInputParameters(track: track)
                 inputParameters.setVolume(videoSound.bgm != nil ? 1 : 0, at: .zero)
@@ -171,6 +227,12 @@ extension ADVideoPlayerView {
         audioMix.inputParameters = audioMixInputParameters
         playerItem.audioMix = audioMix
     }
+}
+
+extension VideoPlayerView {
+    @objc func playDidFinish() {
+        pause(seekToZero: true)
+    }
     
     func playerTimeUpdate(_ time: CMTime) {
         let duration = clipRange?.duration.seconds ?? asset.duration.seconds
@@ -179,10 +241,28 @@ extension ADVideoPlayerView {
             item.target(progress, time)
         }
     }
-}
+    
+    func onRenderFrame() {
+        guard let filter = filter else {
+            renderImageView.image = nil
+            return
+        }
+        
+        guard let time = player.currentItem?.currentTime() else { return }
 
-extension ADVideoPlayerView {
-    @objc func playDidFinish() {
-        pause(seekToZero: true)
+        guard videoOutput.hasNewPixelBuffer(forItemTime: time), let pixelBuffer = videoOutput.copyPixelBuffer(forItemTime: time, itemTimeForDisplay: nil) else {
+            return
+        }
+
+        let inputImage = CIImage(cvPixelBuffer: pixelBuffer).transformed(by: videoTransform.inverted())
+        filter.setValue(inputImage, forKey: kCIInputImageKey)
+        guard let outputImage = filter.outputImage else { return }
+        
+        if let cgImage = ciContext.createCGImage(outputImage, from: inputImage.extent) {
+            DispatchQueue.main.async {
+                self.renderImageView.image = UIImage(cgImage: cgImage)
+            }
+        }
     }
 }
+#endif

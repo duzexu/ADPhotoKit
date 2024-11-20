@@ -9,8 +9,8 @@
 import UIKit
 import ADPhotoKit
 
-#if Module_ImageEdit
-class ImageFilterSelectView: UIView, ADToolConfigable {
+#if Module_ImageEdit || Module_VideoEdit
+class FilterSelectView: UIView, ADToolConfigable {
 
     weak var dataSource: (UICollectionViewDataSource & UICollectionViewDelegate)?
     

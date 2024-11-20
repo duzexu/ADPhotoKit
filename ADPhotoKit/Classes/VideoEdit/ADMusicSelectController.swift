@@ -73,6 +73,14 @@ public class ADVideoSound {
     public var bgm: ADMusicItem? = nil
     /// Whether bgm loop play.
     public var bgmLoop: Bool = true
+    
+    /// Create video sound.
+    public init(lyricOn: Bool = false, ostOn: Bool = true, bgm: ADMusicItem? = nil, bgmLoop: Bool = true) {
+        self.lyricOn = lyricOn
+        self.ostOn = ostOn
+        self.bgm = bgm
+        self.bgmLoop = bgmLoop
+    }
 }
 
 /// Music select datasource.

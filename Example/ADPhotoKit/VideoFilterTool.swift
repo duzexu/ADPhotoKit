@@ -1,16 +1,17 @@
 //
-//  ImageFilterTool.swift
+//  VideoFilterTool.swift
 //  ADPhotoKit_Example
 //
-//  Created by xu on 2021/9/16.
-//  Copyright © 2021 CocoaPods. All rights reserved.
+//  Created by du on 2024/11/19.
+//  Copyright © 2024 CocoaPods. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import ADPhotoKit
+import AVFoundation
 
-#if Module_ImageEdit
-enum ImageFilter: CaseIterable {
+#if Module_VideoEdit
+enum VideoFilter: CaseIterable {
     case none
     case chrome
     case fade
@@ -71,23 +72,10 @@ enum ImageFilter: CaseIterable {
     }
 }
 
-enum FilterActionData {
-    case update(old: Int, new: Int)
-}
-
-class FilterAction: ADEditAction {
-    var data: FilterActionData
-    var identifier: String
+class VideoFilterTool: NSObject, ADVideoEditTool {
+    var playableRectUpdate: ((CGFloat, CGFloat, Bool) -> Void)!
     
-    init(data: FilterActionData, identifier: String) {
-        self.data = data
-        self.identifier = identifier
-    }
-}
-
-class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
-    
-    var modifySourceImage: ((UIImage) -> Void)?
+    weak var videoPlayable: ADVideoPlayable?
     
     var image: UIImage {
         return UIImage(named: "filter")!
@@ -103,18 +91,20 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
         return selectIndex != -1
     }
     
-    var contentLockStatus: ((Bool) -> Void)?
-    
     var toolConfigView: ADToolConfigable?
     
     var toolInteractView: ADToolInteractable?
+    
+    private var filterInfos: [(String,UIImage)] = []
+    private var filterImages: [UIImage] = []
+    private var selectIndex: Int = -1
     
     func toolDidSelect(ctx: UIViewController?) -> Bool {
         return true
     }
     
     var identifier: String {
-        return "com.adphoto.demo.imagefilter"
+        return "com.adphoto.demo.videofilter"
     }
     
     func encode() -> Any? {
@@ -128,84 +118,38 @@ class ImageFilterTool: NSObject, ADImageEditTool, ADSourceImageEditable {
         indexDidChange()
     }
     
-    let originImage: UIImage
-    var filterInfos: [(String,UIImage)] = []
-    var filterImages: [UIImage] = []
-    var selectIndex: Int = -1
-    
-    init(image: UIImage, filters: [ImageFilter] = ImageFilter.allCases) {
-        originImage = image
+    init(asset: AVAsset, filters: [VideoFilter] = VideoFilter.allCases) {
         super.init()
-        
-        let thumbnail = generateThumbnailImage(img: image) ?? image
-        
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.apertureMode = .encodedPixels
+        generator.generateCGImagesAsynchronously(forTimes: [NSValue(time: .zero)]) { [weak self] _, cgImage, _, result, error in
+            if result == .succeeded, let cg = cgImage {
+                let image = UIImage(cgImage: cg)
+                DispatchQueue.global().async {
+                    for filter in filters {
+                        let img = filter.process(img: image)
+                        self?.filterInfos.append((filter.name,img))
+                        self?.filterImages.append(filter.process(img: image))
+                    }
+                    DispatchQueue.main.async {
+                        self?.indexDidChange()
+                    }
+                }
+            }
+        }
         let selectV = FilterSelectView(dataSource: self)
         toolConfigView = selectV
-        
-        DispatchQueue.global().async {
-            for filter in filters {
-                let img = filter.process(img: thumbnail)
-                self.filterInfos.append((filter.name,img))
-                self.filterImages.append(filter.process(img: image))
-            }
-            DispatchQueue.main.async {
-                self.indexDidChange()
-            }
-        }
-        
-        func generateThumbnailImage(img: UIImage) -> UIImage? {
-            let size: CGSize
-            let ratio = (img.size.width / img.size.height)
-            let fixLength: CGFloat = 200
-            if ratio >= 1 {
-                size = CGSize(width: fixLength * ratio, height: fixLength)
-            } else {
-                size = CGSize(width: fixLength, height: fixLength / ratio)
-            }
-            UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-            img.draw(in: CGRect(origin: .zero, size: size))
-            let result = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            return result
-        }
     }
     
     func indexDidChange() {
-        guard selectIndex >= 0 else {
-            (toolConfigView as? FilterSelectView)?.collectionView.reloadData()
-            modifySourceImage?(originImage)
-            return
-        }
-        guard selectIndex < filterImages.count else {
-            return
-        }
+        (videoPlayable as? VideoPlayerView)?.filterIndex = selectIndex
         (toolConfigView as? FilterSelectView)?.collectionView.reloadData()
-        modifySourceImage?(filterImages[selectIndex])
     }
-    
-    func undo(action: any ADEditAction) {
-        if let action = action as? FilterAction {
-            switch action.data {
-            case .update(let old, _):
-                selectIndex = old
-                indexDidChange()
-            }
-        }
-    }
-    
-    func redo(action: any ADEditAction) {
-        if let action = action as? FilterAction {
-            switch action.data {
-            case .update(_, let new):
-                selectIndex = new
-                indexDidChange()
-            }
-        }
-    }
-    
 }
 
-extension ImageFilterTool: UICollectionViewDataSource, UICollectionViewDelegate {
+
+extension VideoFilterTool: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filterInfos.count
     }
@@ -227,7 +171,6 @@ extension ImageFilterTool: UICollectionViewDataSource, UICollectionViewDelegate 
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        undoManager.push(action: FilterAction(data: .update(old: selectIndex, new: indexPath.row), identifier: identifier))
         selectIndex = indexPath.row
         indexDidChange()
     }

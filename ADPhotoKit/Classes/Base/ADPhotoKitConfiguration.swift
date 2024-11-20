@@ -234,13 +234,14 @@ public class ADPhotoKitConfiguration {
     public var systemVideoEditTools: ADVideoEditTools = .all
     
     /// User custom video edit tools. Custom tools is default add after system tools.
-    public var customVideoEditToolsBlock: (() -> [ADVideoEditTool])?
-    
-    /// Custom video edit controller.
-    public var customVideoEditVCBlock: ((ADPhotoKitConfig, AVAsset, ADVideoEditInfo?) -> ADVideoEditConfigurable)?
+    /// - Note: Usually when you add a custom `ADVideoEditTool`, you need to set `customVideoPlayable` at the same time to respond to the modification of the corresponding tool.
+    public var customVideoEditToolsBlock: ((AVAsset) -> [ADVideoEditTool])?
     
     /// Custom video player.
     public var customVideoPlayable: ADVideoPlayable.Type?
+    
+    /// Custom video edit controller.
+    public var customVideoEditVCBlock: ((ADPhotoKitConfig, AVAsset, ADVideoEditInfo?) -> ADVideoEditConfigurable)?
     
     /* =============== bgm =============== */
     

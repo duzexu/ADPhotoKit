@@ -10,7 +10,8 @@ import AVFoundation
 
 extension AVAsset {
     
-    var naturalSize: CGSize {
+    /// Return asset naturalSize.
+    public var naturalSize: CGSize {
         if let videoTrack = tracks(withMediaType: .video).first {
             var size = videoTrack.naturalSize
             if AVAsset.isPortraitTrack(videoTrack) {

@@ -59,7 +59,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         if model.imageEditInfo != nil {
             imageView.image = model.imageEditInfo?.editImg
             tagImageView.isHidden = false
-            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .imageEdit)
+            tagImageView.image = Bundle.image(name: "ImageEditedIcon", module: .imageEdit)
             return
         }
         #endif
@@ -67,7 +67,7 @@ public class ADBrowserToolBarCell: UICollectionViewCell {
         if model.videoEditInfo != nil {
             imageView.image = model.videoEditInfo?.editThumbnail
             tagImageView.isHidden = false
-            tagImageView.image = Bundle.image(name: "EditedIcon_Normal", module: .videoEdit)
+            tagImageView.image = Bundle.image(name: "VideoEditedIcon", module: .videoEdit)
             return
         }
         #endif

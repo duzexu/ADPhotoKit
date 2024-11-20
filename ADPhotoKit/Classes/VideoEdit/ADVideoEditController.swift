@@ -171,7 +171,7 @@ extension ADVideoEditController {
             let clip = ADVideoClip(asset: asset, min: min, max: max)
             tools.append(clip)
         }
-        if let custom = ADPhotoKitConfiguration.default.customVideoEditToolsBlock?() {
+        if let custom = ADPhotoKitConfiguration.default.customVideoEditToolsBlock?(asset) {
             tools.append(contentsOf: custom)
         }
         
