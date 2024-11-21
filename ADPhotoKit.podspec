@@ -75,6 +75,7 @@ Pod::Spec.new do |s|
   s.subspec "VideoEdit" do |video|
     video.dependency 'ADPhotoKit/Base'
     video.dependency 'SnapKit'
+    video.dependency 'Kingfisher'
     video.source_files  = ["ADPhotoKit/Classes/VideoEdit/**/*.swift","ADPhotoKit/Classes/EditCore/**/*.swift"]
     video.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => 'Module_VideoEdit'}
     video.resource_bundles = {

@@ -22,7 +22,9 @@ class ADAssetOperation: Operation {
     let completion: ((ADPhotoKitUI.Asset) -> Void)
     
     private var requestID: PHImageRequestID?
+    #if Module_VideoEdit
     private var exporter: ADVideoExporter?
+    #endif
     
     private var _isFinished: Bool = false {
         willSet { willChangeValue(forKey: "isFinished") }
