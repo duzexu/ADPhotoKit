@@ -72,8 +72,12 @@ public struct ADConstraintParams {
 
 extension ADSelectAssetModel {
     func result(image: UIImage?) -> ADAssetResult? {
-        #if Module_ImageEdit || Module_VideoEdit
+        #if Module_ImageEdit && Module_VideoEdit
         return ADAssetResult(image: image, asset: nil, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
+        #elseif Module_ImageEdit
+        return ADAssetResult(image: image, asset: nil, imageEditInfo: imageEditInfo)
+        #elseif Module_VideoEdit
+        return ADAssetResult(image: image, asset: nil, videoEditInfo: videoEditInfo)
         #else
         if let img = image {
             return ADAssetResult(image: img, asset: nil)
@@ -84,8 +88,12 @@ extension ADSelectAssetModel {
     }
     
     func result(asset: AVAsset?) -> ADAssetResult? {
-        #if Module_ImageEdit || Module_VideoEdit
+        #if Module_ImageEdit && Module_VideoEdit
         return ADAssetResult(image: nil, asset: asset, imageEditInfo: imageEditInfo, videoEditInfo: videoEditInfo)
+        #elseif Module_ImageEdit
+        return ADAssetResult(image: nil, asset: asset, imageEditInfo: imageEditInfo)
+        #elseif Module_VideoEdit
+        return ADAssetResult(image: nil, asset: asset, videoEditInfo: videoEditInfo)
         #else
         if let asset = asset {
             return ADAssetResult(image: nil, asset: asset)
